@@ -15,8 +15,8 @@ libdazzle_public_headers = [
   'actions/dzl-child-property-action.h',
   'actions/dzl-settings-flag-action.h',
   'actions/dzl-widget-action-group.h',
+
   'animation/dzl-animation.h',
-  'animation/dzl-frame-source.h',
 
   'bindings/dzl-binding-group.h',
   'bindings/dzl-signal-group.h',
@@ -101,7 +101,6 @@ libdazzle_public_sources = [
   'actions/dzl-widget-action-group.c',
 
   'animation/dzl-animation.c',
-  'animation/dzl-frame-source.c',
 
   'bindings/dzl-binding-group.c',
   'bindings/dzl-signal-group.c',
@@ -186,6 +185,9 @@ libdazzle_sources = [
   libdazzle_generated_headers,
   libdazzle_public_headers,
   libdazzle_public_sources,
+
+  'animation/dzl-frame-source.c',
+  'animation/dzl-frame-source.h',
 
   'panel/dzl-dock-bin-edge-private.h',
   'panel/dzl-dock-paned-private.h',
