@@ -17,6 +17,7 @@ libdazzle_public_headers = [
   'actions/dzl-widget-action-group.h',
 
   'animation/dzl-animation.h',
+  'animation/dzl-box-theatric.h',
 
   'bindings/dzl-binding-group.h',
   'bindings/dzl-signal-group.h',
@@ -105,6 +106,7 @@ libdazzle_public_sources = [
   'actions/dzl-widget-action-group.c',
 
   'animation/dzl-animation.c',
+  'animation/dzl-box-theatric.c',
 
   'bindings/dzl-binding-group.c',
   'bindings/dzl-signal-group.c',
