@@ -1,0 +1,156 @@
+dzltab {
+  background-image: none;
+  background-color: transparent;
+  border-style: solid;
+  border-width: 2px;
+  border-color: transparent;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+
+dzltab:hover:checked,
+dzltab:checked {
+  border-color: transparent;
+  border-bottom-color: @theme_selected_bg_color;
+}
+
+dzltab:hover {
+  border-color: transparent;
+  border-bottom-color: @borders;
+}
+
+dzltab label {
+  color: @theme_fg_color;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+dzltab button {
+  border: none;
+  color: transparent;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+dzltab button:hover,
+dzltab button:checked,
+dzltab:hover button,
+dzltab:checked button {
+  color: alpha(@theme_fg_color, 0.55);
+}
+
+dzltab button:checked:active,
+dzltab button:hover:active {
+  color: alpha(@theme_fg_color, 0.65);
+}
+
+
+dzltabstrip.left dzltab:checked {
+  border-color: transparent;
+  border-left-color: @theme_selected_bg_color;
+}
+
+dzltabstrip.right dzltab:checked {
+  border-color: transparent;
+  border-right-color: @theme_selected_bg_color;
+}
+
+dzltabstrip {
+  background-color: @theme_bg_color;
+  padding-top: 3px;
+  border-bottom: 1px solid @borders;
+}
+
+
+dzldockstack button.pinned {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0 6px 0 6px;
+}
+
+
+dzldockbin {
+  border: 1px solid alpha(@borders, 0.75);
+  -DzlDockBin-handle-size: 1;
+}
+
+dzldockwidget {
+  background-color: transparent;
+}
+
+dzltab > * {
+  padding: 0 3px 0 3px;
+}
+
+
+dzldockoverlayedge {
+  background-color: @theme_bg_color;
+}
+dzldockoverlayedge.top dzltabstrip dzltab:checked {
+  border-bottom-color: @theme_selected_bg_color;
+}
+dzldockoverlayedge.left dzltabstrip dzltab:checked {
+  border-right-color: @theme_selected_bg_color;
+}
+dzldockoverlayedge.right dzltabstrip dzltab:checked {
+  border-left-color: @theme_selected_bg_color;
+}
+dzldockoverlayedge.bottom dzltabstrip dzltab:checked {
+  border-top-color: @theme_selected_bg_color;
+  background: blue;
+}
+
+
+textview {
+  padding: 12px;
+}
+
+
+dzldockbar button {
+ border: none;
+ background: transparent;
+ box-shadow: none;
+ margin: 12px 3px 0 3px;
+ padding: 0px;
+ font-weight: bold;
+ font-size: 0.8em;
+ outline-offset: 1px;
+}
+
+
+
+
+dzldockbinedge.left:not(.pinned) {
+  background: @theme_bg_color;
+  border: 5px solid blue;
+  box-shadow: 5px 0px 15px black;
+  margin-right: 50px;
+}
+dzldockbinedge.right:not(.pinned) {
+  background: @theme_bg_color;
+  border: 5px solid blue;
+  box-shadow: 5px 0px 15px black;
+  margin-left: 20px;
+}
+dzldockbinedge.bottom:not(.pinned) {
+  background: @theme_bg_color;
+  border: 5px solid blue;
+  box-shadow: 0px 5px 15px black;
+  margin-top: 20px;
+}
+
+dzldockbinedge.pinned {
+  box-shadow: none;
+}
+
+dzldockpaned {
+  -DzlMultiPaned-handle-size: 1;
+}
+
+dzldockpaned .handle {
+  border: 1px solid blue;
+}

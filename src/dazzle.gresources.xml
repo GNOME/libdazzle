@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/gnome/dazzle/ui">
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-simple-popover.ui">widgets/dzl-simple-popover.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-empty-state.ui">widgets/dzl-empty-state.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-pill-box.ui">widgets/dzl-pill-box.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-suggestion-popover.ui">suggestions/dzl-suggestion-popover.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-suggestion-row.ui">suggestions/dzl-suggestion-row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-shortcut-accel-dialog.ui">shortcuts/dzl-shortcut-accel-dialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-shortcut-theme-editor.ui">shortcuts/dzl-shortcut-theme-editor.ui</file>
+  </gresource>
+</gresources>

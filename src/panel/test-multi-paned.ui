@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<interface>
+  <object class="GtkWindow" id="window">
+    <property name="title">Test Panel</property>
+    <child>
+      <object class="DzlMultiPaned">
+        <property name="visible">true</property>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Button</property>
+            <property name="visible">true</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Button</property>
+            <property name="visible">true</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Button</property>
+            <property name="expand">true</property>
+            <property name="visible">true</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Button</property>
+            <property name="visible">true</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label">Button</property>
+            <property name="visible">true</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

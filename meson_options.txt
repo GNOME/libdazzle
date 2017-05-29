@@ -1,0 +1,13 @@
+
+# Performance and debugging related options
+option('enable_tracing', type: 'boolean', value: false)
+option('enable_profiling', type: 'boolean', value: false)
+option('enable_rdtscp', type: 'boolean', value: false,
+  description: 'Use intel rdtscp haswell instruction for performance counters'
+)
+
+# Support for multiple languages
+option('with_introspection', type: 'boolean', value: true)
+option('with_vapi', type: 'boolean', value: true)
+
+

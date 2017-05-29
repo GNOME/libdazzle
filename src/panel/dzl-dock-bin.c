@@ -1,0 +1,2244 @@
+/* dzl-dock-bin.c
+ *
+ * Copyright (C) 2016 Christian Hergert <chergert@redhat.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <stdlib.h>
+
+#include "actions/dzl-child-property-action.h"
+#include "panel/dzl-dock-bin.h"
+#include "panel/dzl-dock-bin-edge-private.h"
+#include "panel/dzl-dock-item.h"
+
+#define HANDLE_WIDTH  3
+#define HANDLE_HEIGHT 3
+
+typedef enum
+{
+  DZL_DOCK_BIN_CHILD_LEFT   = GTK_POS_LEFT,
+  DZL_DOCK_BIN_CHILD_RIGHT  = GTK_POS_RIGHT,
+  DZL_DOCK_BIN_CHILD_TOP    = GTK_POS_TOP,
+  DZL_DOCK_BIN_CHILD_BOTTOM = GTK_POS_BOTTOM,
+  DZL_DOCK_BIN_CHILD_CENTER = 4,
+  LAST_DZL_DOCK_BIN_CHILD   = 5
+} DzlDockBinChildType;
+
+typedef struct
+{
+  /*
+   * The child widget in question.
+   * Typically this is a DzlDockBinEdge, but the
+   * center widget can be whatever.
+   */
+  GtkWidget *widget;
+
+  /*
+   * The GdkWindow for the handle to resize the edge.
+   * This is an input only window, the pane handle is drawn
+   * with CSS by whatever styling the application has chose.
+   */
+  GdkWindow *handle;
+
+  /*
+   * When dragging, we need to know our offset relative to the
+   * grab position to alter preferred size requests.
+   */
+  gint drag_offset;
+
+  /*
+   * This is the position of the child before the drag started.
+   * We use this, combined with @drag_offset to determine the
+   * size the child should be in the drag operation.
+   */
+  gint drag_begin_position;
+
+  /*
+   * Priority child property used to alter which child is
+   * dominant in each slice stage. See
+   * dzl_dock_bin_get_children_preferred_width() for more information
+   * on how the slicing is performed.
+   */
+  gint priority;
+
+  /*
+   * Cached size request used during size allocation.
+   */
+  GtkRequisition min_req;
+  GtkRequisition nat_req;
+
+  /*
+   * The type of child. The DZL_DOCK_BIN_CHILD_CENTER is always
+   * the last child, and our sort function ensures that.
+   */
+  DzlDockBinChildType type : 3;
+
+  /*
+   * If the panel is pinned, this will be set to TRUE. A pinned panel
+   * means that it is displayed juxtapose the center child, where as
+   * an unpinned child is floating above teh center child.
+   */
+  guint pinned : 1;
+} DzlDockBinChild;
+
+typedef struct
+{
+  /*
+   * All of our dock children, including edges and center child.
+   */
+  DzlDockBinChild children[LAST_DZL_DOCK_BIN_CHILD];
+
+  /*
+   * Actions used to toggle edge visibility.
+   */
+  GSimpleActionGroup *actions;
+
+  /*
+   * The pan gesture is used to resize edges.
+   */
+  GtkGesturePan *pan_gesture;
+
+  /*
+   * While in a pan gesture, we need to drag the current edge
+   * being dragged. This is left, right, top, or bottom only.
+   */
+  DzlDockBinChild *drag_child;
+
+  /*
+   * We need to track the position during a DnD request. We can use this
+   * to highlight the area where the drop will occur.
+   */
+  gint dnd_drag_x;
+  gint dnd_drag_y;
+} DzlDockBinPrivate;
+
+static void dzl_dock_bin_init_buildable_iface (GtkBuildableIface    *iface);
+static void dzl_dock_bin_init_dock_iface      (DzlDockInterface     *iface);
+static void dzl_dock_bin_init_dock_item_iface (DzlDockItemInterface *iface);
+
+G_DEFINE_TYPE_EXTENDED (DzlDockBin, dzl_dock_bin, GTK_TYPE_CONTAINER, 0,
+                        G_ADD_PRIVATE (DzlDockBin)
+                        G_IMPLEMENT_INTERFACE (GTK_TYPE_BUILDABLE, dzl_dock_bin_init_buildable_iface)
+                        G_IMPLEMENT_INTERFACE (DZL_TYPE_DOCK_ITEM, dzl_dock_bin_init_dock_item_iface)
+                        G_IMPLEMENT_INTERFACE (DZL_TYPE_DOCK, dzl_dock_bin_init_dock_iface))
+
+enum {
+  PROP_0,
+  PROP_LEFT_VISIBLE,
+  PROP_RIGHT_VISIBLE,
+  PROP_TOP_VISIBLE,
+  PROP_BOTTOM_VISIBLE,
+  N_PROPS,
+
+  PROP_MANAGER,
+};
+
+enum {
+  CHILD_PROP_0,
+  CHILD_PROP_PINNED,
+  CHILD_PROP_POSITION,
+  CHILD_PROP_PRIORITY,
+  N_CHILD_PROPS
+};
+
+static GParamSpec *properties [N_PROPS];
+static GParamSpec *child_properties [N_CHILD_PROPS];
+
+static gint
+dzl_dock_bin_child_compare (gconstpointer a,
+                            gconstpointer b)
+{
+  const DzlDockBinChild *child_a = a;
+  const DzlDockBinChild *child_b = b;
+
+  if (child_a->type == DZL_DOCK_BIN_CHILD_CENTER)
+    return 1;
+  else if (child_b->type == DZL_DOCK_BIN_CHILD_CENTER)
+    return -1;
+
+  if ((child_a->pinned ^ child_b->pinned) != 0)
+    return child_a->pinned - child_b->pinned;
+
+  return child_a->priority - child_b->priority;
+}
+
+static void
+dzl_dock_bin_resort_children (DzlDockBin *self)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  /*
+   * Sort the children by priority/pinned status, but do not change
+   * the position of the DZL_DOCK_BIN_CHILD_CENTER child. It should
+   * always be at the last position.
+   */
+
+  g_qsort_with_data (&priv->children[0],
+                     DZL_DOCK_BIN_CHILD_CENTER,
+                     sizeof (DzlDockBinChild),
+                     (GCompareDataFunc)dzl_dock_bin_child_compare,
+                     NULL);
+
+  gtk_widget_queue_allocate (GTK_WIDGET (self));
+}
+
+static GAction *
+dzl_dock_bin_get_visible_action_for_type (DzlDockBin          *self,
+                                          DzlDockBinChildType  type)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  const gchar *name = NULL;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  switch (type)
+    {
+    case DZL_DOCK_BIN_CHILD_LEFT:
+      name = "left-visible";
+      break;
+
+    case DZL_DOCK_BIN_CHILD_RIGHT:
+      name = "right-visible";
+      break;
+
+    case DZL_DOCK_BIN_CHILD_TOP:
+      name = "top-visible";
+      break;
+
+    case DZL_DOCK_BIN_CHILD_BOTTOM:
+      name = "bottom-visible";
+      break;
+
+    case DZL_DOCK_BIN_CHILD_CENTER:
+    case LAST_DZL_DOCK_BIN_CHILD:
+    default:
+      g_assert_not_reached ();
+    }
+
+  return g_action_map_lookup_action (G_ACTION_MAP (priv->actions), name);
+}
+
+static gboolean
+get_visible (DzlDockBin  *self,
+             const gchar *action_name)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GAction *action;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (action_name != NULL);
+
+  action = g_action_map_lookup_action (G_ACTION_MAP (priv->actions), action_name);
+
+  if (action != NULL)
+    {
+      GVariant *v = g_action_get_state (action);
+      gboolean ret = v ? g_variant_get_boolean (v) : FALSE;
+
+      g_clear_pointer (&v, g_variant_unref);
+
+      return ret;
+    }
+
+  return FALSE;
+}
+
+static gboolean
+set_visible (DzlDockBin  *self,
+             const gchar *action_name,
+             gboolean     value)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GAction *action;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (action_name != NULL);
+
+  action = g_action_map_lookup_action (G_ACTION_MAP (priv->actions), action_name);
+
+  if (action != NULL)
+    g_simple_action_set_state (G_SIMPLE_ACTION (action), g_variant_new_boolean (value));
+
+  return FALSE;
+}
+
+static void
+dzl_dock_bin_update_actions (DzlDockBin *self)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  /*
+   * We need to walk each of the children edges looking for widgets
+   * that are visible. If so, we need to keep the edge action enabled.
+   * Otherwise disable it, so any buttons representing the action get
+   * properly desensitized.
+   */
+
+  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+      GAction *action;
+      gboolean enabled = FALSE;
+
+      if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
+        continue;
+
+      action = dzl_dock_bin_get_visible_action_for_type (self, child->type);
+
+      if (child->widget != NULL)
+        enabled = dzl_dock_item_has_widgets (DZL_DOCK_ITEM (child->widget));
+
+      g_simple_action_set_enabled (G_SIMPLE_ACTION (action), enabled);
+    }
+}
+
+static gboolean
+map_boolean_to_variant (GBinding     *binding,
+                        const GValue *from_value,
+                        GValue       *to_value,
+                        gpointer      user_data)
+{
+  g_assert (G_IS_BINDING (binding));
+
+  if (g_value_get_boolean (from_value))
+    g_value_set_variant (to_value, g_variant_new_boolean (TRUE));
+  else
+    g_value_set_variant (to_value, g_variant_new_boolean (FALSE));
+
+  return TRUE;
+}
+
+static DzlDockBinChild *
+dzl_dock_bin_get_child (DzlDockBin *self,
+                        GtkWidget  *widget)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_WIDGET (widget));
+
+  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+
+      if ((GtkWidget *)child->widget == widget)
+        return child;
+    }
+
+  g_assert_not_reached ();
+
+  return NULL;
+}
+
+static DzlDockBinChild *
+dzl_dock_bin_get_child_typed (DzlDockBin          *self,
+                              DzlDockBinChildType  type)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
+  g_assert (type < LAST_DZL_DOCK_BIN_CHILD);
+
+  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+
+      if (child->type == type)
+        return child;
+    }
+
+  g_assert_not_reached ();
+
+  return NULL;
+}
+
+static void
+dzl_dock_bin_update_focus_chain (DzlDockBin *self)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  DzlDockBinChild *child;
+  GList *focus_chain = NULL;
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  for (i = G_N_ELEMENTS (priv->children); i > 0; i--)
+    {
+      child = &priv->children [i - 1];
+
+      if ((child->widget != NULL) &&
+          (child->type != DZL_DOCK_BIN_CHILD_CENTER))
+        focus_chain = g_list_prepend (focus_chain, child->widget);
+    }
+
+  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+
+  if (child->widget != NULL)
+    focus_chain = g_list_prepend (focus_chain, child->widget);
+
+  if (focus_chain != NULL)
+    {
+      gtk_container_set_focus_chain (GTK_CONTAINER (self), focus_chain);
+      g_list_free (focus_chain);
+    }
+}
+
+static void
+dzl_dock_bin_add (GtkContainer *container,
+                  GtkWidget    *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)container;
+  DzlDockBinChild *child;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_WIDGET (widget));
+
+  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+
+  if (child->widget != NULL)
+    {
+      g_warning ("Attempt to add a %s to a %s, but it already has a child of type %s",
+                 G_OBJECT_TYPE_NAME (widget),
+                 G_OBJECT_TYPE_NAME (self),
+                 G_OBJECT_TYPE_NAME (child->widget));
+      return;
+    }
+
+  if (DZL_IS_DOCK_ITEM (widget) &&
+      !dzl_dock_item_adopt (DZL_DOCK_ITEM (self), DZL_DOCK_ITEM (widget)))
+    {
+      g_warning ("Child of type %s has a different DzlDockManager than %s",
+                 G_OBJECT_TYPE_NAME (widget), G_OBJECT_TYPE_NAME (self));
+      return;
+    }
+
+  child->widget = g_object_ref_sink (widget);
+  gtk_widget_set_parent (widget, GTK_WIDGET (self));
+
+  dzl_dock_bin_update_focus_chain (self);
+
+  gtk_widget_queue_resize (GTK_WIDGET (self));
+}
+
+static void
+dzl_dock_bin_remove (GtkContainer *container,
+                     GtkWidget    *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)container;
+  DzlDockBinChild *child;
+
+  g_return_if_fail (DZL_IS_DOCK_BIN (self));
+  g_return_if_fail (GTK_IS_WIDGET (widget));
+
+  child = dzl_dock_bin_get_child (self, widget);
+  gtk_widget_unparent (child->widget);
+  g_clear_object (&child->widget);
+
+  gtk_widget_queue_resize (GTK_WIDGET (self));
+}
+
+static void
+dzl_dock_bin_forall (GtkContainer *container,
+                     gboolean      include_internal,
+                     GtkCallback   callback,
+                     gpointer      user_data)
+{
+  DzlDockBin *self = (DzlDockBin *)container;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  DzlDockBinChild *child;
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (callback != NULL);
+
+  /*
+   * Always call the "center" child callback first. This helps ensure that
+   * it is the first child to be rendered. We need that to ensure that panels
+   * are drawn *above* the center, even when floating. Note that the center
+   * child is always the last child in the array.
+   */
+  child = &priv->children [G_N_ELEMENTS (priv->children) - 1];
+  if (child->widget != NULL)
+    callback (child->widget, user_data);
+
+  /*
+   * Normally, we would iterate the array backwards so that we can ensure that
+   * the list is safe against widget destruction. However, since we have a
+   * fixed size array, we can walk forwards safely.  This helps ensure we
+   * preserve draw ordering for the various panels when we chain up to the
+   * container draw vfunc.
+   */
+
+  for (i = 0; i < G_N_ELEMENTS (priv->children) - 1; i++)
+    {
+      child = &priv->children[i];
+
+      if (child->widget != NULL)
+        callback (GTK_WIDGET (child->widget), user_data);
+    }
+}
+
+static void
+dzl_dock_bin_get_children_preferred_width (DzlDockBin      *self,
+                                           DzlDockBinChild *children,
+                                           gint             n_children,
+                                           gint            *min_width,
+                                           gint            *nat_width)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  DzlDockBinChild *child = children;
+  gint child_min_width = 0;
+  gint child_nat_width = 0;
+  gint neighbor_min_width = 0;
+  gint neighbor_nat_width = 0;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (children != NULL);
+  g_assert (n_children > 0);
+  g_assert (min_width != NULL);
+  g_assert (nat_width != NULL);
+
+  *min_width = 0;
+  *nat_width = 0;
+
+  /*
+   * We have a fairly simple rule for deducing the size request of
+   * the children layout. Since children edges can have any priority,
+   * we need to know how to slice them into areas that allow us to
+   * combine (additive) or negotiate (maximum) widths with the
+   * neighboring widgets.
+   *
+   *          .
+   *          .
+   *     +----+---------------------------------+
+   *     |    |              2                  |
+   *     |    +=================================+.....
+   *     |    |                            |    |
+   *     |    |                            |    |
+   *     | 1  |              5             |    |
+   *     |    |                            | 3  |
+   *     |    +==.==.==.==.==.==.==.==.==.=+    |
+   *     |    |              4             |    |
+   *     +----+----------------------------+----+
+   *          .                            .
+   *          .                            .
+   *
+   * The children are sorted in their weighting order. Each child
+   * will dominate the leftover allocation, in the orientation that
+   * matters.
+   *
+   * 1 and 3 in the diagram above will always be additive with their
+   * neighbors horizontal neighbors. See the guide does for how this
+   * gets sliced. Even if 3 were dominant (instead of 2), it would still
+   * be additive to its neighbors. Same for 1.
+   *
+   * Both 2 and 4, will always negotiate their widths with the next
+   * child.
+   *
+   * This allows us to make a fairly simple recursive function to
+   * size ourselves and then call again with the next child, working our
+   * way down to 5 (the center widget).
+   *
+   * At this point, we walk back up the recursive-stack and do our
+   * adding or negotiating.
+   */
+
+  if (child->widget != NULL)
+    gtk_widget_get_preferred_width (child->widget, &child_min_width, &child_nat_width);
+
+  if (child == priv->drag_child)
+    child_nat_width = MAX (child_min_width,
+                           child->drag_begin_position + child->drag_offset);
+
+  if (n_children > 1)
+    dzl_dock_bin_get_children_preferred_width (self,
+                                               &children [1],
+                                               n_children - 1,
+                                               &neighbor_min_width,
+                                               &neighbor_nat_width);
+
+  switch (child->type)
+    {
+    case DZL_DOCK_BIN_CHILD_LEFT:
+    case DZL_DOCK_BIN_CHILD_RIGHT:
+      if (child->pinned)
+        {
+          *min_width = (child_min_width + neighbor_min_width);
+          *nat_width = (child_nat_width + neighbor_nat_width);
+        }
+      else
+        {
+          *min_width = MAX (child_min_width, neighbor_min_width);
+          *nat_width = MAX (child_nat_width, neighbor_nat_width);
+        }
+      break;
+
+    case DZL_DOCK_BIN_CHILD_TOP:
+    case DZL_DOCK_BIN_CHILD_BOTTOM:
+      *min_width = MAX (child_min_width, neighbor_min_width);
+      *nat_width = MAX (child_nat_width, neighbor_nat_width);
+      break;
+
+    case DZL_DOCK_BIN_CHILD_CENTER:
+      *min_width = child_min_width;
+      *nat_width = child_min_width;
+      break;
+
+    case LAST_DZL_DOCK_BIN_CHILD:
+    default:
+      g_assert_not_reached ();
+    }
+
+  child->min_req.width = *min_width;
+  child->nat_req.width = *nat_width;
+}
+
+static void
+dzl_dock_bin_get_preferred_width (GtkWidget *widget,
+                                  gint      *min_width,
+                                  gint      *nat_width)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (min_width != NULL);
+  g_assert (nat_width != NULL);
+
+  dzl_dock_bin_get_children_preferred_width (self,
+                                             priv->children,
+                                             G_N_ELEMENTS (priv->children),
+                                             min_width,
+                                             nat_width);
+}
+
+static void
+dzl_dock_bin_get_children_preferred_height (DzlDockBin      *self,
+                                            DzlDockBinChild *children,
+                                            gint             n_children,
+                                            gint            *min_height,
+                                            gint            *nat_height)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  DzlDockBinChild *child = children;
+  gint child_min_height = 0;
+  gint child_nat_height = 0;
+  gint neighbor_min_height = 0;
+  gint neighbor_nat_height = 0;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (children != NULL);
+  g_assert (n_children > 0);
+  g_assert (min_height != NULL);
+  g_assert (nat_height != NULL);
+
+  *min_height = 0;
+  *nat_height = 0;
+
+  /*
+   * See dzl_dock_bin_get_children_preferred_width() for more information on
+   * how this works. This works just like that but the negotiated/additive
+   * operations are switched between the left/right and top/bottom.
+   */
+
+  if (child->widget != NULL)
+    gtk_widget_get_preferred_height (child->widget, &child_min_height, &child_nat_height);
+
+  if (child == priv->drag_child)
+    child_nat_height = MAX (child_min_height,
+                            child->drag_begin_position + child->drag_offset);
+
+  if (n_children > 1)
+    dzl_dock_bin_get_children_preferred_height (self,
+                                                &children [1],
+                                                n_children - 1,
+                                                &neighbor_min_height,
+                                                &neighbor_nat_height);
+
+  switch (child->type)
+    {
+    case DZL_DOCK_BIN_CHILD_LEFT:
+    case DZL_DOCK_BIN_CHILD_RIGHT:
+      *min_height = MAX (child_min_height, neighbor_min_height);
+      *nat_height = MAX (child_nat_height, neighbor_nat_height);
+      break;
+
+    case DZL_DOCK_BIN_CHILD_TOP:
+    case DZL_DOCK_BIN_CHILD_BOTTOM:
+      if (child->pinned)
+        {
+          *min_height = (child_min_height + neighbor_min_height);
+          *nat_height = (child_nat_height + neighbor_nat_height);
+        }
+      else
+        {
+          *min_height = MAX (child_min_height, neighbor_min_height);
+          *nat_height = MAX (child_nat_height, neighbor_nat_height);
+        }
+      break;
+
+    case DZL_DOCK_BIN_CHILD_CENTER:
+      *min_height = child_min_height;
+      *nat_height = child_min_height;
+      break;
+
+    case LAST_DZL_DOCK_BIN_CHILD:
+    default:
+      g_assert_not_reached ();
+    }
+
+  child->min_req.height = *min_height;
+  child->nat_req.height = *nat_height;
+}
+
+static void
+dzl_dock_bin_get_preferred_height (GtkWidget *widget,
+                                   gint      *min_height,
+                                   gint      *nat_height)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (min_height != NULL);
+  g_assert (nat_height != NULL);
+
+  dzl_dock_bin_get_children_preferred_height (self,
+                                              priv->children,
+                                              G_N_ELEMENTS (priv->children),
+                                              min_height,
+                                              nat_height);
+}
+
+static void
+dzl_dock_bin_negotiate_size (DzlDockBin           *self,
+                             const GtkAllocation  *allocation,
+                             const GtkRequisition *child_min,
+                             const GtkRequisition *child_nat,
+                             const GtkRequisition *neighbor_min,
+                             const GtkRequisition *neighbor_nat,
+                             GtkAllocation        *child_alloc)
+{
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (allocation != NULL);
+  g_assert (child_min != NULL);
+  g_assert (child_nat != NULL);
+  g_assert (neighbor_min != NULL);
+  g_assert (neighbor_nat != NULL);
+  g_assert (child_alloc != NULL);
+
+  if (allocation->width - child_nat->width < neighbor_min->width)
+    child_alloc->width = allocation->width - neighbor_min->width;
+  else
+    child_alloc->width = child_nat->width;
+
+  if (allocation->height - child_nat->height < neighbor_min->height)
+    child_alloc->height = allocation->height - neighbor_min->height;
+  else
+    child_alloc->height = child_nat->height;
+}
+
+static void
+dzl_dock_bin_child_size_allocate (DzlDockBin      *self,
+                                  DzlDockBinChild *children,
+                                  gint             n_children,
+                                  GtkAllocation   *allocation)
+{
+  DzlDockBinChild *child = children;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (children != NULL);
+  g_assert (n_children >= 1);
+  g_assert (allocation != NULL);
+
+  if (n_children == 1)
+    {
+      g_assert (child->type == DZL_DOCK_BIN_CHILD_CENTER);
+
+      if (child->widget != NULL && gtk_widget_get_visible (child->widget))
+        gtk_widget_size_allocate (child->widget, allocation);
+
+      return;
+    }
+
+  if (child->widget != NULL &&
+      gtk_widget_get_visible (child->widget) &&
+      gtk_widget_get_child_visible (child->widget))
+    {
+      GtkAllocation child_alloc = { 0 };
+      GtkAllocation handle_alloc = { 0 };
+      GtkRequisition neighbor_min = { 0 };
+      GtkRequisition neighbor_nat = { 0 };
+      GtkStyleContext *style_context = gtk_widget_get_style_context (child->widget);
+      GtkStateType state = gtk_style_context_get_state (style_context);
+      GtkBorder margin;
+
+      gtk_style_context_get_margin (style_context, state, &margin);
+
+      dzl_dock_bin_get_children_preferred_height (self, child, 1,
+                                                  &child->min_req.height,
+                                                  &child->nat_req.height);
+
+      dzl_dock_bin_get_children_preferred_width (self, child, 1,
+                                                 &child->min_req.width,
+                                                 &child->nat_req.width);
+
+      if (child->pinned)
+        {
+          dzl_dock_bin_get_children_preferred_height (self,
+                                                      &children [1],
+                                                      n_children - 1,
+                                                      &neighbor_min.height,
+                                                      &neighbor_nat.height);
+
+          dzl_dock_bin_get_children_preferred_width (self,
+                                                     &children [1],
+                                                     n_children - 1,
+                                                     &neighbor_min.width,
+                                                     &neighbor_nat.width);
+        }
+
+      dzl_dock_bin_negotiate_size (self,
+                                   allocation,
+                                   &child->min_req,
+                                   &child->nat_req,
+                                   &neighbor_min,
+                                   &neighbor_nat,
+                                   &child_alloc);
+
+      switch (child->type)
+        {
+        case DZL_DOCK_BIN_CHILD_LEFT:
+          child_alloc.x = allocation->x;
+          child_alloc.y = allocation->y;
+          child_alloc.height = allocation->height;
+
+          if (child->pinned)
+            {
+              allocation->x += child_alloc.width;
+              allocation->width -= child_alloc.width;
+            }
+
+          break;
+
+
+        case DZL_DOCK_BIN_CHILD_RIGHT:
+          child_alloc.x = allocation->x + allocation->width - child_alloc.width;
+          child_alloc.y = allocation->y;
+          child_alloc.height = allocation->height;
+
+          if (child->pinned)
+            allocation->width -= child_alloc.width;
+
+          break;
+
+
+        case DZL_DOCK_BIN_CHILD_TOP:
+          child_alloc.x = allocation->x;
+          child_alloc.y = allocation->y;
+          child_alloc.width = allocation->width;
+
+          if (child->pinned)
+            {
+              allocation->y += child_alloc.height;
+              allocation->height -= child_alloc.height;
+            }
+
+          break;
+
+
+        case DZL_DOCK_BIN_CHILD_BOTTOM:
+          child_alloc.x = allocation->x;
+          child_alloc.y = allocation->y + allocation->height - child_alloc.height;
+          child_alloc.width = allocation->width;
+
+          if (child->pinned)
+            allocation->height -= child_alloc.height;
+
+          break;
+
+
+        case DZL_DOCK_BIN_CHILD_CENTER:
+        case LAST_DZL_DOCK_BIN_CHILD:
+        default:
+          g_assert_not_reached ();
+          break;
+        }
+
+      handle_alloc = child_alloc;
+
+      switch (child->type)
+        {
+        case DZL_DOCK_BIN_CHILD_LEFT:
+
+          /*
+           * When left-to-right, we often have a scrollbar to deal
+           * with right here. So fudge the allocation position a bit
+           * to the right so that the scrollbar can still be easily
+           * hovered.
+           */
+          if (gtk_widget_get_direction (child->widget) == GTK_TEXT_DIR_LTR)
+            {
+              handle_alloc.x += handle_alloc.width - (HANDLE_WIDTH / 2);
+              handle_alloc.width = HANDLE_WIDTH;
+            }
+          else
+            {
+              handle_alloc.x += handle_alloc.width - HANDLE_WIDTH;
+              handle_alloc.width = HANDLE_WIDTH;
+            }
+
+          handle_alloc.x -= margin.right;
+
+          break;
+
+        case DZL_DOCK_BIN_CHILD_RIGHT:
+          handle_alloc.width = HANDLE_WIDTH;
+
+          if (gtk_widget_get_direction (child->widget) == GTK_TEXT_DIR_RTL)
+            handle_alloc.x -= (HANDLE_WIDTH / 2);
+
+          handle_alloc.x += margin.left;
+
+          break;
+
+        case DZL_DOCK_BIN_CHILD_BOTTOM:
+          handle_alloc.height = HANDLE_HEIGHT;
+          handle_alloc.y += margin.top;
+          break;
+
+        case DZL_DOCK_BIN_CHILD_TOP:
+          handle_alloc.y += handle_alloc.height - HANDLE_HEIGHT;
+          handle_alloc.y -= margin.bottom;
+          handle_alloc.height = HANDLE_HEIGHT;
+          break;
+
+        case DZL_DOCK_BIN_CHILD_CENTER:
+        case LAST_DZL_DOCK_BIN_CHILD:
+        default:
+          break;
+        }
+
+      if (child_alloc.width > 0 && child_alloc.height > 0 && child->handle)
+        gdk_window_move_resize (child->handle,
+                                handle_alloc.x, handle_alloc.y,
+                                handle_alloc.width, handle_alloc.height);
+
+      gtk_widget_size_allocate (child->widget, &child_alloc);
+    }
+
+  dzl_dock_bin_child_size_allocate (self, &children [1], n_children - 1, allocation);
+}
+
+static void
+dzl_dock_bin_size_allocate (GtkWidget     *widget,
+                            GtkAllocation *allocation)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GtkAllocation child_allocation;
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (allocation != NULL);
+
+  gtk_widget_set_allocation (widget, allocation);
+
+  child_allocation.x = 0;
+  child_allocation.y = 0;
+  child_allocation.width = allocation->width;
+  child_allocation.height = allocation->height;
+
+  if (gtk_widget_get_realized (widget))
+    {
+      gdk_window_move_resize (gtk_widget_get_window (widget),
+                              allocation->x,
+                              allocation->y,
+                              child_allocation.width,
+                              child_allocation.height);
+    }
+
+  dzl_dock_bin_child_size_allocate (self,
+                                    priv->children,
+                                    G_N_ELEMENTS (priv->children),
+                                    &child_allocation);
+
+  /*
+   * Hide all of the handle input windows that should be hidden
+   * because the child has an empty allocation.
+   */
+
+  for (i = DZL_DOCK_BIN_CHILD_CENTER; i > 0; i--)
+    {
+      DzlDockBinChild *child = &priv->children [i - 1];
+
+      if (child->handle != NULL)
+        {
+          if (DZL_IS_DOCK_BIN_EDGE (child->widget))
+            {
+              if (gtk_widget_get_realized (child->widget))
+                gdk_window_raise (gtk_widget_get_window (child->widget));
+
+              if (dzl_dock_revealer_get_reveal_child (DZL_DOCK_REVEALER (child->widget)))
+                gdk_window_show (child->handle);
+            }
+          else
+            gdk_window_hide (child->handle);
+        }
+    }
+}
+
+static void
+dzl_dock_bin_visible_change_state (GSimpleAction *action,
+                                   GVariant      *state,
+                                   gpointer       user_data)
+{
+  DzlDockBin *self = user_data;
+  DzlDockBinChild *child;
+  DzlDockBinChildType type;
+  const gchar *action_name;
+  gboolean reveal_child;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (G_IS_SIMPLE_ACTION (action));
+  g_assert (state != NULL);
+  g_assert (g_variant_is_of_type (state, G_VARIANT_TYPE_BOOLEAN));
+
+  action_name = g_action_get_name (G_ACTION (action));
+  reveal_child = g_variant_get_boolean (state);
+
+  if (g_str_has_prefix (action_name, "left"))
+    type = DZL_DOCK_BIN_CHILD_LEFT;
+  else if (g_str_has_prefix (action_name, "right"))
+    type = DZL_DOCK_BIN_CHILD_RIGHT;
+  else if (g_str_has_prefix (action_name, "top"))
+    type = DZL_DOCK_BIN_CHILD_TOP;
+  else if (g_str_has_prefix (action_name, "bottom"))
+    type = DZL_DOCK_BIN_CHILD_BOTTOM;
+  else
+    return;
+
+  child = dzl_dock_bin_get_child_typed (self, type);
+
+  dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget), reveal_child);
+}
+
+static void
+dzl_dock_bin_set_child_pinned (DzlDockBin *self,
+                               GtkWidget  *widget,
+                               gboolean    pinned)
+{
+  DzlDockBinChild *child;
+  GtkStyleContext *style_context;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_WIDGET (widget));
+
+  child = dzl_dock_bin_get_child (self, widget);
+
+  if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
+    return;
+
+  child->pinned = !!pinned;
+
+  style_context = gtk_widget_get_style_context (widget);
+
+  if (child->pinned)
+    gtk_style_context_add_class (style_context, DZL_DOCK_BIN_STYLE_CLASS_PINNED);
+  else
+    gtk_style_context_remove_class (style_context, DZL_DOCK_BIN_STYLE_CLASS_PINNED);
+
+  dzl_dock_bin_resort_children (self);
+
+  gtk_widget_queue_resize (GTK_WIDGET (self));
+
+  if (child->widget != NULL)
+    gtk_container_child_notify_by_pspec (GTK_CONTAINER (self), child->widget,
+                                         child_properties [CHILD_PROP_PINNED]);
+}
+
+static void
+dzl_dock_bin_set_child_priority (DzlDockBin *self,
+                                 GtkWidget  *widget,
+                                 gint        priority)
+{
+  DzlDockBinChild *child;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_WIDGET (widget));
+
+  child = dzl_dock_bin_get_child (self, widget);
+  child->priority = priority;
+
+  dzl_dock_bin_resort_children (self);
+
+  gtk_widget_queue_resize (GTK_WIDGET (self));
+
+  if (child->widget != NULL)
+    gtk_container_child_notify_by_pspec (GTK_CONTAINER (self), child->widget,
+                                         child_properties [CHILD_PROP_PRIORITY]);
+}
+
+static void
+dzl_dock_bin_create_child_handle (DzlDockBin      *self,
+                                  DzlDockBinChild *child)
+{
+  GdkWindowAttr attributes = { 0 };
+  GdkDisplay *display;
+  GdkWindow *parent;
+  const gchar *cursor_name;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (child != NULL);
+  g_assert (child->type < DZL_DOCK_BIN_CHILD_CENTER);
+  g_assert (child->handle == NULL);
+
+  display = gtk_widget_get_display (GTK_WIDGET (self));
+  parent = gtk_widget_get_window (GTK_WIDGET (self));
+
+  cursor_name = (child->type == DZL_DOCK_BIN_CHILD_LEFT || child->type == DZL_DOCK_BIN_CHILD_RIGHT)
+              ? "col-resize"
+              : "row-resize";
+
+  attributes.window_type = GDK_WINDOW_CHILD;
+  attributes.wclass = GDK_INPUT_ONLY;
+  attributes.x = -1;
+  attributes.y = -1;
+  attributes.width = 1;
+  attributes.height = 1;
+  attributes.visual = gtk_widget_get_visual (GTK_WIDGET (self));
+  attributes.event_mask = (GDK_BUTTON_PRESS_MASK |
+                           GDK_BUTTON_RELEASE_MASK |
+                           GDK_ENTER_NOTIFY_MASK |
+                           GDK_LEAVE_NOTIFY_MASK |
+                           GDK_POINTER_MOTION_MASK);
+  attributes.cursor = gdk_cursor_new_from_name (display, cursor_name);
+
+  child->handle = gdk_window_new (parent, &attributes, GDK_WA_CURSOR);
+  gtk_widget_register_window (GTK_WIDGET (self), child->handle);
+
+  g_clear_object (&attributes.cursor);
+}
+
+static void
+dzl_dock_bin_destroy_child_handle (DzlDockBin      *self,
+                                   DzlDockBinChild *child)
+{
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (child != NULL);
+  g_assert (child->type < DZL_DOCK_BIN_CHILD_CENTER);
+
+  if (child->handle != NULL)
+    {
+      gdk_window_destroy (child->handle);
+      child->handle = NULL;
+    }
+}
+
+static void
+dzl_dock_bin_realize (GtkWidget *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GdkWindowAttr attributes = { 0 };
+  GdkWindow *parent;
+  GdkWindow *window;
+  GtkAllocation alloc;
+  gint attributes_mask = 0;
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
+
+  gtk_widget_set_realized (GTK_WIDGET (self), TRUE);
+
+  parent = gtk_widget_get_parent_window (GTK_WIDGET (self));
+
+  attributes.window_type = GDK_WINDOW_CHILD;
+  attributes.wclass = GDK_INPUT_OUTPUT;
+  attributes.visual = gtk_widget_get_visual (GTK_WIDGET (self));
+  attributes.x = alloc.x;
+  attributes.y = alloc.y;
+  attributes.width = alloc.width;
+  attributes.height = alloc.height;
+  attributes.event_mask = 0;
+
+  attributes_mask = (GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL);
+
+  window = gdk_window_new (parent, &attributes, attributes_mask);
+  gtk_widget_set_window (GTK_WIDGET (self), window);
+  gtk_widget_register_window (GTK_WIDGET (self), window);
+
+  for (i = 0; i < DZL_DOCK_BIN_CHILD_CENTER; i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+
+      dzl_dock_bin_create_child_handle (self, child);
+    }
+}
+
+static void
+dzl_dock_bin_unrealize (GtkWidget *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  for (i = 0; i < DZL_DOCK_BIN_CHILD_CENTER; i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+
+      dzl_dock_bin_destroy_child_handle (self, child);
+    }
+
+  GTK_WIDGET_CLASS (dzl_dock_bin_parent_class)->unrealize (widget);
+}
+
+static void
+dzl_dock_bin_map (GtkWidget *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  GTK_WIDGET_CLASS (dzl_dock_bin_parent_class)->map (widget);
+
+  for (i = 0; i < DZL_DOCK_BIN_CHILD_CENTER; i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+
+      if (child->handle != NULL)
+        gdk_window_show (child->handle);
+    }
+}
+
+static void
+dzl_dock_bin_unmap (GtkWidget *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  for (i = 0; i < DZL_DOCK_BIN_CHILD_CENTER; i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+
+      if (child->handle != NULL)
+        gdk_window_hide (child->handle);
+    }
+
+  GTK_WIDGET_CLASS (dzl_dock_bin_parent_class)->unmap (widget);
+}
+
+static void
+dzl_dock_bin_pan_gesture_drag_begin (DzlDockBin    *self,
+                                     gdouble        x,
+                                     gdouble        y,
+                                     GtkGesturePan *gesture)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GdkEventSequence *sequence;
+  DzlDockBinChild *child = NULL;
+  GtkAllocation child_alloc;
+  const GdkEvent *event;
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_GESTURE_PAN (gesture));
+
+  sequence = gtk_gesture_single_get_current_sequence (GTK_GESTURE_SINGLE (gesture));
+  event = gtk_gesture_get_last_event (GTK_GESTURE (gesture), sequence);
+
+  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      if (priv->children [i].handle == event->any.window)
+        {
+          child = &priv->children [i];
+          break;
+        }
+    }
+
+  if (child == NULL || child->type >= DZL_DOCK_BIN_CHILD_CENTER)
+    {
+      gtk_gesture_set_state (GTK_GESTURE (gesture), GTK_EVENT_SEQUENCE_DENIED);
+      return;
+    }
+
+  gtk_widget_get_allocation (child->widget, &child_alloc);
+
+  priv->drag_child = child;
+  priv->drag_child->drag_offset = 0;
+
+  if (child->type == DZL_DOCK_BIN_CHILD_LEFT || child->type == DZL_DOCK_BIN_CHILD_RIGHT)
+    {
+      gtk_gesture_pan_set_orientation (gesture, GTK_ORIENTATION_HORIZONTAL);
+      priv->drag_child->drag_begin_position = child_alloc.width;
+    }
+  else
+    {
+      gtk_gesture_pan_set_orientation (gesture, GTK_ORIENTATION_VERTICAL);
+      priv->drag_child->drag_begin_position = child_alloc.height;
+    }
+
+  gtk_gesture_set_state (GTK_GESTURE (gesture), GTK_EVENT_SEQUENCE_CLAIMED);
+}
+
+static void
+dzl_dock_bin_pan_gesture_drag_end (DzlDockBin    *self,
+                                   gdouble        x,
+                                   gdouble        y,
+                                   GtkGesturePan *gesture)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GdkEventSequence *sequence;
+  GtkEventSequenceState state;
+  GtkAllocation child_alloc;
+  gint position;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_GESTURE_PAN (gesture));
+
+  sequence = gtk_gesture_single_get_current_sequence (GTK_GESTURE_SINGLE (gesture));
+  state = gtk_gesture_get_sequence_state (GTK_GESTURE (gesture), sequence);
+
+  if (state == GTK_EVENT_SEQUENCE_DENIED)
+    goto cleanup;
+
+  g_assert (priv->drag_child != NULL);
+  g_assert (DZL_IS_DOCK_BIN_EDGE (priv->drag_child->widget));
+
+  gtk_widget_get_allocation (priv->drag_child->widget, &child_alloc);
+
+  if ((priv->drag_child->type == DZL_DOCK_BIN_CHILD_LEFT) ||
+      (priv->drag_child->type == DZL_DOCK_BIN_CHILD_RIGHT))
+    position = child_alloc.width;
+  else
+    position = child_alloc.height;
+
+  dzl_dock_revealer_set_position (DZL_DOCK_REVEALER (priv->drag_child->widget), position);
+
+cleanup:
+  if (priv->drag_child != NULL)
+    {
+      priv->drag_child->drag_offset = 0;
+      priv->drag_child->drag_begin_position = 0;
+      priv->drag_child = NULL;
+    }
+}
+
+static void
+dzl_dock_bin_pan_gesture_pan (DzlDockBin      *self,
+                              GtkPanDirection  direction,
+                              gdouble          offset,
+                              GtkGesturePan   *gesture)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  gint position;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_GESTURE_PAN (gesture));
+  g_assert (priv->drag_child != NULL);
+  g_assert (priv->drag_child->type < DZL_DOCK_BIN_CHILD_CENTER);
+
+  /*
+   * This callback is used to adjust the size allocation of the edge in
+   * question (denoted by priv->drag_child). It is always one of the
+   * left, right, top, or bottom children. Never the center child.
+   *
+   * Because of how GtkRevealer works, we are doing a bit of a workaround
+   * here. We need the revealer (the DzlDockBinEdge) child to have a size
+   * request that matches the visible area, otherwise animating out the
+   * revealer will not look right.
+   */
+
+  if (direction == GTK_PAN_DIRECTION_UP)
+    {
+      if (priv->drag_child->type == DZL_DOCK_BIN_CHILD_TOP)
+        offset = -offset;
+    }
+  else if (direction == GTK_PAN_DIRECTION_DOWN)
+    {
+      if (priv->drag_child->type == DZL_DOCK_BIN_CHILD_BOTTOM)
+        offset = -offset;
+    }
+  else if (direction == GTK_PAN_DIRECTION_LEFT)
+    {
+      if (priv->drag_child->type == DZL_DOCK_BIN_CHILD_LEFT)
+        offset = -offset;
+    }
+  else if (direction == GTK_PAN_DIRECTION_RIGHT)
+    {
+      if (priv->drag_child->type == DZL_DOCK_BIN_CHILD_RIGHT)
+        offset = -offset;
+    }
+
+  priv->drag_child->drag_offset = (gint)offset;
+
+  position = priv->drag_child->drag_offset + priv->drag_child->drag_begin_position;
+  if (position >= 0)
+    dzl_dock_revealer_set_position (DZL_DOCK_REVEALER (priv->drag_child->widget), position);
+}
+
+static void
+dzl_dock_bin_create_pan_gesture (DzlDockBin *self)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GtkGesture *gesture;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (priv->pan_gesture == NULL);
+
+  gesture = gtk_gesture_pan_new (GTK_WIDGET (self), GTK_ORIENTATION_HORIZONTAL);
+  gtk_gesture_single_set_touch_only (GTK_GESTURE_SINGLE (gesture), FALSE);
+  gtk_event_controller_set_propagation_phase (GTK_EVENT_CONTROLLER (gesture), GTK_PHASE_CAPTURE);
+
+  g_signal_connect_object (gesture,
+                           "drag-begin",
+                           G_CALLBACK (dzl_dock_bin_pan_gesture_drag_begin),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (gesture,
+                           "drag-end",
+                           G_CALLBACK (dzl_dock_bin_pan_gesture_drag_end),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (gesture,
+                           "pan",
+                           G_CALLBACK (dzl_dock_bin_pan_gesture_pan),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  priv->pan_gesture = GTK_GESTURE_PAN (gesture);
+}
+
+static void
+dzl_dock_bin_drag_enter (DzlDockBin     *self,
+                         GdkDragContext *drag_context,
+                         gint            x,
+                         gint            y,
+                         guint           time_)
+{
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GDK_IS_DRAG_CONTEXT (drag_context));
+
+}
+
+static gboolean
+dzl_dock_bin_drag_motion (GtkWidget      *widget,
+                          GdkDragContext *drag_context,
+                          gint            x,
+                          gint            y,
+                          guint           time_)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GDK_IS_DRAG_CONTEXT (drag_context));
+
+  /*
+   * The purpose of this function is to determine of the location for which
+   * the drag is currently located, is a valid drop site. We first calculate
+   * the locations for the various zones, and then simply determine which
+   * zone we are in (or none).
+   */
+
+  if (priv->dnd_drag_x == -1 && priv->dnd_drag_y == -1)
+    dzl_dock_bin_drag_enter (self, drag_context, x, y, time_);
+
+  priv->dnd_drag_x = x;
+  priv->dnd_drag_y = y;
+
+  gtk_widget_queue_draw (GTK_WIDGET (self));
+
+  return TRUE;
+}
+
+static void
+dzl_dock_bin_drag_leave (GtkWidget      *widget,
+                         GdkDragContext *context,
+                         guint           time_)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GDK_IS_DRAG_CONTEXT (context));
+
+  priv->dnd_drag_x = -1;
+  priv->dnd_drag_y = -1;
+}
+
+static void
+dzl_dock_bin_grab_focus (GtkWidget *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  DzlDockBinChild *child;
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+
+  if (child->widget != NULL)
+    {
+      if (gtk_widget_child_focus (child->widget, GTK_DIR_TAB_FORWARD))
+        return;
+    }
+
+  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      child = &priv->children [i];
+
+      if (DZL_IS_DOCK_REVEALER (child->widget) &&
+          gtk_widget_get_visible (child->widget) &&
+          gtk_widget_get_child_visible (child->widget) &&
+          dzl_dock_revealer_get_reveal_child (DZL_DOCK_REVEALER (child->widget)))
+        {
+          if (gtk_widget_child_focus (child->widget, GTK_DIR_TAB_FORWARD))
+            return;
+        }
+    }
+}
+
+static GtkWidget *
+dzl_dock_bin_real_create_edge (DzlDockBin *self)
+{
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  return g_object_new (DZL_TYPE_DOCK_BIN_EDGE,
+                       "visible", TRUE,
+                       "reveal-child", FALSE,
+                       NULL);
+}
+
+static void
+dzl_dock_bin_create_edge (DzlDockBin          *self,
+                          DzlDockBinChild     *child,
+                          DzlDockBinChildType  type)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  g_autoptr(GSimpleActionGroup) map = NULL;
+  g_autoptr(GAction) pinned = NULL;
+  const gchar *name = NULL;
+  GAction *action;
+  gboolean reveal_child = FALSE;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (child != NULL);
+  g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
+  g_assert (type < LAST_DZL_DOCK_BIN_CHILD);
+
+  child->widget = DZL_DOCK_BIN_GET_CLASS (self)->create_edge (self);
+
+  if (child->widget == NULL)
+    {
+      g_warning ("%s failed to create edge widget",
+                 G_OBJECT_TYPE_NAME (self));
+      return;
+    }
+  else if (!DZL_IS_DOCK_BIN_EDGE (child->widget))
+    {
+      g_warning ("%s child %s is not a DzlDockBinEdge",
+                 G_OBJECT_TYPE_NAME (self),
+                 G_OBJECT_TYPE_NAME (child));
+      return;
+    }
+
+  /*
+   * If the user set the initial state for the edge before we created the
+   * edge, the value for it will be the state to the action. We need to
+   * grab that and apply it for our initial state.
+   */
+  switch (type)
+    {
+    case DZL_DOCK_BIN_CHILD_LEFT:   reveal_child = get_visible (self, "left-visible");   break;
+    case DZL_DOCK_BIN_CHILD_RIGHT:  reveal_child = get_visible (self, "right-visible");  break;
+    case DZL_DOCK_BIN_CHILD_TOP:    reveal_child = get_visible (self, "top-visible");    break;
+    case DZL_DOCK_BIN_CHILD_BOTTOM: reveal_child = get_visible (self, "bottom-visible"); break;
+    case DZL_DOCK_BIN_CHILD_CENTER:
+    case LAST_DZL_DOCK_BIN_CHILD:
+    default:
+      break;
+    }
+
+  g_object_set (child->widget,
+                "edge", (GtkPositionType)type,
+                "reveal-child", reveal_child,
+                NULL);
+
+  gtk_widget_set_parent (g_object_ref_sink (child->widget), GTK_WIDGET (self));
+
+  action = dzl_dock_bin_get_visible_action_for_type (self, type);
+  g_object_bind_property_full (child->widget, "reveal-child",
+                               action, "state",
+                               G_BINDING_SYNC_CREATE,
+                               map_boolean_to_variant,
+                               NULL, NULL, NULL);
+
+  dzl_dock_item_adopt (DZL_DOCK_ITEM (self), DZL_DOCK_ITEM (child->widget));
+
+  /* Action for panel children to easily activate */
+  map = g_simple_action_group_new ();
+  pinned = g_object_new (DZL_TYPE_CHILD_PROPERTY_ACTION,
+                         "enabled", TRUE,
+                         "container", self,
+                         "child", child->widget,
+                         "child-property-name", "pinned",
+                         "name", "pinned",
+                         NULL);
+  g_action_map_add_action (G_ACTION_MAP (map), pinned);
+  gtk_widget_insert_action_group (child->widget, "panel", G_ACTION_GROUP (map));
+  g_clear_object (&pinned);
+
+  /* Action for global widgetry to activate */
+  if (child->type == DZL_DOCK_BIN_CHILD_LEFT)
+    name = "left-pinned";
+  else if (child->type == DZL_DOCK_BIN_CHILD_RIGHT)
+    name = "right-pinned";
+  else if (child->type == DZL_DOCK_BIN_CHILD_TOP)
+    name = "top-pinned";
+  else if (child->type == DZL_DOCK_BIN_CHILD_BOTTOM)
+    name = "bottom-pinned";
+  pinned = g_object_new (DZL_TYPE_CHILD_PROPERTY_ACTION,
+                         "enabled", TRUE,
+                         "container", self,
+                         "child", child->widget,
+                         "child-property-name", "pinned",
+                         "name", name,
+                         NULL);
+  g_action_map_add_action (G_ACTION_MAP (priv->actions), pinned);
+
+  if (child->pinned)
+    gtk_style_context_add_class (gtk_widget_get_style_context (child->widget),
+                                 DZL_DOCK_BIN_STYLE_CLASS_PINNED);
+}
+
+static void
+dzl_dock_bin_init_child (DzlDockBin          *self,
+                         DzlDockBinChild     *child,
+                         DzlDockBinChildType  type)
+{
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (child != NULL);
+  g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
+  g_assert (type < LAST_DZL_DOCK_BIN_CHILD);
+
+  child->type = type;
+  child->priority = (int)type * 100;
+  child->pinned = TRUE;
+}
+
+static void
+dzl_dock_bin_destroy (GtkWidget *widget)
+{
+  DzlDockBin *self = DZL_DOCK_BIN (widget);
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_clear_object (&priv->actions);
+  g_clear_object (&priv->pan_gesture);
+
+  GTK_WIDGET_CLASS (dzl_dock_bin_parent_class)->destroy (widget);
+}
+
+static void
+dzl_dock_bin_get_child_property (GtkContainer *container,
+                                 GtkWidget    *widget,
+                                 guint         prop_id,
+                                 GValue       *value,
+                                 GParamSpec   *pspec)
+{
+  DzlDockBin *self = DZL_DOCK_BIN (container);
+  DzlDockBinChild *child = dzl_dock_bin_get_child (self, widget);
+
+  switch (prop_id)
+    {
+    case CHILD_PROP_PRIORITY:
+      g_value_set_int (value, child->priority);
+      break;
+
+    case CHILD_PROP_POSITION:
+      g_value_set_enum (value, (GtkPositionType)child->type);
+      break;
+
+    case CHILD_PROP_PINNED:
+      g_value_set_boolean (value, child->pinned);
+      break;
+
+    default:
+      GTK_CONTAINER_WARN_INVALID_CHILD_PROPERTY_ID (container, prop_id, pspec);
+    }
+}
+
+static void
+dzl_dock_bin_set_child_property (GtkContainer *container,
+                                 GtkWidget    *widget,
+                                 guint         prop_id,
+                                 const GValue *value,
+                                 GParamSpec   *pspec)
+{
+  DzlDockBin *self = DZL_DOCK_BIN (container);
+
+  switch (prop_id)
+    {
+    case CHILD_PROP_PINNED:
+      dzl_dock_bin_set_child_pinned (self, widget, g_value_get_boolean (value));
+      break;
+
+    case CHILD_PROP_PRIORITY:
+      dzl_dock_bin_set_child_priority (self, widget, g_value_get_int (value));
+      break;
+
+    default:
+      GTK_CONTAINER_WARN_INVALID_CHILD_PROPERTY_ID (container, prop_id, pspec);
+    }
+}
+
+static void
+dzl_dock_bin_get_property (GObject    *object,
+                           guint       prop_id,
+                           GValue     *value,
+                           GParamSpec *pspec)
+{
+  DzlDockBin *self = DZL_DOCK_BIN (object);
+
+  switch (prop_id)
+    {
+    case PROP_LEFT_VISIBLE:
+      g_value_set_boolean (value, get_visible (self, "left-visible"));
+      break;
+
+    case PROP_RIGHT_VISIBLE:
+      g_value_set_boolean (value, get_visible (self, "right-visible"));
+      break;
+
+    case PROP_TOP_VISIBLE:
+      g_value_set_boolean (value, get_visible (self, "top-visible"));
+      break;
+
+    case PROP_BOTTOM_VISIBLE:
+      g_value_set_boolean (value, get_visible (self, "bottom-visible"));
+      break;
+
+    case PROP_MANAGER:
+      g_value_set_object (value, dzl_dock_item_get_manager (DZL_DOCK_ITEM (self)));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+dzl_dock_bin_set_property (GObject      *object,
+                           guint         prop_id,
+                           const GValue *value,
+                           GParamSpec   *pspec)
+{
+  DzlDockBin *self = DZL_DOCK_BIN (object);
+
+  switch (prop_id)
+    {
+    case PROP_LEFT_VISIBLE:
+      set_visible (self, "left-visible", g_value_get_boolean (value));
+      break;
+
+    case PROP_RIGHT_VISIBLE:
+      set_visible (self, "right-visible", g_value_get_boolean (value));
+      break;
+
+    case PROP_TOP_VISIBLE:
+      set_visible (self, "top-visible", g_value_get_boolean (value));
+      break;
+
+    case PROP_BOTTOM_VISIBLE:
+      set_visible (self, "bottom-visible", g_value_get_boolean (value));
+      break;
+
+    case PROP_MANAGER:
+      dzl_dock_item_set_manager (DZL_DOCK_ITEM (self), g_value_get_object (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+dzl_dock_bin_class_init (DzlDockBinClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
+
+  object_class->get_property = dzl_dock_bin_get_property;
+  object_class->set_property = dzl_dock_bin_set_property;
+
+  widget_class->destroy = dzl_dock_bin_destroy;
+  widget_class->drag_leave = dzl_dock_bin_drag_leave;
+  widget_class->drag_motion = dzl_dock_bin_drag_motion;
+  widget_class->get_preferred_height = dzl_dock_bin_get_preferred_height;
+  widget_class->get_preferred_width = dzl_dock_bin_get_preferred_width;
+  widget_class->grab_focus = dzl_dock_bin_grab_focus;
+  widget_class->map = dzl_dock_bin_map;
+  widget_class->realize = dzl_dock_bin_realize;
+  widget_class->size_allocate = dzl_dock_bin_size_allocate;
+  widget_class->unmap = dzl_dock_bin_unmap;
+  widget_class->unrealize = dzl_dock_bin_unrealize;
+
+  container_class->add = dzl_dock_bin_add;
+  container_class->forall = dzl_dock_bin_forall;
+  container_class->get_child_property = dzl_dock_bin_get_child_property;
+  container_class->remove = dzl_dock_bin_remove;
+  container_class->set_child_property = dzl_dock_bin_set_child_property;
+
+  klass->create_edge = dzl_dock_bin_real_create_edge;
+
+  g_object_class_override_property (object_class, PROP_MANAGER, "manager");
+
+  properties [PROP_LEFT_VISIBLE] =
+    g_param_spec_boolean ("left-visible",
+                          "Left Visible",
+                          "If the left panel is visible.",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_RIGHT_VISIBLE] =
+    g_param_spec_boolean ("right-visible",
+                          "Right Visible",
+                          "If the right panel is visible.",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_TOP_VISIBLE] =
+    g_param_spec_boolean ("top-visible",
+                          "Top Visible",
+                          "If the top panel is visible.",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_BOTTOM_VISIBLE] =
+    g_param_spec_boolean ("bottom-visible",
+                          "Bottom Visible",
+                          "If the bottom panel is visible.",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  child_properties [CHILD_PROP_PINNED] =
+    g_param_spec_boolean ("pinned",
+                          "Pinned",
+                          "If the child panel is pinned",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  child_properties [CHILD_PROP_POSITION] =
+    g_param_spec_enum ("position",
+                       "Position",
+                       "The position of the dock edge",
+                       GTK_TYPE_POSITION_TYPE,
+                       GTK_POS_LEFT,
+                       (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  child_properties [CHILD_PROP_PRIORITY] =
+    g_param_spec_int ("priority",
+                      "Priority",
+                      "The priority of the dock edge",
+                      G_MININT,
+                      G_MAXINT,
+                      0,
+                      (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  gtk_container_class_install_child_properties (container_class, N_CHILD_PROPS, child_properties);
+
+  gtk_widget_class_set_css_name (widget_class, "dzldockbin");
+}
+
+static void
+dzl_dock_bin_init (DzlDockBin *self)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  static GtkTargetEntry drag_entries[] = {
+    { (gchar *)"DZL_DOCK_BIN_WIDGET", GTK_TARGET_SAME_APP, 0 },
+  };
+  static const GActionEntry entries[] = {
+    { "left-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
+    { "right-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
+    { "top-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
+    { "bottom-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
+  };
+
+  gtk_widget_set_has_window (GTK_WIDGET (self), TRUE);
+
+  priv->actions = g_simple_action_group_new ();
+  g_action_map_add_action_entries (G_ACTION_MAP (priv->actions),
+                                   entries, G_N_ELEMENTS (entries),
+                                   self);
+  gtk_widget_insert_action_group (GTK_WIDGET (self), "dockbin", G_ACTION_GROUP (priv->actions));
+
+  dzl_dock_bin_create_pan_gesture (self);
+
+  gtk_drag_dest_set (GTK_WIDGET (self),
+                     GTK_DEST_DEFAULT_ALL,
+                     drag_entries,
+                     G_N_ELEMENTS (drag_entries),
+                     GDK_ACTION_MOVE);
+
+  priv->dnd_drag_x = -1;
+  priv->dnd_drag_y = -1;
+
+  dzl_dock_bin_init_child (self, &priv->children [0], DZL_DOCK_BIN_CHILD_LEFT);
+  dzl_dock_bin_init_child (self, &priv->children [1], DZL_DOCK_BIN_CHILD_RIGHT);
+  dzl_dock_bin_init_child (self, &priv->children [2], DZL_DOCK_BIN_CHILD_BOTTOM);
+  dzl_dock_bin_init_child (self, &priv->children [3], DZL_DOCK_BIN_CHILD_TOP);
+  dzl_dock_bin_init_child (self, &priv->children [4], DZL_DOCK_BIN_CHILD_CENTER);
+}
+
+GtkWidget *
+dzl_dock_bin_new (void)
+{
+  return g_object_new (DZL_TYPE_DOCK_BIN, NULL);
+}
+
+/**
+ * dzl_dock_bin_get_center_widget:
+ * @self: A #DzlDockBin
+ *
+ * Gets the center widget for the dock.
+ *
+ * Returns: (transfer none) (nullable): A #GtkWidget or %NULL.
+ */
+GtkWidget *
+dzl_dock_bin_get_center_widget (DzlDockBin *self)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  DzlDockBinChild *child;
+
+  g_return_val_if_fail (DZL_IS_DOCK_BIN (self), NULL);
+
+  child = &priv->children [DZL_DOCK_BIN_CHILD_CENTER];
+
+  return child->widget;
+}
+
+/**
+ * dzl_dock_bin_get_top_edge:
+ * Returns: (transfer none): A #GtkWidget
+ */
+GtkWidget *
+dzl_dock_bin_get_top_edge (DzlDockBin *self)
+{
+  DzlDockBinChild *child;
+
+  g_return_val_if_fail (DZL_IS_DOCK_BIN (self), NULL);
+
+  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_TOP);
+
+  if (child->widget == NULL)
+    dzl_dock_bin_create_edge (self, child, DZL_DOCK_BIN_CHILD_TOP);
+
+  return child->widget;
+}
+
+/**
+ * dzl_dock_bin_get_left_edge:
+ * Returns: (transfer none): A #GtkWidget
+ */
+GtkWidget *
+dzl_dock_bin_get_left_edge (DzlDockBin *self)
+{
+  DzlDockBinChild *child;
+
+  g_return_val_if_fail (DZL_IS_DOCK_BIN (self), NULL);
+
+  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_LEFT);
+
+  if (child->widget == NULL)
+    dzl_dock_bin_create_edge (self, child, DZL_DOCK_BIN_CHILD_LEFT);
+
+  return child->widget;
+}
+
+/**
+ * dzl_dock_bin_get_bottom_edge:
+ * Returns: (transfer none): A #GtkWidget
+ */
+GtkWidget *
+dzl_dock_bin_get_bottom_edge (DzlDockBin *self)
+{
+  DzlDockBinChild *child;
+
+  g_return_val_if_fail (DZL_IS_DOCK_BIN (self), NULL);
+
+  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_BOTTOM);
+
+  if (child->widget == NULL)
+    dzl_dock_bin_create_edge (self, child, DZL_DOCK_BIN_CHILD_BOTTOM);
+
+  return child->widget;
+}
+
+/**
+ * dzl_dock_bin_get_right_edge:
+ * Returns: (transfer none): A #GtkWidget
+ */
+GtkWidget *
+dzl_dock_bin_get_right_edge (DzlDockBin *self)
+{
+  DzlDockBinChild *child;
+
+  g_return_val_if_fail (DZL_IS_DOCK_BIN (self), NULL);
+
+  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_RIGHT);
+
+  if (child->widget == NULL)
+    dzl_dock_bin_create_edge (self, child, DZL_DOCK_BIN_CHILD_RIGHT);
+
+  return child->widget;
+}
+
+static void
+dzl_dock_bin_init_dock_iface (DzlDockInterface *iface)
+{
+}
+
+static void
+dzl_dock_bin_add_child (GtkBuildable *buildable,
+                        GtkBuilder   *builder,
+                        GObject      *child,
+                        const gchar  *type)
+{
+  DzlDockBin *self = (DzlDockBin *)buildable;
+  GtkWidget *parent;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_BUILDER (builder));
+  g_assert (G_IS_OBJECT (child));
+
+  if (!GTK_IS_WIDGET (child))
+    {
+      g_warning ("Attempt to add a child of type \"%s\" to a \"%s\"",
+                 G_OBJECT_TYPE_NAME (child), G_OBJECT_TYPE_NAME (self));
+      return;
+    }
+
+  if (DZL_IS_DOCK_ITEM (child) &&
+      !dzl_dock_item_adopt (DZL_DOCK_ITEM (self), DZL_DOCK_ITEM (child)))
+    {
+      g_warning ("Child of type %s has a different DzlDockManager than %s",
+                 G_OBJECT_TYPE_NAME (child), G_OBJECT_TYPE_NAME (self));
+      return;
+    }
+
+  if (!type || !*type || (g_strcmp0 ("center", type) == 0))
+    {
+      gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (child));
+      return;
+    }
+
+  if (g_strcmp0 ("top", type) == 0)
+    parent = dzl_dock_bin_get_top_edge (self);
+  else if (g_strcmp0 ("bottom", type) == 0)
+    parent = dzl_dock_bin_get_bottom_edge (self);
+  else if (g_strcmp0 ("right", type) == 0)
+    parent = dzl_dock_bin_get_right_edge (self);
+  else
+    parent = dzl_dock_bin_get_left_edge (self);
+
+  if (DZL_IS_DOCK_BIN_EDGE (parent))
+    gtk_container_add (GTK_CONTAINER (parent), GTK_WIDGET (child));
+}
+
+static GObject *
+dzl_dock_bin_get_internal_child (GtkBuildable *buildable,
+                                 GtkBuilder   *builder,
+                                 const gchar  *childname)
+{
+  DzlDockBin *self = (DzlDockBin *)buildable;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_BUILDER (builder));
+
+  if (g_strcmp0 ("top", childname) == 0)
+    return G_OBJECT (dzl_dock_bin_get_top_edge (self));
+  else if (g_strcmp0 ("bottom", childname) == 0)
+    return G_OBJECT (dzl_dock_bin_get_bottom_edge (self));
+  else if (g_strcmp0 ("right", childname) == 0)
+    return G_OBJECT (dzl_dock_bin_get_right_edge (self));
+  else if (g_strcmp0 ("left", childname) == 0)
+    return G_OBJECT (dzl_dock_bin_get_left_edge (self));
+
+  return NULL;
+}
+
+static void
+dzl_dock_bin_init_buildable_iface (GtkBuildableIface *iface)
+{
+  iface->add_child = dzl_dock_bin_add_child;
+  iface->get_internal_child = dzl_dock_bin_get_internal_child;
+}
+
+static void
+dzl_dock_bin_present_child (DzlDockItem *item,
+                            DzlDockItem *widget)
+{
+  DzlDockBin *self = (DzlDockBin *)item;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  guint i;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (DZL_IS_DOCK_ITEM (widget));
+  g_assert (GTK_IS_WIDGET (widget));
+
+  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      DzlDockBinChild *child = &priv->children [i];
+
+      if (DZL_IS_DOCK_BIN_EDGE (child->widget) &&
+          gtk_widget_is_ancestor (GTK_WIDGET (child->widget), child->widget))
+        {
+          dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget), TRUE);
+          return;
+        }
+    }
+}
+
+static gboolean
+dzl_dock_bin_get_child_visible (DzlDockItem *item,
+                                DzlDockItem *child)
+{
+  DzlDockBin *self = (DzlDockBin *)item;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GtkWidget *ancestor;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (DZL_IS_DOCK_ITEM (item));
+
+  ancestor = gtk_widget_get_ancestor (GTK_WIDGET (child), DZL_TYPE_DOCK_BIN_EDGE);
+
+  if (ancestor == NULL)
+    return FALSE;
+
+  if ((ancestor == priv->children [0].widget) ||
+      (ancestor == priv->children [1].widget) ||
+      (ancestor == priv->children [2].widget) ||
+      (ancestor == priv->children [3].widget))
+    return dzl_dock_revealer_get_child_revealed (DZL_DOCK_REVEALER (ancestor));
+
+  return FALSE;
+}
+
+static void
+dzl_dock_bin_set_child_visible (DzlDockItem *item,
+                                DzlDockItem *child,
+                                gboolean     child_visible)
+{
+  DzlDockBin *self = (DzlDockBin *)item;
+  GtkWidget *ancestor;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (DZL_IS_DOCK_ITEM (item));
+
+  ancestor = gtk_widget_get_ancestor (GTK_WIDGET (child), DZL_TYPE_DOCK_BIN_EDGE);
+
+  if (ancestor != NULL)
+    dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (ancestor), child_visible);
+}
+
+static gboolean
+dzl_dock_bin_minimize (DzlDockItem     *item,
+                       DzlDockItem     *child,
+                       GtkPositionType *position)
+{
+  DzlDockBin *self = (DzlDockBin *)item;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (DZL_IS_DOCK_ITEM (child));
+  g_assert (position != NULL);
+
+  for (guint i = 0; i < LAST_DZL_DOCK_BIN_CHILD; i++)
+    {
+      const DzlDockBinChild *info = &priv->children [i];
+
+      if (info->widget != NULL && gtk_widget_is_ancestor (GTK_WIDGET (child), info->widget))
+        {
+          switch (info->type)
+            {
+            case DZL_DOCK_BIN_CHILD_LEFT:
+            case DZL_DOCK_BIN_CHILD_CENTER:
+            case LAST_DZL_DOCK_BIN_CHILD:
+            default:
+              *position = GTK_POS_LEFT;
+              break;
+
+            case DZL_DOCK_BIN_CHILD_RIGHT:
+              *position = GTK_POS_RIGHT;
+              break;
+
+            case DZL_DOCK_BIN_CHILD_TOP:
+              *position = GTK_POS_TOP;
+              break;
+
+            case DZL_DOCK_BIN_CHILD_BOTTOM:
+              *position = GTK_POS_BOTTOM;
+              break;
+            }
+
+          break;
+        }
+    }
+
+  return FALSE;
+}
+
+static void
+dzl_dock_bin_update_visibility (DzlDockItem *item)
+{
+  DzlDockBin *self = (DzlDockBin *)item;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+
+  dzl_dock_bin_update_actions (self);
+}
+
+static void
+dzl_dock_bin_init_dock_item_iface (DzlDockItemInterface *iface)
+{
+  iface->present_child = dzl_dock_bin_present_child;
+  iface->get_child_visible = dzl_dock_bin_get_child_visible;
+  iface->set_child_visible = dzl_dock_bin_set_child_visible;
+  iface->minimize = dzl_dock_bin_minimize;
+  iface->update_visibility = dzl_dock_bin_update_visibility;
+}

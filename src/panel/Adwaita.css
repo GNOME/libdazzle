@@ -1,0 +1,80 @@
+dzldockbinedge {
+  background-color: @content_view_bg;
+  border-color: @borders;
+  border-style: solid;
+}
+
+dzldockbinedge.right {
+  border-left-width: 1px;
+}
+
+dzldockbinedge.left {
+  border-right-width: 1px;
+}
+
+dzldockbinedge.bottom {
+  border-top-width: 1px;
+}
+
+dzldockpaned .handle {
+  border: 1px solid @borders;
+}
+
+dzldockstack dzltabstrip {
+  padding-top: 2px;
+  background-color: @content_view_bg;
+  color: @theme_fg_color;
+  border-bottom: 1px solid mix(@theme_bg_color, @borders, 0.25);
+}
+
+dzldockstack dzltabstrip button.control,
+dzldockstack dzltabstrip dzltab {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  border-bottom: 3px;
+  border-bottom-style: solid;
+  border-bottom-color: transparent;
+
+  margin-left: 6px;
+  margin-right: 6px;
+
+  color: @theme_fg_color;
+}
+
+dzldockstack dzltabstrip button.control,
+dzldockstack dzltabstrip dzltab button,
+dzldockstack dzltabstrip dzltab {
+  transition-duration: 200ms;
+}
+
+dzldockstack dzltabstrip dzltab button {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+dzldockstack dzltabstrip dzltab:active {
+  border-bottom-color: @theme_selected_bg_color;
+}
+
+dzldockstack dzltabstrip button.control:last-child {
+  margin-right: 16px;
+}
+
+dzldockstack dzltabstrip button.control:hover,
+dzldockstack dzltabstrip dzltab:hover {
+  border-bottom-color: mix(@borders, @theme_bg_color, 0.25);
+}
+
+dzldockstack dzltabstrip button.control:hover:checked,
+dzldockstack dzltabstrip button.control:checked,
+dzldockstack dzltabstrip dzltab:hover:checked,
+dzldockstack dzltabstrip dzltab:checked {
+  border-bottom-color: @theme_selected_bg_color;
+}

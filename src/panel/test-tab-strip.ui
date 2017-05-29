@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<interface>
+  <object class="GtkWindow" id="window">
+    <property name="title">Test Panel</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">true</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="DzlTabStrip">
+            <property name="visible">true</property>
+            <property name="stack">stack</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="visible">true</property>
+            <property name="vexpand">true</property>
+            <child>
+              <object class="GtkTextView">
+                <property name="monospace">true</property>
+                <property name="visible">true</property>
+                <property name="buffer">buffer1</property>
+              </object>
+              <packing>
+                <property name="name">tab1</property>
+                <property name="title">Tab 1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkTextView">
+                <property name="monospace">true</property>
+                <property name="visible">true</property>
+                <property name="buffer">buffer2</property>
+              </object>
+              <packing>
+                <property name="name">tab2</property>
+                <property name="title">Tab 2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkTextView">
+                <property name="monospace">true</property>
+                <property name="visible">true</property>
+                <property name="buffer">buffer3</property>
+              </object>
+              <packing>
+                <property name="name">tab3</property>
+                <property name="title">Tab 3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkTextView">
+                <property name="monospace">true</property>
+                <property name="visible">true</property>
+                <property name="buffer">buffer4</property>
+              </object>
+              <packing>
+                <property name="name">tab4</property>
+                <property name="title">Tab 4</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkTextBuffer" id="buffer1">
+    <property name="text">Page 1</property>
+  </object>
+  <object class="GtkTextBuffer" id="buffer2">
+    <property name="text">Page 2</property>
+  </object>
+  <object class="GtkTextBuffer" id="buffer3">
+    <property name="text">Page 3</property>
+  </object>
+  <object class="GtkTextBuffer" id="buffer4">
+    <property name="text">Page 4</property>
+  </object>
+</interface>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<interface>
+  <template class="GseShortcutAccelDialog" parent="GtkDialog">
+    <child type="action">
+      <object class="GtkButton" id="button_cancel">
+        <property name="can-default">true</property>
+      </object>
+    </child>
+    <child type="action">
+      <object class="GtkButton" id="button_set">
+        <property name="can-default">true</property>
+      </object>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <child>
+          <object class="GtkStack" id="stack">
+            <property name="homogeneous">true</property>
+            <property name="margin">24</property>
+            <property name="visible">true</property>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">18</property>
+                <property name="visible">true</property>
+                <child>
+                  <object class="GtkLabel" id="selection_label">
+                    <property name="xalign">0.5</property>
+                    <property name="use-markup">true</property>
+                    <property name="visible">true</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkImage">
+                    <property name="resource">/org/gnome/gse/icons/enter-keyboard-shortcut.svg</property>
+                    <property name="expand">true</property>
+                    <property name="visible">true</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="xalign">0.5</property>
+                    <property name="label" translatable="yes">Press Escape to cancel or Backspace to disable.</property>
+                    <property name="visible">true</property>
+                    <style>
+                      <class name="dim-label"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="name">selection</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">18</property>
+                <property name="visible">true</property>
+                <child>
+                  <object class="GtkLabel" id="display_label">
+                    <property name="xalign">0.5</property>
+                    <property name="use-markup">true</property>
+                    <property name="visible">true</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GseShortcutLabel" id="display_shortcut">
+                    <property name="halign">center</property>
+                    <property name="visible">true</property>
+                    <style>
+                      <class name="dim-label"/>
+                    </style>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="name">display</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="accept">button_set</action-widget>
+      <action-widget response="cancel">button_cancel</action-widget>
+    </action-widgets>
+  </template>
+</interface>
