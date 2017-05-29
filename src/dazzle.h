@@ -101,6 +101,7 @@ G_BEGIN_DECLS
 #include "widgets/dzl-simple-label.h"
 #include "widgets/dzl-simple-popover.h"
 #include "widgets/dzl-slider.h"
+#include "widgets/dzl-stack-list.h"
 #include "widgets/dzl-three-grid.h"
 #undef DAZZLE_INSIDE
 

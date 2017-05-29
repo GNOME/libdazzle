@@ -89,6 +89,7 @@ libdazzle_public_headers = [
   'widgets/dzl-simple-label.h',
   'widgets/dzl-simple-popover.h',
   'widgets/dzl-slider.h',
+  'widgets/dzl-stack-list.h',
   'widgets/dzl-three-grid.h',
 ]
 
@@ -173,6 +174,7 @@ libdazzle_public_sources = [
   'widgets/dzl-simple-label.c',
   'widgets/dzl-simple-popover.c',
   'widgets/dzl-slider.c',
+  'widgets/dzl-stack-list.c',
   'widgets/dzl-three-grid.c',
 ]
 
@@ -194,6 +196,9 @@ libdazzle_sources = [
   'util/dzl-counter.c',
   'util/dzl-counter.h',
   'util/dzl-util-private.h',
+
+  'widgets/dzl-rect-helper.c',
+  'widgets/dzl-rect-helper.h',
 
   # Other dependencies
   libdazzle_resources,
