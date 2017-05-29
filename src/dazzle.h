@@ -40,6 +40,7 @@ G_BEGIN_DECLS
 #include "bindings/dzl-binding-group.h"
 #include "bindings/dzl-signal-group.h"
 #include "cache/dzl-task-cache.h"
+#include "files/dzl-directory-reaper.h"
 #include "menus/dzl-menu-manager.h"
 #include "panel/dzl-dock-bin-edge.h"
 #include "panel/dzl-dock-bin.h"

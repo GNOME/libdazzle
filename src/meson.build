@@ -23,6 +23,8 @@ libdazzle_public_headers = [
 
   'cache/dzl-task-cache.h',
 
+  'files/dzl-directory-reaper.h',
+
   'menus/dzl-menu-manager.h',
 
   'panel/dzl-dock-bin-edge.h',
@@ -105,6 +107,8 @@ libdazzle_public_sources = [
   'bindings/dzl-signal-group.c',
 
   'cache/dzl-task-cache.c',
+
+  'files/dzl-directory-reaper.c',
 
   'menus/dzl-menu-manager.c',
 
