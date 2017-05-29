@@ -69,8 +69,12 @@ libdazzle_public_headers = [
   'suggestions/dzl-suggestion-row.h',
   'suggestions/dzl-suggestion.h',
 
+  'util/dzl-cairo.h',
   'util/dzl-date-time.h',
+  'util/dzl-dnd.h',
   'util/dzl-heap.h',
+  'util/dzl-pango.h',
+  'util/dzl-rgba.h',
 
   'widgets/dzl-bin.h',
   'widgets/dzl-box.h',
@@ -154,8 +158,12 @@ libdazzle_public_sources = [
   'suggestions/dzl-suggestion-row.c',
   'suggestions/dzl-suggestion.c',
 
+  'util/dzl-cairo.c',
   'util/dzl-date-time.c',
+  'util/dzl-dnd.c',
   'util/dzl-heap.c',
+  'util/dzl-pango.c',
+  'util/dzl-rgba.c',
   'util/dzl-util.c',
 
   'widgets/dzl-bin.c',
