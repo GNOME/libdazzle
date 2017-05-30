@@ -91,6 +91,7 @@ G_BEGIN_DECLS
 #include "util/dzl-pango.h"
 #include "util/dzl-rgba.h"
 #include "widgets/dzl-bin.h"
+#include "widgets/dzl-bolding-label.h"
 #include "widgets/dzl-box.h"
 #include "widgets/dzl-centering-bin.h"
 #include "widgets/dzl-column-layout.h"

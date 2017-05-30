@@ -83,6 +83,7 @@ libdazzle_public_headers = [
   'util/dzl-rgba.h',
 
   'widgets/dzl-bin.h',
+  'widgets/dzl-bolding-label.h',
   'widgets/dzl-box.h',
   'widgets/dzl-centering-bin.h',
   'widgets/dzl-column-layout.h',
@@ -179,6 +180,7 @@ libdazzle_public_sources = [
   'theming/dzl-theme-manager.c',
 
   'widgets/dzl-bin.c',
+  'widgets/dzl-bolding-label.c',
   'widgets/dzl-box.c',
   'widgets/dzl-centering-bin.c',
   'widgets/dzl-column-layout.c',
