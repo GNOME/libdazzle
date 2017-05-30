@@ -27,7 +27,11 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlThemeManager, dzl_theme_manager, DZL, THEME_MANAGER, GObject)
 
-DzlThemeManager *dzl_theme_manager_new (void);
+DzlThemeManager *dzl_theme_manager_new                 (void);
+void             dzl_theme_manager_add_resource_path   (DzlThemeManager *self,
+                                                        const gchar     *resource_path);
+void             dzl_theme_manager_remove_resource_path (DzlThemeManager *self,
+                                                        const gchar     *resource_path);
 
 G_END_DECLS
 
