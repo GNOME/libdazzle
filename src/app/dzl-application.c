@@ -96,31 +96,11 @@ dzl_application_real_remove_resource_path (DzlApplication *self,
 }
 
 static void
-dzl_application_load_app_menu (DzlApplication *self)
-{
-  DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
-  g_autofree gchar *menu_path = NULL;
-  const gchar *base_path;
-  GMenu *app_menu;
-
-  g_assert (DZL_IS_APPLICATION (self));
-
-  /* Load the default application menus.ui. We override the default gtk
-   * resources loading of menus.ui so that we can merge items from plugins
-   * into this same menu instance.
-   */
-  base_path = g_application_get_resource_base_path (G_APPLICATION (self));
-  menu_path = g_build_filename (base_path, "gtk", "menus.ui", NULL);
-  dzl_menu_manager_add_resource (priv->menu_manager, menu_path, NULL);
-  app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
-  gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
-}
-
-static void
 dzl_application_startup (GApplication *app)
 {
   DzlApplication *self = (DzlApplication *)app;
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+  GMenu *app_menu;
 
   g_assert (DZL_IS_APPLICATION (self));
 
@@ -128,9 +108,12 @@ dzl_application_startup (GApplication *app)
   priv->menu_manager = dzl_menu_manager_new ();
   priv->menu_merge_ids = g_hash_table_new (NULL, NULL);
 
-  dzl_application_load_app_menu (self);
+  dzl_application_add_resource_path (self, g_application_get_resource_base_path (app));
 
   G_APPLICATION_CLASS (dzl_application_parent_class)->startup (app);
+
+  app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
+  gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
 }
 
 static void
