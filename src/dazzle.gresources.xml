@@ -15,6 +15,7 @@
   </gresource>
 
   <gresource prefix="/org/gnome/dazzle/css">
+    <file compressed="true" alias="dzl-stack-list.css">widgets/dzl-stack-list.css</file>
     <file compressed="true" alias="dzl-suggestion-entry.css">suggestions/dzl-suggestion-entry.css</file>
   </gresource>
 

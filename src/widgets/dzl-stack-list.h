@@ -50,16 +50,16 @@ typedef GtkWidget *(*DzlStackListCreateWidgetFunc) (gpointer item,
                                                     gpointer user_data);
 
 GtkWidget *dzl_stack_list_new        (void);
-void       dzl_stack_list_push       (DzlStackList                 *self,
+void       dzl_stack_list_push       (DzlStackList                  *self,
                                       GtkWidget                     *header,
                                       GListModel                    *model,
-                                      DzlStackListCreateWidgetFunc  create_widget_func,
+                                      DzlStackListCreateWidgetFunc   create_widget_func,
                                       gpointer                       user_data,
                                       GDestroyNotify                 user_data_free_func);
-void        dzl_stack_list_pop       (DzlStackList                 *self);
-GListModel *dzl_stack_list_get_model (DzlStackList                 *self);
-guint       dzl_stack_list_get_depth (DzlStackList                 *self);
-void        dzl_stack_list_clear     (DzlStackList                 *self);
+void        dzl_stack_list_pop       (DzlStackList                  *self);
+GListModel *dzl_stack_list_get_model (DzlStackList                  *self);
+guint       dzl_stack_list_get_depth (DzlStackList                  *self);
+void        dzl_stack_list_clear     (DzlStackList                  *self);
 
 G_END_DECLS
 
