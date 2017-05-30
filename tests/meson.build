@@ -52,3 +52,9 @@ test_heap = executable('test-heap', 'test-heap.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_slider = executable('test-slider', 'test-slider.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
