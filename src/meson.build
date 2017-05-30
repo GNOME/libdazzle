@@ -35,13 +35,12 @@ libdazzle_generated_headers = [
   dzl_version_h,
 ]
 
-non_introspectable_public_headers = [
-  'util/dzl-int-pair.h',
-]
+install_headers('dazzle.h', subdir: libdazzle_header_subdir)
 
-libdazzle_public_headers = [
-  'dazzle.h',
-]
+# Filled out in the subdirs
+libdazzle_public_headers = []
+libdazzle_public_sources = []
+libdazzle_private_sources = []
 
 subdir('actions')
 subdir('animation')
@@ -52,6 +51,8 @@ subdir('files')
 subdir('graphing')
 subdir('menus')
 subdir('panel')
+subdir('pathbar')
+subdir('prefs')
 subdir('search')
 subdir('settings')
 subdir('shortcuts')
@@ -62,185 +63,10 @@ subdir('tree')
 subdir('util')
 subdir('widgets')
 
-libdazzle_public_sources = [
-  'actions/dzl-child-property-action.c',
-  'actions/dzl-properties-group.c',
-  'actions/dzl-settings-flag-action.c',
-  'actions/dzl-widget-action-group.c',
-
-  'animation/dzl-animation.c',
-  'animation/dzl-box-theatric.c',
-
-  'app/dzl-application.c',
-  'app/dzl-application-window.c',
-
-  'bindings/dzl-binding-group.c',
-  'bindings/dzl-signal-group.c',
-
-  'cache/dzl-task-cache.c',
-
-  'files/dzl-directory-model.c',
-  'files/dzl-directory-reaper.c',
-
-  'graphing/dzl-cpu-graph.c',
-  'graphing/dzl-cpu-model.c',
-  'graphing/dzl-graph-column.c',
-  'graphing/dzl-graph-line-renderer.c',
-  'graphing/dzl-graph-model.c',
-  'graphing/dzl-graph-renderer.c',
-  'graphing/dzl-graph-view.c',
-
-  'menus/dzl-joined-menu.c',
-  'menus/dzl-menu-button.c',
-  'menus/dzl-menu-button-item.c',
-  'menus/dzl-menu-button-section.c',
-  'menus/dzl-menu-manager.c',
-
-  'panel/dzl-dock-bin-edge.c',
-  'panel/dzl-dock-bin.c',
-  'panel/dzl-dock-item.c',
-  'panel/dzl-dock-manager.c',
-  'panel/dzl-dock-overlay-edge.c',
-  'panel/dzl-dock-overlay.c',
-  'panel/dzl-dock-paned.c',
-  'panel/dzl-dock-revealer.c',
-  'panel/dzl-dock-stack.c',
-  'panel/dzl-dock-transient-grab.c',
-  'panel/dzl-dock-widget.c',
-  'panel/dzl-dock-window.c',
-  'panel/dzl-dock.c',
-  'panel/dzl-tab-strip.c',
-  'panel/dzl-tab.c',
-
-  'pathbar/dzl-path.c',
-  'pathbar/dzl-path-bar.c',
-  'pathbar/dzl-path-element.c',
-
-  'prefs/dzl-preferences-bin.c',
-  'prefs/dzl-preferences-entry.c',
-  'prefs/dzl-preferences-file-chooser-button.c',
-  'prefs/dzl-preferences-flow-box.c',
-  'prefs/dzl-preferences-font-button.c',
-  'prefs/dzl-preferences-group.c',
-  'prefs/dzl-preferences-page.c',
-  'prefs/dzl-preferences-spin-button.c',
-  'prefs/dzl-preferences-switch.c',
-  'prefs/dzl-preferences-view.c',
-  'prefs/dzl-preferences.c',
-
-  'search/dzl-fuzzy-index-builder.c',
-  'search/dzl-fuzzy-index-cursor.c',
-  'search/dzl-fuzzy-index-match.c',
-  'search/dzl-fuzzy-index.c',
-  'search/dzl-fuzzy-mutable-index.c',
-  'search/dzl-levenshtein.c',
-  'search/dzl-pattern-spec.c',
-  'search/dzl-trie.c',
-
-  'settings/dzl-settings-sandwich.c',
-
-  'shortcuts/dzl-shortcut-accel-dialog.c',
-  'shortcuts/dzl-shortcut-chord.c',
-  'shortcuts/dzl-shortcut-context.c',
-  'shortcuts/dzl-shortcut-controller.c',
-  'shortcuts/dzl-shortcut-label.c',
-  'shortcuts/dzl-shortcut-manager.c',
-  'shortcuts/dzl-shortcut-model.c',
-  'shortcuts/dzl-shortcut-theme-editor.c',
-  'shortcuts/dzl-shortcut-theme-load.c',
-  'shortcuts/dzl-shortcut-theme-save.c',
-  'shortcuts/dzl-shortcut-theme.c',
-  'shortcuts/dzl-shortcuts-group.c',
-  'shortcuts/dzl-shortcuts-section.c',
-  'shortcuts/dzl-shortcuts-shortcut.c',
-  'shortcuts/dzl-shortcuts-window.c',
-
-  'statemachine/dzl-state-machine-buildable.c',
-  'statemachine/dzl-state-machine.c',
-
-  'suggestions/dzl-suggestion-entry-buffer.c',
-  'suggestions/dzl-suggestion-entry.c',
-  'suggestions/dzl-suggestion-popover.c',
-  'suggestions/dzl-suggestion-row.c',
-  'suggestions/dzl-suggestion.c',
-
-  'tree/dzl-tree-builder.c',
-  'tree/dzl-tree.c',
-  'tree/dzl-tree-node.c',
-
-  'util/dzl-cairo.c',
-  'util/dzl-counter.c',
-  'util/dzl-date-time.c',
-  'util/dzl-dnd.c',
-  'util/dzl-file-manager.c',
-  'util/dzl-gdk.c',
-  'util/dzl-gtk.c',
-  'util/dzl-heap.c',
-  'util/dzl-pango.c',
-  'util/dzl-rgba.c',
-  'util/dzl-ring.c',
-  'util/dzl-util.c',
-  'util/dzl-variant.c',
-
-  'theming/dzl-css-provider.c',
-  'theming/dzl-theme-manager.c',
-
-  'widgets/dzl-bin.c',
-  'widgets/dzl-bolding-label.c',
-  'widgets/dzl-box.c',
-  'widgets/dzl-centering-bin.c',
-  'widgets/dzl-column-layout.c',
-  'widgets/dzl-counters-window.c',
-  'widgets/dzl-elastic-bin.c',
-  'widgets/dzl-empty-state.c',
-  'widgets/dzl-entry-box.c',
-  'widgets/dzl-file-chooser-entry.c',
-  'widgets/dzl-list-box.c',
-  'widgets/dzl-list-box-row.c',
-  'widgets/dzl-multi-paned.c',
-  'widgets/dzl-pill-box.c',
-  'widgets/dzl-priority-box.c',
-  'widgets/dzl-progress-button.c',
-  'widgets/dzl-progress-menu-button.c',
-  'widgets/dzl-progress-icon.c',
-  'widgets/dzl-radio-box.c',
-  'widgets/dzl-scrolled-window.c',
-  'widgets/dzl-search-bar.c',
-  'widgets/dzl-simple-label.c',
-  'widgets/dzl-simple-popover.c',
-  'widgets/dzl-slider.c',
-  'widgets/dzl-stack-list.c',
-  'widgets/dzl-three-grid.c',
-]
-
 libdazzle_sources = [
-  non_introspectable_public_headers,
   libdazzle_generated_headers,
   libdazzle_public_sources,
-
-  'animation/dzl-frame-source.c',
-
-  'graphing/dzl-graph-column-private.h',
-
-  'panel/dzl-dock-bin-edge-private.h',
-  'panel/dzl-dock-paned-private.h',
-  'panel/dzl-tab-private.h',
-
-  'prefs/dzl-preferences-bin-private.h',
-  'prefs/dzl-preferences-group-private.h',
-  'prefs/dzl-preferences-page-private.h',
-
-  'search/dzl-fuzzy-index-private.h',
-
-  'shortcuts/dzl-shortcut-closure-chain.c',
-
-  'tree/dzl-tree-private.h',
-
-  'util/dzl-util-private.h',
-
-  'widgets/dzl-list-box-private.h',
-  'widgets/dzl-rect-helper.c',
-
+  libdazzle_private_sources,
   libdazzle_resources,
 ]
 

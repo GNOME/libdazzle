@@ -19,6 +19,8 @@
 #ifndef DZL_INT_PAIR_H
 #define DZL_INT_PAIR_H
 
+#ifndef __GI_SCANNER__
+
 #include <glib.h>
 
 G_BEGIN_DECLS
@@ -196,5 +198,7 @@ dzl_uint_pair_free (DzlUIntPair *pair)
 }
 
 G_END_DECLS
+
+#endif /* __GI_SCANNER__ */
 
 #endif /* DZL_INT_PAIR_H */

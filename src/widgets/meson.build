@@ -27,6 +27,37 @@ widgets_headers = [
   'dzl-three-grid.h',
 ]
 
+widgets_sources = [
+  'dzl-bin.c',
+  'dzl-bolding-label.c',
+  'dzl-box.c',
+  'dzl-centering-bin.c',
+  'dzl-column-layout.c',
+  'dzl-counters-window.c',
+  'dzl-elastic-bin.c',
+  'dzl-empty-state.c',
+  'dzl-entry-box.c',
+  'dzl-file-chooser-entry.c',
+  'dzl-list-box.c',
+  'dzl-list-box-row.c',
+  'dzl-multi-paned.c',
+  'dzl-pill-box.c',
+  'dzl-priority-box.c',
+  'dzl-progress-button.c',
+  'dzl-progress-menu-button.c',
+  'dzl-progress-icon.c',
+  'dzl-radio-box.c',
+  'dzl-scrolled-window.c',
+  'dzl-search-bar.c',
+  'dzl-simple-label.c',
+  'dzl-simple-popover.c',
+  'dzl-slider.c',
+  'dzl-stack-list.c',
+  'dzl-three-grid.c',
+]
+
 libdazzle_public_headers += files(widgets_headers)
+libdazzle_public_sources += files(widgets_sources)
+libdazzle_private_sources += files('dzl-rect-helper.c')
 
 install_headers(widgets_headers, subdir: join_paths(libdazzle_header_subdir, 'widgets'))
