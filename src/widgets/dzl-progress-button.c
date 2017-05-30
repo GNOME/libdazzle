@@ -174,6 +174,7 @@ static void
 dzl_progress_button_class_init (DzlProgressButtonClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GdkScreen *screen = gdk_screen_get_default ();
 
   object_class->dispose = dzl_progress_button_dispose;
   object_class->get_property = dzl_progress_button_get_property;
@@ -188,6 +189,17 @@ dzl_progress_button_class_init (DzlProgressButtonClass *klass)
                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  if (screen != NULL)
+    {
+      g_autoptr(GtkCssProvider) provider = NULL;
+
+      provider = gtk_css_provider_new ();
+      gtk_css_provider_load_from_resource (provider, "/org/gnome/dazzle/css/dzl-progress-button.css");
+      gtk_style_context_add_provider_for_screen (screen,
+                                                 GTK_STYLE_PROVIDER (provider),
+                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION - 100);
+    }
 }
 
 GtkWidget *
