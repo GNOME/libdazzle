@@ -169,17 +169,14 @@ remove_directory_with_children (GFile         *file,
                                 GError       **error)
 {
   g_autoptr(GFileEnumerator) enumerator = NULL;
+  g_autofree gchar *uri = NULL;
   gpointer infoptr;
 
   g_assert (G_IS_FILE (file));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
-#ifdef IDE_ENABLE_TRACE
-  {
-    g_autofree gchar *uri = g_file_get_uri (file);
-    IDE_TRACE_MSG ("Removing directory recursively \"%s\"", uri);
-  }
-#endif
+  uri = g_file_get_uri (file);
+  g_debug ("Removing directory recursively \"%s\"", uri);
 
   enumerator = g_file_enumerate_children (file,
                                           G_FILE_ATTRIBUTE_STANDARD_NAME","
