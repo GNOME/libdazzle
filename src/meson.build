@@ -1,5 +1,13 @@
 libdazzle_api_version = '1.0'
 
+version_arr = meson.project_version().split('.')
+dazzle_version_major = version_arr[0].to_int()
+dazzle_version_minor = version_arr[1].to_int()
+dazzle_version_micro = version_arr[2].to_int()
+
+libdazzle_header_subdir = 'libdazzle-' + libdazzle_api_version
+libdazzle_header_dir = join_paths(get_option('includedir'), libdazzle_header_subdir)
+
 libdazzle_resources = gnome.compile_resources(
   'dzl-resources',
   'dazzle.gresources.xml',
@@ -232,6 +240,19 @@ libdazzle_sources = [
   libdazzle_resources,
 ]
 
+version_data = configuration_data()
+version_data.set('DZL_MAJOR_VERSION', dazzle_version_major)
+version_data.set('DZL_MINOR_VERSION', dazzle_version_minor)
+version_data.set('DZL_MICRO_VERSION', dazzle_version_micro)
+version_data.set('DZL_VERSION', meson.project_version())
+
+dzl_version_h = configure_file(
+          input: 'dzl-version.h.in',
+         output: 'dzl-version.h',
+    install_dir: libdazzle_header_dir,
+        install: true,
+  configuration: version_data)
+
 libdazzle_deps = [
   dependency('gio-2.0'),
   dependency('gmodule-2.0'),
@@ -292,8 +313,6 @@ if get_option('with_introspection')
 endif
 
 # TODO: This is ugly and should be handled upstream
-libdazzle_header_subdir = 'libdazzle-' + libdazzle_api_version
-libdazzle_header_dir = join_paths(get_option('includedir'), libdazzle_header_subdir)
 foreach header: libdazzle_public_headers
   header_split = header.split('/')
   if header_split.length() == 2

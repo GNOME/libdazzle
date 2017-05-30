@@ -1,0 +1,96 @@
+/* dzl-version.h.in
+ *
+ * Copyright (C) 2017 Christian Hergert <chergert@redhat.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef DZL_VERSION_H
+#define DZL_VERSION_H
+
+#if !defined(DAZZLE_INSIDE) && !defined(DAZZLE_COMPILATION)
+#error "Only <dazzle.h> can be included directly."
+#endif
+
+/**
+ * SECTION:dzl-version
+ * @short_description: Dazzle version checking
+ *
+ * Dazzle provides macros to check the version of the library at compile-time
+ */
+
+/**
+ * DZL_MAJOR_VERSION:
+ *
+ * Dzl major version component (e.g. 1 if %DZL_VERSION is 1.2.3)
+ */
+#define DZL_MAJOR_VERSION              (@DZL_MAJOR_VERSION@)
+
+/**
+ * DZL_MINOR_VERSION:
+ *
+ * Dzl minor version component (e.g. 2 if %DZL_VERSION is 1.2.3)
+ */
+#define DZL_MINOR_VERSION              (@DZL_MINOR_VERSION@)
+
+/**
+ * DZL_MICRO_VERSION:
+ *
+ * Dzl micro version component (e.g. 3 if %DZL_VERSION is 1.2.3)
+ */
+#define DZL_MICRO_VERSION              (@DZL_MICRO_VERSION@)
+
+/**
+ * DZL_VERSION
+ *
+ * Dzl version.
+ */
+#define DZL_VERSION                    (@DZL_VERSION@)
+
+/**
+ * DZL_VERSION_S:
+ *
+ * Dazzle version, encoded as a string, useful for printing and
+ * concatenation.
+ */
+#define DZL_VERSION_S                  "@DZL_VERSION@"
+
+#define DZL_ENCODE_VERSION(major,minor,micro) \
+        ((major) << 24 | (minor) << 16 | (micro) << 8)
+
+/**
+ * DZL_VERSION_HEX:
+ *
+ * Dazzle version, encoded as an hexadecimal number, useful for
+ * integer comparisons.
+ */
+#define DZL_VERSION_HEX \
+        (DZL_ENCODE_VERSION (DZL_MAJOR_VERSION, DZL_MINOR_VERSION, DZL_MICRO_VERSION))
+
+/**
+ * DZL_CHECK_VERSION:
+ * @major: required major version
+ * @minor: required minor version
+ * @micro: required micro version
+ *
+ * Compile-time version checking. Evaluates to %TRUE if the version
+ * of dazzle is greater than the required one.
+ */
+#define DZL_CHECK_VERSION(major,minor,micro)   \
+        (DZL_MAJOR_VERSION > (major) || \
+         (DZL_MAJOR_VERSION == (major) && DZL_MINOR_VERSION > (minor)) || \
+         (DZL_MAJOR_VERSION == (major) && DZL_MINOR_VERSION == (minor) && \
+          DZL_MICRO_VERSION >= (micro)))
+
+#endif /* DZL_VERSION_H */
