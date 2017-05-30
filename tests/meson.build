@@ -118,3 +118,9 @@ test_tab_strip = executable('test-tab-strip', 'test-tab-strip.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_panel = executable('test-panel', 'test-panel.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
