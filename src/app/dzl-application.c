@@ -37,6 +37,12 @@ typedef struct
   DzlMenuManager *menu_manager;
   GHashTable *menu_merge_ids;
 
+  /*
+   * The shortcut manager can be used to autoload keyboard themes from
+   * plugins or the application resources.
+   */
+  DzlShortcutManager *shortcut_manager;
+
 } DzlApplicationPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlApplication, dzl_application, GTK_TYPE_APPLICATION)
@@ -107,6 +113,7 @@ dzl_application_startup (GApplication *app)
   priv->theme_manager = dzl_theme_manager_new ();
   priv->menu_manager = dzl_menu_manager_new ();
   priv->menu_merge_ids = g_hash_table_new (NULL, NULL);
+  priv->shortcut_manager = g_object_ref (dzl_shortcut_manager_get_default ());
 
   dzl_application_add_resource_path (self, g_application_get_resource_base_path (app));
 
@@ -129,6 +136,7 @@ dzl_application_shutdown (GApplication *app)
   g_clear_pointer (&priv->menu_merge_ids, g_hash_table_unref);
   g_clear_object (&priv->theme_manager);
   g_clear_object (&priv->menu_manager);
+  g_clear_object (&priv->shortcut_manager);
 }
 
 static void
@@ -243,4 +251,22 @@ dzl_application_remove_resource_path (DzlApplication *self,
   g_return_if_fail (resource_path != NULL);
 
   DZL_APPLICATION_GET_CLASS (self)->remove_resource_path (self, resource_path);
+}
+
+/**
+ * dzl_application_get_shortcut_manager:
+ * @self: a #DzlApplication
+ *
+ * Gets the #DzlShortcutManager for the application.
+ *
+ * Returns: (transfer none): A #DzlShortcutManager
+ */
+DzlShortcutManager *
+dzl_application_get_shortcut_manager (DzlApplication *self)
+{
+  DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_APPLICATION (self), NULL);
+
+  return priv->shortcut_manager;
 }

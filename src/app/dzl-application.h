@@ -26,6 +26,7 @@
 #include <gtk/gtk.h>
 
 #include "menus/dzl-menu-manager.h"
+#include "shortcuts/dzl-shortcut-manager.h"
 #include "theming/dzl-theme-manager.h"
 
 G_BEGIN_DECLS
@@ -54,14 +55,15 @@ struct _DzlApplicationClass
   gpointer _reserved8;
 };
 
-DzlMenuManager  *dzl_application_get_menu_manager     (DzlApplication *self);
-DzlThemeManager *dzl_application_get_theme_manager    (DzlApplication *self);
-GMenu           *dzl_application_get_menu_by_id       (DzlApplication *self,
-                                                       const gchar    *menu_id);
-void             dzl_application_add_resource_path    (DzlApplication *self,
-                                                       const gchar    *resource_path);
-void             dzl_application_remove_resource_path (DzlApplication *self,
-                                                       const gchar    *resource_path);
+DzlMenuManager     *dzl_application_get_menu_manager     (DzlApplication *self);
+DzlShortcutManager *dzl_application_get_shortcut_manager (DzlApplication *self);
+DzlThemeManager    *dzl_application_get_theme_manager    (DzlApplication *self);
+GMenu              *dzl_application_get_menu_by_id       (DzlApplication *self,
+                                                          const gchar    *menu_id);
+void                dzl_application_add_resource_path    (DzlApplication *self,
+                                                          const gchar    *resource_path);
+void                dzl_application_remove_resource_path (DzlApplication *self,
+                                                          const gchar    *resource_path);
 
 G_END_DECLS
 
