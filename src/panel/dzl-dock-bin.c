@@ -1610,13 +1610,10 @@ dzl_dock_bin_create_edge (DzlDockBin          *self,
 
   /* Action for panel children to easily activate */
   map = g_simple_action_group_new ();
-  pinned = g_object_new (DZL_TYPE_CHILD_PROPERTY_ACTION,
-                         "enabled", TRUE,
-                         "container", self,
-                         "child", child->widget,
-                         "child-property-name", "pinned",
-                         "name", "pinned",
-                         NULL);
+  pinned = dzl_child_property_action_new ("pinned",
+                                          GTK_CONTAINER (self),
+                                          child->widget,
+                                          "pinned");
   g_action_map_add_action (G_ACTION_MAP (map), pinned);
   gtk_widget_insert_action_group (child->widget, "panel", G_ACTION_GROUP (map));
   g_clear_object (&pinned);
@@ -1630,13 +1627,10 @@ dzl_dock_bin_create_edge (DzlDockBin          *self,
     name = "top-pinned";
   else if (child->type == DZL_DOCK_BIN_CHILD_BOTTOM)
     name = "bottom-pinned";
-  pinned = g_object_new (DZL_TYPE_CHILD_PROPERTY_ACTION,
-                         "enabled", TRUE,
-                         "container", self,
-                         "child", child->widget,
-                         "child-property-name", "pinned",
-                         "name", name,
-                         NULL);
+  pinned = dzl_child_property_action_new (name,
+                                          GTK_CONTAINER (self),
+                                          child->widget,
+                                          "pinned");
   g_action_map_add_action (G_ACTION_MAP (priv->actions), pinned);
 
   if (child->pinned)
