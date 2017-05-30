@@ -393,13 +393,15 @@ if get_option('enable_rdtscp')
   libdazzle_args += '-DDZL_HAVE_RDTSCP'
 endif
 
-libdazzle = library(
-  'dazzle-' + apiversion,
+libdazzle_map = join_paths(meson.current_source_dir(), 'dazzle.map')
+
+libdazzle = shared_library(
+  'dazzle-' + libdazzle_api_version,
   libdazzle_sources,
 
-         link_depends: 'dazzle.map',
+         link_depends: libdazzle_map,
                c_args: libdazzle_args,
-            link_args: [ '-Wl,--version-script,' + join_paths(meson.current_source_dir(), 'dazzle.map') ],
+            link_args: [ '-Wl,--version-script,' + libdazzle_map ],
          dependencies: libdazzle_deps,
   include_directories: [ root_inc, src_inc ],
               install: true,
