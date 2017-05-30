@@ -54,6 +54,7 @@ dzl_application_real_add_resource_path (DzlApplication *self,
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
   g_autoptr(GError) error = NULL;
   g_autofree gchar *menu_path = NULL;
+  g_autofree gchar *keythemes_path = NULL;
   guint merge_id;
 
   g_assert (DZL_IS_APPLICATION (self));
@@ -77,6 +78,14 @@ dzl_application_real_add_resource_path (DzlApplication *self,
   g_hash_table_insert (priv->menu_merge_ids, (gchar *)resource_path, GUINT_TO_POINTER (merge_id));
   if (error != NULL && !g_error_matches (error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
     g_warning ("%s", error->message);
+
+  /*
+   * Load any shortcut theme information from the plugin or application
+   * resources. We always append so that the application resource dir is
+   * loaded before any plugin paths.
+   */
+  keythemes_path = g_build_filename (resource_path, "keythemes", NULL);
+  dzl_shortcut_manager_append_search_path (priv->shortcut_manager, keythemes_path);
 }
 
 static void
@@ -84,6 +93,7 @@ dzl_application_real_remove_resource_path (DzlApplication *self,
                                            const gchar    *resource_path)
 {
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+  g_autofree gchar *keythemes_path = NULL;
   guint merge_id;
 
   g_assert (DZL_IS_APPLICATION (self));
@@ -99,6 +109,10 @@ dzl_application_real_remove_resource_path (DzlApplication *self,
   merge_id = GPOINTER_TO_UINT (g_hash_table_lookup (priv->menu_merge_ids, resource_path));
   if (merge_id != 0)
     dzl_menu_manager_remove (priv->menu_manager, merge_id);
+
+  /* Remove keythemes path from the shortcuts manager */
+  keythemes_path = g_build_filename (resource_path, "keythemes", NULL);
+  dzl_shortcut_manager_remove_search_path (priv->shortcut_manager, keythemes_path);
 }
 
 static void
