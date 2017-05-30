@@ -41,155 +41,26 @@ non_introspectable_public_headers = [
 
 libdazzle_public_headers = [
   'dazzle.h',
-
-  'actions/dzl-child-property-action.h',
-  'actions/dzl-properties-group.h',
-  'actions/dzl-settings-flag-action.h',
-  'actions/dzl-widget-action-group.h',
-
-  'animation/dzl-animation.h',
-  'animation/dzl-box-theatric.h',
-
-  'app/dzl-application.h',
-  'app/dzl-application-window.h',
-
-  'bindings/dzl-binding-group.h',
-  'bindings/dzl-signal-group.h',
-
-  'cache/dzl-task-cache.h',
-
-  'files/dzl-directory-model.h',
-  'files/dzl-directory-reaper.h',
-
-  'graphing/dzl-cpu-graph.h',
-  'graphing/dzl-cpu-model.h',
-  'graphing/dzl-graph-column.h',
-  'graphing/dzl-graph-line-renderer.h',
-  'graphing/dzl-graph-model.h',
-  'graphing/dzl-graph-renderer.h',
-  'graphing/dzl-graph-view.h',
-
-  'menus/dzl-joined-menu.h',
-  'menus/dzl-menu-button.h',
-  'menus/dzl-menu-button-item.h',
-  'menus/dzl-menu-button-section.h',
-  'menus/dzl-menu-manager.h',
-
-  'panel/dzl-dock-bin-edge.h',
-  'panel/dzl-dock-bin.h',
-  'panel/dzl-dock-item.h',
-  'panel/dzl-dock-manager.h',
-  'panel/dzl-dock-overlay-edge.h',
-  'panel/dzl-dock-overlay.h',
-  'panel/dzl-dock-paned.h',
-  'panel/dzl-dock-revealer.h',
-  'panel/dzl-dock-stack.h',
-  'panel/dzl-dock-transient-grab.h',
-  'panel/dzl-dock-types.h',
-  'panel/dzl-dock-widget.h',
-  'panel/dzl-dock-window.h',
-  'panel/dzl-dock.h',
-  'panel/dzl-tab-strip.h',
-  'panel/dzl-tab.h',
-
-  'pathbar/dzl-path.h',
-  'pathbar/dzl-path-bar.h',
-  'pathbar/dzl-path-element.h',
-
-  'prefs/dzl-preferences-bin.h',
-  'prefs/dzl-preferences-entry.h',
-  'prefs/dzl-preferences-file-chooser-button.h',
-  'prefs/dzl-preferences-flow-box.h',
-  'prefs/dzl-preferences-font-button.h',
-  'prefs/dzl-preferences-group.h',
-  'prefs/dzl-preferences-page.h',
-  'prefs/dzl-preferences-spin-button.h',
-  'prefs/dzl-preferences-switch.h',
-  'prefs/dzl-preferences-view.h',
-  'prefs/dzl-preferences.h',
-
-  'search/dzl-fuzzy-index-builder.h',
-  'search/dzl-fuzzy-index-cursor.h',
-  'search/dzl-fuzzy-index-match.h',
-  'search/dzl-fuzzy-index.h',
-  'search/dzl-fuzzy-mutable-index.h',
-  'search/dzl-levenshtein.h',
-  'search/dzl-pattern-spec.h',
-  'search/dzl-trie.h',
-
-  'settings/dzl-settings-sandwich.h',
-
-  'shortcuts/dzl-shortcut-accel-dialog.h',
-  'shortcuts/dzl-shortcut-chord.h',
-  'shortcuts/dzl-shortcut-context.h',
-  'shortcuts/dzl-shortcut-controller.h',
-  'shortcuts/dzl-shortcut-label.h',
-  'shortcuts/dzl-shortcut-manager.h',
-  'shortcuts/dzl-shortcut-model.h',
-  'shortcuts/dzl-shortcut-theme-editor.h',
-  'shortcuts/dzl-shortcut-theme.h',
-  'shortcuts/dzl-shortcuts-group.h',
-  'shortcuts/dzl-shortcuts-section.h',
-  'shortcuts/dzl-shortcuts-shortcut.h',
-  'shortcuts/dzl-shortcuts-window.h',
-
-  'statemachine/dzl-state-machine-buildable.h',
-  'statemachine/dzl-state-machine.h',
-
-  'suggestions/dzl-suggestion-entry-buffer.h',
-  'suggestions/dzl-suggestion-entry.h',
-  'suggestions/dzl-suggestion-popover.h',
-  'suggestions/dzl-suggestion-row.h',
-  'suggestions/dzl-suggestion.h',
-
-  'theming/dzl-css-provider.h',
-  'theming/dzl-theme-manager.h',
-
-  'tree/dzl-tree-builder.h',
-  'tree/dzl-tree-node.h',
-  'tree/dzl-tree-types.h',
-  'tree/dzl-tree.h',
-
-  'util/dzl-cairo.h',
-  'util/dzl-counter.h',
-  'util/dzl-date-time.h',
-  'util/dzl-dnd.h',
-  'util/dzl-file-manager.h',
-  'util/dzl-gdk.h',
-  'util/dzl-gtk.h',
-  'util/dzl-heap.h',
-  'util/dzl-pango.h',
-  'util/dzl-rgba.h',
-  'util/dzl-ring.h',
-  'util/dzl-variant.h',
-
-  'widgets/dzl-bin.h',
-  'widgets/dzl-bolding-label.h',
-  'widgets/dzl-box.h',
-  'widgets/dzl-centering-bin.h',
-  'widgets/dzl-column-layout.h',
-  'widgets/dzl-counters-window.h',
-  'widgets/dzl-elastic-bin.h',
-  'widgets/dzl-empty-state.h',
-  'widgets/dzl-entry-box.h',
-  'widgets/dzl-file-chooser-entry.h',
-  'widgets/dzl-list-box.h',
-  'widgets/dzl-list-box-row.h',
-  'widgets/dzl-multi-paned.h',
-  'widgets/dzl-pill-box.h',
-  'widgets/dzl-priority-box.h',
-  'widgets/dzl-progress-button.h',
-  'widgets/dzl-progress-menu-button.h',
-  'widgets/dzl-progress-icon.h',
-  'widgets/dzl-radio-box.h',
-  'widgets/dzl-scrolled-window.h',
-  'widgets/dzl-search-bar.h',
-  'widgets/dzl-simple-label.h',
-  'widgets/dzl-simple-popover.h',
-  'widgets/dzl-slider.h',
-  'widgets/dzl-stack-list.h',
-  'widgets/dzl-three-grid.h',
 ]
+
+subdir('actions')
+subdir('animation')
+subdir('app')
+subdir('bindings')
+subdir('cache')
+subdir('files')
+subdir('graphing')
+subdir('menus')
+subdir('panel')
+subdir('search')
+subdir('settings')
+subdir('shortcuts')
+subdir('statemachine')
+subdir('suggestions')
+subdir('theming')
+subdir('tree')
+subdir('util')
+subdir('widgets')
 
 libdazzle_public_sources = [
   'actions/dzl-child-property-action.c',
@@ -345,11 +216,9 @@ libdazzle_public_sources = [
 libdazzle_sources = [
   non_introspectable_public_headers,
   libdazzle_generated_headers,
-  libdazzle_public_headers,
   libdazzle_public_sources,
 
   'animation/dzl-frame-source.c',
-  'animation/dzl-frame-source.h',
 
   'graphing/dzl-graph-column-private.h',
 
@@ -364,10 +233,6 @@ libdazzle_sources = [
   'search/dzl-fuzzy-index-private.h',
 
   'shortcuts/dzl-shortcut-closure-chain.c',
-  'shortcuts/dzl-shortcut-closure-chain.h',
-  'shortcuts/dzl-shortcut-private.h',
-  'shortcuts/dzl-shortcuts-shortcut-private.h',
-  'shortcuts/dzl-shortcuts-window-private.h',
 
   'tree/dzl-tree-private.h',
 
@@ -375,7 +240,6 @@ libdazzle_sources = [
 
   'widgets/dzl-list-box-private.h',
   'widgets/dzl-rect-helper.c',
-  'widgets/dzl-rect-helper.h',
 
   libdazzle_resources,
 ]
@@ -396,7 +260,7 @@ endif
 libdazzle_map = join_paths(meson.current_source_dir(), 'dazzle.map')
 
 libdazzle = shared_library(
-  'dazzle-' + libdazzle_api_version,
+  'dazzle-' + apiversion,
   libdazzle_sources,
 
          link_depends: libdazzle_map,
@@ -442,17 +306,6 @@ if get_option('with_introspection')
 
   endif
 endif
-
-# TODO: This is ugly and should be handled upstream
-foreach header: libdazzle_public_headers + non_introspectable_public_headers
-  header_split = header.split('/')
-  if header_split.length() == 2
-    header_path = join_paths(libdazzle_header_subdir, header_split[0])
-    install_headers(header, subdir: header_path)
-  else
-    install_headers(header, subdir: libdazzle_header_subdir)
-  endif
-endforeach
 
 pkgg = import('pkgconfig')
 
