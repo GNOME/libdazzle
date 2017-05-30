@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme name="test" parent="default">
+  <property name="title" translatable="yes">Test</property>
+  <property name="subtitle" translatable="yes">Test theme</property>
+
+  <shortcut accelerator="<Control>g" command="com.example.foo.test"/>
+
+  <context name="GtkWindow">
+
+    <shortcut accelerator="<Control>p" action="view.print"/>
+    <shortcut accelerator="<Primary>n|<Primary>p" action="view.print-preview"/>
+
+    <shortcut accelerator="<Control>a">
+      <signal name="select-all">
+        <param>0</param>
+      </signal>
+    </shortcut>
+
+    <shortcut accelerator="<Control>p">
+      <action name="view.print"/>
+    </shortcut>
+
+  </context>
+</theme>
