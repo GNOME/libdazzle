@@ -34,3 +34,9 @@ test_binding_group = executable('test-binding-group', 'test-binding-group.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_signal_group = executable('test-signal-group', 'test-signal-group.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
