@@ -52,20 +52,23 @@ dzl_css_provider_update (DzlCssProvider *self)
 {
   g_autofree gchar *theme_name = NULL;
   g_autofree gchar *resource_path = NULL;
-  GtkSettings *settings = gtk_settings_get_default ();
-  gboolean prefer_dark_theme = FALSE;
+  GtkSettings *settings;
   gsize len = 0;
   guint32 flags = 0;
+  gboolean prefer_dark_theme = FALSE;
 
   g_assert (DZL_IS_CSS_PROVIDER (self));
 
-  if ((theme_name = g_strdup(g_getenv ("GTK_THEME"))))
+  settings = gtk_settings_get_default ();
+  theme_name = g_strdup (g_getenv ("GTK_THEME"));
+
+  if (theme_name != NULL)
     {
       char *p;
 
       /* Theme variants are specified with the syntax
        * "<theme>:<variant>" e.g. "Adwaita:dark" */
-      if ((p = strrchr (theme_name, ':')))
+      if (NULL != (p = strrchr (theme_name, ':')))
         {
           *p = '\0';
           p++;
@@ -80,14 +83,14 @@ dzl_css_provider_update (DzlCssProvider *self)
                     NULL);
     }
 
-  resource_path = g_strdup_printf ("%s/theme/%s%s.css",
+  resource_path = g_strdup_printf ("%s/%s%s.css",
                                    self->base_path,
                                    theme_name, prefer_dark_theme ? "-dark" : "");
 
   if (!g_resources_get_info (resource_path, G_RESOURCE_LOOKUP_FLAGS_NONE, &len, &flags, NULL))
     {
       g_free (resource_path);
-      resource_path = g_strdup_printf ("%s/theme/shared.css", self->base_path);
+      resource_path = g_strdup_printf ("%s/shared.css", self->base_path);
     }
 
   /* Nothing to load */
