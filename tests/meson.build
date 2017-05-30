@@ -70,3 +70,9 @@ test_file_chooser_entry = executable('test-file-chooser-entry', 'test-file-choos
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_elastic_bin = executable('test-elastic-bin', 'test-elastic-bin.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
