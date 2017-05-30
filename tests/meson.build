@@ -100,3 +100,21 @@ test_fuzzy_index = executable('test-fuzzy-index', 'test-fuzzy-index.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_bin = executable('test-bin', 'test-bin.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
+test_multi_paned = executable('test-multi-paned', 'test-multi-paned.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
+test_tab_strip = executable('test-tab-strip', 'test-tab-strip.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
