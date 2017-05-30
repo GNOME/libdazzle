@@ -80,6 +80,8 @@ G_BEGIN_DECLS
 #include "suggestions/dzl-suggestion-popover.h"
 #include "suggestions/dzl-suggestion-row.h"
 #include "suggestions/dzl-suggestion.h"
+#include "theming/dzl-css-provider.h"
+#include "theming/dzl-theme-manager.h"
 #include "util/dzl-cairo.h"
 #include "util/dzl-counter.h"
 #include "util/dzl-date-time.h"

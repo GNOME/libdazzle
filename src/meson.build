@@ -70,6 +70,9 @@ libdazzle_public_headers = [
   'suggestions/dzl-suggestion-row.h',
   'suggestions/dzl-suggestion.h',
 
+  'theming/dzl-css-provider.h',
+  'theming/dzl-theme-manager.h',
+
   'util/dzl-cairo.h',
   'util/dzl-date-time.h',
   'util/dzl-dnd.h',
@@ -168,6 +171,9 @@ libdazzle_public_sources = [
   'util/dzl-rgba.c',
   'util/dzl-util.c',
 
+  'theming/dzl-css-provider.c',
+  'theming/dzl-theme-manager.c',
+
   'widgets/dzl-bin.c',
   'widgets/dzl-box.c',
   'widgets/dzl-centering-bin.c',
@@ -224,6 +230,7 @@ libdazzle_deps = [
   dependency('gio-2.0'),
   dependency('gmodule-2.0'),
   dependency('gtk+-3.0'),
+  dependency('libpeas-1.0'),
   cc.find_library('m', required: false),
   cc.find_library('rt', required: false),
 ]
