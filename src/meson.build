@@ -425,7 +425,7 @@ if get_option('with_introspection')
                 install: true,
         install_dir_gir: girdir,
     install_dir_typelib: typelibdir,
-             extra_args: [ '--c-include=dazzle.h' ],
+             extra_args: [ '--c-include=dazzle.h', '--quiet' ],
   )
 
   if get_option('with_vapi')
@@ -464,4 +464,3 @@ pkgg.generate(
      requires: 'gtk+-3.0',
   install_dir: join_paths(libdir, 'pkgconfig'),
 )
-
