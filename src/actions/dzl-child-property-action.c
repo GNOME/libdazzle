@@ -488,7 +488,6 @@ dzl_child_property_action_new (const gchar  *name,
   g_autoptr(DzlChildPropertyAction) self = NULL;
   g_autofree gchar *signal_detail = NULL;
 
-  g_return_val_if_fail (DZL_IS_CHILD_PROPERTY_ACTION (self), NULL);
   g_return_val_if_fail (GTK_IS_CONTAINER (container), NULL);
   g_return_val_if_fail (GTK_IS_WIDGET (child), NULL);
   g_return_val_if_fail (child_property_name != NULL, NULL);
