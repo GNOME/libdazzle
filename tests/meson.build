@@ -64,3 +64,9 @@ test_slider = executable('test-slider', 'test-slider.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_file_chooser_entry = executable('test-file-chooser-entry', 'test-file-chooser-entry.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
