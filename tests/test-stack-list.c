@@ -88,6 +88,10 @@ main (gint   argc,
   DzlStackList *stack_list;
   GtkWidget *window;
 
+  /* TODO: Figure out brokenness with wayland positining */
+
+  gdk_set_allowed_backends ("x11");
+
   gtk_init (&argc, &argv);
 
   root = g_file_new_for_path ("/");
