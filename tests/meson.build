@@ -28,3 +28,9 @@ test_state_machine = executable('test-state-machine', 'test-state-machine.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_binding_group = executable('test-binding-group', 'test-binding-group.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
