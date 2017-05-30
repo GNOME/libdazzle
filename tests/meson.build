@@ -136,3 +136,9 @@ test_shortcut_theme = executable('test-shortcut-theme', 'test-shortcut-theme.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_progress_button = executable('test-progress-button', 'test-progress-button.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
