@@ -9,10 +9,16 @@ test_env = [
 ]
 
 test_cflags = [
+  '-fPIE',
   '-DTEST_DATA_DIR="@0@/data"'.format(meson.current_source_dir()),
+]
+
+test_link_args = [
+  '-fPIC',
 ]
 
 test_menu_manager = executable('test-menu-manager', 'test-menu-manager.c',
         c_args: test_cflags,
-  dependencies: libdazzle_dep,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
 )

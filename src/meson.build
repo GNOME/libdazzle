@@ -15,7 +15,22 @@ libdazzle_resources = gnome.compile_resources(
   c_name: 'dzl',
 )
 
-libdazzle_generated_headers = []
+version_data = configuration_data()
+version_data.set('DZL_MAJOR_VERSION', dazzle_version_major)
+version_data.set('DZL_MINOR_VERSION', dazzle_version_minor)
+version_data.set('DZL_MICRO_VERSION', dazzle_version_micro)
+version_data.set('DZL_VERSION', meson.project_version())
+
+dzl_version_h = configure_file(
+          input: 'dzl-version.h.in',
+         output: 'dzl-version.h',
+    install_dir: libdazzle_header_dir,
+        install: true,
+  configuration: version_data)
+
+libdazzle_generated_headers = [
+  dzl_version_h,
+]
 
 libdazzle_public_headers = [
   'dazzle.h',
@@ -238,22 +253,8 @@ libdazzle_sources = [
   'widgets/dzl-rect-helper.c',
   'widgets/dzl-rect-helper.h',
 
-  # Other dependencies
   libdazzle_resources,
 ]
-
-version_data = configuration_data()
-version_data.set('DZL_MAJOR_VERSION', dazzle_version_major)
-version_data.set('DZL_MINOR_VERSION', dazzle_version_minor)
-version_data.set('DZL_MICRO_VERSION', dazzle_version_micro)
-version_data.set('DZL_VERSION', meson.project_version())
-
-dzl_version_h = configure_file(
-          input: 'dzl-version.h.in',
-         output: 'dzl-version.h',
-    install_dir: libdazzle_header_dir,
-        install: true,
-  configuration: version_data)
 
 libdazzle_deps = [
   dependency('gio-2.0'),
@@ -265,20 +266,24 @@ libdazzle_deps = [
 
 libdazzle_args = []
 if get_option('enable_rdtscp')
-  libdazzle_args += '-DEGG_HAVE_RDTSCP'
+  libdazzle_args += '-DDZL_HAVE_RDTSCP'
 endif
 
 libdazzle = shared_library(
   'dazzle-' + libdazzle_api_version,
   libdazzle_sources,
 
+  link_depends: 'dazzle.map',
         c_args: libdazzle_args,
+     link_args: [
+       '-Wl,--version-script,' + join_paths(meson.current_source_dir(), 'dazzle.map'),
+     ],
   dependencies: libdazzle_deps,
        install: true,
 )
 
 libdazzle_dep = declare_dependency(
-              sources: libdazzle_sources,
+              sources: libdazzle_generated_headers,
          dependencies: libdazzle_deps,
             link_with: libdazzle,
   include_directories: include_directories('.'),
