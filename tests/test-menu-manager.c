@@ -6,7 +6,7 @@ build_path (const gchar *name)
   g_autofree gchar *path = NULL;
   const gchar *ret;
 
-  path = g_build_filename (TEST_DATA_DIR, name, NULL);
+  path = g_build_filename (TEST_DATA_DIR, "menus", name, NULL);
   ret = g_intern_string (path);
 
   return ret;
