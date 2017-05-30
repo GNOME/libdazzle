@@ -661,6 +661,33 @@ dzl_shortcut_manager_set_user_dir (DzlShortcutManager *self,
 }
 
 void
+dzl_shortcut_manager_remove_search_path (DzlShortcutManager *self,
+                                         const gchar        *directory)
+{
+  DzlShortcutManagerPrivate *priv;
+
+  g_return_if_fail (!self || DZL_IS_SHORTCUT_MANAGER (self));
+  g_return_if_fail (directory != NULL);
+
+  if (self == NULL)
+    self = dzl_shortcut_manager_get_default ();
+
+  priv = dzl_shortcut_manager_get_instance_private (self);
+
+  for (GList *iter = priv->search_path.head; iter != NULL; iter = iter->next)
+    {
+      gchar *path = iter->data;
+
+      if (g_strcmp0 (path, directory) == 0)
+        {
+          /* TODO: Remove any merged keybindings */
+          g_queue_delete_link (&priv->search_path, iter);
+          g_free (path);
+        }
+    }
+}
+
+void
 dzl_shortcut_manager_append_search_path (DzlShortcutManager *self,
                                          const gchar        *directory)
 {
@@ -675,6 +702,8 @@ dzl_shortcut_manager_append_search_path (DzlShortcutManager *self,
   priv = dzl_shortcut_manager_get_instance_private (self);
 
   g_queue_push_tail (&priv->search_path, g_strdup (directory));
+
+  /* TODO: Reload keythemes */
 }
 
 void
@@ -692,6 +721,8 @@ dzl_shortcut_manager_prepend_search_path (DzlShortcutManager *self,
   priv = dzl_shortcut_manager_get_instance_private (self);
 
   g_queue_push_head (&priv->search_path, g_strdup (directory));
+
+  /* TODO: Reload keythemes */
 }
 
 /**

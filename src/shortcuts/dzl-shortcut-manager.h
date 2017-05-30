@@ -72,6 +72,8 @@ void                dzl_shortcut_manager_append_search_path      (DzlShortcutMan
                                                                   const gchar            *directory);
 void                dzl_shortcut_manager_prepend_search_path     (DzlShortcutManager     *self,
                                                                   const gchar            *directory);
+void                dzl_shortcut_manager_remove_search_path      (DzlShortcutManager     *self,
+                                                                  const gchar            *directory);
 DzlShortcutTheme   *dzl_shortcut_manager_get_theme               (DzlShortcutManager     *self);
 void                dzl_shortcut_manager_set_theme               (DzlShortcutManager     *self,
                                                                   DzlShortcutTheme       *theme);
