@@ -45,6 +45,13 @@ ninja
 ninja install
 ```
 
+If you need control over installation paths, see `meson --help`.
+Here is a fairly common way to configure libdazzle.
+
+```sh
+meson --prefix=/opt/gnome --libdir=/opt/gnome/lib . build
+```
+
 ## Components
 
 libdazzle has a wide range of components from utilities for `GIO`, widgets for `Gtk`, an animation framework, state machines, paneling and high-performance counters.
