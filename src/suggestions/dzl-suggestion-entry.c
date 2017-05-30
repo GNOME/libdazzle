@@ -116,7 +116,7 @@ dzl_suggestion_entry_init_default_css (void)
     {
       css_provider = gtk_css_provider_new ();
       gtk_css_provider_load_from_resource (css_provider,
-                                           "/org/gnome/dazzle/dzl-suggestion-entry.css");
+                                           "/org/gnome/dazzle/css/dzl-suggestion-entry.css");
       gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
                                                  GTK_STYLE_PROVIDER (css_provider),
                                                  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION - 1);
