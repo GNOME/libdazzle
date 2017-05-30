@@ -67,3 +67,4 @@ vapidir = join_paths(get_option('datadir'), 'vapi')
 gnome = import('gnome')
 
 subdir('src')
+subdir('tests')
