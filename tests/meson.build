@@ -46,3 +46,9 @@ test_task_cache = executable('test-task-cache', 'test-task-cache.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_heap = executable('test-heap', 'test-heap.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
