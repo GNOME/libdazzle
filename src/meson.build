@@ -290,3 +290,17 @@ if get_option('with_introspection')
 
   endif
 endif
+
+# TODO: This is ugly and should be handled upstream
+libdazzle_header_subdir = 'libdazzle-' + libdazzle_api_version
+libdazzle_header_dir = join_paths(get_option('includedir'), libdazzle_header_subdir)
+foreach header: libdazzle_public_headers
+  header_split = header.split('/')
+  if header_split.length() == 2
+    header_path = join_paths(libdazzle_header_subdir, header_split[0])
+    install_headers(header, subdir: header_path)
+  else
+    install_headers(header, subdir: libdazzle_header_subdir)
+  endif
+endforeach
+
