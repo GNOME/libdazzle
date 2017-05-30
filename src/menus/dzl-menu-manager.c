@@ -30,7 +30,7 @@ G_DEFINE_TYPE (DzlMenuManager, dzl_menu_manager, G_TYPE_OBJECT)
 
 #define DZL_MENU_ATTRIBUTE_BEFORE   "before"
 #define DZL_MENU_ATTRIBUTE_AFTER    "after"
-#define DZL_MENU_ATTRIBUTE_MERGE_ID "dzl-merge-id"
+#define DZL_MENU_ATTRIBUTE_MERGE_ID "dazzle-merge-id"
 
 /**
  * SECTION:dzlmenumanager
