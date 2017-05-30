@@ -19,6 +19,7 @@ main (gint   argc,
   DzlMenuManager *manager;
   GMenu *menu;
   GtkWidget *widget;
+  GtkWindow *window;
   GError *error = NULL;
   GMenu *top;
 
@@ -58,8 +59,18 @@ main (gint   argc,
   menu = dzl_menu_manager_get_menu_by_id (manager, "menu-4");
   g_menu_append_submenu (top, "menu-4", G_MENU_MODEL (menu));
 
-  widget = gtk_menu_new_from_model (G_MENU_MODEL (top));
-  gtk_menu_popup_at_pointer (GTK_MENU (widget), NULL);
+  window = g_object_new (GTK_TYPE_WINDOW,
+                         "title", "Test Window",
+                         NULL);
+  g_signal_connect (window, "delete-event", gtk_main_quit, NULL);
+
+  widget = gtk_menu_bar_new_from_model (G_MENU_MODEL (top));
+  gtk_widget_set_halign (widget, GTK_ALIGN_START);
+  gtk_widget_set_valign (widget, GTK_ALIGN_START);
+  gtk_container_add (GTK_CONTAINER (window), widget);
+  gtk_widget_show (widget);
+
+  gtk_window_present (window);
 
   gtk_main ();
 
