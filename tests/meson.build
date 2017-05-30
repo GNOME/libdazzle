@@ -124,3 +124,9 @@ test_panel = executable('test-panel', 'test-panel.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_shortcut_chord = executable('test-shortcut-chord', 'test-shortcut-chord.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
