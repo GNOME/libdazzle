@@ -77,6 +77,12 @@ test_elastic_bin = executable('test-elastic-bin', 'test-elastic-bin.c',
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_stack_list = executable('test-stack-list', 'test-stack-list.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
 test_suggestion = executable('test-suggestion', 'test-suggestion.c', 'fuzzy.c', 'fuzzy.h',
         c_args: test_cflags,
      link_args: test_link_args,
