@@ -37,10 +37,11 @@ configure_file(
 
 add_project_arguments([
   '-DHAVE_CONFIG_H',
-  '-I' + meson.build_root(),
-  '-I' + join_paths(meson.source_root(), 'src'),
   '-DDAZZLE_COMPILATION',
 ], language: 'c')
+
+root_inc = include_directories('.')
+src_inc = include_directories('src')
 
 cc = meson.get_compiler('c')
 
