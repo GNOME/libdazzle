@@ -19,9 +19,6 @@
 #define G_LOG_DOMAIN "dzl-application"
 
 #include "app/dzl-application.h"
-#include "menus/dzl-menu-manager.h"
-#include "theming/dzl-css-provider.h"
-#include "theming/dzl-theme-manager.h"
 
 typedef struct
 {
