@@ -88,3 +88,9 @@ test_suggestion_buffer = executable('test-suggestion-buffer', 'test-suggestion-b
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_fuzzy_index = executable('test-fuzzy-index', 'test-fuzzy-index.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)

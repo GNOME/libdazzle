@@ -52,6 +52,11 @@ libdazzle_public_headers = [
   'files/dzl-directory-model.h',
   'files/dzl-directory-reaper.h',
 
+  'fuzzy/dzl-fuzzy-index-builder.h',
+  'fuzzy/dzl-fuzzy-index-cursor.h',
+  'fuzzy/dzl-fuzzy-index-match.h',
+  'fuzzy/dzl-fuzzy-index.h',
+
   'menus/dzl-menu-manager.h',
 
   'panel/dzl-dock-bin-edge.h',
@@ -148,6 +153,11 @@ libdazzle_public_sources = [
   'files/dzl-directory-model.c',
   'files/dzl-directory-reaper.c',
 
+  'fuzzy/dzl-fuzzy-index-builder.c',
+  'fuzzy/dzl-fuzzy-index-cursor.c',
+  'fuzzy/dzl-fuzzy-index-match.c',
+  'fuzzy/dzl-fuzzy-index.c',
+
   'menus/dzl-menu-manager.c',
 
   'panel/dzl-dock-bin-edge.c',
@@ -235,6 +245,10 @@ libdazzle_sources = [
 
   'animation/dzl-frame-source.c',
   'animation/dzl-frame-source.h',
+
+  'fuzzy/dzl-fuzzy-index-private.h',
+  'fuzzy/dzl-fuzzy-util.c',
+  'fuzzy/dzl-fuzzy-util.h',
 
   'panel/dzl-dock-bin-edge-private.h',
   'panel/dzl-dock-paned-private.h',
