@@ -32,7 +32,7 @@
                 </child>
                 <child>
                   <object class="GtkImage">
-                    <property name="resource">/org/gnome/gse/icons/enter-keyboard-shortcut.svg</property>
+                    <property name="resource">/org/gnome/dazzle/icons/enter-keyboard-shortcut.svg</property>
                     <property name="expand">true</property>
                     <property name="visible">true</property>
                   </object>

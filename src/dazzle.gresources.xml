@@ -9,4 +9,9 @@
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-shortcut-accel-dialog.ui">shortcuts/dzl-shortcut-accel-dialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-shortcut-theme-editor.ui">shortcuts/dzl-shortcut-theme-editor.ui</file>
   </gresource>
+
+  <gresource prefix="/org/gnome/dazzle/icons">
+    <file compressed="true" preprocess="xml-stripblanks" alias="enter-keyboard-shortcut.svg">shortcuts/enter-keyboard-shortcut.svg</file>
+  </gresource>
+
 </gresources>
