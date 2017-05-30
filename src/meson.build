@@ -34,6 +34,7 @@ libdazzle_public_headers = [
 
   'cache/dzl-task-cache.h',
 
+  'files/dzl-directory-model.h',
   'files/dzl-directory-reaper.h',
 
   'menus/dzl-menu-manager.h',
@@ -129,6 +130,7 @@ libdazzle_public_sources = [
 
   'cache/dzl-task-cache.c',
 
+  'files/dzl-directory-model.c',
   'files/dzl-directory-reaper.c',
 
   'menus/dzl-menu-manager.c',
