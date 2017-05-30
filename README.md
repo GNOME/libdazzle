@@ -5,7 +5,8 @@ It provides various features that we wish were in the underlying library but can
 In most cases, they are wildly out of scope for those libraries.
 In other cases, our design isn't quite generic enough to work for everyone.
 
-However, we still want to dazzle and delight our users!
+While we don't want to blind our users, we do think of dazzle as something you haven't seen before.
+As we improve our implementations in libdazzle, we do think that bits of libdazzle can be migrated into upstream projects.
 
 Currently, the primary consumer of libdazzle is the Builder IDE.
 Most of this code was extracted from Builder so that it could be used by others.
