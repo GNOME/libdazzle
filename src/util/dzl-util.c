@@ -298,11 +298,22 @@ dzl_gtk_widget_class_add_css_resource (GtkWidgetClass *widget_class,
     {
       g_autoptr(GtkCssProvider) provider = NULL;
 
+      /*
+       * It would be nice if our theme data could be more theme friendly.
+       * However, we need to be higher than SETTINGS so that some of our
+       * stuff takes effect, but that is already higher than theming.
+       *
+       * So really the only proper answer is to get themes to style us and
+       * eventually drop all CSS. Given that is impossible... I'm not sure
+       * what other options we really have. Some themes will just need to
+       * !important or whatever when it matters.
+       */
+
       provider = gtk_css_provider_new ();
       gtk_css_provider_load_from_resource (provider, resource);
       gtk_style_context_add_provider_for_screen (screen,
                                                  GTK_STYLE_PROVIDER (provider),
-                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION - 100);
+                                                 GTK_STYLE_PROVIDER_PRIORITY_SETTINGS + 50);
     }
 
 }
