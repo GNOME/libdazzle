@@ -255,7 +255,7 @@ dzl_child_property_action_change_state (GAction  *action,
                                             self->child,
                                             self->child_property_name,
                                             &value);
-          g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_STATE]);
+          g_object_notify (G_OBJECT (self), "state");
 
           return;
         }
@@ -363,7 +363,7 @@ child_notify_cb (DzlChildPropertyAction *self,
   g_assert (pspec != NULL);
   g_assert (GTK_IS_WIDGET (child));
 
-  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_STATE]);
+  g_object_notify (G_OBJECT (self), "state");
 }
 
 static void
