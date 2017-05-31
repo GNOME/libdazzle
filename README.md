@@ -16,7 +16,7 @@ The libdazzle project is heavily opinionated, and tends to gravitate towards des
 ## Language Support
 
 libdazzle, as you might imagine, is written in C.
-We find C the most convenient language when it comes down to interopability with other language runtimes.
+We find C the most convenient language when it comes down to interoperability with other language runtimes.
 libdazzle supports GObject Introspection and vapi meaning you can use libdazzle from a wide variety of languages including:
 
  - Python 2.7 or 3.x
