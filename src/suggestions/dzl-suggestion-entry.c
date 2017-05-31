@@ -20,10 +20,10 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-suggestion.h"
-#include "dzl-suggestion-entry.h"
-#include "dzl-suggestion-entry-buffer.h"
-#include "dzl-suggestion-popover.h"
+#include "suggestions/dzl-suggestion.h"
+#include "suggestions/dzl-suggestion-entry.h"
+#include "suggestions/dzl-suggestion-entry-buffer.h"
+#include "suggestions/dzl-suggestion-popover.h"
 
 #if 0
 # define _TRACE_LEVEL (1<<G_LOG_LEVEL_USER_SHIFT)
