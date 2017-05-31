@@ -40,7 +40,7 @@ struct _DzlSimplePopoverClass
    * Connect to this signal to perform your forward progress.
    */
   void (*activate) (DzlSimplePopover *self,
-                    const gchar     *text);
+                    const gchar      *text);
 
   /**
    * DzlSimplePopover::insert-text:
@@ -54,11 +54,11 @@ struct _DzlSimplePopoverClass
    * being inserted.
    */
   gboolean (*insert_text) (DzlSimplePopover *self,
-                           guint            position,
-                           const gchar     *chars,
-                           guint            n_chars);
+                           guint             position,
+                           const gchar      *chars,
+                           guint             n_chars);
 
-  
+
   /**
    * DzlSimplePopover::changed:
    * @self: A #DzlSimplePopover.
@@ -71,19 +71,19 @@ struct _DzlSimplePopoverClass
 GtkWidget   *dzl_simple_popover_new             (void);
 const gchar *dzl_simple_popover_get_text        (DzlSimplePopover *self);
 void         dzl_simple_popover_set_text        (DzlSimplePopover *self,
-                                                const gchar     *text);
+                                                 const gchar     *text);
 const gchar *dzl_simple_popover_get_message     (DzlSimplePopover *self);
 void         dzl_simple_popover_set_message     (DzlSimplePopover *self,
-                                                const gchar     *message);
+                                                 const gchar     *message);
 const gchar *dzl_simple_popover_get_title       (DzlSimplePopover *self);
 void         dzl_simple_popover_set_title       (DzlSimplePopover *self,
-                                                const gchar     *title);
+                                                 const gchar     *title);
 const gchar *dzl_simple_popover_get_button_text (DzlSimplePopover *self);
 void         dzl_simple_popover_set_button_text (DzlSimplePopover *self,
-                                                const gchar     *button_text);
+                                                 const gchar     *button_text);
 gboolean     dzl_simple_popover_get_ready       (DzlSimplePopover *self);
 void         dzl_simple_popover_set_ready       (DzlSimplePopover *self,
-                                                gboolean         ready);
+                                                 gboolean         ready);
 
 G_END_DECLS
 
