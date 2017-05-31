@@ -23,7 +23,7 @@
 
 /*
  * This is just a helper object for animating rectangles.
- * It allows us to use egg_object_animate() to animate
+ * It allows us to use dzl_object_animate() to animate
  * coordinates.
  */
 
