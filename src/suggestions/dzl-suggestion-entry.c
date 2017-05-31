@@ -24,6 +24,7 @@
 #include "suggestions/dzl-suggestion-entry.h"
 #include "suggestions/dzl-suggestion-entry-buffer.h"
 #include "suggestions/dzl-suggestion-popover.h"
+#include "util/dzl-util-private.h"
 
 #if 0
 # define _TRACE_LEVEL (1<<G_LOG_LEVEL_USER_SHIFT)
@@ -104,24 +105,6 @@ dzl_suggestion_entry_hide_suggestions (DzlSuggestionEntry *self)
   dzl_suggestion_popover_popdown (priv->popover);
 
   DZL_EXIT;
-}
-
-static void
-dzl_suggestion_entry_init_default_css (void)
-{
-  g_autoptr(GtkCssProvider) css_provider = NULL;
-  static gsize initialized;
-
-  if (g_once_init_enter (&initialized))
-    {
-      css_provider = gtk_css_provider_new ();
-      gtk_css_provider_load_from_resource (css_provider,
-                                           "/org/gnome/dazzle/css/dzl-suggestion-entry.css");
-      gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                                 GTK_STYLE_PROVIDER (css_provider),
-                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION - 1);
-      g_once_init_leave (&initialized, TRUE);
-    }
 }
 
 static gboolean
@@ -468,6 +451,8 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
                                 G_CALLBACK (dzl_suggestion_entry_activate_suggestion),
                                 NULL, NULL, NULL, G_TYPE_NONE, 0);
 
+  dzl_gtk_widget_class_add_css_resource (widget_class, "/org/gnome/dazzle/css/dzl-suggestion-entry.css");
+
   bindings = gtk_binding_set_by_class (klass);
   gtk_binding_entry_add_signal (bindings, GDK_KEY_Escape, 0, "hide-suggestions", 0);
   gtk_binding_entry_add_signal (bindings, GDK_KEY_space, GDK_CONTROL_MASK, "show-suggestions", 0);
@@ -488,8 +473,6 @@ static void
 dzl_suggestion_entry_init (DzlSuggestionEntry *self)
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
-
-  dzl_suggestion_entry_init_default_css ();
 
   priv->changed_handler =
     g_signal_connect_after (self,
