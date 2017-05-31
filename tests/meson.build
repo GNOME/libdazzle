@@ -166,3 +166,9 @@ test_entry_box = executable('test-entry-box', 'test-entry-box.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_bolding_label = executable('test-bolding-label', 'test-bolding-label.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
