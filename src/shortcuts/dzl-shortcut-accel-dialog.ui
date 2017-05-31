@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <interface>
-  <template class="GseShortcutAccelDialog" parent="GtkDialog">
+  <template class="DzlShortcutAccelDialog" parent="GtkDialog">
     <child type="action">
       <object class="GtkButton" id="button_cancel">
         <property name="can-default">true</property>
@@ -65,7 +65,7 @@
                   </object>
                 </child>
                 <child>
-                  <object class="GseShortcutLabel" id="display_shortcut">
+                  <object class="DzlShortcutLabel" id="display_shortcut">
                     <property name="halign">center</property>
                     <property name="visible">true</property>
                     <style>

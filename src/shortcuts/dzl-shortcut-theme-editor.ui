@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="GseShortcutThemeEditor" parent="GtkBin">
+  <template class="DzlShortcutThemeEditor" parent="GtkBin">
     <child>
       <object class="GtkBox">
         <property name="orientation">vertical</property>
