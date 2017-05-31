@@ -110,6 +110,7 @@ G_BEGIN_DECLS
 #include "widgets/dzl-pill-box.h"
 #include "widgets/dzl-priority-box.h"
 #include "widgets/dzl-progress-button.h"
+#include "widgets/dzl-progress-icon.h"
 #include "widgets/dzl-radio-box.h"
 #include "widgets/dzl-scrolled-window.h"
 #include "widgets/dzl-search-bar.h"
