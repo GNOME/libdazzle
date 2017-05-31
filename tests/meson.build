@@ -154,3 +154,9 @@ test_progress_icon = executable('test-progress-icon', 'test-progress-icon.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_simple_popover = executable('test-simple-popover', 'test-simple-popover.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
