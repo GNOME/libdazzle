@@ -129,10 +129,13 @@ dzl_application_startup (GApplication *app)
   priv->menu_merge_ids = g_hash_table_new (NULL, NULL);
   priv->shortcut_manager = g_object_ref (dzl_shortcut_manager_get_default ());
 
-  dzl_application_add_resource_path (self, g_application_get_resource_base_path (app));
-
   G_APPLICATION_CLASS (dzl_application_parent_class)->startup (app);
 
+  /*
+   * We cannot register resources before chaining startup because
+   * the GtkSettings and other plumbing will not yet be initialized.
+   */
+  dzl_application_add_resource_path (self, g_application_get_resource_base_path (app));
   app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
   gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
 }
@@ -168,6 +171,7 @@ dzl_application_class_init (DzlApplicationClass *klass)
 static void
 dzl_application_init (DzlApplication *self)
 {
+  g_application_set_default (G_APPLICATION (self));
 }
 
 /**
