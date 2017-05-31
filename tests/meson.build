@@ -143,6 +143,12 @@ test_progress_button = executable('test-progress-button', 'test-progress-button.
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_progress_menu_button = executable('test-progress-menu-button', 'test-progress-menu-button.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
 test_progress_icon = executable('test-progress-icon', 'test-progress-icon.c',
         c_args: test_cflags,
      link_args: test_link_args,
