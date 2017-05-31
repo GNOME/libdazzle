@@ -140,4 +140,8 @@ static void
 dzl_entry_box_init (DzlEntryBox *self)
 {
   self->max_width_chars = -1;
+
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
+  gtk_container_set_reallocate_redraws (GTK_CONTAINER (self), TRUE);
+  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
