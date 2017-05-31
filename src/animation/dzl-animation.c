@@ -242,7 +242,7 @@ dzl_animation_load_begin_values (DzlAnimation *animation)
   Tween *tween;
   guint i;
 
-  g_return_if_fail (DZL_IS_ANIMATION (animation));
+  g_assert (DZL_IS_ANIMATION (animation));
 
   for (i = 0; i < animation->tweens->len; i++)
     {
@@ -281,7 +281,7 @@ dzl_animation_unload_begin_values (DzlAnimation *animation)
   Tween *tween;
   guint i;
 
-  g_return_if_fail (DZL_IS_ANIMATION (animation));
+  g_assert (DZL_IS_ANIMATION (animation));
 
   for (i = 0; i < animation->tweens->len; i++)
     {
@@ -309,7 +309,7 @@ dzl_animation_get_offset (DzlAnimation *animation,
   gdouble offset;
   gint64 frame_msec;
 
-  g_return_val_if_fail (DZL_IS_ANIMATION (animation), 0.0);
+  g_assert (DZL_IS_ANIMATION (animation));
 
   if (frame_time == 0)
     {
@@ -403,10 +403,10 @@ dzl_animation_get_value_at_offset (DzlAnimation *animation,
                                    Tween        *tween,
                                    GValue       *value)
 {
-  g_return_if_fail (DZL_IS_ANIMATION (animation));
-  g_return_if_fail (tween != NULL);
-  g_return_if_fail (value != NULL);
-  g_return_if_fail (value->g_type == tween->pspec->value_type);
+  g_assert (DZL_IS_ANIMATION (animation));
+  g_assert (tween != NULL);
+  g_assert (value != NULL);
+  g_assert (value->g_type == tween->pspec->value_type);
 
   if (value->g_type < LAST_FUNDAMENTAL)
     {
@@ -470,7 +470,7 @@ dzl_animation_tick (DzlAnimation *animation,
   Tween *tween;
   guint i;
 
-  g_return_val_if_fail (DZL_IS_ANIMATION (animation), FALSE);
+  g_assert (DZL_IS_ANIMATION (animation));
 
   if (offset == animation->last_offset)
     return offset < 1.0;
