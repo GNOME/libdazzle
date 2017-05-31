@@ -361,3 +361,14 @@ foreach header: libdazzle_public_headers
   endif
 endforeach
 
+pkgg = import('pkgconfig')
+
+pkgg.generate(
+    libraries: [libdazzle],
+      subdirs: 'libdazzle-@0@'.format(libdazzle_api_version),
+      version: meson.project_version(),
+         name: 'Dazzle',
+     filebase: 'libdazzle-@0@'.format(libdazzle_api_version),
+  description: 'Razzle Dazzle for Gtk+ 3.x applications',
+     requires: 'gtk+-3.0')
+
