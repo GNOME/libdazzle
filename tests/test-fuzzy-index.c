@@ -62,11 +62,11 @@ test_index_builder_basic (void)
   dzl_fuzzy_index_builder_insert (builder, "baz", g_variant_new_int32 (5));
 
   dzl_fuzzy_index_builder_write_async (builder,
-                                   file,
-                                   G_PRIORITY_DEFAULT,
-                                   NULL,
-                                   test_index_builder_basic_cb,
-                                   &error);
+                                       file,
+                                       G_PRIORITY_LOW,
+                                       NULL,
+                                       test_index_builder_basic_cb,
+                                       &error);
 
   g_main_loop_run (main_loop);
   g_assert_no_error (error);
@@ -242,11 +242,11 @@ test_index_basic (void)
   dzl_fuzzy_index_builder_insert (builder, "gtk_widget_set_name", g_variant_new_int32 (5));
 
   dzl_fuzzy_index_builder_write_async (builder,
-                                   file,
-                                   G_PRIORITY_DEFAULT,
-                                   NULL,
-                                   test_index_basic_cb,
-                                   g_object_ref (file));
+                                       file,
+                                       G_PRIORITY_LOW,
+                                       NULL,
+                                       test_index_basic_cb,
+                                       g_object_ref (file));
 
   g_main_loop_run (main_loop);
   g_assert_no_error (error);

@@ -159,7 +159,7 @@ dzl_directory_model_next_files_cb (GObject      *object,
 
   g_file_enumerator_next_files_async (enumerator,
                                       NEXT_FILES_CHUNK_SIZE,
-                                      G_PRIORITY_DEFAULT,
+                                      G_PRIORITY_LOW,
                                       g_task_get_cancellable (task),
                                       dzl_directory_model_next_files_cb,
                                       g_object_ref (task));
@@ -182,7 +182,7 @@ dzl_directory_model_enumerate_children_cb (GObject      *object,
 
   g_file_enumerator_next_files_async (enumerator,
                                       NEXT_FILES_CHUNK_SIZE,
-                                      G_PRIORITY_DEFAULT,
+                                      G_PRIORITY_LOW,
                                       g_task_get_cancellable (task),
                                       dzl_directory_model_next_files_cb,
                                       g_object_ref (task));
@@ -289,7 +289,7 @@ dzl_directory_model_reload (DzlDirectoryModel *self)
                                        G_FILE_ATTRIBUTE_STANDARD_TYPE","
                                        G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON,
                                        G_FILE_QUERY_INFO_NONE,
-                                       G_PRIORITY_DEFAULT,
+                                       G_PRIORITY_LOW,
                                        self->cancellable,
                                        dzl_directory_model_enumerate_children_cb,
                                        g_object_ref (task));

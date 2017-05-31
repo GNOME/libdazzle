@@ -342,7 +342,7 @@ dzl_fuzzy_index_query_async (DzlFuzzyIndex       *self,
                          NULL);
 
   g_async_initable_init_async (G_ASYNC_INITABLE (cursor),
-                               G_PRIORITY_DEFAULT,
+                               G_PRIORITY_LOW,
                                cancellable,
                                dzl_fuzzy_index_query_cb,
                                g_object_ref (task));
