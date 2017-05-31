@@ -15,6 +15,8 @@ int main (int argc, char *argv[])
   GtkWidget *box;
   GtkWidget *label;
   GtkWidget *button;
+  PangoAttrList *attrs;
+  PangoAttribute *attr;
 
   gtk_init (&argc, &argv);
 
@@ -30,7 +32,13 @@ int main (int argc, char *argv[])
                       NULL);
   gtk_container_add (GTK_CONTAINER (window), box);
 
+  attrs = pango_attr_list_new ();
+  pango_attr_list_insert (attrs, (attr = pango_attr_style_new (PANGO_STYLE_ITALIC)));
+  attr->start_index = 0;
+  attr->end_index = 6;
+
   label = g_object_new (DZL_TYPE_BOLDING_LABEL,
+                        "attributes", attrs,
                         "label", "toggle to bold",
                         "visible", TRUE,
                         NULL);
@@ -51,6 +59,8 @@ int main (int argc, char *argv[])
   g_signal_connect (window, "delete-event", gtk_main_quit, NULL);
   gtk_window_present (GTK_WINDOW (window));
   gtk_main ();
+
+  pango_attr_list_unref (attrs);
 
   return 0;
 }
