@@ -284,3 +284,25 @@ dzl_gtk_widget_add_class (GtkWidget   *widget,
 {
   gtk_style_context_add_class (gtk_widget_get_style_context (widget), class_name);
 }
+
+void
+dzl_gtk_widget_class_add_css_resource (GtkWidgetClass *widget_class,
+                                       const gchar    *resource)
+{
+  GdkScreen *screen = gdk_screen_get_default ();
+
+  g_return_if_fail (widget_class != NULL);
+  g_return_if_fail (resource != NULL);
+
+  if (screen != NULL)
+    {
+      g_autoptr(GtkCssProvider) provider = NULL;
+
+      provider = gtk_css_provider_new ();
+      gtk_css_provider_load_from_resource (provider, resource);
+      gtk_style_context_add_provider_for_screen (screen,
+                                                 GTK_STYLE_PROVIDER (provider),
+                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION - 100);
+    }
+
+}

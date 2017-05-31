@@ -29,22 +29,24 @@ G_BEGIN_DECLS
 #define dzl_set_weak_pointer(ptr,obj) \
   ((obj!=*(ptr))?(dzl_clear_weak_pointer(ptr),*(ptr)=obj,((obj)?g_object_add_weak_pointer((GObject*)obj,(gpointer*)ptr),NULL:NULL),1):0)
 
-void          dzl_gtk_widget_add_class             (GtkWidget        *widget,
-                                                    const gchar      *class_name);
-gboolean      dzl_gtk_widget_activate_action       (GtkWidget        *widget,
-                                                    const gchar      *full_action_name,
-                                                    GVariant         *variant);
-GVariant     *dzl_gtk_widget_get_action_state      (GtkWidget        *widget,
-                                                    const gchar      *action_name);
-GActionGroup *dzl_gtk_widget_find_group_for_action (GtkWidget        *widget,
-                                                    const gchar      *action_name);
-void          dzl_g_action_name_parse              (const gchar      *action_name,
-                                                    gchar           **prefix,
-                                                    gchar           **name);
-void          dzl_gtk_style_context_get_borders    (GtkStyleContext  *style_context,
-                                                    GtkBorder        *borders);
-void          dzl_gtk_allocation_subtract_border   (GtkAllocation    *alloc,
-                                                    GtkBorder        *border);
+void          dzl_gtk_widget_class_add_css_resource (GtkWidgetClass   *widget_class,
+                                                     const gchar      *resource);
+void          dzl_gtk_widget_add_class              (GtkWidget        *widget,
+                                                     const gchar      *class_name);
+gboolean      dzl_gtk_widget_activate_action        (GtkWidget        *widget,
+                                                     const gchar      *full_action_name,
+                                                     GVariant         *variant);
+GVariant     *dzl_gtk_widget_get_action_state       (GtkWidget        *widget,
+                                                     const gchar      *action_name);
+GActionGroup *dzl_gtk_widget_find_group_for_action  (GtkWidget        *widget,
+                                                     const gchar      *action_name);
+void          dzl_g_action_name_parse               (const gchar      *action_name,
+                                                     gchar           **prefix,
+                                                     gchar           **name);
+void          dzl_gtk_style_context_get_borders     (GtkStyleContext  *style_context,
+                                                     GtkBorder        *borders);
+void          dzl_gtk_allocation_subtract_border    (GtkAllocation    *alloc,
+                                                     GtkBorder        *border);
 
 G_END_DECLS
 

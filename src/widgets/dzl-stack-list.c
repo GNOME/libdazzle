@@ -21,6 +21,7 @@
 #include <glib/gi18n.h>
 
 #include "animation/dzl-animation.h"
+#include "util/dzl-util-private.h"
 #include "widgets/dzl-rect-helper.h"
 #include "widgets/dzl-stack-list.h"
 
@@ -388,7 +389,6 @@ dzl_stack_list_class_init (DzlStackListClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  GdkScreen *screen;
 
   object_class->finalize = dzl_stack_list_finalize;
   object_class->get_property = dzl_stack_list_get_property;
@@ -425,19 +425,7 @@ dzl_stack_list_class_init (DzlStackListClass *klass)
                   GTK_TYPE_LIST_BOX_ROW);
 
   gtk_widget_class_set_css_name (widget_class, "stacklist");
-
-  screen = gdk_screen_get_default ();
-
-  if (screen != NULL)
-    {
-      g_autoptr(GtkCssProvider) provider = NULL;
-
-      provider = gtk_css_provider_new ();
-      gtk_css_provider_load_from_resource (provider, "/org/gnome/dazzle/css/dzl-stack-list.css");
-      gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                                 GTK_STYLE_PROVIDER (provider),
-                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION - 100);
-    }
+  dzl_gtk_widget_class_add_css_resource (widget_class, "/org/gnome/dazzle/css/dzl-stack-list.css");
 }
 
 static void
