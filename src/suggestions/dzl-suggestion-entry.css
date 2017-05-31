@@ -11,7 +11,7 @@ suggestionpopover > revealer > box {
 }
 
 suggestionpopover > revealer > box > elastic > scrolledwindow {
-  background: rgba(255,255,255,.95);
+  background: alpha(@content_view_bg, 0.95);
   border-radius: 0 0 7px 7px;
 }
 
@@ -29,11 +29,11 @@ suggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list 
 }
 
 suggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row:selected .title {
-  color: #fff;
+  color: @theme_selected_fg_color;
 }
 
 suggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row .title {
-  color: #4a86cf;
+  color: @theme_selected_bg_color;
 }
 
 suggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row:first-child:selected {
