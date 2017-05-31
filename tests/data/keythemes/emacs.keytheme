@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme name="emacs">
+  <property name="title" translatable="yes">Emacs</property>
+  <property name="subtitle" translatable="yes">Emacs theme</property>
+</theme>
