@@ -68,7 +68,6 @@ G_BEGIN_DECLS
 #include "settings/dzl-settings-sandwich.h"
 #include "shortcuts/dzl-shortcut-accel-dialog.h"
 #include "shortcuts/dzl-shortcut-chord.h"
-#include "shortcuts/dzl-shortcut-closure-chain.h"
 #include "shortcuts/dzl-shortcut-context.h"
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-label.h"

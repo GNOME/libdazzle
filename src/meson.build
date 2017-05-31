@@ -110,6 +110,7 @@ libdazzle_public_headers = [
   'tree/dzl-tree.h',
 
   'util/dzl-cairo.h',
+  'util/dzl-counter.h',
   'util/dzl-date-time.h',
   'util/dzl-dnd.h',
   'util/dzl-file-manager.h',
@@ -216,6 +217,7 @@ libdazzle_public_sources = [
   'tree/dzl-tree-node.c',
 
   'util/dzl-cairo.c',
+  'util/dzl-counter.c',
   'util/dzl-date-time.c',
   'util/dzl-dnd.c',
   'util/dzl-file-manager.c',
@@ -277,8 +279,6 @@ libdazzle_sources = [
 
   'tree/dzl-tree-private.h',
 
-  'util/dzl-counter.c',
-  'util/dzl-counter.h',
   'util/dzl-util-private.h',
 
   'widgets/dzl-rect-helper.c',
