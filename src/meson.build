@@ -104,6 +104,11 @@ libdazzle_public_headers = [
   'theming/dzl-css-provider.h',
   'theming/dzl-theme-manager.h',
 
+  'tree/dzl-tree-builder.h',
+  'tree/dzl-tree-node.h',
+  'tree/dzl-tree-types.h',
+  'tree/dzl-tree.h',
+
   'util/dzl-cairo.h',
   'util/dzl-date-time.h',
   'util/dzl-dnd.h',
@@ -206,6 +211,10 @@ libdazzle_public_sources = [
   'suggestions/dzl-suggestion-row.c',
   'suggestions/dzl-suggestion.c',
 
+  'tree/dzl-tree-builder.c',
+  'tree/dzl-tree.c',
+  'tree/dzl-tree-node.c',
+
   'util/dzl-cairo.c',
   'util/dzl-date-time.c',
   'util/dzl-dnd.c',
@@ -265,6 +274,8 @@ libdazzle_sources = [
   'shortcuts/dzl-shortcut-private.h',
   'shortcuts/dzl-shortcuts-shortcut-private.h',
   'shortcuts/dzl-shortcuts-window-private.h',
+
+  'tree/dzl-tree-private.h',
 
   'util/dzl-counter.c',
   'util/dzl-counter.h',
