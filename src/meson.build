@@ -306,9 +306,7 @@ libdazzle = shared_library(
 
   link_depends: 'dazzle.map',
         c_args: libdazzle_args,
-     link_args: [
-       '-Wl,--version-script,' + join_paths(meson.current_source_dir(), 'dazzle.map'),
-     ],
+     link_args: [ '-Wl,--version-script,' + join_paths(meson.current_source_dir(), 'dazzle.map') ],
   dependencies: libdazzle_deps,
        install: true,
 )
@@ -323,27 +321,25 @@ libdazzle_dep = declare_dependency(
 if get_option('with_introspection')
 
   libdazzle_gir = gnome.generate_gir(libdazzle,
-    sources: libdazzle_generated_headers + libdazzle_public_headers + libdazzle_public_sources,
-    nsversion: libdazzle_api_version,
-    namespace: 'Dazzle',
-    symbol_prefix: 'dzl',
-    identifier_prefix: 'Dzl',
-    link_with: libdazzle,
-    includes: ['Gio-2.0', 'Gtk-3.0'],
-    install: true,
-    install_dir_gir: girdir,
+                sources: libdazzle_generated_headers + libdazzle_public_headers + libdazzle_public_sources,
+              nsversion: libdazzle_api_version,
+              namespace: 'Dazzle',
+          symbol_prefix: 'dzl',
+      identifier_prefix: 'Dzl',
+              link_with: libdazzle,
+               includes: ['Gio-2.0', 'Gtk-3.0'],
+                install: true,
+        install_dir_gir: girdir,
     install_dir_typelib: typelibdir,
-    extra_args: [
-      '--c-include=dazzle.h',
-    ]
+             extra_args: [ '--c-include=dazzle.h' ],
   )
 
   if get_option('with_vapi')
 
     libdazzle_vapi = gnome.generate_vapi('libdazzle-' + libdazzle_api_version,
-      sources: libdazzle_gir[0],
-      packages: [ 'gio-2.0', 'gtk+-3.0' ],
-      install: true,
+          sources: libdazzle_gir[0],
+         packages: [ 'gio-2.0', 'gtk+-3.0' ],
+          install: true,
       install_dir: vapidir,
     )
 
@@ -370,5 +366,6 @@ pkgg.generate(
          name: 'Dazzle',
      filebase: 'libdazzle-@0@'.format(libdazzle_api_version),
   description: 'Razzle Dazzle for Gtk+ 3.x applications',
-     requires: 'gtk+-3.0')
+     requires: 'gtk+-3.0',
+)
 
