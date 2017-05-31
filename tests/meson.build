@@ -184,3 +184,9 @@ test_file_manager = executable('test-file-manager', 'test-file-manager.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_empty_state = executable('test-empty-state', 'test-empty-state.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
