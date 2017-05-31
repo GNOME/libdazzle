@@ -27,6 +27,9 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlBoldingLabel, dzl_bolding_label, DZL, BOLDING_LABEL, GtkLabel)
 
+void dzl_bolding_label_set_weight (DzlBoldingLabel *self,
+                                   PangoWeight      weight);
+
 G_END_DECLS
 
 #endif /* DZL_BOLDING_LABEL_H */

@@ -99,3 +99,33 @@ static void
 dzl_bolding_label_init (DzlBoldingLabel *self)
 {
 }
+
+static gboolean
+remove_weights (PangoAttribute *attr,
+                gpointer        user_data)
+{
+  return attr->klass->type == ((PangoAttribute *)user_data)->klass->type;
+}
+
+void
+dzl_bolding_label_set_weight (DzlBoldingLabel *self,
+                              PangoWeight      weight)
+{
+  PangoAttrList *attrs;
+  PangoAttrList *copy;
+  PangoAttribute *attr;
+
+  g_return_if_fail (DZL_IS_BOLDING_LABEL (self));
+
+  attrs = gtk_label_get_attributes (GTK_LABEL (self));
+  if (attrs)
+    copy = pango_attr_list_copy (attrs);
+  else
+    copy = pango_attr_list_new ();
+  attr = pango_attr_weight_new (weight);
+  pango_attr_list_filter (copy, remove_weights, attr);
+  pango_attr_list_insert (copy, attr);
+  gtk_label_set_attributes (GTK_LABEL (self), copy);
+  gtk_widget_queue_draw (GTK_WIDGET (self));
+  pango_attr_list_unref (copy);
+}
