@@ -9,6 +9,11 @@ However, as part of libdazzle, which is GPLv3+, the combined work will be GPLv3+
 You do not need to assign us copyright attribution.
 It is our belief that you should always retain copyright on your own work.
 
+## Testing
+
+When working on a new widget or tool, try to write unit tests to prove the implementation.
+Not everything we have in the code base has tests, and ideally that will improve, not get worse.
+
 ## Code Style
 
 We follow the GObject and Gtk coding style.
