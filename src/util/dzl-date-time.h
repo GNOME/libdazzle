@@ -19,11 +19,16 @@
 #ifndef DZL_DATE_TIME_H
 #define DZL_DATE_TIME_H
 
-#include <glib.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
-gchar *dzl_date_time_format_for_display (GDateTime *self);
+gchar       *dzl_g_date_time_format_for_display  (GDateTime      *self);
+gchar       *dzl_g_time_span_to_label            (GTimeSpan       span);
+gboolean     dzl_g_time_span_to_label_mapping    (GBinding       *binding,
+                                                  const GValue   *from_value,
+                                                  GValue         *to_value,
+                                                  gpointer        user_data);
 
 G_END_DECLS
 

@@ -21,7 +21,7 @@
 #include "dzl-date-time.h"
 
 /**
- * dzl_date_time_format_for_display:
+ * dzl_g_date_time_format_for_display:
  * @self: A #GDateTime
  *
  * Helper function to "humanize" a #GDateTime into a relative time
@@ -31,7 +31,7 @@
  *   date and time imprecisely such as "Yesterday".
  */
 gchar *
-dzl_date_time_format_for_display (GDateTime *self)
+dzl_g_date_time_format_for_display (GDateTime *self)
 {
   GDateTime *now;
   GTimeSpan diff;
@@ -67,4 +67,48 @@ dzl_date_time_format_for_display (GDateTime *self)
   years = MAX (2, diff / (60 * 60 * 24 * 365));
 
   return g_strdup_printf (ngettext ("About %u year ago", "About %u years ago", years), years);
+}
+
+gchar *
+dzl_g_time_span_to_label (GTimeSpan span)
+{
+  gint64 hours;
+  gint64 minutes;
+  gint64 seconds;
+
+  span = ABS (span);
+
+  hours = span / G_TIME_SPAN_HOUR;
+  minutes = (span % G_TIME_SPAN_HOUR) / G_TIME_SPAN_MINUTE;
+  seconds = (span % G_TIME_SPAN_MINUTE) / G_TIME_SPAN_SECOND;
+
+  g_assert (minutes < 60);
+  g_assert (seconds < 60);
+
+  if (hours == 0)
+    return g_strdup_printf ("%02"G_GINT64_FORMAT":%02"G_GINT64_FORMAT,
+                            minutes, seconds);
+  else
+    return g_strdup_printf ("%02"G_GINT64_FORMAT":%02"G_GINT64_FORMAT":%02"G_GINT64_FORMAT,
+                            hours, minutes, seconds);
+}
+
+gboolean
+dzl_g_time_span_to_label_mapping (GBinding     *binding,
+                                  const GValue *from_value,
+                                  GValue       *to_value,
+                                  gpointer      user_data)
+{
+  GTimeSpan span;
+
+  g_assert (G_IS_BINDING (binding));
+  g_assert (from_value != NULL);
+  g_assert (G_VALUE_HOLDS (from_value, G_TYPE_INT64));
+  g_assert (to_value != NULL);
+  g_assert (G_VALUE_HOLDS (to_value, G_TYPE_STRING));
+
+  span = g_value_get_int64 (from_value);
+  g_value_take_string (to_value, dzl_g_time_span_to_label (span));
+
+  return TRUE;
 }
