@@ -1,7 +1,30 @@
 project('libdazzle', 'c',
-  version: '0.1.0',
-  meson_version: '>= 0.36.0',
+          version: '0.1.0',
+          license: 'GPLv3+',
+    meson_version: '>= 0.38.1',
+  default_options: [ 'warning_level=1', 'buildtype=debugoptimized' ],
 )
+
+version_arr = meson.project_version().split('.')
+dazzle_version_major = version_arr[0].to_int()
+dazzle_version_minor = version_arr[1].to_int()
+dazzle_version_micro = version_arr[2].to_int()
+
+apiversion = '1.0'
+soversion = 0
+
+if dazzle_version_minor.is_odd()
+  dazzle_interface_age = 0
+else
+  dazzle_interface_age = dazzle_version_micro
+endif
+
+# maintaining compatibility with the previous libtool versioning
+# current = minor * 100 + micro - interface
+# revision = interface
+current = dazzle_version_minor * 100 + dazzle_version_micro - dazzle_interface_age
+revision = dazzle_interface_age
+libversion = '@0@.@1@.@2@'.format(soversion, current, revision)
 
 config_h = configuration_data()
 config_h.set_quoted('GETTEXT_PACKAGE', 'libdazzle')

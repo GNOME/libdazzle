@@ -1,11 +1,5 @@
-libdazzle_api_version = '1.0'
 
-version_arr = meson.project_version().split('.')
-dazzle_version_major = version_arr[0].to_int()
-dazzle_version_minor = version_arr[1].to_int()
-dazzle_version_micro = version_arr[2].to_int()
-
-libdazzle_header_subdir = 'libdazzle-' + libdazzle_api_version
+libdazzle_header_subdir = 'libdazzle-' + apiversion
 libdazzle_header_dir = join_paths(get_option('includedir'), libdazzle_header_subdir)
 
 libdazzle_resources = gnome.compile_resources(
@@ -301,13 +295,15 @@ if get_option('enable_rdtscp')
 endif
 
 libdazzle = shared_library(
-  'dazzle-' + libdazzle_api_version,
+  'dazzle-' + apiversion,
   libdazzle_sources,
 
   link_depends: 'dazzle.map',
         c_args: libdazzle_args,
      link_args: [ '-Wl,--version-script,' + join_paths(meson.current_source_dir(), 'dazzle.map') ],
   dependencies: libdazzle_deps,
+     soversion: soversion,
+       version: libversion,
        install: true,
 )
 
@@ -322,7 +318,7 @@ if get_option('with_introspection')
 
   libdazzle_gir = gnome.generate_gir(libdazzle,
                 sources: libdazzle_generated_headers + libdazzle_public_headers + libdazzle_public_sources,
-              nsversion: libdazzle_api_version,
+              nsversion: apiversion,
               namespace: 'Dazzle',
           symbol_prefix: 'dzl',
       identifier_prefix: 'Dzl',
@@ -336,7 +332,7 @@ if get_option('with_introspection')
 
   if get_option('with_vapi')
 
-    libdazzle_vapi = gnome.generate_vapi('libdazzle-' + libdazzle_api_version,
+    libdazzle_vapi = gnome.generate_vapi('libdazzle-' + apiversion,
           sources: libdazzle_gir[0],
          packages: [ 'gio-2.0', 'gtk+-3.0' ],
           install: true,
@@ -361,10 +357,10 @@ pkgg = import('pkgconfig')
 
 pkgg.generate(
     libraries: [libdazzle],
-      subdirs: 'libdazzle-@0@'.format(libdazzle_api_version),
+      subdirs: 'libdazzle-@0@'.format(apiversion),
       version: meson.project_version(),
          name: 'Dazzle',
-     filebase: 'libdazzle-@0@'.format(libdazzle_api_version),
+     filebase: 'libdazzle-@0@'.format(apiversion),
   description: 'Razzle Dazzle for Gtk+ 3.x applications',
      requires: 'gtk+-3.0',
 )
