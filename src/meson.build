@@ -294,7 +294,7 @@ if get_option('enable_rdtscp')
   libdazzle_args += '-DDZL_HAVE_RDTSCP'
 endif
 
-libdazzle = shared_library(
+libdazzle = library(
   'dazzle-' + apiversion,
   libdazzle_sources,
 
