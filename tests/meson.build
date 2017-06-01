@@ -196,3 +196,9 @@ test_empty_state = executable('test-empty-state', 'test-empty-state.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_fuzzy_mutable_index = executable('test-fuzzy-mutable-index', 'test-fuzzy-mutable-index.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
