@@ -22,6 +22,11 @@
 
 #include "dzl-gdk.h"
 
+/**
+ * dzl_gdk_synthesize_event_key: (skip)
+ *
+ * Returns: (transfer full): A #GdkEventKey
+ */
 GdkEventKey *
 dzl_gdk_synthesize_event_key (GdkWindow *window,
                               gunichar   ch)
@@ -91,6 +96,11 @@ dzl_gdk_synthesize_event_key (GdkWindow *window,
   return &ev->key;
 }
 
+/**
+ * dzl_gdk_synthesize_event_keyval: (skip)
+ *
+ * Returns: (transfer full): A #GdkEventKey
+ */
 GdkEventKey *
 dzl_gdk_synthesize_event_keyval (GdkWindow *window,
                                  guint      keyval)
