@@ -50,6 +50,7 @@ libdazzle_public_headers = [
   'fuzzy/dzl-fuzzy-index-cursor.h',
   'fuzzy/dzl-fuzzy-index-match.h',
   'fuzzy/dzl-fuzzy-index.h',
+  'fuzzy/dzl-fuzzy-mutable-index.h',
 
   'menus/dzl-menu-manager.h',
 
@@ -160,6 +161,7 @@ libdazzle_public_sources = [
   'fuzzy/dzl-fuzzy-index-cursor.c',
   'fuzzy/dzl-fuzzy-index-match.c',
   'fuzzy/dzl-fuzzy-index.c',
+  'fuzzy/dzl-fuzzy-mutable-index.c',
 
   'menus/dzl-menu-manager.c',
 

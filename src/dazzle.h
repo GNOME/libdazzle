@@ -48,6 +48,7 @@ G_BEGIN_DECLS
 #include "fuzzy/dzl-fuzzy-index-builder.h"
 #include "fuzzy/dzl-fuzzy-index-cursor.h"
 #include "fuzzy/dzl-fuzzy-index-match.h"
+#include "fuzzy/dzl-fuzzy-mutable-index.h"
 #include "menus/dzl-menu-manager.h"
 #include "panel/dzl-dock-bin-edge.h"
 #include "panel/dzl-dock-bin.h"
