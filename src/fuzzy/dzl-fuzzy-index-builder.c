@@ -464,13 +464,10 @@ dzl_fuzzy_index_builder_write_worker (GTask        *task,
    * keys that insert the same document (as we deduplicate documents inserted
    * into the index).
    */
-  if (self->documents->len > 0)
-    {
-      documents = g_variant_new_array (NULL,
-                                       (GVariant * const *)self->documents->pdata,
-                                       self->documents->len);
-      g_variant_dict_insert_value (&dict, "documents", g_variant_ref_sink (documents));
-    }
+  documents = g_variant_new_array (NULL,
+                                   (GVariant * const *)self->documents->pdata,
+                                   self->documents->len);
+  g_variant_dict_insert_value (&dict, "documents", g_variant_ref_sink (documents));
 
   /* Now write the variant to disk */
   variant = g_variant_ref_sink (g_variant_dict_end (&dict));
