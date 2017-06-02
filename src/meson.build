@@ -46,6 +46,14 @@ libdazzle_public_headers = [
   'files/dzl-directory-model.h',
   'files/dzl-directory-reaper.h',
 
+  'graphing/dzl-cpu-graph.h',
+  'graphing/dzl-cpu-model.h',
+  'graphing/dzl-graph-column.h',
+  'graphing/dzl-graph-line-renderer.h',
+  'graphing/dzl-graph-model.h',
+  'graphing/dzl-graph-renderer.h',
+  'graphing/dzl-graph-view.h',
+
   'fuzzy/dzl-fuzzy-index-builder.h',
   'fuzzy/dzl-fuzzy-index-cursor.h',
   'fuzzy/dzl-fuzzy-index-match.h',
@@ -165,6 +173,14 @@ libdazzle_public_sources = [
   'fuzzy/dzl-fuzzy-index.c',
   'fuzzy/dzl-fuzzy-mutable-index.c',
 
+  'graphing/dzl-cpu-graph.c',
+  'graphing/dzl-cpu-model.c',
+  'graphing/dzl-graph-column.c',
+  'graphing/dzl-graph-line-renderer.c',
+  'graphing/dzl-graph-model.c',
+  'graphing/dzl-graph-renderer.c',
+  'graphing/dzl-graph-view.c',
+
   'menus/dzl-menu-manager.c',
 
   'panel/dzl-dock-bin-edge.c',
@@ -266,6 +282,9 @@ libdazzle_sources = [
   'fuzzy/dzl-fuzzy-index-private.h',
   'fuzzy/dzl-fuzzy-util.c',
   'fuzzy/dzl-fuzzy-util.h',
+
+  'graphing/dzl-column-private.h',
+  'graphing/dzl-graph-column-private.h',
 
   'panel/dzl-dock-bin-edge-private.h',
   'panel/dzl-dock-paned-private.h',

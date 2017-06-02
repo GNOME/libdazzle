@@ -208,3 +208,9 @@ test_desktop_index = executable('test-desktop-index', 'test-desktop-index.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_cpu_graph = executable('test-cpu-graph', 'test-cpu-graph.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
