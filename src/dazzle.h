@@ -102,6 +102,7 @@ G_BEGIN_DECLS
 #include "util/dzl-heap.h"
 #include "util/dzl-pango.h"
 #include "util/dzl-rgba.h"
+#include "util/dzl-ring.h"
 #include "widgets/dzl-bin.h"
 #include "widgets/dzl-bolding-label.h"
 #include "widgets/dzl-box.h"

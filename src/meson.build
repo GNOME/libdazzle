@@ -113,6 +113,7 @@ libdazzle_public_headers = [
   'util/dzl-heap.h',
   'util/dzl-pango.h',
   'util/dzl-rgba.h',
+  'util/dzl-ring.h',
 
   'widgets/dzl-bin.h',
   'widgets/dzl-bolding-label.h',
@@ -222,6 +223,7 @@ libdazzle_public_sources = [
   'util/dzl-heap.c',
   'util/dzl-pango.c',
   'util/dzl-rgba.c',
+  'util/dzl-ring.c',
   'util/dzl-util.c',
 
   'theming/dzl-css-provider.c',
