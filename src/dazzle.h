@@ -51,7 +51,6 @@ G_BEGIN_DECLS
 #include "fuzzy/dzl-fuzzy-mutable-index.h"
 #include "graphing/dzl-cpu-graph.h"
 #include "graphing/dzl-cpu-model.h"
-#include "graphing/dzl-cpu-table.h"
 #include "graphing/dzl-graph-column.h"
 #include "graphing/dzl-graph-line-renderer.h"
 #include "graphing/dzl-graph-model.h"
