@@ -53,9 +53,9 @@ dzl_fuzzy_index_match_finalize (GObject *object)
 
 static void
 dzl_fuzzy_index_match_get_property (GObject    *object,
-                                guint       prop_id,
-                                GValue     *value,
-                                GParamSpec *pspec)
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
   DzlFuzzyIndexMatch *self = DZL_FUZZY_INDEX_MATCH (object);
 
@@ -80,9 +80,9 @@ dzl_fuzzy_index_match_get_property (GObject    *object,
 
 static void
 dzl_fuzzy_index_match_set_property (GObject      *object,
-                                guint         prop_id,
-                                const GValue *value,
-                                GParamSpec   *pspec)
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
 {
   DzlFuzzyIndexMatch *self = DZL_FUZZY_INDEX_MATCH (object);
 
