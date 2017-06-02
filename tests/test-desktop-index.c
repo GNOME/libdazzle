@@ -1,6 +1,151 @@
 #include <dazzle.h>
 #include <stdlib.h>
 
+static GTimer *timer;
+static gchar *last_query;
+
+static void
+query_cb (GObject      *object,
+          GAsyncResult *result,
+          gpointer      user_data)
+{
+  g_autoptr(GListModel) model = NULL;
+  DzlFuzzyIndex *index = (DzlFuzzyIndex *)object;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GListStore) suggestions = NULL;
+  g_autoptr(DzlSuggestionEntry) entry = user_data;
+  g_autoptr(GHashTable) hash = NULL;
+  guint n_items;
+  gdouble elapsed = g_timer_elapsed (timer, NULL);
+
+  model = dzl_fuzzy_index_query_finish (index, result, &error);
+
+  //g_print ("Search took %lf msec\n", elapsed / 1000.0);
+
+  if (error)
+    {
+      g_printerr ("%s\n", error->message);
+      return;
+    }
+
+  suggestions = g_list_store_new (DZL_TYPE_SUGGESTION);
+
+  n_items = g_list_model_get_n_items (model);
+
+  hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(DzlFuzzyIndexMatch) match = g_list_model_get_item (model, i);
+      GVariant *doc = dzl_fuzzy_index_match_get_document (match);
+      g_autoptr(DzlSuggestion) suggestion = NULL;
+      g_autoptr(GVariantDict) dict = g_variant_dict_new (doc);
+      const gchar *id = NULL;
+      const gchar *title = NULL;
+      const gchar *icon_name = NULL;
+      g_autofree gchar *highlight = NULL;
+      g_autofree gchar *escaped = NULL;
+
+      g_variant_dict_lookup (dict, "id", "&s", &id);
+      g_variant_dict_lookup (dict, "title", "&s", &title);
+      g_variant_dict_lookup (dict, "icon-name", "&s", &icon_name);
+
+      if (g_hash_table_contains (hash, id))
+        continue;
+      else
+        g_hash_table_insert (hash, g_strdup (id), NULL);
+
+      escaped = g_markup_escape_text (title, -1);
+      highlight = dzl_fuzzy_highlight (escaped, last_query, FALSE);
+
+      suggestion = g_object_new (DZL_TYPE_SUGGESTION,
+                                 "id", id,
+                                 "icon-name", icon_name,
+                                 "title", highlight,
+                                 NULL);
+
+      g_list_store_append (suggestions, suggestion);
+    }
+
+  dzl_suggestion_entry_set_model (entry, G_LIST_MODEL (suggestions));
+}
+
+static void
+entry_changed (DzlSuggestionEntry *entry,
+               DzlFuzzyIndex      *index)
+{
+  const gchar *typed_text;
+  GString *str = g_string_new (NULL);
+
+  g_assert (DZL_IS_SUGGESTION_ENTRY (entry));
+  g_assert (DZL_IS_FUZZY_INDEX (index));
+
+  typed_text = dzl_suggestion_entry_get_typed_text (entry);
+
+  g_timer_reset (timer);
+
+  for (; *typed_text; typed_text = g_utf8_next_char (typed_text))
+    {
+      gunichar ch = g_utf8_get_char (typed_text);
+
+      if (!g_unichar_isspace (ch))
+        g_string_append_unichar (str, ch);
+    }
+
+  dzl_fuzzy_index_query_async (index, str->str, 25, NULL, query_cb, g_object_ref (entry));
+
+  g_free (last_query);
+  last_query = g_string_free (str, FALSE);
+}
+
+static void
+create_ui (void)
+{
+  GtkWindow *window;
+  GtkHeaderBar *header;
+  GtkWidget *entry;
+  g_autoptr(DzlFuzzyIndex) index = dzl_fuzzy_index_new ();
+  g_autoptr(GFile) file = g_file_new_for_path ("desktop.index");
+  g_autoptr(GError) error = NULL;
+  gboolean r;
+
+  timer = g_timer_new ();
+
+  r = dzl_fuzzy_index_load_file (index, file, NULL, &error);
+  g_assert_no_error (error);
+  g_assert (r);
+
+  window = g_object_new (GTK_TYPE_WINDOW,
+                         "title", "Title Window",
+                         "default-width", 800,
+                         "default-height", 600,
+                         NULL);
+
+  header = g_object_new (GTK_TYPE_HEADER_BAR,
+                         "show-close-button", TRUE,
+                         "visible", TRUE,
+                         NULL);
+  gtk_window_set_titlebar (window, GTK_WIDGET (header));
+
+  entry = g_object_new (DZL_TYPE_SUGGESTION_ENTRY,
+                        "visible", TRUE,
+                        "max-width-chars", 55,
+                        NULL);
+  gtk_header_bar_set_custom_title (header, entry);
+
+  g_signal_connect_data (entry,
+                         "changed",
+                         G_CALLBACK (entry_changed),
+                         g_steal_pointer (&index),
+                         (GClosureNotify)g_object_unref,
+                         0);
+
+  gtk_widget_grab_focus (entry);
+  g_signal_connect (window, "delete-event", gtk_main_quit, NULL);
+  gtk_window_present (window);
+
+}
+
 static gchar **
 tokenize (const gchar *input)
 {
@@ -12,7 +157,8 @@ test_desktop_index_key (DzlFuzzyIndexBuilder *builder,
                         GKeyFile             *key_file,
                         const gchar          *group,
                         const gchar          *key,
-                        GVariant             *document)
+                        GVariant             *document,
+                        gboolean              can_tokenize)
 {
   g_autofree gchar *str = NULL;
   g_auto(GStrv) words = NULL;
@@ -25,22 +171,32 @@ test_desktop_index_key (DzlFuzzyIndexBuilder *builder,
   if (NULL == (str = g_key_file_get_string (key_file, group, key, NULL)))
     return;
 
+  if (!can_tokenize)
+    {
+      dzl_fuzzy_index_builder_insert (builder, str, document);
+      return;
+    }
+
   words = tokenize (str);
 
   for (guint i = 0; words[i] != NULL; i++)
-  {
-    if (*words[i])
-      dzl_fuzzy_index_builder_insert (builder, words[i], document);
-  }
+    {
+      if (*words[i] && !g_ascii_isspace (*words[i]))
+        dzl_fuzzy_index_builder_insert (builder, words[i], document);
+    }
 }
 
 static gboolean
 test_desktop_index_file (DzlFuzzyIndexBuilder  *builder,
                          const gchar           *path,
+                         const gchar           *name,
                          GError               **error)
 {
   g_autoptr(GKeyFile) key_file = NULL;
   g_autoptr(GVariant) document = NULL;
+  g_autofree gchar *icon = NULL;
+  g_autofree gchar *entry_name = NULL;
+  GVariantDict dict;
 
   g_assert (DZL_IS_FUZZY_INDEX_BUILDER (builder));
   g_assert (path != NULL);
@@ -60,12 +216,19 @@ test_desktop_index_file (DzlFuzzyIndexBuilder  *builder,
       return FALSE;
     }
 
-  document = g_variant_take_ref (g_variant_new_string (path));
+  icon = g_key_file_get_string (key_file, "Desktop Entry", "Icon", NULL);
+  entry_name = g_key_file_get_string (key_file, "Desktop Entry", "Name", NULL);
 
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Comment", document);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Categories", document);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Keywords", document);
+  g_variant_dict_init (&dict, NULL);
+  g_variant_dict_insert (&dict, "id", "s", name ?: "");
+  g_variant_dict_insert (&dict, "icon-name", "s", icon ?: "");
+  g_variant_dict_insert (&dict, "title", "s", entry_name ?: "");
+  document = g_variant_take_ref (g_variant_dict_end (&dict));
+
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, FALSE);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Comment", document, TRUE);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Categories", document, TRUE);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Keywords", document, TRUE);
 
   return TRUE;
 }
@@ -80,6 +243,7 @@ main (gint   argc,
   g_autoptr(GError) error = NULL;
 
   context = g_option_context_new ("[DIRECTORIES...] - Index desktop info directories");
+  g_option_context_add_group (context, gtk_get_option_group (TRUE));
 
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -89,7 +253,7 @@ main (gint   argc,
 
   builder = dzl_fuzzy_index_builder_new ();
 
-  dzl_fuzzy_index_builder_set_case_sensitive (builder, TRUE);
+  dzl_fuzzy_index_builder_set_case_sensitive (builder, FALSE);
 
   for (guint i = 1; i < argc; i++)
     {
@@ -113,7 +277,7 @@ main (gint   argc,
 
           path = g_build_filename (directory, name, NULL);
 
-          if (!test_desktop_index_file (builder, path, &error))
+          if (!test_desktop_index_file (builder, path, name, &error))
             {
               g_printerr ("%s\n", error->message);
               g_clear_error (&error);
@@ -128,6 +292,9 @@ main (gint   argc,
     g_printerr ("%s\n", error->message);
 
   g_print ("desktop.index.written\n");
+
+  create_ui ();
+  gtk_main ();
 
   return EXIT_SUCCESS;
 }
