@@ -214,3 +214,9 @@ test_cpu_graph = executable('test-cpu-graph', 'test-cpu-graph.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_trie = executable('test-trie', 'test-trie.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
