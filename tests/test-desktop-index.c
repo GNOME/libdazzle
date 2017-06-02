@@ -16,11 +16,8 @@ query_cb (GObject      *object,
   g_autoptr(DzlSuggestionEntry) entry = user_data;
   g_autoptr(GHashTable) hash = NULL;
   guint n_items;
-  gdouble elapsed = g_timer_elapsed (timer, NULL);
 
   model = dzl_fuzzy_index_query_finish (index, result, &error);
-
-  //g_print ("Search took %lf msec\n", elapsed / 1000.0);
 
   if (error)
     {
@@ -241,6 +238,7 @@ main (gint   argc,
   g_autoptr(DzlFuzzyIndexBuilder) builder = NULL;
   g_autoptr(GFile) outfile = NULL;
   g_autoptr(GError) error = NULL;
+  g_autoptr(GPtrArray) ar = NULL;
 
   context = g_option_context_new ("[DIRECTORIES...] - Index desktop info directories");
   g_option_context_add_group (context, gtk_get_option_group (TRUE));
@@ -255,10 +253,16 @@ main (gint   argc,
 
   dzl_fuzzy_index_builder_set_case_sensitive (builder, FALSE);
 
+  ar = g_ptr_array_new ();
   for (guint i = 1; i < argc; i++)
+    g_ptr_array_add (ar, argv[i]);
+  if (ar->len == 0)
+    g_ptr_array_add (ar, "/usr/share/applications");
+
+  for (guint i = 0; i < ar->len; i++)
     {
       const gchar *name;
-      const gchar *directory = argv[i];
+      const gchar *directory = g_ptr_array_index (ar, i);
       g_autoptr(GDir) dir = g_dir_open (directory, 0, &error);
 
       if (dir == NULL)
