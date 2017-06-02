@@ -232,8 +232,8 @@ fuzzy_match_compare (gconstpointer a,
 static gboolean
 fuzzy_do_match (const DzlFuzzyLookup    *lookup,
                 const DzlFuzzyIndexItem *item,
-                guint                 table_index,
-                gint                  score)
+                guint                    table_index,
+                gint                     score)
 {
   const DzlFuzzyIndexItem *table;
   const DzlFuzzyIndexItem *iter;
@@ -290,9 +290,9 @@ fuzzy_do_match (const DzlFuzzyLookup    *lookup,
 
 static void
 dzl_fuzzy_index_cursor_worker (GTask        *task,
-                           gpointer      source_object,
-                           gpointer      task_data,
-                           GCancellable *cancellable)
+                               gpointer      source_object,
+                               gpointer      task_data,
+                               GCancellable *cancellable)
 {
   DzlFuzzyIndexCursor *self = source_object;
   g_autoptr(GHashTable) matches = NULL;
