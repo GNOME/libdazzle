@@ -569,9 +569,9 @@ dzl_fuzzy_mutable_index_remove (DzlFuzzyMutableIndex *fuzzy,
 }
 
 gchar *
-dzl_fuzzy_mutable_index_highlight (DzlFuzzyMutableIndex *fuzzy,
-                                   const gchar          *str,
-                                   const gchar          *match)
+dzl_fuzzy_highlight (const gchar *str,
+                     const gchar *match,
+                     gboolean     case_sensitive)
 {
   static const gchar *begin = "<b>";
   static const gchar *end = "</b>";
@@ -590,8 +590,15 @@ dzl_fuzzy_mutable_index_highlight (DzlFuzzyMutableIndex *fuzzy,
       str_ch = g_utf8_get_char (str);
       match_ch = g_utf8_get_char (match);
 
+      if (str_ch == '&' && !strncmp (str, "&amp;", 5))
+        {
+          str += 4;
+          g_string_append (ret, "&amp;");
+          continue;
+        }
+
       if ((str_ch == match_ch) ||
-          (!fuzzy->case_sensitive && g_unichar_tolower (str_ch) == g_unichar_tolower (match_ch)))
+          (!case_sensitive && g_unichar_tolower (str_ch) == g_unichar_tolower (match_ch)))
         {
           if (!element_open)
             {

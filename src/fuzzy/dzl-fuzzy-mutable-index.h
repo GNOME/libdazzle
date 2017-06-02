@@ -55,9 +55,9 @@ void                      dzl_fuzzy_mutable_index_remove             (DzlFuzzyMu
                                                                       const gchar          *key);
 DzlFuzzyMutableIndex     *dzl_fuzzy_mutable_index_ref                (DzlFuzzyMutableIndex *fuzzy);
 void                      dzl_fuzzy_mutable_index_unref              (DzlFuzzyMutableIndex *fuzzy);
-gchar                    *dzl_fuzzy_mutable_index_highlight          (DzlFuzzyMutableIndex *fuzzy,
-                                                                      const gchar          *str,
-                                                                      const gchar          *query);
+gchar                    *dzl_fuzzy_highlight                        (const gchar          *str,
+                                                                      const gchar          *query,
+                                                                      gboolean              case_sensitive);
 
 G_END_DECLS
 
