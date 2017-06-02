@@ -100,6 +100,7 @@ G_BEGIN_DECLS
 #include "tree/dzl-tree-builder.h"
 #include "tree/dzl-tree-node.h"
 #include "tree/dzl-tree-types.h"
+#include "trie/dzl-trie.h"
 #include "util/dzl-cairo.h"
 #include "util/dzl-counter.h"
 #include "util/dzl-date-time.h"

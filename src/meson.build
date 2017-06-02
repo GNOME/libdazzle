@@ -112,6 +112,8 @@ libdazzle_public_headers = [
   'tree/dzl-tree-types.h',
   'tree/dzl-tree.h',
 
+  'trie/dzl-trie.h',
+
   'util/dzl-cairo.h',
   'util/dzl-counter.h',
   'util/dzl-date-time.h',
@@ -229,6 +231,8 @@ libdazzle_public_sources = [
   'tree/dzl-tree-builder.c',
   'tree/dzl-tree.c',
   'tree/dzl-tree-node.c',
+
+  'trie/dzl-trie.c',
 
   'util/dzl-cairo.c',
   'util/dzl-counter.c',
