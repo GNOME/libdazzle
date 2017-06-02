@@ -202,3 +202,9 @@ test_fuzzy_mutable_index = executable('test-fuzzy-mutable-index', 'test-fuzzy-mu
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_desktop_index = executable('test-desktop-index', 'test-desktop-index.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
