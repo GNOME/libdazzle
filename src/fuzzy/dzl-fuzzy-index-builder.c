@@ -19,6 +19,7 @@
 #define G_LOG_DOMAIN "dzl-fuzzy-index-builder"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "fuzzy/dzl-fuzzy-index-builder.h"
 #include "fuzzy/dzl-fuzzy-util.h"
@@ -332,7 +333,7 @@ dzl_fuzzy_index_builder_build_index (DzlFuzzyIndexBuilder *self)
       if (!self->case_sensitive)
         key = lower = g_utf8_casefold (key, -1);
 
-      for (tmp = key; *tmp != '\0'; tmp = g_utf8_next_char (tmp))
+      for (tmp = key; *tmp; tmp = g_utf8_next_char (tmp))
         {
           gunichar ch = g_utf8_get_char (tmp);
 
@@ -355,11 +356,12 @@ dzl_fuzzy_index_builder_build_index (DzlFuzzyIndexBuilder *self)
 
   while (g_hash_table_iter_next (&iter, &keyptr, (gpointer *)&row))
     {
-      gchar key[16];
+      gchar key[8];
       GVariant *variant;
       gunichar ch = GPOINTER_TO_UINT (keyptr);
 
-      g_snprintf (key, sizeof key, "%c", ch);
+      key [g_unichar_to_utf8 (ch, key)] = 0;
+
       g_array_sort (row, pos_doc_pair_compare);
 
       variant = g_variant_new_fixed_array ((const GVariantType *)"(uu)",
@@ -462,10 +464,13 @@ dzl_fuzzy_index_builder_write_worker (GTask        *task,
    * keys that insert the same document (as we deduplicate documents inserted
    * into the index).
    */
-  documents = g_variant_new_array (NULL,
-                                   (GVariant * const *)self->documents->pdata,
-                                   self->documents->len);
-  g_variant_dict_insert_value (&dict, "documents", g_variant_ref_sink (documents));
+  if (self->documents->len > 0)
+    {
+      documents = g_variant_new_array (NULL,
+                                       (GVariant * const *)self->documents->pdata,
+                                       self->documents->len);
+      g_variant_dict_insert_value (&dict, "documents", g_variant_ref_sink (documents));
+    }
 
   /* Now write the variant to disk */
   variant = g_variant_ref_sink (g_variant_dict_end (&dict));
