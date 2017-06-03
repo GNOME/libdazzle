@@ -33,7 +33,8 @@ void                  dzl_fuzzy_index_builder_set_case_sensitive  (DzlFuzzyIndex
                                                                    gboolean               case_sensitive);
 guint64               dzl_fuzzy_index_builder_insert              (DzlFuzzyIndexBuilder  *self,
                                                                    const gchar           *key,
-                                                                   GVariant              *document);
+                                                                   GVariant              *document,
+                                                                   guint                  priority);
 gboolean              dzl_fuzzy_index_builder_write               (DzlFuzzyIndexBuilder  *self,
                                                                    GFile                 *file,
                                                                    gint                   io_priority,

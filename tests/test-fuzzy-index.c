@@ -55,11 +55,11 @@ test_index_builder_basic (void)
   builder = dzl_fuzzy_index_builder_new ();
   g_object_add_weak_pointer (G_OBJECT (builder), (gpointer *)&builder);
 
-  dzl_fuzzy_index_builder_insert (builder, "foo", g_variant_new_int32 (1));
-  dzl_fuzzy_index_builder_insert (builder, "FOO", g_variant_new_int32 (2));
-  dzl_fuzzy_index_builder_insert (builder, "Foo", g_variant_new_int32 (3));
-  dzl_fuzzy_index_builder_insert (builder, "bar", g_variant_new_int32 (4));
-  dzl_fuzzy_index_builder_insert (builder, "baz", g_variant_new_int32 (5));
+  dzl_fuzzy_index_builder_insert (builder, "foo", g_variant_new_int32 (1), 7);
+  dzl_fuzzy_index_builder_insert (builder, "FOO", g_variant_new_int32 (2), 7);
+  dzl_fuzzy_index_builder_insert (builder, "Foo", g_variant_new_int32 (3), 7);
+  dzl_fuzzy_index_builder_insert (builder, "bar", g_variant_new_int32 (4), 7);
+  dzl_fuzzy_index_builder_insert (builder, "baz", g_variant_new_int32 (5), 7);
 
   dzl_fuzzy_index_builder_write_async (builder,
                                        file,
@@ -233,13 +233,13 @@ test_index_basic (void)
    * We want to ensure we only get the highest scoring item for a
    * document (which are deduplicated in the index).
    */
-  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_show", g_variant_new_int32 (1));
-  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_show_all", g_variant_new_int32 (1));
-  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_hide", g_variant_new_int32 (2));
-  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_hide_all", g_variant_new_int32 (2));
-  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_get_parent", g_variant_new_int32 (3));
-  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_get_name", g_variant_new_int32 (4));
-  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_set_name", g_variant_new_int32 (5));
+  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_show", g_variant_new_int32 (1), 7);
+  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_show_all", g_variant_new_int32 (1), 7);
+  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_hide", g_variant_new_int32 (2), 7);
+  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_hide_all", g_variant_new_int32 (2), 7);
+  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_get_parent", g_variant_new_int32 (3), 7);
+  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_get_name", g_variant_new_int32 (4), 7);
+  dzl_fuzzy_index_builder_insert (builder, "gtk_widget_set_name", g_variant_new_int32 (5), 7);
 
   dzl_fuzzy_index_builder_write_async (builder,
                                        file,

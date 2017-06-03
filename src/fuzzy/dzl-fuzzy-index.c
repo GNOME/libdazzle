@@ -466,6 +466,9 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
   g_assert (DZL_IS_FUZZY_INDEX (self));
   g_assert (document_id != NULL);
 
+  /* Mask off the key priority */
+  lookaside_id &= 0x00FFFFFF;
+
   if G_UNLIKELY (lookaside_id >= self->lookaside_len)
     return FALSE;
 

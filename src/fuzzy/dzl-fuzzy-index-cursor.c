@@ -26,14 +26,14 @@
 
 struct _DzlFuzzyIndexCursor
 {
-  GObject       object;
+  GObject          object;
 
   DzlFuzzyIndex   *index;
-  gchar        *query;
-  GVariantDict *tables;
-  GArray       *matches;
-  guint         max_matches;
-  guint         case_sensitive : 1;
+  gchar           *query;
+  GVariantDict    *tables;
+  GArray          *matches;
+  guint            max_matches;
+  guint            case_sensitive : 1;
 };
 
 typedef struct
@@ -53,12 +53,12 @@ typedef struct
 {
   DzlFuzzyIndex                   *index;
   const DzlFuzzyIndexItem * const *tables;
-  const gsize                  *tables_n_elements;
-  gint                         *tables_state;
-  guint                         n_tables;
-  guint                         max_matches;
-  const gchar                  *needle;
-  GHashTable                   *matches;
+  const gsize                     *tables_n_elements;
+  gint                            *tables_state;
+  guint                            n_tables;
+  guint                            max_matches;
+  const gchar                     *needle;
+  GHashTable                      *matches;
 } DzlFuzzyLookup;
 
 enum {
@@ -385,10 +385,8 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
 
       for (i = 0; i < lookup.tables_n_elements[0]; i++)
         {
-          const DzlFuzzyIndexItem *item;
+          const DzlFuzzyIndexItem *item = &lookup.tables[0][i];
           DzlFuzzyMatch match;
-
-          item = &lookup.tables[0][i];
 
           if (item->lookaside_id != last_id)
             {
@@ -425,6 +423,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
         gpointer ptr;
         gfloat   fval;
       } other_score;
+      guint penalty = ((lookaside_id & 0xFF000000) >> 24) + 1;
 
       if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,
                                                 lookaside_id,
@@ -432,7 +431,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                 &match.key))
         continue;
 
-      match.score = 1.0 / (strlen (match.key) + score);
+      match.score = 1.0 / ((strlen (match.key) + score) * penalty);
 
       if (g_hash_table_lookup_extended (by_document,
                                         GUINT_TO_POINTER (match.document_id),

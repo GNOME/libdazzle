@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define G_LOG_DOMAIN "dzl-fuzzy-index-builder"
+#define G_LOG_DOMAIN    "dzl-fuzzy-index-builder"
+#define MAX_KEY_ENTRIES (0x00FFFFFF)
 
 #include <stdlib.h>
 #include <string.h>
@@ -121,6 +122,12 @@ enum {
 
 static GParamSpec *properties [N_PROPS];
 
+static guint
+mask_priority (guint key_id)
+{
+  return key_id & 0x00FFFFFF;
+}
+
 static void
 dzl_fuzzy_index_builder_finalize (GObject *object)
 {
@@ -215,6 +222,7 @@ dzl_fuzzy_index_builder_new (void)
  * @self: A #DzlFuzzyIndexBuilder
  * @key: The UTF-8 encoded key for the document
  * @document: The document to store
+ * @priority: An optional priority for the keyword.
  *
  * Inserts @document into the index using @key as the lookup key.
  *
@@ -224,21 +232,32 @@ dzl_fuzzy_index_builder_new (void)
  * If @document is floating, it's floating reference will be sunk using
  * g_variant_ref_sink().
  *
+ * @priority may be used to group results by priority. Priority must be
+ * less than 256.
+ *
  * Returns: The document id registered for @document.
  */
 guint64
 dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
                                 const gchar          *key,
-                                GVariant             *document)
+                                GVariant             *document,
+                                guint                 priority)
 {
   GVariant *real_document = NULL;
   gpointer document_id = NULL;
   gpointer key_id = NULL;
   KVPair pair;
 
-  g_return_val_if_fail (DZL_IS_FUZZY_INDEX_BUILDER (self), 0);
-  g_return_val_if_fail (key != NULL, 0);
-  g_return_val_if_fail (document != NULL, 0);
+  g_return_val_if_fail (DZL_IS_FUZZY_INDEX_BUILDER (self), 0L);
+  g_return_val_if_fail (key != NULL, 0L);
+  g_return_val_if_fail (document != NULL, 0L);
+  g_return_val_if_fail (priority <= 0xFF, 0L);
+
+  if (self->keys->len > MAX_KEY_ENTRIES)
+    {
+      g_warning ("Index is full, cannot add more entries");
+      return 0L;
+    }
 
   key = g_string_chunk_insert_const (self->strings, key);
 
@@ -255,7 +274,7 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
 
   if (!g_hash_table_lookup_extended (self->key_ids, key, NULL, &key_id))
     {
-      key_id = GUINT_TO_POINTER (self->keys->len);
+      key_id = GUINT_TO_POINTER (self->keys->len | ((priority & 0xFF) << 24));
       g_ptr_array_add (self->keys, (gchar *)key);
     }
 
@@ -328,7 +347,7 @@ dzl_fuzzy_index_builder_build_index (DzlFuzzyIndexBuilder *self)
       const gchar *tmp;
       guint position = 0;
 
-      key = g_ptr_array_index (self->keys, kvpair->key_id);
+      key = g_ptr_array_index (self->keys, mask_priority (kvpair->key_id));
 
       if (!self->case_sensitive)
         key = lower = g_utf8_casefold (key, -1);

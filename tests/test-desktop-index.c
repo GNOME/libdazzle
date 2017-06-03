@@ -158,7 +158,8 @@ test_desktop_index_key (DzlFuzzyIndexBuilder *builder,
                         const gchar          *group,
                         const gchar          *key,
                         GVariant             *document,
-                        gboolean              can_tokenize)
+                        gboolean              can_tokenize,
+                        gint                  priority)
 {
   g_autofree gchar *str = NULL;
   g_auto(GStrv) words = NULL;
@@ -173,7 +174,7 @@ test_desktop_index_key (DzlFuzzyIndexBuilder *builder,
 
   if (!can_tokenize)
     {
-      dzl_fuzzy_index_builder_insert (builder, str, document);
+      dzl_fuzzy_index_builder_insert (builder, str, document, priority);
       return;
     }
 
@@ -182,7 +183,7 @@ test_desktop_index_key (DzlFuzzyIndexBuilder *builder,
   for (guint i = 0; words[i] != NULL; i++)
     {
       if (*words[i] && !g_ascii_isspace (*words[i]))
-        dzl_fuzzy_index_builder_insert (builder, words[i], document);
+        dzl_fuzzy_index_builder_insert (builder, words[i], document, priority);
     }
 }
 
@@ -225,10 +226,10 @@ test_desktop_index_file (DzlFuzzyIndexBuilder  *builder,
   g_variant_dict_insert (&dict, "title", "s", entry_name ?: "");
   document = g_variant_take_ref (g_variant_dict_end (&dict));
 
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, FALSE);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Comment", document, TRUE);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Categories", document, TRUE);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Keywords", document, TRUE);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, FALSE, 0);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Keywords", document, TRUE, 20);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Comment", document, TRUE, 40);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Categories", document, TRUE, 60);
 
   return TRUE;
 }
