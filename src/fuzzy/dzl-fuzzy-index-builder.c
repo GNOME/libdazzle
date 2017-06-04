@@ -276,6 +276,7 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
     {
       key_id = GUINT_TO_POINTER (self->keys->len | ((priority & 0xFF) << 24));
       g_ptr_array_add (self->keys, (gchar *)key);
+      g_hash_table_insert (self->key_ids, (gpointer)key, key_id);
     }
 
   pair.key_id = GPOINTER_TO_UINT (key_id);
