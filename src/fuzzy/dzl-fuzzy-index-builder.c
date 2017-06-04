@@ -108,7 +108,7 @@ typedef struct
    */
   guint position;
 
-  /* The document id (which is the hash of the document. */
+  /* The index into the kvpairs */
   guint lookaside_id;
 } IndexItem;
 
