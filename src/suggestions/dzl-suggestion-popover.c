@@ -25,6 +25,7 @@
 #include "suggestions/dzl-suggestion.h"
 #include "suggestions/dzl-suggestion-popover.h"
 #include "suggestions/dzl-suggestion-row.h"
+#include "util/dzl-util-private.h"
 
 struct _DzlSuggestionPopover
 {
@@ -35,6 +36,8 @@ struct _DzlSuggestionPopover
   GtkRevealer        *revealer;
   GtkScrolledWindow  *scrolled_window;
   GtkListBox         *list_box;
+
+  DzlAnimation       *scroll_anim;
 
   GListModel         *model;
 
@@ -63,6 +66,94 @@ G_DEFINE_TYPE (DzlSuggestionPopover, dzl_suggestion_popover, GTK_TYPE_WINDOW)
 
 static GParamSpec *properties [N_PROPS];
 static guint signals [N_SIGNALS];
+
+static gdouble
+check_range (gdouble lower,
+             gdouble page_size,
+             gdouble y1,
+             gdouble y2)
+{
+  gdouble upper = lower + page_size;
+
+  /*
+   * The goal here is to determine if y1 and y2 fall within lower and upper. We
+   * will determine the new value to set to ensure the minimum amount to scroll
+   * to show the rows.
+   */
+
+  /* Do nothing if we are all visible */
+  if (y1 >= lower && y2 <= upper)
+    return lower;
+
+  /* We might need to scroll y2 into view */
+  if (y2 > upper)
+    return y2 - page_size;
+
+  return y1;
+}
+
+static void
+dzl_suggestion_popover_select_row (DzlSuggestionPopover *self,
+                                   GtkListBoxRow        *row)
+{
+  GtkAdjustment *adj;
+  GtkAllocation alloc;
+  gdouble y1;
+  gdouble y2;
+  gdouble page_size;
+  gdouble value;
+  gdouble new_value;
+
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+  g_assert (GTK_IS_LIST_BOX_ROW (row));
+
+  gtk_list_box_select_row (self->list_box, row);
+
+  gtk_widget_get_allocation (GTK_WIDGET (row), &alloc);
+
+  /* If there is no allocation yet, ignore things */
+  if (alloc.y < 0)
+    return;
+
+  /*
+   * We want to ensure that Y1 and Y2 are both within the
+   * page of the scrolled window. If not, we need to animate
+   * our scroll position to include that row.
+   */
+
+  y1 = alloc.y;
+  y2 = alloc.y + alloc.height;
+
+  adj = gtk_scrolled_window_get_vadjustment (self->scrolled_window);
+  page_size = gtk_adjustment_get_page_size (adj);
+  value = gtk_adjustment_get_value (adj);
+
+  new_value = check_range (value, page_size, y1, y2);
+
+  if (new_value != value)
+    {
+      DzlAnimation *anim;
+      guint duration = 167;
+
+      if (self->scroll_anim != NULL)
+        {
+          dzl_animation_stop (self->scroll_anim);
+
+          /* Speed up the animation because we are scrolling while already
+           * scrolling. We don't want to fall behind.
+           */
+          duration = 84;
+        }
+
+      anim = dzl_object_animate (adj,
+                                 DZL_ANIMATION_EASE_IN_OUT_CUBIC,
+                                 duration,
+                                 gtk_widget_get_frame_clock (GTK_WIDGET (self->scrolled_window)),
+                                 "value", new_value,
+                                 NULL);
+      dzl_set_weak_pointer (&self->scroll_anim, anim);
+    }
+}
 
 static void
 dzl_suggestion_popover_reposition (DzlSuggestionPopover *self)
@@ -333,6 +424,12 @@ dzl_suggestion_popover_destroy (GtkWidget *widget)
       self->delete_event_handler = 0;
 
       self->transient_for = NULL;
+    }
+
+  if (self->scroll_anim != NULL)
+    {
+      dzl_animation_stop (self->scroll_anim);
+      dzl_clear_weak_pointer (&self->scroll_anim);
     }
 
   g_clear_object (&self->model);
@@ -722,7 +819,7 @@ dzl_suggestion_popover_move_by (DzlSuggestionPopover *self,
 
   if (NULL == gtk_list_box_get_selected_row (self->list_box))
     {
-      gtk_list_box_select_row (self->list_box, row);
+      dzl_suggestion_popover_select_row (self, row);
       return;
     }
 
@@ -757,7 +854,7 @@ dzl_suggestion_popover_move_by (DzlSuggestionPopover *self,
   row_lookup.index = CLAMP (row_lookup.index, -0, (gint)g_list_model_get_n_items (self->model) - 1);
 
   row = gtk_list_box_get_row_at_index (self->list_box, row_lookup.index);
-  gtk_list_box_select_row (self->list_box, row);
+  dzl_suggestion_popover_select_row (self, row);
 }
 
 static void
@@ -794,7 +891,7 @@ dzl_suggestion_popover_set_selected (DzlSuggestionPopover *self,
     gtk_container_foreach (GTK_CONTAINER (self->list_box), find_suggestion_row, &lookup);
 
   if (row != NULL)
-    gtk_list_box_select_row (self->list_box, row);
+    dzl_suggestion_popover_select_row (self, row);
 }
 
 /**
