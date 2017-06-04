@@ -376,7 +376,8 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
           const DzlFuzzyIndexItem *item;
 
           item = &lookup.tables[0][i];
-          fuzzy_do_match (&lookup, item, 1, item->position);
+
+          fuzzy_do_match (&lookup, item, 1, MIN (16, item->position * 4));
         }
     }
   else
@@ -386,6 +387,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
       for (i = 0; i < lookup.tables_n_elements[0]; i++)
         {
           const DzlFuzzyIndexItem *item = &lookup.tables[0][i];
+          guint penalty = ((item->lookaside_id & 0xFF000000) >> 24) + 1;
           DzlFuzzyMatch match;
 
           if (item->lookaside_id != last_id)
@@ -398,7 +400,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                         &match.key))
                 continue;
 
-              match.score = 0;
+              match.score = 1.0 / ((strlen (match.key) + item->position) * penalty);
 
               g_array_append_val (self->matches, match);
             }
@@ -485,11 +487,14 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
   if (g_task_return_error_if_cancelled (task))
     return;
 
-  g_array_sort (self->matches, fuzzy_match_compare);
-  if (lookup.max_matches > 0 && lookup.max_matches < self->matches->len)
-    g_array_set_size (self->matches, lookup.max_matches);
-
 cleanup:
+  if (self->matches != NULL)
+    {
+      g_array_sort (self->matches, fuzzy_match_compare);
+      if (lookup.max_matches > 0 && lookup.max_matches < self->matches->len)
+        g_array_set_size (self->matches, lookup.max_matches);
+    }
+
   g_task_return_boolean (task, TRUE);
 }
 
