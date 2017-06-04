@@ -463,7 +463,7 @@ dzl_fuzzy_mutable_index_match (DzlFuzzyMutableIndex *fuzzy,
       for (i = 0; i < root->len; i++)
         {
           item = &g_array_index (root, DzlFuzzyMutableIndexItem, i);
-          dzl_fuzzy_mutable_index_do_match (&lookup, item, 1, 0);
+          dzl_fuzzy_mutable_index_do_match (&lookup, item, 1, MIN (16, item->pos * 4));
         }
     }
   else
