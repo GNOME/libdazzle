@@ -1,6 +1,20 @@
 #include <dazzle.h>
 #include <stdlib.h>
 
+static gint
+compare_match (gconstpointer a,
+               gconstpointer b)
+{
+  const DzlFuzzyMutableIndexMatch *ma = a;
+  const DzlFuzzyMutableIndexMatch *mb = b;
+
+  if (ma->score < mb->score)
+    return 1;
+  else if (ma->score > mb->score)
+    return -1;
+  return 0;
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -44,6 +58,8 @@ main (gint   argc,
          begin = g_get_monotonic_time();
          matches = dzl_fuzzy_mutable_index_match (fuzzy, argv[i], 0);
          end = g_get_monotonic_time();
+
+         g_array_sort (matches, compare_match);
 
          for (guint j = 0; j < matches->len; j++)
            {
