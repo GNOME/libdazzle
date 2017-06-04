@@ -478,10 +478,13 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
 
   if (key != NULL)
     {
-      if G_UNLIKELY (entry->key_id >= g_variant_n_children (self->keys))
+      /* The key_id has a mask with the priority as well */
+      guint key_id = entry->key_id & 0x00FFFFFF;
+
+      if G_UNLIKELY (key_id >= g_variant_n_children (self->keys))
         return FALSE;
 
-      g_variant_get_child (self->keys, entry->key_id, "&s", key);
+      g_variant_get_child (self->keys, key_id, "&s", key);
     }
 
   return TRUE;
