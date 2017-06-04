@@ -590,11 +590,20 @@ dzl_fuzzy_highlight (const gchar *str,
       str_ch = g_utf8_get_char (str);
       match_ch = g_utf8_get_char (match);
 
-      if (str_ch == '&' && !strncmp (str, "&amp;", 5))
+      if (str_ch == '&')
         {
-          str += 4;
-          g_string_append (ret, "&amp;");
-          continue;
+          if (0 == strncmp (str, "&amp;", 5))
+            {
+              str += 4;
+              g_string_append (ret, "&amp;");
+              continue;
+            }
+          else if (0 == strncmp (str, "&apos;", 6))
+            {
+              str += 5;
+              g_string_append (ret, "&apos;");
+              continue;
+            }
         }
 
       if ((str_ch == match_ch) ||
