@@ -227,6 +227,7 @@ test_desktop_index_file (DzlFuzzyIndexBuilder  *builder,
   document = g_variant_take_ref (g_variant_dict_end (&dict));
 
   test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, FALSE, 0);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, TRUE, 0);
   test_desktop_index_key (builder, key_file, "Desktop Entry", "Keywords", document, TRUE, 20);
   test_desktop_index_key (builder, key_file, "Desktop Entry", "Comment", document, TRUE, 40);
   test_desktop_index_key (builder, key_file, "Desktop Entry", "Categories", document, TRUE, 60);
