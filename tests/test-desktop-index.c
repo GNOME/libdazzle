@@ -43,6 +43,7 @@ query_cb (GObject      *object,
       g_autofree gchar *highlight = NULL;
       g_autofree gchar *escaped = NULL;
       g_autofree gchar *subtitle = NULL;
+      g_autofree gchar *escape_keyword = NULL;
 
       g_variant_dict_lookup (dict, "id", "&s", &id);
       g_variant_dict_lookup (dict, "title", "&s", &title);
@@ -55,9 +56,10 @@ query_cb (GObject      *object,
 
       escaped = g_markup_escape_text (title, -1);
       highlight = dzl_fuzzy_highlight (escaped, last_query, FALSE);
+      escape_keyword = g_markup_escape_text (dzl_fuzzy_index_match_get_key (match), -1);
       subtitle = g_strdup_printf ("%lf (%s)",
                                   dzl_fuzzy_index_match_get_score (match),
-                                  dzl_fuzzy_index_match_get_key (match));
+                                  escape_keyword);
 
       suggestion = g_object_new (DZL_TYPE_SUGGESTION,
                                  "id", id,
