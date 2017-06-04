@@ -19,8 +19,6 @@
 #include <string.h>
 #include <dazzle.h>
 
-#include "fuzzy.h"
-
 /*
  * Most of this is exactly how you SHOULD NOT write a web browser
  * shell. It's just dummy code to test the suggestions widget.
@@ -35,7 +33,7 @@ typedef struct
   const gchar *suffix;
 } DemoData;
 
-static Fuzzy *search_index;
+static DzlFuzzyMutableIndex *search_index;
 static const DemoData demo_data[] = {
   { NULL, "https://twitter.com", "Twitter", "twitter.com" },
   { NULL, "https://facebook.com", "Facebook", "facebook.com" },
@@ -77,8 +75,8 @@ static gint
 compare_match (gconstpointer a,
                gconstpointer b)
 {
-  const FuzzyMatch *match_a = a;
-  const FuzzyMatch *match_b = b;
+  const DzlFuzzyMutableIndexMatch *match_a = a;
+  const DzlFuzzyMutableIndexMatch *match_b = b;
 
   if (match_a->score < match_b->score)
     return 1;
@@ -119,18 +117,18 @@ create_search_results (const gchar *full_query,
   g_autofree gchar *with_slashes = g_strdup_printf ("://%s", query);
   gboolean exact = FALSE;
 
-  matches = fuzzy_match (search_index, query, 20);
+  matches = dzl_fuzzy_mutable_index_match (search_index, query, 20);
 
   g_array_sort (matches, compare_match);
 
   for (guint i = 0; i < matches->len; i++)
     {
-      const FuzzyMatch *match = &g_array_index (matches, FuzzyMatch, i);
+      const DzlFuzzyMutableIndexMatch *match = &g_array_index (matches, DzlFuzzyMutableIndexMatch, i);
       const DemoData *data = match->value;
       g_autofree gchar *markup = NULL;
       DzlSuggestion *item;
 
-      markup = fuzzy_highlight (search_index, data->url, query);
+      markup = dzl_fuzzy_highlight (data->url, query, FALSE);
 
       if (g_str_has_suffix (data->url, with_slashes))
         exact = TRUE;
@@ -237,13 +235,13 @@ main (gint   argc,
 
   gtk_init (&argc, &argv);
 
-  search_index = fuzzy_new (FALSE);
+  search_index = dzl_fuzzy_mutable_index_new (FALSE);
 
   for (guint i = 0; i < G_N_ELEMENTS (demo_data); i++)
     {
       const DemoData *data = &demo_data[i];
 
-      fuzzy_insert (search_index, data->url, (gpointer)data);
+      dzl_fuzzy_mutable_index_insert (search_index, data->url, (gpointer)data);
     }
 
   window = g_object_new (GTK_TYPE_WINDOW,
