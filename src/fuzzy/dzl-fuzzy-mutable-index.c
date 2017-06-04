@@ -478,7 +478,7 @@ dzl_fuzzy_mutable_index_match (DzlFuzzyMutableIndex *fuzzy,
             {
               match.key = dzl_fuzzy_mutable_index_get_string (fuzzy, item->id);
               match.value = g_ptr_array_index (fuzzy->id_to_value, item->id);
-              match.score = 0;
+              match.score = 1.0 / (strlen (match.key) + item->pos);
               g_array_append_val (matches, match);
               last_id = match.id;
             }
