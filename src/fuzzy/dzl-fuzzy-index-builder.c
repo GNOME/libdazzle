@@ -437,11 +437,6 @@ dzl_fuzzy_index_builder_write_worker (GTask        *task,
   g_assert (G_IS_FILE (file));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
-  if (!self->case_sensitive)
-    {
-      /* TODO: g_utf8_strdown() all of the keys. */
-    }
-
   g_variant_dict_init (&dict, NULL);
 
   /* Set our version number for the document */
