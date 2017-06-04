@@ -274,7 +274,12 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
 
   if (!g_hash_table_lookup_extended (self->key_ids, key, NULL, &key_id))
     {
-      key_id = GUINT_TO_POINTER (self->keys->len | ((priority & 0xFF) << 24));
+      guint key_id_val = self->keys->len;
+
+      if (priority != 0)
+        key_id_val |= (priority & 0xFF) << 24;
+
+      key_id = GUINT_TO_POINTER (key_id_val);
       g_ptr_array_add (self->keys, (gchar *)key);
       g_hash_table_insert (self->key_ids, (gpointer)key, key_id);
     }
@@ -342,13 +347,20 @@ dzl_fuzzy_index_builder_build_index (DzlFuzzyIndexBuilder *self)
   for (i = 0; i < self->kv_pairs->len; i++)
     {
       g_autofree gchar *lower = NULL;
-      KVPair *kvpair = &g_array_index (self->kv_pairs, KVPair, i);
-      IndexItem item = { 0, i };
       const gchar *key;
       const gchar *tmp;
+      KVPair *kvpair;
+      IndexItem item;
       guint position = 0;
 
+      kvpair = &g_array_index (self->kv_pairs, KVPair, i);
       key = g_ptr_array_index (self->keys, mask_priority (kvpair->key_id));
+
+      /* the priority for the key is stashed in the high 8 bits of
+       * the kvpair.key_id. So we need to propagate that to the
+       * entry in the index for resolution later.
+       */
+      item.lookaside_id = i | (kvpair->key_id & 0xFF000000);
 
       if (!self->case_sensitive)
         key = lower = g_utf8_casefold (key, -1);
