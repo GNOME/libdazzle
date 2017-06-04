@@ -108,6 +108,7 @@ G_BEGIN_DECLS
 #include "util/dzl-file-manager.h"
 #include "util/dzl-gdk.h"
 #include "util/dzl-heap.h"
+#include "util/dzl-levenshtein.h"
 #include "util/dzl-pango.h"
 #include "util/dzl-rgba.h"
 #include "util/dzl-ring.h"
