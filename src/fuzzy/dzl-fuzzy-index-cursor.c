@@ -20,9 +20,9 @@
 
 #include <string.h>
 
-#include "dzl-fuzzy-index-cursor.h"
-#include "dzl-fuzzy-index-match.h"
-#include "dzl-fuzzy-index-private.h"
+#include "fuzzy/dzl-fuzzy-index-cursor.h"
+#include "fuzzy/dzl-fuzzy-index-match.h"
+#include "fuzzy/dzl-fuzzy-index-private.h"
 
 struct _DzlFuzzyIndexCursor
 {
