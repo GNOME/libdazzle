@@ -420,12 +420,12 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
     {
       guint lookaside_id = GPOINTER_TO_UINT (key);
       guint score = GPOINTER_TO_UINT (value);
+      guint penalty = ((lookaside_id & 0xFF000000) >> 24) + 1;
       DzlFuzzyMatch match;
       union {
         gpointer ptr;
         gfloat   fval;
       } other_score;
-      guint penalty = ((lookaside_id & 0xFF000000) >> 24) + 1;
 
       if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,
                                                 lookaside_id,
