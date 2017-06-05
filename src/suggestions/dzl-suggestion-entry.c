@@ -451,8 +451,6 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
                                 G_CALLBACK (dzl_suggestion_entry_activate_suggestion),
                                 NULL, NULL, NULL, G_TYPE_NONE, 0);
 
-  dzl_gtk_widget_class_add_css_resource (widget_class, "/org/gnome/dazzle/css/dzl-suggestion-entry.css");
-
   bindings = gtk_binding_set_by_class (klass);
   gtk_binding_entry_add_signal (bindings, GDK_KEY_Escape, 0, "hide-suggestions", 0);
   gtk_binding_entry_add_signal (bindings, GDK_KEY_space, GDK_CONTROL_MASK, "show-suggestions", 0);

@@ -14,10 +14,16 @@
     <file compressed="true" preprocess="xml-stripblanks" alias="enter-keyboard-shortcut.svg">shortcuts/enter-keyboard-shortcut.svg</file>
   </gresource>
 
-  <gresource prefix="/org/gnome/dazzle/css">
-    <file compressed="true" alias="dzl-progress-button.css">widgets/dzl-progress-button.css</file>
-    <file compressed="true" alias="dzl-stack-list.css">widgets/dzl-stack-list.css</file>
-    <file compressed="true" alias="dzl-suggestion-entry.css">suggestions/dzl-suggestion-entry.css</file>
+  <gresource prefix="/org/gnome/dazzle/themes">
+    <!-- Adwaita CSS theme -->
+    <file compressed="true" alias="Adwaita.css">../data/themes/Adwaita.css</file>
+    <file compressed="true" alias="Adwaita/Adwaita-panels.css">../data/themes/Adwaita/Adwaita-panels.css</file>
+
+    <!-- Default and Fallback Theme -->
+    <file compressed="true" alias="shared.css">../data/themes/shared.css</file>
+    <file compressed="true" alias="shared/shared-progressbutton.css">../data/themes/shared/shared-progressbutton.css</file>
+    <file compressed="true" alias="shared-stacklist.css">../data/themes/shared/shared-stacklist.css</file>
+    <file compressed="true" alias="shared-suggestions.css">../data/themes/shared/shared-suggestions.css</file>
   </gresource>
 
 </gresources>

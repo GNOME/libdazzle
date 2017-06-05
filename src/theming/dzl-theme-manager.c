@@ -69,11 +69,11 @@ dzl_theme_manager_new (void)
  *
  * This will automatically register resources found within @resource_path.
  *
- * If the @resource_path contains a directory named "css", that directory will
- * be traversed for files matching the theme name and variant. For example, if
- * using the Adwaita theme, "css/Adwaita.css" will be loaded. If the dark
- * variant is being used, "css/Adwaita-dark.css" will be loaeded. If no
- * matching theme file is located, "css/shared.css" will be loaded.
+ * If the @resource_path contains a directory named "themes", that directory
+ * will be traversed for files matching the theme name and variant. For
+ * example, if using the Adwaita theme, "themes/Adwaita.css" will be loaded. If
+ * the dark variant is being used, "themes/Adwaita-dark.css" will be loaeded. If
+ * no matching theme file is located, "themes/shared.css" will be loaded.
  *
  * The "icons" sub-directory will be used to locate icon themes.
  */
@@ -93,7 +93,7 @@ dzl_theme_manager_add_resource_path (DzlThemeManager *self,
    * current application theme, using @resource_path/css as the base directory
    * to locate theming files.
    */
-  css_dir = g_build_filename (resource_path, "css", NULL);
+  css_dir = g_build_filename (resource_path, "themes", NULL);
   provider = dzl_css_provider_new (css_dir);
   g_hash_table_insert (self->providers_by_path, g_strdup (resource_path), g_object_ref (provider));
   gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),

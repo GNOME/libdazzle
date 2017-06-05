@@ -1,0 +1,37 @@
+dzlstacklist row {
+  padding: 3px 0;
+  color: @theme_fg_color;
+}
+dzlstacklist row label.dim-label {
+  font-size: smaller;
+}
+dzlstacklist row:backdrop {
+  color: @theme_unfocused_fg_color;
+}
+dzlstacklist row image {
+  margin: 6px 12px;
+  min-height: 16px;
+  min-width: 16px;
+  opacity: 0.7;
+}
+dzlstacklist list.stack-header {
+  background-color: @theme_base_color;
+  border-bottom: 1px solid @borders;
+}
+dzlstacklist list.stack-header:backdrop {
+  background-color: @theme_unfocused_base_color;
+  border-color: @unfocused_borders;
+}
+dzlstacklist list.stack-header row:not(:last-child) {
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+dzlstacklist list:not(.stack-header) row:active,
+dzlstacklist list:not(.stack-header) row:selected,
+dzlstacklist list.stack-header row:not(:last-child):active,
+dzlstacklist list.stack-header row:not(:last-child):selected {
+  color: @theme_selected_fg_color;
+  background-color: @theme_selected_bg_color;
+}
+dzlstacklist list.stack-header row:last-child label:not(.dim-label) {
+  font-weight: bold;
+}

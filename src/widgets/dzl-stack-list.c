@@ -424,8 +424,7 @@ dzl_stack_list_class_init (DzlStackListClass *klass)
                   1,
                   GTK_TYPE_LIST_BOX_ROW);
 
-  gtk_widget_class_set_css_name (widget_class, "stacklist");
-  dzl_gtk_widget_class_add_css_resource (widget_class, "/org/gnome/dazzle/css/dzl-stack-list.css");
+  gtk_widget_class_set_css_name (widget_class, "dzlstacklist");
 }
 
 static void

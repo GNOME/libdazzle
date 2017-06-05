@@ -543,7 +543,7 @@ dzl_suggestion_popover_class_init (DzlSuggestionPopoverClass *klass)
   gtk_widget_class_bind_template_child (widget_class, DzlSuggestionPopover, list_box);
   gtk_widget_class_bind_template_child (widget_class, DzlSuggestionPopover, scrolled_window);
 
-  gtk_widget_class_set_css_name (widget_class, "suggestionpopover");
+  gtk_widget_class_set_css_name (widget_class, "dzlsuggestionpopover");
 
   g_type_ensure (DZL_TYPE_ELASTIC_BIN);
 }
