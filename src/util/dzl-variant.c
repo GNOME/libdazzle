@@ -1,6 +1,6 @@
-/* dzl-fuzzy-util.c
+/* dzl-variant.c
  *
- * Copyright (C) 2016 Christian Hergert <chergert@redhat.com>
+ * Copyright (C) 2016-2017 Christian Hergert <chergert@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define G_LOG_DOMAIN "dzl-fuzzy-util"
+#define G_LOG_DOMAIN "dzl-variant"
 
-#include "dzl-fuzzy-util.h"
+#include "util/dzl-variant.h"
 
 guint
-fuzzy_g_variant_hash (gconstpointer data)
+dzl_g_variant_hash (gconstpointer data)
 {
   GVariant *variant = (GVariant *)data;
   GBytes *bytes;

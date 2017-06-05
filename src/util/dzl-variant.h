@@ -1,6 +1,6 @@
-/* dzl-fuzzy-util.h
+/* dzl-variant.h
  *
- * Copyright (C) 2016 Christian Hergert <chergert@redhat.com>
+ * Copyright (C) 2016-2017 Christian Hergert <chergert@redhat.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DZL_FUZZY_UTIL_H
-#define DZL_FUZZY_UTIL_H
+#ifndef DZL_VARIANT_H
+#define DZL_VARIANT_H
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-guint fuzzy_g_variant_hash (gconstpointer data);
+guint dzl_g_variant_hash (gconstpointer data);
 
 G_END_DECLS
 
-#endif /* DZL_FUZZY_UTIL_H */
+#endif /* DZL_VARIANT_H */

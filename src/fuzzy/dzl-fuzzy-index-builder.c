@@ -23,7 +23,7 @@
 #include <string.h>
 
 #include "fuzzy/dzl-fuzzy-index-builder.h"
-#include "fuzzy/dzl-fuzzy-util.h"
+#include "util/dzl-variant.h"
 
 struct _DzlFuzzyIndexBuilder
 {
@@ -204,7 +204,7 @@ static void
 dzl_fuzzy_index_builder_init (DzlFuzzyIndexBuilder *self)
 {
   self->documents = g_ptr_array_new_with_free_func ((GDestroyNotify)g_variant_unref);
-  self->documents_hash = g_hash_table_new (fuzzy_g_variant_hash, g_variant_equal);
+  self->documents_hash = g_hash_table_new (dzl_g_variant_hash, g_variant_equal);
   self->kv_pairs = g_array_new (FALSE, FALSE, sizeof (KVPair));
   self->strings = g_string_chunk_new (4096);
   self->key_ids = g_hash_table_new (NULL, NULL);

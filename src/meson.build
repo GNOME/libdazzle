@@ -125,6 +125,7 @@ libdazzle_public_headers = [
   'util/dzl-pango.h',
   'util/dzl-rgba.h',
   'util/dzl-ring.h',
+  'util/dzl-variant.h',
 
   'widgets/dzl-bin.h',
   'widgets/dzl-bolding-label.h',
@@ -247,6 +248,7 @@ libdazzle_public_sources = [
   'util/dzl-rgba.c',
   'util/dzl-ring.c',
   'util/dzl-util.c',
+  'util/dzl-variant.c',
 
   'theming/dzl-css-provider.c',
   'theming/dzl-theme-manager.c',
@@ -286,8 +288,6 @@ libdazzle_sources = [
   'animation/dzl-frame-source.h',
 
   'fuzzy/dzl-fuzzy-index-private.h',
-  'fuzzy/dzl-fuzzy-util.c',
-  'fuzzy/dzl-fuzzy-util.h',
 
   'graphing/dzl-column-private.h',
   'graphing/dzl-graph-column-private.h',
