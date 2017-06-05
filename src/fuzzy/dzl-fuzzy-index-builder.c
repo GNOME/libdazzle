@@ -253,6 +253,9 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
   g_return_val_if_fail (document != NULL, 0L);
   g_return_val_if_fail (priority <= 0xFF, 0L);
 
+  /* move the priority bits into the proper area */
+  priority = (priority & 0xFF) << 24;
+
   if (self->keys->len > MAX_KEY_ENTRIES)
     {
       g_warning ("Index is full, cannot add more entries");
@@ -261,6 +264,11 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
 
   key = g_string_chunk_insert_const (self->strings, key);
 
+  /*
+   * We try to deduplicate document entries here by hashing the document and
+   * looking for another matching it. This way our generated index can stay
+   * relatively small when it comes to documents.
+   */
   if (!g_hash_table_lookup_extended (self->documents_hash,
                                      document,
                                      (gpointer *)&real_document,
@@ -272,19 +280,23 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
       g_hash_table_insert (self->documents_hash, real_document, document_id);
     }
 
+  /*
+   * If we already have the key then reuse its key index. If not, then add it.
+   */
   if (!g_hash_table_lookup_extended (self->key_ids, key, NULL, &key_id))
     {
-      guint key_id_val = self->keys->len;
-
-      if (priority != 0)
-        key_id_val |= (priority & 0xFF) << 24;
-
-      key_id = GUINT_TO_POINTER (key_id_val);
+      key_id = GUINT_TO_POINTER (self->keys->len);
       g_ptr_array_add (self->keys, (gchar *)key);
       g_hash_table_insert (self->key_ids, (gpointer)key, key_id);
     }
 
-  pair.key_id = GPOINTER_TO_UINT (key_id);
+  /*
+   * A bit of slight-of-hand here. We share keys between all key<->document
+   * pairs, but steal the high bits for the key priority in the kvpair entry.
+   * This allows for both deduplication and different priorities based on
+   * certain document pairs.
+   */
+  pair.key_id = GPOINTER_TO_UINT (key_id) | priority;
   pair.document_id = GPOINTER_TO_UINT (document_id);
 
   g_array_append_val (self->kv_pairs, pair);
