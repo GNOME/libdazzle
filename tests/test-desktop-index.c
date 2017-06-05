@@ -240,6 +240,56 @@ test_desktop_index_file (DzlFuzzyIndexBuilder  *builder,
   return TRUE;
 }
 
+static void
+fsck_index (void)
+{
+  g_autofree gchar *contents = NULL;
+  g_autoptr(GVariant) variant = NULL;
+  g_autoptr(GVariantIter) iter = NULL;
+  const gchar *key;
+  GVariant *value;
+  GVariantDict dict;
+  gsize len;
+  GError *error = NULL;
+  gboolean r;
+
+  r = g_file_get_contents ("desktop.index", &contents, &len, &error);
+  g_assert_no_error (error);
+  g_assert (r);
+
+  variant = g_variant_new_from_data (G_VARIANT_TYPE_VARDICT, contents, len, FALSE, NULL, NULL);
+  g_assert (variant != NULL);
+  g_variant_take_ref (variant);
+
+  g_variant_dict_init (&dict, variant);
+
+  r = g_variant_dict_lookup (&dict, "tables", "a{sv}" , &iter);
+  g_assert (r);
+
+  while (g_variant_iter_loop (iter, "{sv}", &key, &value))
+    {
+      g_autoptr(GVariantIter) aiter = NULL;
+      guint last_key_id = 0;
+      gint last_offset = -1;
+      guint key_id;
+      guint offset;
+
+      aiter = g_variant_iter_new (value);
+      g_assert (aiter != NULL);
+
+      while (g_variant_iter_loop (aiter, "(uu)", &offset, &key_id))
+        {
+          g_assert_cmpint (key_id, >=, last_key_id);
+          if (key_id == last_key_id)
+            g_assert_cmpint (offset, >, last_offset);
+          last_key_id = key_id;
+          last_offset = offset;
+        }
+    }
+
+  g_variant_dict_clear (&dict);
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -307,6 +357,7 @@ main (gint   argc,
 
   g_print ("desktop.index.written\n");
 
+  fsck_index ();
   create_ui ();
   gtk_main ();
 
