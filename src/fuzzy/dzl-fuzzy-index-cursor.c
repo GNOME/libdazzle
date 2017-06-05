@@ -80,6 +80,36 @@ G_DEFINE_TYPE_EXTENDED (DzlFuzzyIndexCursor, dzl_fuzzy_index_cursor, G_TYPE_OBJE
                         G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_INITABLE, async_initable_iface_init)
                         G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
+static inline gfloat
+pointer_to_float (gpointer ptr)
+{
+  union {
+    gpointer ptr;
+#if __WORDSIZE == 64
+    gdouble fval;
+#else
+    gfloat fval;
+#endif
+  } convert;
+  convert.ptr = ptr;
+  return (gfloat)convert.fval;
+}
+
+static inline gpointer
+float_to_pointer (gfloat fval)
+{
+  union {
+    gpointer ptr;
+#if __WORDSIZE == 64
+    gdouble fval;
+#else
+    gfloat fval;
+#endif
+  } convert;
+  convert.fval = fval;
+  return convert.ptr;
+}
+
 static void
 dzl_fuzzy_index_cursor_finalize (GObject *object)
 {
@@ -420,12 +450,9 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
     {
       guint lookaside_id = GPOINTER_TO_UINT (key);
       guint score = GPOINTER_TO_UINT (value);
-      guint penalty = ((lookaside_id & 0xFF000000) >> 24) + 1;
+      gpointer other_score;
       DzlFuzzyMatch match;
-      union {
-        gpointer ptr;
-        gfloat   fval;
-      } other_score;
+      guint penalty;
 
       if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,
                                                 lookaside_id,
@@ -438,15 +465,13 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
       if (g_hash_table_lookup_extended (by_document,
                                         GUINT_TO_POINTER (match.document_id),
                                         NULL,
-                                        &other_score.ptr) &&
-          other_score.fval <= match.score)
+                                        &other_score) &&
+          pointer_to_float (&other_score) <= match.score)
         continue;
-
-      other_score.fval = match.score;
 
       g_hash_table_insert (by_document,
                            GUINT_TO_POINTER (match.document_id),
-                           other_score.ptr);
+                           float_to_pointer (match.score));
 
       g_array_append_val (self->matches, match);
     }
@@ -462,21 +487,17 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
   for (i = 0; i < self->matches->len; i++)
     {
       DzlFuzzyMatch *match;
-      union {
-        gpointer ptr;
-        gfloat   fval;
-      } other_score;
+      gpointer other_score;
 
     next:
       match = &g_array_index (self->matches, DzlFuzzyMatch, i);
-      other_score.ptr = g_hash_table_lookup (by_document,
-                                             GUINT_TO_POINTER (match->document_id));
+      other_score = g_hash_table_lookup (by_document, GUINT_TO_POINTER (match->document_id));
 
       /*
        * This item should have been discarded, but we didn't have enough
        * information at the time we built the array.
        */
-      if (other_score.fval < match->score)
+      if (pointer_to_float (other_score) < match->score)
         {
           g_array_remove_index_fast (self->matches, i);
           if (i < self->matches->len - 1)
