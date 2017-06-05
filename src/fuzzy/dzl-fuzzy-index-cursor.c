@@ -431,7 +431,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                         &match.priority))
                 continue;
 
-              match.score = penalty + ((1.0 / 255.0) * (1.0 / (strlen (match.key) + item->position)));
+              match.score = penalty + ((0.9 / 255.0) * (1.0 / (strlen (match.key) + item->position)));
 
               g_array_append_val (self->matches, match);
             }
@@ -463,7 +463,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                 &match.priority))
         continue;
 
-      match.score = penalty + ((1.0 / 255.0) * (1.0 / (strlen (match.key) + score)));
+      match.score = penalty + ((0.9 / 255.0) * (1.0 / (strlen (match.key) + score)));
 
       if (g_hash_table_lookup_extended (by_document,
                                         GUINT_TO_POINTER (match.document_id),
