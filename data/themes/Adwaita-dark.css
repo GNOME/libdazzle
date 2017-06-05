@@ -2,5 +2,7 @@
 @import url("resource:///org/gnome/dazzle/themes/shared.css");
 
 /* Theme specific styling */
-@import url("resource:///org/gnome/dazzle/themes/Adwaita/Adwaita-dark-graphs.css");
 @import url("resource:///org/gnome/dazzle/themes/Adwaita/Adwaita-panels.css");
+
+@import url("resource:///org/gnome/dazzle/themes/Adwaita/Adwaita-dark-graphs.css");
+@import url("resource:///org/gnome/dazzle/themes/Adwaita/Adwaita-dark-searchbar.css");

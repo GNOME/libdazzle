@@ -18,9 +18,13 @@
     <!-- Adwaita CSS theme -->
     <file compressed="true" alias="Adwaita.css">../data/themes/Adwaita.css</file>
     <file compressed="true" alias="Adwaita-dark.css">../data/themes/Adwaita-dark.css</file>
+
     <file compressed="true" alias="Adwaita/Adwaita-panels.css">../data/themes/Adwaita/Adwaita-panels.css</file>
     <file compressed="true" alias="Adwaita/Adwaita-graphs.css">../data/themes/Adwaita/Adwaita-graphs.css</file>
+    <file compressed="true" alias="Adwaita/Adwaita-searchbar.css">../data/themes/Adwaita/Adwaita-searchbar.css</file>
+
     <file compressed="true" alias="Adwaita/Adwaita-dark-graphs.css">../data/themes/Adwaita/Adwaita-dark-graphs.css</file>
+    <file compressed="true" alias="Adwaita/Adwaita-dark-searchbar.css">../data/themes/Adwaita/Adwaita-dark-searchbar.css</file>
 
     <!-- Default and Fallback Theme -->
     <file compressed="true" alias="shared.css">../data/themes/shared.css</file>
