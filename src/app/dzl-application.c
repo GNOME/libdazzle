@@ -135,6 +135,7 @@ dzl_application_startup (GApplication *app)
    * We cannot register resources before chaining startup because
    * the GtkSettings and other plumbing will not yet be initialized.
    */
+  dzl_application_add_resource_path (self, "/org/gnome/dazzle");
   dzl_application_add_resource_path (self, g_application_get_resource_base_path (app));
   app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
   gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
