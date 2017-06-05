@@ -83,14 +83,23 @@ dzl_css_provider_update (DzlCssProvider *self)
                     NULL);
     }
 
+  /* First check with full path to theme+variant */
   resource_path = g_strdup_printf ("%s/%s%s.css",
                                    self->base_path,
                                    theme_name, prefer_dark_theme ? "-dark" : "");
 
   if (!g_resources_get_info (resource_path, G_RESOURCE_LOOKUP_FLAGS_NONE, &len, &flags, NULL))
     {
+      /* Now try without the theme variant */
       g_free (resource_path);
-      resource_path = g_strdup_printf ("%s/shared.css", self->base_path);
+      resource_path = g_strdup_printf ("%s/%s.css", self->base_path, theme_name);
+
+      /* Now fallback to shared styling */
+      if (!g_resources_get_info (resource_path, G_RESOURCE_LOOKUP_FLAGS_NONE, &len, &flags, NULL))
+        {
+          g_free (resource_path);
+          resource_path = g_strdup_printf ("%s/shared.css", self->base_path);
+        }
     }
 
   /* Nothing to load */
