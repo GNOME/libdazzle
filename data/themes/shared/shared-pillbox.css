@@ -1,4 +1,9 @@
 dzlpillbox {
   border-radius: 3px;
-  background-color: @wm_bg_b;
+  background-color: mix(@borders, @theme_bg_color, .5);
+}
+
+dzlpillbox:backdrop {
+  border-radius: 3px;
+  background-color: mix(@borders, @theme_unfocused_bg_color, .75);
 }
