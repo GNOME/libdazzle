@@ -460,7 +460,7 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
                           guint           lookaside_id,
                           guint          *document_id,
                           const gchar   **key,
-                          guint          *penalty)
+                          gfloat         *penalty)
 {
   const LookasideEntry *entry;
   const gchar *local_key = NULL;
@@ -492,8 +492,10 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
 
   if (penalty != NULL)
     {
-      *penalty = (entry->key_id & 0xFF000000) >> 24;
-      *penalty += strlen (local_key);
+      guint p = (entry->key_id & 0xFF000000) >> 24;
+
+      /* Use the penalty to force categorization by importance. */
+      *penalty = (255 - p) / 255.0;
     }
 
   return TRUE;

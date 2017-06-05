@@ -29,7 +29,7 @@ gboolean     _dzl_fuzzy_index_resolve         (DzlFuzzyIndex  *self,
                                                guint           lookaside_id,
                                                guint          *document_id,
                                                const gchar   **key,
-                                               guint          *penalty);
+                                               gfloat         *penalty);
 
 G_END_DECLS
 
