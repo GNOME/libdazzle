@@ -388,7 +388,7 @@ dzl_fuzzy_index_builder_build_index (DzlFuzzyIndexBuilder *self)
 
   while (g_hash_table_iter_next (&iter, &keyptr, (gpointer *)&row))
     {
-      gchar key[8];
+      gchar key[12];
       GVariant *variant;
       gunichar ch = GPOINTER_TO_UINT (keyptr);
 
