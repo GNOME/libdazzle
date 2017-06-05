@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-fuzzy-index"
 
+#include <string.h>
+
 #include "dzl-fuzzy-index.h"
 #include "dzl-fuzzy-index-cursor.h"
 #include "dzl-fuzzy-index-private.h"
@@ -460,8 +462,9 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
                           guint           lookaside_id,
                           guint          *document_id,
                           const gchar   **key,
-                          gfloat         *penalty,
-                          guint          *priority)
+                          guint          *priority,
+                          guint           in_score,
+                          gfloat         *out_score)
 {
   const LookasideEntry *entry;
   const gchar *local_key = NULL;
@@ -469,6 +472,8 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
 
   g_assert (DZL_IS_FUZZY_INDEX (self));
   g_assert (document_id != NULL);
+  g_assert (out_score != NULL);
+  g_assert (priority != NULL);
 
   /* Mask off the key priority */
   lookaside_id &= 0x00FFFFFF;
@@ -491,16 +496,8 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
   if (document_id != NULL)
     *document_id = entry->document_id;
 
-  if (priority)
-    *priority = (entry->key_id & 0xFF000000) >> 24;
-
-  if (penalty != NULL)
-    {
-      guint p = (entry->key_id & 0xFF000000) >> 24;
-
-      /* Use the penalty to force categorization by importance. */
-      *penalty = (255 - p) / 255.0;
-    }
+  *priority = (entry->key_id & 0xFF000000) >> 24;
+  *out_score = ((1.0 / 256.0) / (strlen (local_key) + in_score)) + ((255.0 - *priority) / 256.0);
 
   return TRUE;
 }

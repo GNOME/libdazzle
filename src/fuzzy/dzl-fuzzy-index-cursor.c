@@ -417,7 +417,6 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
         {
           const DzlFuzzyIndexItem *item = &lookup.tables[0][i];
           DzlFuzzyMatch match;
-          gfloat penalty;
 
           if (item->lookaside_id != last_id)
             {
@@ -427,11 +426,10 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                         item->lookaside_id,
                                                         &match.document_id,
                                                         &match.key,
-                                                        &penalty,
-                                                        &match.priority))
+                                                        &match.priority,
+                                                        item->position,
+                                                        &match.score))
                 continue;
-
-              match.score = penalty + (.1 * (1.0 / (strlen (match.key) + item->position)));
 
               g_array_append_val (self->matches, match);
             }
@@ -453,17 +451,15 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
       guint score = GPOINTER_TO_UINT (value);
       gpointer other_score;
       DzlFuzzyMatch match;
-      gfloat penalty;
 
       if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,
                                                 lookaside_id,
                                                 &match.document_id,
                                                 &match.key,
-                                                &penalty,
-                                                &match.priority))
+                                                &match.priority,
+                                                score,
+                                                &match.score))
         continue;
-
-      match.score = penalty + (.1 * (1.0 / (strlen (match.key) + score)));
 
       if (g_hash_table_lookup_extended (by_document,
                                         GUINT_TO_POINTER (match.document_id),

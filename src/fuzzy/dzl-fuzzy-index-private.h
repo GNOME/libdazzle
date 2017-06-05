@@ -29,8 +29,9 @@ gboolean     _dzl_fuzzy_index_resolve         (DzlFuzzyIndex  *self,
                                                guint           lookaside_id,
                                                guint          *document_id,
                                                const gchar   **key,
-                                               gfloat         *penalty,
-                                               guint          *priority);
+                                               guint          *priority,
+                                               guint           in_score,
+                                               gfloat         *out_score);
 
 G_END_DECLS
 
