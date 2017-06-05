@@ -112,7 +112,13 @@ create_ui (void)
   g_autoptr(DzlFuzzyIndex) index = dzl_fuzzy_index_new ();
   g_autoptr(GFile) file = g_file_new_for_path ("desktop.index");
   g_autoptr(GError) error = NULL;
+  g_autoptr(GtkCssProvider) provider = NULL;
   gboolean r;
+
+  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
+  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                             GTK_STYLE_PROVIDER (provider),
+                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION-1);
 
   timer = g_timer_new ();
 
