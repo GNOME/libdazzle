@@ -469,7 +469,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                         GUINT_TO_POINTER (match.document_id),
                                         NULL,
                                         &other_score) &&
-          pointer_to_float (&other_score) <= match.score)
+          match.score <= pointer_to_float (other_score))
         continue;
 
       g_hash_table_insert (by_document,
