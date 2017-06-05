@@ -406,7 +406,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
         {
           const DzlFuzzyIndexItem *item = &lookup.tables[0][i];
 
-          fuzzy_do_match (&lookup, item, 1, MIN (16, item->position * 4));
+          fuzzy_do_match (&lookup, item, 1, MIN (16, item->position * 2));
         }
     }
   else
