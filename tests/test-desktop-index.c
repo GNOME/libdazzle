@@ -232,10 +232,11 @@ test_desktop_index_file (DzlFuzzyIndexBuilder  *builder,
   document = g_variant_take_ref (g_variant_dict_end (&dict));
 
   test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, FALSE, 0);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, TRUE, 0);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Keywords", document, TRUE, 20);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Comment", document, TRUE, 40);
-  test_desktop_index_key (builder, key_file, "Desktop Entry", "Categories", document, TRUE, 60);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Name", document, TRUE, 1);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "GenericName", document, TRUE, 2);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Keywords", document, TRUE, 3);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Comment", document, TRUE, 4);
+  test_desktop_index_key (builder, key_file, "Desktop Entry", "Categories", document, TRUE, 5);
 
   return TRUE;
 }
