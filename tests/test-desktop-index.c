@@ -57,9 +57,10 @@ query_cb (GObject      *object,
       escaped = g_markup_escape_text (title, -1);
       highlight = dzl_fuzzy_highlight (escaped, last_query, FALSE);
       escape_keyword = g_markup_escape_text (dzl_fuzzy_index_match_get_key (match), -1);
-      subtitle = g_strdup_printf ("%lf (%s)",
+      subtitle = g_strdup_printf ("%lf (%s) (priority %u)",
                                   dzl_fuzzy_index_match_get_score (match),
-                                  escape_keyword);
+                                  escape_keyword,
+                                  dzl_fuzzy_index_match_get_priority (match));
 
       suggestion = g_object_new (DZL_TYPE_SUGGESTION,
                                  "id", id,

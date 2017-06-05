@@ -47,6 +47,7 @@ typedef struct
   const gchar *key;
   guint        document_id;
   gfloat       score;
+  guint        priority;
 } DzlFuzzyMatch;
 
 typedef struct
@@ -426,7 +427,8 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                         item->lookaside_id,
                                                         &match.document_id,
                                                         &match.key,
-                                                        &penalty))
+                                                        &penalty,
+                                                        &match.priority))
                 continue;
 
               match.score = 1.0 / (strlen (match.key) + item->position) * penalty;
@@ -457,10 +459,10 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                 lookaside_id,
                                                 &match.document_id,
                                                 &match.key,
-                                                &penalty))
+                                                &penalty,
+                                                &match.priority))
         continue;
 
-      match.score = 1.0 / (strlen (match.key) + score) * penalty;
 
       if (g_hash_table_lookup_extended (by_document,
                                         GUINT_TO_POINTER (match.document_id),
@@ -575,7 +577,7 @@ dzl_fuzzy_index_cursor_get_n_items (GListModel *model)
 
 static gpointer
 dzl_fuzzy_index_cursor_get_item (GListModel *model,
-                             guint       position)
+                                 guint       position)
 {
   DzlFuzzyIndexCursor *self = (DzlFuzzyIndexCursor *)model;
   g_autoptr(GVariant) document = NULL;
@@ -592,6 +594,7 @@ dzl_fuzzy_index_cursor_get_item (GListModel *model,
                        "document", document,
                        "key", match->key,
                        "score", match->score,
+                       "priority", match->priority,
                        NULL);
 }
 

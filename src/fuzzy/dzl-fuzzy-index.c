@@ -460,7 +460,8 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
                           guint           lookaside_id,
                           guint          *document_id,
                           const gchar   **key,
-                          gfloat         *penalty)
+                          gfloat         *penalty,
+                          guint          *priority)
 {
   const LookasideEntry *entry;
   const gchar *local_key = NULL;
@@ -489,6 +490,9 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
 
   if (document_id != NULL)
     *document_id = entry->document_id;
+
+  if (priority)
+    *priority = (entry->key_id & 0xFF000000) >> 24;
 
   if (penalty != NULL)
     {

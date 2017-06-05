@@ -30,6 +30,7 @@ G_DECLARE_FINAL_TYPE (DzlFuzzyIndexMatch, dzl_fuzzy_index_match, DZL, FUZZY_INDE
 const gchar *dzl_fuzzy_index_match_get_key      (DzlFuzzyIndexMatch *self);
 GVariant    *dzl_fuzzy_index_match_get_document (DzlFuzzyIndexMatch *self);
 gfloat       dzl_fuzzy_index_match_get_score    (DzlFuzzyIndexMatch *self);
+guint        dzl_fuzzy_index_match_get_priority (DzlFuzzyIndexMatch *self);
 
 G_END_DECLS
 

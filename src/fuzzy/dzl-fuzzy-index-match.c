@@ -26,6 +26,7 @@ struct _DzlFuzzyIndexMatch
   GVariant *document;
   gchar    *key;
   gfloat    score;
+  guint     priority;
 };
 
 enum {
@@ -33,6 +34,7 @@ enum {
   PROP_DOCUMENT,
   PROP_KEY,
   PROP_SCORE,
+  PROP_PRIORITY,
   N_PROPS
 };
 
@@ -73,6 +75,10 @@ dzl_fuzzy_index_match_get_property (GObject    *object,
       g_value_set_string (value, self->key);
       break;
 
+    case PROP_PRIORITY:
+      g_value_set_uint (value, self->priority);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -98,6 +104,10 @@ dzl_fuzzy_index_match_set_property (GObject      *object,
 
     case PROP_KEY:
       self->key = g_value_dup_string (value);
+      break;
+
+    case PROP_PRIORITY:
+      self->priority = g_value_get_uint (value);
       break;
 
     default:
@@ -128,6 +138,15 @@ dzl_fuzzy_index_match_class_init (DzlFuzzyIndexMatchClass *klass)
                          "The string key that was inserted for the document",
                          NULL,
                          (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_PRIORITY] =
+    g_param_spec_uint ("priority",
+                       "Priority",
+                       "The priority used when creating the index",
+                       0,
+                       255,
+                       0,
+                       (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_SCORE] =
     g_param_spec_float ("score",
@@ -173,4 +192,12 @@ dzl_fuzzy_index_match_get_key (DzlFuzzyIndexMatch *self)
   g_return_val_if_fail (DZL_IS_FUZZY_INDEX_MATCH (self), NULL);
 
   return self->key;
+}
+
+guint
+dzl_fuzzy_index_match_get_priority (DzlFuzzyIndexMatch *self)
+{
+  g_return_val_if_fail (DZL_IS_FUZZY_INDEX_MATCH (self), 0);
+
+  return self->priority;
 }
