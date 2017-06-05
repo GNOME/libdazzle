@@ -119,7 +119,7 @@ dzl_pill_box_class_init (DzlPillBoxClass *klass)
                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
   g_object_class_install_property (object_class, PROP_LABEL, properties [PROP_LABEL]);
 
-  gtk_widget_class_set_css_name (widget_class, "pillbox");
+  gtk_widget_class_set_css_name (widget_class, "dzlpillbox");
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/dazzle/ui/dzl-pill-box.ui");
   gtk_widget_class_bind_template_child (widget_class, DzlPillBox, label);
 }
