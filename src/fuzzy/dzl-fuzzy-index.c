@@ -459,9 +459,12 @@ gboolean
 _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
                           guint           lookaside_id,
                           guint          *document_id,
-                          const gchar   **key)
+                          const gchar   **key,
+                          guint          *penalty)
 {
   const LookasideEntry *entry;
+  const gchar *local_key = NULL;
+  guint key_id;
 
   g_assert (DZL_IS_FUZZY_INDEX (self));
   g_assert (document_id != NULL);
@@ -474,17 +477,23 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
 
   entry = &self->lookaside_raw [lookaside_id];
 
-  *document_id = entry->document_id;
+  /* The key_id has a mask with the priority as well */
+  key_id = entry->key_id & 0x00FFFFFF;
+  if G_UNLIKELY (key_id >= g_variant_n_children (self->keys))
+    return FALSE;
+
+  g_variant_get_child (self->keys, key_id, "&s", &local_key);
 
   if (key != NULL)
+    *key = local_key;
+
+  if (document_id != NULL)
+    *document_id = entry->document_id;
+
+  if (penalty != NULL)
     {
-      /* The key_id has a mask with the priority as well */
-      guint key_id = entry->key_id & 0x00FFFFFF;
-
-      if G_UNLIKELY (key_id >= g_variant_n_children (self->keys))
-        return FALSE;
-
-      g_variant_get_child (self->keys, key_id, "&s", key);
+      *penalty = (entry->key_id & 0xFF000000) >> 24;
+      *penalty += strlen (local_key);
     }
 
   return TRUE;

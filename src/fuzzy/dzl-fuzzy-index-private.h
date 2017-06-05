@@ -28,7 +28,8 @@ GVariant    *_dzl_fuzzy_index_lookup_document (DzlFuzzyIndex  *self,
 gboolean     _dzl_fuzzy_index_resolve         (DzlFuzzyIndex  *self,
                                                guint           lookaside_id,
                                                guint          *document_id,
-                                               const gchar   **key);
+                                               const gchar   **key,
+                                               guint          *penalty);
 
 G_END_DECLS
 

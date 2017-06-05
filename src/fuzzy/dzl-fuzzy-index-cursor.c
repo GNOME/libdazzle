@@ -417,8 +417,8 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
       for (i = 0; i < lookup.tables_n_elements[0]; i++)
         {
           const DzlFuzzyIndexItem *item = &lookup.tables[0][i];
-          guint penalty = ((item->lookaside_id & 0xFF000000) >> 24) + 1;
           DzlFuzzyMatch match;
+          guint penalty;
 
           if (item->lookaside_id != last_id)
             {
@@ -427,10 +427,11 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
               if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,
                                                         item->lookaside_id,
                                                         &match.document_id,
-                                                        &match.key))
+                                                        &match.key,
+                                                        &penalty))
                 continue;
 
-              match.score = 1.0 / ((strlen (match.key) + item->position) * penalty);
+              match.score = 1.0 / (strlen (match.key) + item->position + penalty);
 
               g_array_append_val (self->matches, match);
             }
@@ -457,10 +458,11 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
       if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,
                                                 lookaside_id,
                                                 &match.document_id,
-                                                &match.key))
+                                                &match.key,
+                                                &penalty))
         continue;
 
-      match.score = 1.0 / ((strlen (match.key) + score) * penalty);
+      match.score = 1.0 / (strlen (match.key) + score + penalty);
 
       if (g_hash_table_lookup_extended (by_document,
                                         GUINT_TO_POINTER (match.document_id),
