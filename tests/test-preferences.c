@@ -49,6 +49,17 @@ add_preferences (DzlPreferences *prefs)
   dzl_preferences_set_page (prefs, "appearance", NULL);
 }
 
+static void
+load_css (void)
+{
+  g_autoptr(GtkCssProvider) provider = NULL;
+
+  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
+  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                             GTK_STYLE_PROVIDER (provider),
+                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -57,6 +68,8 @@ main (gint   argc,
   GtkWidget *view;
 
   gtk_init (&argc, &argv);
+
+  load_css ();
 
   window = g_object_new (GTK_TYPE_WINDOW,
                          "title", "Preferences Test",
