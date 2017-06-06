@@ -55,7 +55,6 @@ dzl_application_real_add_resource_path (DzlApplication *self,
   g_autoptr(GError) error = NULL;
   g_autofree gchar *menu_path = NULL;
   g_autofree gchar *keythemes_path = NULL;
-  g_autofree gchar *icons_path = NULL;
   guint merge_id;
 
   g_assert (DZL_IS_APPLICATION (self));
@@ -66,7 +65,7 @@ dzl_application_real_add_resource_path (DzlApplication *self,
 
   /*
    * Allow the theme manager to monitor the css/Adwaita.css or other themes
-   * based on gtk-theme-name.
+   * based on gtk-theme-name. The theme manager also loads icons.
    */
   dzl_theme_manager_add_resource_path (priv->theme_manager, resource_path);
 
@@ -87,14 +86,6 @@ dzl_application_real_add_resource_path (DzlApplication *self,
    */
   keythemes_path = g_build_filename (resource_path, "keythemes", NULL);
   dzl_shortcut_manager_append_search_path (priv->shortcut_manager, keythemes_path);
-
-  /*
-   * We want to allow loading icons from $resource_path/icons/ just like Gtk
-   * will do for the base application. However, we cannot remove these once
-   * they've been added, so remove_resource_path() does nothing.
-   */
-  icons_path = g_build_filename (resource_path, "icons", NULL);
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (), icons_path);
 }
 
 static void
