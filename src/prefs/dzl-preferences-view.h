@@ -29,7 +29,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlPreferencesView, dzl_preferences_view, DZL, PREFERENCES_VIEW, GtkBin)
 
-GtkWidget *dzl_preferences_view_new (void);
+GtkWidget *dzl_preferences_view_new            (void);
+void       dzl_preferences_view_reapply_filter (DzlPreferencesView *self);
 
 G_END_DECLS
 

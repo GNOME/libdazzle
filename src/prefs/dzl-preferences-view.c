@@ -192,6 +192,14 @@ go_back_activate (GSimpleAction *action,
   gtk_widget_hide (GTK_WIDGET (self->subpage_stack));
 }
 
+void
+dzl_preferences_view_reapply_filter (DzlPreferencesView *self)
+{
+  g_return_if_fail (DZL_IS_PREFERENCES_VIEW (self));
+
+  dzl_preferences_view_refilter (self, gtk_entry_get_text (GTK_ENTRY (self->search_entry)));
+}
+
 static void
 dzl_preferences_view_search_entry_changed (DzlPreferencesView *self,
                                            GtkSearchEntry     *search_entry)
@@ -199,7 +207,7 @@ dzl_preferences_view_search_entry_changed (DzlPreferencesView *self,
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
   g_assert (GTK_IS_SEARCH_ENTRY (search_entry));
 
-  dzl_preferences_view_refilter (self, gtk_entry_get_text (GTK_ENTRY (search_entry)));
+  dzl_preferences_view_reapply_filter (self);
 }
 
 static void
