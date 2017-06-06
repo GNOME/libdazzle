@@ -120,6 +120,7 @@ G_BEGIN_DECLS
 #include "util/dzl-dnd.h"
 #include "util/dzl-file-manager.h"
 #include "util/dzl-gdk.h"
+#include "util/dzl-gtk.h"
 #include "util/dzl-heap.h"
 #include "util/dzl-pango.h"
 #include "util/dzl-rgba.h"
