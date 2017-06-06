@@ -31,87 +31,85 @@ struct _DzlPreferencesInterface
 {
   GTypeInterface parent_interface;
 
-  void     (*set_page)         (DzlPreferences *self,
-                                const gchar    *page_name,
-                                GHashTable     *map);
-  void     (*add_page)         (DzlPreferences *self,
-                                const gchar    *page_name,
-                                const gchar    *title,
-                                gint            priority);
-  void     (*add_group)        (DzlPreferences *self,
-                                const gchar    *page_name,
-                                const gchar    *group_name,
-                                const gchar    *title,
-                                gint            priority);
-  void     (*add_list_group)   (DzlPreferences   *self,
-                                const gchar      *page_name,
-                                const gchar      *group_name,
-                                const gchar      *title,
-                                GtkSelectionMode  mode,
-                                gint              priority);
-  guint    (*add_radio)        (DzlPreferences *self,
-                                const gchar    *page_name,
-                                const gchar    *group_name,
-                                const gchar    *schema_id,
-                                const gchar    *key,
-                                const gchar    *path,
-                                const gchar    *variant_string,
-                                const gchar    *title,
-                                const gchar    *subtitle,
-                                const gchar    *keywords,
-                                gint            priority);
-  guint    (*add_font_button)  (DzlPreferences *self,
-                                const gchar    *page_name,
-                                const gchar    *group_name,
-                                const gchar    *schema_id,
-                                const gchar    *key,
-                                const gchar    *title,
-                                const gchar    *keywords,
-                                gint            priority);
-  guint    (*add_switch)       (DzlPreferences *self,
-                                const gchar    *page_name,
-                                const gchar    *group_name,
-                                const gchar    *schema_id,
-                                const gchar    *key,
-                                const gchar    *path,
-                                const gchar    *variant_string,
-                                const gchar    *title,
-                                const gchar    *subtitle,
-                                const gchar    *keywords,
-                                gint            priority);
-  guint    (*add_spin_button)  (DzlPreferences *self,
-                                const gchar    *page_name,
-                                const gchar    *group_name,
-                                const gchar    *schema_id,
-                                const gchar    *key,
-                                const gchar    *path,
-                                const gchar    *title,
-                                const gchar    *subtitle,
-                                const gchar    *keywords,
-                                gint            priority);
-  guint    (*add_file_chooser) (DzlPreferences      *self,
-                                const gchar         *page_name,
-                                const gchar         *group_name,
-                                const gchar         *schema_id,
-                                const gchar         *key,
-                                const gchar         *path,
-                                const gchar         *title,
-                                const gchar         *subtitle,
-                                GtkFileChooserAction action,
-                                const gchar         *keywords,
-                                gint                 priority);
-  guint    (*add_custom)       (DzlPreferences *self,
-                                const gchar    *page_name,
-                                const gchar    *group_name,
-                                GtkWidget      *widget,
-                                const gchar    *keywords,
-                                gint            priority);
-
-  gboolean (*remove_id)        (DzlPreferences *self,
-                                guint           widget_id);
-
-  GtkWidget *(*get_widget)     (DzlPreferences *self,
-                                guint           widget_id);
+  void        (*set_page)                   (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             GHashTable           *map);
+  void        (*add_page)                   (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *title,
+                                             gint                  priority);
+  void        (*add_group)                  (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             const gchar          *title,
+                                             gint                  priority);
+  void        (*add_list_group)             (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             const gchar          *title,
+                                             GtkSelectionMode      mode,
+                                             gint                  priority);
+  guint       (*add_radio)                  (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             const gchar          *schema_id,
+                                             const gchar          *key,
+                                             const gchar          *path,
+                                             const gchar          *variant_string,
+                                             const gchar          *title,
+                                             const gchar          *subtitle,
+                                             const gchar          *keywords,
+                                             gint                  priority);
+  guint       (*add_font_button)            (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             const gchar          *schema_id,
+                                             const gchar          *key,
+                                             const gchar          *title,
+                                             const gchar          *keywords,
+                                             gint                  priority);
+  guint       (*add_switch)                 (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             const gchar          *schema_id,
+                                             const gchar          *key,
+                                             const gchar          *path,
+                                             const gchar          *variant_string,
+                                             const gchar          *title,
+                                             const gchar          *subtitle,
+                                             const gchar          *keywords,
+                                             gint                  priority);
+  guint       (*add_spin_button)            (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             const gchar          *schema_id,
+                                             const gchar          *key,
+                                             const gchar          *path,
+                                             const gchar          *title,
+                                             const gchar          *subtitle,
+                                             const gchar          *keywords,
+                                             gint                  priority);
+  guint      (*add_file_chooser)            (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             const gchar          *schema_id,
+                                             const gchar          *key,
+                                             const gchar          *path,
+                                             const gchar          *title,
+                                             const gchar          *subtitle,
+                                             GtkFileChooserAction  action,
+                                             const gchar          *keywords,
+                                             gint                  priority);
+  guint      (*add_custom)                  (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             GtkWidget            *widget,
+                                             const gchar          *keywords,
+                                             gint                  priority);
+  gboolean   (*remove_id)                   (DzlPreferences       *self,
+                                             guint                 widget_id);
+  GtkWidget *(*get_widget)                  (DzlPreferences       *self,
+                                             guint                 widget_id);
 };
 
 void       dzl_preferences_add_page         (DzlPreferences       *self,
@@ -193,7 +191,6 @@ void       dzl_preferences_set_page         (DzlPreferences       *self,
                                              GHashTable           *map);
 GtkWidget *dzl_preferences_get_widget       (DzlPreferences       *self,
                                              guint                 widget_id);
-
 
 G_END_DECLS
 
