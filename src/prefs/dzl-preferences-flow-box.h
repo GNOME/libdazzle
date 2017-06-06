@@ -19,7 +19,7 @@
 #ifndef DZL_PREFERENCES_FLOW_BOX_H
 #define DZL_PREFERENCES_FLOW_BOX_H
 
-#include <dazzle.h>
+#include "widgets/dzl-column-layout.h"
 
 G_BEGIN_DECLS
 
