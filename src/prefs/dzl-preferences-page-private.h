@@ -21,7 +21,6 @@
 
 #include "prefs/dzl-preferences-page.h"
 #include "prefs/dzl-preferences-flow-box.h"
-#include "search/dzl-pattern-spec.h"
 
 G_BEGIN_DECLS
 
@@ -35,8 +34,6 @@ struct _DzlPreferencesPage
 
 void _dzl_preferences_page_set_map  (DzlPreferencesPage *self,
                                      GHashTable         *map);
-void _dzl_preferences_page_refilter (DzlPreferencesPage *self,
-                                     DzlPatternSpec     *spec);
 
 G_END_DECLS
 

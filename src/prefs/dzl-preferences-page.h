@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 
 #include "prefs/dzl-preferences-group.h"
+#include "search/dzl-pattern-spec.h"
 
 G_BEGIN_DECLS
 
@@ -33,6 +34,8 @@ void                 dzl_preferences_page_add_group (DzlPreferencesPage  *self,
                                                      DzlPreferencesGroup *group);
 DzlPreferencesGroup *dzl_preferences_page_get_group (DzlPreferencesPage  *self,
                                                      const gchar         *group_name);
+void                 dzl_preferences_page_refilter  (DzlPreferencesPage  *self,
+                                                     DzlPatternSpec      *spec);
 
 G_END_DECLS
 
