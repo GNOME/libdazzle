@@ -29,3 +29,11 @@ dzldockstack dzltabstrip dzltab:checked {
   border-top-width: 1px;
   border-bottom-width: 0px;
 }
+
+dzldockstack dzltabstrip dzltab:checked:first-child {
+  border-left-color: alpha(@theme_base_color, 0.25);
+}
+
+dzldockstack dzltabstrip dzltab:checked:last-child {
+  border-right-color: alpha(@theme_base_color, 0.25);
+}
