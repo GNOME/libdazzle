@@ -144,6 +144,17 @@ log_handler (const gchar    *domain,
   g_print ("%s: time=%0.5lf %s\n", domain, t, message);
 }
 
+static void
+load_css (void)
+{
+  g_autoptr(GtkCssProvider) provider = NULL;
+
+  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
+  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                             GTK_STYLE_PROVIDER (provider),
+                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -151,21 +162,14 @@ main (gint   argc,
   GtkBuilder *builder = NULL;
   GtkWindow *window = NULL;
   GActionGroup *group;
-  GtkCssProvider *provider;
   GError *error = NULL;
   g_autofree gchar *ui_path = g_build_filename (TEST_DATA_DIR, "test-panel.ui", NULL);
-  g_autofree gchar *css_path = g_build_filename (TEST_DATA_DIR, "test-panel.css", NULL);
 
   gtk_init (&argc, &argv);
 
-  timer = g_timer_new ();
+  load_css ();
 
-  provider = gtk_css_provider_new ();
-  gtk_css_provider_load_from_path (provider, css_path, &error);
-  g_assert_no_error (error);
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  timer = g_timer_new ();
 
   builder = gtk_builder_new ();
   gtk_builder_add_from_file (builder, ui_path, &error);
