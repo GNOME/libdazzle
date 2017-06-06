@@ -27,16 +27,16 @@ dzlpreferencesview list row spinbutton entry {
   margin-left: 2px;
 }
 
-dzlpreferences dzlpreferencesgroup list row {
+dzlpreferencesview dzlpreferencesgroup list row {
   padding: 10px;
   border-bottom: 1px solid alpha(@borders, 0.2);
 }
 
-dzlpreferences dzlpreferencesgroup list row:last-child {
+dzlpreferencesview dzlpreferencesgroup list row:last-child {
   border-bottom: none;
 }
 
-dzlpreferences dzlpreferencesgroup list entry {
+dzlpreferencesview dzlpreferencesgroup list entry {
   background: none;
   min-height: 0px;
 }
