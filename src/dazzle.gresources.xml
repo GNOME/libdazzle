@@ -23,14 +23,21 @@
   </gresource>
 
   <gresource prefix="/org/gnome/dazzle/themes">
+    <!-- Arc CSS theme -->
+    <file compressed="true" alias="Arc.css">../data/themes/Arc.css</file>
+    <file compressed="true" alias="Arc-Dark.css">../data/themes/Arc.css</file>
+    <file compressed="true" alias="Arc-Darker.css">../data/themes/Arc.css</file>
+    <file compressed="true" alias="Arc-solid.css">../data/themes/Arc.css</file>
+    <file compressed="true" alias="Arc-Dark-solid.css">../data/themes/Arc.css</file>
+    <file compressed="true" alias="Arc-Darker-solid.css">../data/themes/Arc.css</file>
+    <file compressed="true" alias="Arc/Arc-panels.css">../data/themes/Arc/Arc-panels.css</file>
+
     <!-- Adwaita CSS theme -->
     <file compressed="true" alias="Adwaita.css">../data/themes/Adwaita.css</file>
     <file compressed="true" alias="Adwaita-dark.css">../data/themes/Adwaita-dark.css</file>
-
     <file compressed="true" alias="Adwaita/Adwaita-panels.css">../data/themes/Adwaita/Adwaita-panels.css</file>
     <file compressed="true" alias="Adwaita/Adwaita-graphs.css">../data/themes/Adwaita/Adwaita-graphs.css</file>
     <file compressed="true" alias="Adwaita/Adwaita-searchbar.css">../data/themes/Adwaita/Adwaita-searchbar.css</file>
-
     <file compressed="true" alias="Adwaita/Adwaita-dark-graphs.css">../data/themes/Adwaita/Adwaita-dark-graphs.css</file>
     <file compressed="true" alias="Adwaita/Adwaita-dark-searchbar.css">../data/themes/Adwaita/Adwaita-dark-searchbar.css</file>
 

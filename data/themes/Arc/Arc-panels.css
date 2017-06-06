@@ -1,0 +1,31 @@
+dzldockstack dzltabstrip {
+  background-color: @theme_bg_color;
+}
+
+dzldockstack dzltabstrip button.control:hover:checked,
+dzldockstack dzltabstrip button.control:checked,
+dzldockstack dzltabstrip dzltab:hover:checked,
+dzldockstack dzltabstrip dzltab:checked {
+  color: @theme_fg_color;
+  background-color: @theme_base_color;
+  border-color: @borders;
+}
+
+dzldockstack dzltabstrip dzltab {
+  margin-top: 3px;
+}
+
+dzldockstack dzltabstrip dzltab:backdrop:checked,
+dzldockstack dzltabstrip dzltab:backdrop {
+  background-color: alpha(@theme_base_color, 0.25);
+  border-color: transparent;
+}
+
+dzldockstack dzltabstrip dzltab:checked {
+  border-style: solid;
+  border-color: @borders;
+  border-right-width: 1px;
+  border-left-width: 1px;
+  border-top-width: 1px;
+  border-bottom-width: 0px;
+}

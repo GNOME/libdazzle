@@ -1,0 +1,5 @@
+/* Theme agnostic or base-layer CSS styling */
+@import url("resource:///org/gnome/dazzle/themes/shared.css");
+
+/* Theme specific styling */
+@import url("resource:///org/gnome/dazzle/themes/Arc/Arc-panels.css");
