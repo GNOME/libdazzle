@@ -77,6 +77,7 @@ G_BEGIN_DECLS
 #include "prefs/dzl-preferences-page.h"
 #include "prefs/dzl-preferences-spin-button.h"
 #include "prefs/dzl-preferences-switch.h"
+#include "prefs/dzl-preferences-view.h"
 #include "prefs/dzl-preferences.h"
 #include "search/dzl-fuzzy-index.h"
 #include "search/dzl-fuzzy-index-builder.h"

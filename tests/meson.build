@@ -232,3 +232,9 @@ test_pill_box = executable('test-pill-box', 'test-pill-box.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_preferences = executable('test-preferences', 'test-preferences.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)

@@ -82,6 +82,7 @@ libdazzle_public_headers = [
   'prefs/dzl-preferences-page.h',
   'prefs/dzl-preferences-spin-button.h',
   'prefs/dzl-preferences-switch.h',
+  'prefs/dzl-preferences-view.h',
   'prefs/dzl-preferences.h',
 
   'search/dzl-fuzzy-index-builder.h',
@@ -217,6 +218,7 @@ libdazzle_public_sources = [
   'prefs/dzl-preferences-page.c',
   'prefs/dzl-preferences-spin-button.c',
   'prefs/dzl-preferences-switch.c',
+  'prefs/dzl-preferences-view.c',
   'prefs/dzl-preferences.c',
 
   'search/dzl-fuzzy-index-builder.c',
