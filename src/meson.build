@@ -73,6 +73,18 @@ libdazzle_public_headers = [
   'panel/dzl-tab-strip.h',
   'panel/dzl-tab.h',
 
+  'prefs/dzl-preferences-bin.h',
+  'prefs/dzl-preferences-entry.h',
+  'prefs/dzl-preferences-file-chooser-button.h',
+  'prefs/dzl-preferences-flow-box.h',
+  'prefs/dzl-preferences-font-button.h',
+  'prefs/dzl-preferences-group.h',
+  'prefs/dzl-preferences-language-row.h',
+  'prefs/dzl-preferences-page.h',
+  'prefs/dzl-preferences-spin-button.h',
+  'prefs/dzl-preferences-switch.h',
+  'prefs/dzl-preferences.h',
+
   'search/dzl-fuzzy-index-builder.h',
   'search/dzl-fuzzy-index-cursor.h',
   'search/dzl-fuzzy-index-match.h',
@@ -197,6 +209,18 @@ libdazzle_public_sources = [
   'panel/dzl-tab-strip.c',
   'panel/dzl-tab.c',
 
+  'prefs/dzl-preferences-bin.c',
+  'prefs/dzl-preferences-entry.c',
+  'prefs/dzl-preferences-file-chooser-button.c',
+  'prefs/dzl-preferences-flow-box.c',
+  'prefs/dzl-preferences-font-button.c',
+  'prefs/dzl-preferences-group.c',
+  'prefs/dzl-preferences-language-row.c',
+  'prefs/dzl-preferences-page.c',
+  'prefs/dzl-preferences-spin-button.c',
+  'prefs/dzl-preferences-switch.c',
+  'prefs/dzl-preferences.c',
+
   'search/dzl-fuzzy-index-builder.c',
   'search/dzl-fuzzy-index-cursor.c',
   'search/dzl-fuzzy-index-match.c',
@@ -293,6 +317,10 @@ libdazzle_sources = [
   'panel/dzl-dock-bin-edge-private.h',
   'panel/dzl-dock-paned-private.h',
   'panel/dzl-tab-private.h',
+
+  'prefs/dzl-preferences-bin-private.h',
+  'prefs/dzl-preferences-group-private.h',
+  'prefs/dzl-preferences-page-private.h',
 
   'search/dzl-fuzzy-index-private.h',
 

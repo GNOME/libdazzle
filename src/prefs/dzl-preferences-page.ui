@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <!-- interface-requires gtk+ 3.18 -->
+  <template class="DzlPreferencesPage" parent="GtkBin">
+    <child>
+      <object class="DzlPreferencesFlowBox" id="box">
+        <property name="visible">true</property>
+      </object>
+    </child>
+  </template>
+</interface>

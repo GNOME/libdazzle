@@ -4,6 +4,14 @@
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-simple-popover.ui">widgets/dzl-simple-popover.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-empty-state.ui">widgets/dzl-empty-state.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-pill-box.ui">widgets/dzl-pill-box.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-file-chooser-button.ui">prefs/dzl-preferences-file-chooser-button.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-entry.ui">prefs/dzl-preferences-entry.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-font-button.ui">prefs/dzl-preferences-font-button.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-group.ui">prefs/dzl-preferences-group.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-language-row.ui">prefs/dzl-preferences-language-row.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-page.ui">prefs/dzl-preferences-page.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-spin-button.ui">prefs/dzl-preferences-spin-button.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-switch.ui">prefs/dzl-preferences-switch.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-suggestion-popover.ui">suggestions/dzl-suggestion-popover.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-suggestion-row.ui">suggestions/dzl-suggestion-row.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-shortcut-accel-dialog.ui">shortcuts/dzl-shortcut-accel-dialog.ui</file>
