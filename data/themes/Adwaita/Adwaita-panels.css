@@ -1,25 +1,3 @@
-dzldockbinedge {
-  background-color: @content_view_bg;
-  border-color: @borders;
-  border-style: solid;
-}
-
-dzldockbinedge.right {
-  border-left-width: 1px;
-}
-
-dzldockbinedge.left {
-  border-right-width: 1px;
-}
-
-dzldockbinedge.bottom {
-  border-top-width: 1px;
-}
-
-dzldockpaned .handle {
-  border: 1px solid @borders;
-}
-
 dzldockstack dzltabstrip {
   padding-top: 2px;
   background-color: @content_view_bg;
@@ -29,12 +7,6 @@ dzldockstack dzltabstrip {
 
 dzldockstack dzltabstrip button.control,
 dzldockstack dzltabstrip dzltab {
-  background: transparent;
-  box-shadow: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-
   border-bottom: 3px;
   border-bottom-style: solid;
   border-bottom-color: transparent;
@@ -43,20 +15,6 @@ dzldockstack dzltabstrip dzltab {
   margin-right: 6px;
 
   color: @theme_fg_color;
-}
-
-dzldockstack dzltabstrip button.control,
-dzldockstack dzltabstrip dzltab button,
-dzldockstack dzltabstrip dzltab {
-  transition-duration: 200ms;
-}
-
-dzldockstack dzltabstrip dzltab button {
-  padding: 0;
-  margin: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
 }
 
 dzldockstack dzltabstrip dzltab:active {

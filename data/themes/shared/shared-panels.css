@@ -1,0 +1,45 @@
+
+dzldockstack dzltabstrip button.control,
+dzldockstack dzltabstrip dzltab button,
+dzldockstack dzltabstrip dzltab {
+  transition-duration: 200ms;
+}
+
+dzldockstack dzltabstrip dzltab button {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+dzldockstack dzltabstrip button.control,
+dzldockstack dzltabstrip dzltab {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+dzldockpaned .handle {
+  border: 1px solid @borders;
+}
+
+dzldockbinedge {
+  background-color: @content_view_bg;
+  border-color: @borders;
+  border-style: solid;
+}
+
+dzldockbinedge.right {
+  border-left-width: 1px;
+}
+
+dzldockbinedge.left {
+  border-right-width: 1px;
+}
+
+dzldockbinedge.bottom {
+  border-top-width: 1px;
+}

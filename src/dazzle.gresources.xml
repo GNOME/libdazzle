@@ -36,6 +36,7 @@
 
     <!-- Default and Fallback Theme -->
     <file compressed="true" alias="shared.css">../data/themes/shared.css</file>
+    <file compressed="true" alias="shared/shared-panels.css">../data/themes/shared/shared-panels.css</file>
     <file compressed="true" alias="shared/shared-pillbox.css">../data/themes/shared/shared-pillbox.css</file>
     <file compressed="true" alias="shared/shared-preferences.css">../data/themes/shared/shared-preferences.css</file>
     <file compressed="true" alias="shared/shared-progressbutton.css">../data/themes/shared/shared-progressbutton.css</file>
