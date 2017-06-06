@@ -29,6 +29,19 @@ G_BEGIN_DECLS
 #define dzl_set_weak_pointer(ptr,obj) \
   ((obj!=*(ptr))?(dzl_clear_weak_pointer(ptr),*(ptr)=obj,((obj)?g_object_add_weak_pointer((GObject*)obj,(gpointer*)ptr),NULL:NULL),1):0)
 
+static inline gboolean
+dzl_str_empty0 (const gchar *str)
+{
+  return str == NULL || *str == '\0';
+}
+
+static inline gboolean
+dzl_str_equal0 (const gchar *str1,
+                const gchar *str2)
+{
+  return g_strcmp0 (str1, str2) == 0;
+}
+
 void          dzl_gtk_widget_class_add_css_resource (GtkWidgetClass   *widget_class,
                                                      const gchar      *resource);
 void          dzl_gtk_widget_add_class              (GtkWidget        *widget,
