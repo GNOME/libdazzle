@@ -27,7 +27,21 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_VIEW (dzl_preferences_view_get_type())
 
-G_DECLARE_FINAL_TYPE (DzlPreferencesView, dzl_preferences_view, DZL, PREFERENCES_VIEW, GtkBin)
+G_DECLARE_DERIVABLE_TYPE (DzlPreferencesView, dzl_preferences_view, DZL, PREFERENCES_VIEW, GtkBin)
+
+struct _DzlPreferencesViewClass
+{
+  GtkBinClass parent_class;
+
+  gpointer _reserved1;
+  gpointer _reserved2;
+  gpointer _reserved3;
+  gpointer _reserved4;
+  gpointer _reserved5;
+  gpointer _reserved6;
+  gpointer _reserved7;
+  gpointer _reserved8;
+};
 
 GtkWidget *dzl_preferences_view_new            (void);
 void       dzl_preferences_view_reapply_filter (DzlPreferencesView *self);

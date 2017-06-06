@@ -29,12 +29,8 @@
 #include "prefs/dzl-preferences-view.h"
 #include "util/dzl-util-private.h"
 
-struct _DzlPreferencesView
+typedef struct
 {
-  GtkBin                 parent_instance;
-
-  guint                  last_widget_id;
-
   GActionGroup          *actions;
   GSequence             *pages;
   GHashTable            *widgets;
@@ -44,11 +40,14 @@ struct _DzlPreferencesView
   GtkStackSwitcher      *page_stack_sidebar;
   GtkSearchEntry        *search_entry;
   GtkStack              *subpage_stack;
-};
+
+  guint                  last_widget_id;
+} DzlPreferencesViewPrivate;
 
 static void dzl_preferences_iface_init (DzlPreferencesInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (DzlPreferencesView, dzl_preferences_view, GTK_TYPE_BIN,
+                         G_ADD_PRIVATE (DzlPreferencesView)
                          G_IMPLEMENT_INTERFACE (DZL_TYPE_PREFERENCES, dzl_preferences_iface_init))
 
 static void
@@ -67,6 +66,7 @@ static void
 dzl_preferences_view_refilter (DzlPreferencesView *self,
                                const gchar        *search_text)
 {
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPatternSpec *spec = NULL;
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
@@ -74,10 +74,10 @@ dzl_preferences_view_refilter (DzlPreferencesView *self,
   if (!dzl_str_empty0 (search_text))
     spec = dzl_pattern_spec_new (search_text);
 
-  gtk_container_foreach (GTK_CONTAINER (self->page_stack),
+  gtk_container_foreach (GTK_CONTAINER (priv->page_stack),
                          dzl_preferences_view_refilter_cb,
                          spec);
-  gtk_container_foreach (GTK_CONTAINER (self->subpage_stack),
+  gtk_container_foreach (GTK_CONTAINER (priv->subpage_stack),
                          dzl_preferences_view_refilter_cb,
                          spec);
 
@@ -103,6 +103,7 @@ dzl_preferences_view_notify_visible_child (DzlPreferencesView *self,
                                            GParamSpec         *pspec,
                                            GtkStack           *stack)
 {
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesPage *page;
   GHashTableIter iter;
   gpointer value;
@@ -113,7 +114,7 @@ dzl_preferences_view_notify_visible_child (DzlPreferencesView *self,
   if (gtk_widget_in_destruction (GTK_WIDGET (self)))
     return;
 
-  gtk_widget_hide (GTK_WIDGET (self->subpage_stack));
+  gtk_widget_hide (GTK_WIDGET (priv->subpage_stack));
 
   /*
    * If there are any selections in list groups, re-select it to cause
@@ -155,10 +156,11 @@ static void
 dzl_preferences_view_finalize (GObject *object)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)object;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
 
-  g_clear_pointer (&self->pages, g_sequence_free);
-  g_clear_pointer (&self->widgets, g_hash_table_unref);
-  g_clear_object (&self->actions);
+  g_clear_pointer (&priv->pages, g_sequence_free);
+  g_clear_pointer (&priv->widgets, g_hash_table_unref);
+  g_clear_object (&priv->actions);
 
   G_OBJECT_CLASS (dzl_preferences_view_parent_class)->finalize (object);
 }
@@ -173,11 +175,11 @@ dzl_preferences_view_class_init (DzlPreferencesViewClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/dazzle/ui/dzl-preferences-view.ui");
   gtk_widget_class_set_css_name (widget_class, "dzlpreferencesview");
-  gtk_widget_class_bind_template_child (widget_class, DzlPreferencesView, page_stack);
-  gtk_widget_class_bind_template_child (widget_class, DzlPreferencesView, page_stack_sidebar);
-  gtk_widget_class_bind_template_child (widget_class, DzlPreferencesView, scroller);
-  gtk_widget_class_bind_template_child (widget_class, DzlPreferencesView, search_entry);
-  gtk_widget_class_bind_template_child (widget_class, DzlPreferencesView, subpage_stack);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, page_stack);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, page_stack_sidebar);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, scroller);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, search_entry);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, subpage_stack);
 }
 
 static void
@@ -186,18 +188,21 @@ go_back_activate (GSimpleAction *action,
                   gpointer       user_data)
 {
   DzlPreferencesView *self = user_data;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
 
-  gtk_widget_hide (GTK_WIDGET (self->subpage_stack));
+  gtk_widget_hide (GTK_WIDGET (priv->subpage_stack));
 }
 
 void
 dzl_preferences_view_reapply_filter (DzlPreferencesView *self)
 {
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+
   g_return_if_fail (DZL_IS_PREFERENCES_VIEW (self));
 
-  dzl_preferences_view_refilter (self, gtk_entry_get_text (GTK_ENTRY (self->search_entry)));
+  dzl_preferences_view_refilter (self, gtk_entry_get_text (GTK_ENTRY (priv->search_entry)));
 }
 
 static void
@@ -215,6 +220,8 @@ dzl_preferences_view_notify_subpage_stack_visible (DzlPreferencesView *self,
                                                    GParamSpec         *pspec,
                                                    GtkStack           *subpage_stack)
 {
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
   g_assert (GTK_IS_STACK (subpage_stack));
 
@@ -228,43 +235,44 @@ dzl_preferences_view_notify_subpage_stack_visible (DzlPreferencesView *self,
    */
 
   if (gtk_widget_get_visible (GTK_WIDGET (subpage_stack)))
-    g_object_set (self->scroller, "hscrollbar-policy", GTK_POLICY_AUTOMATIC, NULL);
+    g_object_set (priv->scroller, "hscrollbar-policy", GTK_POLICY_AUTOMATIC, NULL);
   else
-    g_object_set (self->scroller, "hscrollbar-policy", GTK_POLICY_NEVER, NULL);
+    g_object_set (priv->scroller, "hscrollbar-policy", GTK_POLICY_NEVER, NULL);
 }
 
 static void
 dzl_preferences_view_init (DzlPreferencesView *self)
 {
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   static const GActionEntry entries[] = {
     { "go-back", go_back_activate },
   };
 
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  g_signal_connect_object (self->search_entry,
+  g_signal_connect_object (priv->search_entry,
                            "changed",
                            G_CALLBACK (dzl_preferences_view_search_entry_changed),
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_signal_connect_object (self->page_stack,
+  g_signal_connect_object (priv->page_stack,
                            "notify::visible-child",
                            G_CALLBACK (dzl_preferences_view_notify_visible_child),
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_signal_connect_object (self->subpage_stack,
+  g_signal_connect_object (priv->subpage_stack,
                            "notify::visible",
                            G_CALLBACK (dzl_preferences_view_notify_subpage_stack_visible),
                            self,
                            G_CONNECT_SWAPPED);
 
-  self->pages = g_sequence_new (NULL);
-  self->widgets = g_hash_table_new (g_direct_hash, g_direct_equal);
+  priv->pages = g_sequence_new (NULL);
+  priv->widgets = g_hash_table_new (g_direct_hash, g_direct_equal);
 
-  self->actions = G_ACTION_GROUP (g_simple_action_group_new ());
-  g_action_map_add_action_entries (G_ACTION_MAP (self->actions),
+  priv->actions = G_ACTION_GROUP (g_simple_action_group_new ());
+  g_action_map_add_action_entries (G_ACTION_MAP (priv->actions),
                                    entries, G_N_ELEMENTS (entries),
                                    self);
 }
@@ -273,13 +281,15 @@ static GtkWidget *
 dzl_preferences_view_get_page (DzlPreferencesView *self,
                                const gchar        *page_name)
 {
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
   g_assert (page_name != NULL);
 
   if (strchr (page_name, '.') != NULL)
-    return gtk_stack_get_child_by_name (self->subpage_stack, page_name);
+    return gtk_stack_get_child_by_name (priv->subpage_stack, page_name);
   else
-    return gtk_stack_get_child_by_name (self->page_stack, page_name);
+    return gtk_stack_get_child_by_name (priv->page_stack, page_name);
 }
 
 static void
@@ -289,6 +299,7 @@ dzl_preferences_view_add_page (DzlPreferences *preferences,
                                gint            priority)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesPage *page;
   GSequenceIter *iter;
   GtkStack *stack;
@@ -300,9 +311,9 @@ dzl_preferences_view_add_page (DzlPreferences *preferences,
   g_assert (title != NULL || strchr (page_name, '.'));
 
   if (strchr (page_name, '.') != NULL)
-    stack = self->subpage_stack;
+    stack = priv->subpage_stack;
   else
-    stack = self->page_stack;
+    stack = priv->page_stack;
 
   if (gtk_stack_get_child_by_name (stack, page_name))
     return;
@@ -312,9 +323,9 @@ dzl_preferences_view_add_page (DzlPreferences *preferences,
                        "visible", TRUE,
                        NULL);
 
-  if (stack == self->page_stack)
+  if (stack == priv->page_stack)
     {
-      iter = g_sequence_insert_sorted (self->pages, page, sort_by_priority, NULL);
+      iter = g_sequence_insert_sorted (priv->pages, page, sort_by_priority, NULL);
       position = g_sequence_iter_get_position (iter);
     }
 
@@ -406,6 +417,7 @@ dzl_preferences_view_add_radio (DzlPreferences *preferences,
                                 gint            priority)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesSwitch *widget;
   DzlPreferencesGroup *group;
   g_autoptr(GVariant) variant = NULL;
@@ -463,8 +475,8 @@ dzl_preferences_view_add_radio (DzlPreferences *preferences,
 
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
-  widget_id = ++self->last_widget_id;
-  g_hash_table_insert (self->widgets, GINT_TO_POINTER (widget_id), widget);
+  widget_id = ++priv->last_widget_id;
+  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
 
   return widget_id;
 }
@@ -483,6 +495,7 @@ dzl_preferences_view_add_switch (DzlPreferences *preferences,
                                  gint            priority)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesSwitch *widget;
   DzlPreferencesGroup *group;
   g_autoptr(GVariant) variant = NULL;
@@ -539,8 +552,8 @@ dzl_preferences_view_add_switch (DzlPreferences *preferences,
 
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
-  widget_id = ++self->last_widget_id;
-  g_hash_table_insert (self->widgets, GINT_TO_POINTER (widget_id), widget);
+  widget_id = ++priv->last_widget_id;
+  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
 
   return widget_id;
 }
@@ -558,6 +571,7 @@ dzl_preferences_view_add_spin_button (DzlPreferences *preferences,
                                       gint            priority)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesSpinButton *widget;
   DzlPreferencesGroup *group;
   GtkWidget *page;
@@ -601,8 +615,8 @@ dzl_preferences_view_add_spin_button (DzlPreferences *preferences,
 
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
-  widget_id = ++self->last_widget_id;
-  g_hash_table_insert (self->widgets, GINT_TO_POINTER (widget_id), widget);
+  widget_id = ++priv->last_widget_id;
+  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
 
   return widget_id;
 }
@@ -618,6 +632,7 @@ dzl_preferences_view_add_font_button (DzlPreferences *preferences,
                                       gint            priority)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesSwitch *widget;
   DzlPreferencesGroup *group;
   GtkWidget *page;
@@ -658,8 +673,8 @@ dzl_preferences_view_add_font_button (DzlPreferences *preferences,
 
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
-  widget_id = ++self->last_widget_id;
-  g_hash_table_insert (self->widgets, GINT_TO_POINTER (widget_id), widget);
+  widget_id = ++priv->last_widget_id;
+  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
 
   return widget_id;
 }
@@ -678,6 +693,7 @@ dzl_preferences_view_add_file_chooser (DzlPreferences       *preferences,
                                        gint                  priority)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesFileChooserButton *widget;
   DzlPreferencesGroup *group;
   GtkWidget *page;
@@ -721,8 +737,8 @@ dzl_preferences_view_add_file_chooser (DzlPreferences       *preferences,
 
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
-  widget_id = ++self->last_widget_id;
-  g_hash_table_insert (self->widgets, GINT_TO_POINTER (widget_id), widget);
+  widget_id = ++priv->last_widget_id;
+  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
 
   return widget_id;
 }
@@ -736,6 +752,7 @@ dzl_preferences_view_add_custom (DzlPreferences *preferences,
                                  gint            priority)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   DzlPreferencesBin *container;
   DzlPreferencesGroup *group;
   GtkWidget *page;
@@ -763,7 +780,7 @@ dzl_preferences_view_add_custom (DzlPreferences *preferences,
       return 0;
     }
 
-  widget_id = ++self->last_widget_id;
+  widget_id = ++priv->last_widget_id;
 
   gtk_widget_show (widget);
   gtk_widget_show (GTK_WIDGET (group));
@@ -780,7 +797,7 @@ dzl_preferences_view_add_custom (DzlPreferences *preferences,
 
   dzl_preferences_group_add (group, GTK_WIDGET (container));
 
-  g_hash_table_insert (self->widgets, GINT_TO_POINTER (widget_id), widget);
+  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
 
   return widget_id;
 }
@@ -790,15 +807,16 @@ dzl_preferences_view_remove_id (DzlPreferences *preferences,
                                 guint           widget_id)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   GtkWidget *widget;
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
   g_assert (widget_id);
 
-  widget = g_hash_table_lookup (self->widgets, GINT_TO_POINTER (widget_id));
+  widget = g_hash_table_lookup (priv->widgets, GINT_TO_POINTER (widget_id));
   if (widget != NULL)
     {
-      if (g_hash_table_remove (self->widgets, GINT_TO_POINTER (widget_id)))
+      if (g_hash_table_remove (priv->widgets, GINT_TO_POINTER (widget_id)))
         {
           GtkWidget *parent = gtk_widget_get_ancestor (widget, GTK_TYPE_LIST_BOX_ROW);
 
@@ -823,6 +841,7 @@ dzl_preferences_view_set_page (DzlPreferences *preferences,
                                GHashTable     *map)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
   GtkWidget *page;
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
@@ -839,13 +858,13 @@ dzl_preferences_view_set_page (DzlPreferences *preferences,
   if (strchr (page_name, '.') != NULL)
     {
       dzl_preferences_page_set_map (DZL_PREFERENCES_PAGE (page), map);
-      gtk_stack_set_visible_child (self->subpage_stack, page);
-      gtk_widget_show (GTK_WIDGET (self->subpage_stack));
+      gtk_stack_set_visible_child (priv->subpage_stack, page);
+      gtk_widget_show (GTK_WIDGET (priv->subpage_stack));
     }
   else
     {
-      gtk_stack_set_visible_child (self->page_stack, page);
-      gtk_widget_hide (GTK_WIDGET (self->subpage_stack));
+      gtk_stack_set_visible_child (priv->page_stack, page);
+      gtk_widget_hide (GTK_WIDGET (priv->subpage_stack));
     }
 }
 
@@ -854,10 +873,11 @@ dzl_preferences_view_get_widget (DzlPreferences *preferences,
                                  guint           widget_id)
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
 
-  return g_hash_table_lookup (self->widgets, GINT_TO_POINTER (widget_id));
+  return g_hash_table_lookup (priv->widgets, GINT_TO_POINTER (widget_id));
 }
 
 static void
