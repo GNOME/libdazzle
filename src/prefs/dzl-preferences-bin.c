@@ -100,7 +100,7 @@ validate:
 
 static void
 dzl_preferences_bin_evict_settings (gpointer  data,
-                                          GObject  *where_object_was)
+                                    GObject  *where_object_was)
 {
   g_assert (data != NULL);
   g_assert (where_object_was != NULL);

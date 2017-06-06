@@ -36,6 +36,8 @@ DzlPreferencesGroup *dzl_preferences_page_get_group (DzlPreferencesPage  *self,
                                                      const gchar         *group_name);
 void                 dzl_preferences_page_refilter  (DzlPreferencesPage  *self,
                                                      DzlPatternSpec      *spec);
+void                 dzl_preferences_page_set_map   (DzlPreferencesPage  *self,
+                                                     GHashTable          *map);
 
 G_END_DECLS
 

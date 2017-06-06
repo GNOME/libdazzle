@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "search/dzl-pattern-spec.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_GROUP (dzl_preferences_group_get_type())
@@ -31,6 +33,11 @@ void         dzl_preferences_group_add          (DzlPreferencesGroup *self,
                                                  GtkWidget           *widget);
 const gchar *dzl_preferences_group_get_title    (DzlPreferencesGroup *self);
 gint         dzl_preferences_group_get_priority (DzlPreferencesGroup *self);
+void         dzl_preferences_group_set_map      (DzlPreferencesGroup *self,
+                                                 GHashTable          *map);
+guint        dzl_preferences_group_refilter     (DzlPreferencesGroup *self,
+                                                 DzlPatternSpec      *spec);
+
 
 G_END_DECLS
 

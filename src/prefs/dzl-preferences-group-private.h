@@ -42,11 +42,6 @@ struct _DzlPreferencesGroup
   guint          last_focused_tab_backward : 1;
 };
 
-void  _dzl_preferences_group_set_map  (DzlPreferencesGroup *self,
-                                       GHashTable          *map);
-guint _dzl_preferences_group_refilter (DzlPreferencesGroup *self,
-                                       DzlPatternSpec      *spec);
-
 G_END_DECLS
 
 #endif /* DZL_PREFERENCES_GROUP_PRIVATE_H */

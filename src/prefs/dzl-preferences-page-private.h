@@ -32,9 +32,6 @@ struct _DzlPreferencesPage
   GHashTable            *groups_by_name;
 };
 
-void _dzl_preferences_page_set_map  (DzlPreferencesPage *self,
-                                     GHashTable         *map);
-
 G_END_DECLS
 
 #endif /* DZL_PREFERENCES_PAGE_PRIVATE_H */

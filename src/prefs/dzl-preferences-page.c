@@ -154,8 +154,8 @@ dzl_preferences_page_get_group (DzlPreferencesPage *self,
 }
 
 void
-_dzl_preferences_page_set_map (DzlPreferencesPage *self,
-                               GHashTable         *map)
+dzl_preferences_page_set_map (DzlPreferencesPage *self,
+                              GHashTable         *map)
 {
   DzlPreferencesGroup *group;
   GHashTableIter iter;
@@ -165,12 +165,12 @@ _dzl_preferences_page_set_map (DzlPreferencesPage *self,
   g_hash_table_iter_init (&iter, self->groups_by_name);
 
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&group))
-    _dzl_preferences_group_set_map (group, map);
+    dzl_preferences_group_set_map (group, map);
 }
 
 void
-_dzl_preferences_page_refilter (DzlPreferencesPage *self,
-                                DzlPatternSpec     *spec)
+dzl_preferences_page_refilter (DzlPreferencesPage *self,
+                               DzlPatternSpec     *spec)
 {
   DzlPreferencesGroup *group;
   GHashTableIter iter;
@@ -180,6 +180,6 @@ _dzl_preferences_page_refilter (DzlPreferencesPage *self,
 
   g_hash_table_iter_init (&iter, self->groups_by_name);
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&group))
-    count += _dzl_preferences_group_refilter (group, spec);
+    count += dzl_preferences_group_refilter (group, spec);
   gtk_widget_set_visible (GTK_WIDGET (self), count > 0);
 }

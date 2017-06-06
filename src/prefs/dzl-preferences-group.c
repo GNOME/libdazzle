@@ -370,8 +370,8 @@ dzl_preferences_group_add (DzlPreferencesGroup *self,
 }
 
 void
-_dzl_preferences_group_set_map (DzlPreferencesGroup *self,
-                                GHashTable          *map)
+dzl_preferences_group_set_map (DzlPreferencesGroup *self,
+                               GHashTable          *map)
 {
   guint i;
 
@@ -415,8 +415,8 @@ dzl_preferences_group_refilter_cb (GtkWidget *widget,
 }
 
 guint
-_dzl_preferences_group_refilter (DzlPreferencesGroup *self,
-                                 DzlPatternSpec      *spec)
+dzl_preferences_group_refilter (DzlPreferencesGroup *self,
+                                DzlPatternSpec      *spec)
 {
   struct {
     DzlPatternSpec *spec;
