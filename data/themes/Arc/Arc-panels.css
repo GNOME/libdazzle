@@ -12,22 +12,26 @@ dzldockstack dzltabstrip dzltab:checked {
 }
 
 dzldockstack dzltabstrip dzltab {
+  font-size: 0.9em;
   margin-top: 3px;
+  padding-bottom: 3px;
+  border-style: solid;
+  border-color: transparent;
+  border-right-width: 1px;
+  border-left-width: 1px;
+  border-top-width: 1px;
+  border-bottom-width: 0px;
 }
 
 dzldockstack dzltabstrip dzltab:backdrop:checked,
 dzldockstack dzltabstrip dzltab:backdrop {
   background-color: alpha(@theme_base_color, 0.25);
-  border-color: transparent;
 }
 
 dzldockstack dzltabstrip dzltab:checked {
-  border-style: solid;
-  border-color: @borders;
-  border-right-width: 1px;
-  border-left-width: 1px;
-  border-top-width: 1px;
-  border-bottom-width: 0px;
+  border-left-color: @borders;
+  border-right-color: @borders;
+  border-top-color: @borders;
 }
 
 dzldockstack dzltabstrip dzltab:checked:first-child {
