@@ -54,12 +54,6 @@ libdazzle_public_headers = [
   'graphing/dzl-graph-renderer.h',
   'graphing/dzl-graph-view.h',
 
-  'fuzzy/dzl-fuzzy-index-builder.h',
-  'fuzzy/dzl-fuzzy-index-cursor.h',
-  'fuzzy/dzl-fuzzy-index-match.h',
-  'fuzzy/dzl-fuzzy-index.h',
-  'fuzzy/dzl-fuzzy-mutable-index.h',
-
   'menus/dzl-menu-manager.h',
 
   'panel/dzl-dock-bin-edge.h',
@@ -78,6 +72,14 @@ libdazzle_public_headers = [
   'panel/dzl-dock.h',
   'panel/dzl-tab-strip.h',
   'panel/dzl-tab.h',
+
+  'search/dzl-fuzzy-index-builder.h',
+  'search/dzl-fuzzy-index-cursor.h',
+  'search/dzl-fuzzy-index-match.h',
+  'search/dzl-fuzzy-index.h',
+  'search/dzl-fuzzy-mutable-index.h',
+  'search/dzl-levenshtein.h',
+  'search/dzl-trie.h',
 
   'settings/dzl-settings-sandwich.h',
 
@@ -112,8 +114,6 @@ libdazzle_public_headers = [
   'tree/dzl-tree-types.h',
   'tree/dzl-tree.h',
 
-  'trie/dzl-trie.h',
-
   'util/dzl-cairo.h',
   'util/dzl-counter.h',
   'util/dzl-date-time.h',
@@ -121,7 +121,6 @@ libdazzle_public_headers = [
   'util/dzl-file-manager.h',
   'util/dzl-gdk.h',
   'util/dzl-heap.h',
-  'util/dzl-levenshtein.h',
   'util/dzl-pango.h',
   'util/dzl-rgba.h',
   'util/dzl-ring.h',
@@ -171,12 +170,6 @@ libdazzle_public_sources = [
   'files/dzl-directory-model.c',
   'files/dzl-directory-reaper.c',
 
-  'fuzzy/dzl-fuzzy-index-builder.c',
-  'fuzzy/dzl-fuzzy-index-cursor.c',
-  'fuzzy/dzl-fuzzy-index-match.c',
-  'fuzzy/dzl-fuzzy-index.c',
-  'fuzzy/dzl-fuzzy-mutable-index.c',
-
   'graphing/dzl-cpu-graph.c',
   'graphing/dzl-cpu-model.c',
   'graphing/dzl-graph-column.c',
@@ -202,6 +195,14 @@ libdazzle_public_sources = [
   'panel/dzl-dock.c',
   'panel/dzl-tab-strip.c',
   'panel/dzl-tab.c',
+
+  'search/dzl-fuzzy-index-builder.c',
+  'search/dzl-fuzzy-index-cursor.c',
+  'search/dzl-fuzzy-index-match.c',
+  'search/dzl-fuzzy-index.c',
+  'search/dzl-fuzzy-mutable-index.c',
+  'search/dzl-levenshtein.c',
+  'search/dzl-trie.c',
 
   'settings/dzl-settings-sandwich.c',
 
@@ -234,8 +235,6 @@ libdazzle_public_sources = [
   'tree/dzl-tree.c',
   'tree/dzl-tree-node.c',
 
-  'trie/dzl-trie.c',
-
   'util/dzl-cairo.c',
   'util/dzl-counter.c',
   'util/dzl-date-time.c',
@@ -243,7 +242,6 @@ libdazzle_public_sources = [
   'util/dzl-file-manager.c',
   'util/dzl-gdk.c',
   'util/dzl-heap.c',
-  'util/dzl-levenshtein.c',
   'util/dzl-pango.c',
   'util/dzl-rgba.c',
   'util/dzl-ring.c',
@@ -287,14 +285,14 @@ libdazzle_sources = [
   'animation/dzl-frame-source.c',
   'animation/dzl-frame-source.h',
 
-  'fuzzy/dzl-fuzzy-index-private.h',
-
   'graphing/dzl-column-private.h',
   'graphing/dzl-graph-column-private.h',
 
   'panel/dzl-dock-bin-edge-private.h',
   'panel/dzl-dock-paned-private.h',
   'panel/dzl-tab-private.h',
+
+  'search/dzl-fuzzy-index-private.h',
 
   'shortcuts/dzl-shortcut-closure-chain.c',
   'shortcuts/dzl-shortcut-closure-chain.h',

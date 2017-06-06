@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "fuzzy/dzl-fuzzy-index-builder.h"
+#include "search/dzl-fuzzy-index-builder.h"
 #include "util/dzl-variant.h"
 
 struct _DzlFuzzyIndexBuilder

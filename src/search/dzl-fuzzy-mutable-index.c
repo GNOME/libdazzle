@@ -19,7 +19,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "fuzzy/dzl-fuzzy-mutable-index.h"
+#include "search/dzl-fuzzy-mutable-index.h"
 
 /**
  * SECTION:dzl-fuzzy-mutable-index
