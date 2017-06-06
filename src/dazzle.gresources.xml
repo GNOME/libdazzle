@@ -8,7 +8,6 @@
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-entry.ui">prefs/dzl-preferences-entry.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-font-button.ui">prefs/dzl-preferences-font-button.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-group.ui">prefs/dzl-preferences-group.ui</file>
-    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-language-row.ui">prefs/dzl-preferences-language-row.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-page.ui">prefs/dzl-preferences-page.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-spin-button.ui">prefs/dzl-preferences-spin-button.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-switch.ui">prefs/dzl-preferences-switch.ui</file>

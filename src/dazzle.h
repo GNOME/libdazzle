@@ -74,7 +74,6 @@ G_BEGIN_DECLS
 #include "prefs/dzl-preferences-flow-box.h"
 #include "prefs/dzl-preferences-font-button.h"
 #include "prefs/dzl-preferences-group.h"
-#include "prefs/dzl-preferences-language-row.h"
 #include "prefs/dzl-preferences-page.h"
 #include "prefs/dzl-preferences-spin-button.h"
 #include "prefs/dzl-preferences-switch.h"
