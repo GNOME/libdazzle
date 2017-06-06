@@ -1,0 +1,5 @@
+Dazzle name="Dazzle"
+* cheader_filename="dazzle.h"
+*.*.cancellable#parameter nullable default=null
+*.*.io_priority default=GLib.Priority.LOW
+

@@ -390,10 +390,11 @@ if get_option('with_introspection')
   if get_option('with_vapi')
 
     libdazzle_vapi = gnome.generate_vapi('libdazzle-' + apiversion,
-          sources: libdazzle_gir[0],
-         packages: [ 'gio-2.0', 'gtk+-3.0' ],
-          install: true,
-      install_dir: vapidir,
+            sources: libdazzle_gir[0],
+           packages: [ 'gio-2.0', 'gtk+-3.0' ],
+            install: true,
+        install_dir: vapidir,
+      metadata_dirs: [ meson.current_source_dir() ],
     )
 
   endif
