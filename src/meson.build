@@ -79,6 +79,7 @@ libdazzle_public_headers = [
   'search/dzl-fuzzy-index.h',
   'search/dzl-fuzzy-mutable-index.h',
   'search/dzl-levenshtein.h',
+  'search/dzl-pattern-spec.h',
   'search/dzl-trie.h',
 
   'settings/dzl-settings-sandwich.h',
@@ -202,6 +203,7 @@ libdazzle_public_sources = [
   'search/dzl-fuzzy-index.c',
   'search/dzl-fuzzy-mutable-index.c',
   'search/dzl-levenshtein.c',
+  'search/dzl-pattern-spec.c',
   'search/dzl-trie.c',
 
   'settings/dzl-settings-sandwich.c',

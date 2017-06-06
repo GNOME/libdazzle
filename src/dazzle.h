@@ -74,6 +74,7 @@ G_BEGIN_DECLS
 #include "search/dzl-fuzzy-index-match.h"
 #include "search/dzl-fuzzy-mutable-index.h"
 #include "search/dzl-levenshtein.h"
+#include "search/dzl-pattern-spec.h"
 #include "search/dzl-trie.h"
 #include "settings/dzl-settings-sandwich.h"
 #include "shortcuts/dzl-shortcut-accel-dialog.h"
