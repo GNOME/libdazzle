@@ -1,13 +1,5 @@
 #include <dazzle.h>
-
 #include <stdlib.h>
-
-#define CSS_DATA \
-  "dzlgraphview {\n" \
-  "  background-color: #f6f7f8;\n" \
-  "  background-size: 8px 8px;\n" \
-  "  background-image:repeating-linear-gradient(0deg, #f0f1f2, #f0f1f2 1px, transparent 1px, transparent 8px),repeating-linear-gradient(-90deg, #f0f1f2, #f0f1f2 1px, transparent 1px, transparent 8px);\n" \
-  "}"
 
 int
 main (int argc,
@@ -45,8 +37,7 @@ main (int argc,
   timespan = (gint64)seconds * G_USEC_PER_SEC;
   max_samples = seconds * samples;
 
-  provider = gtk_css_provider_new ();
-  gtk_css_provider_load_from_data (provider, CSS_DATA, -1, NULL);
+  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
   gtk_style_context_add_provider_for_screen (gdk_screen_get_default (), GTK_STYLE_PROVIDER (provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_object_unref (provider);
 
