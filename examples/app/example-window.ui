@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="ExampleWindow" parent="GtkWindow">
+    <child>
+      <object class="DzlDockBin" id="dockbin">
+        <property name="visible">true</property>
+      </object>
+    </child>
+  </template>
+</interface>

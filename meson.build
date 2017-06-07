@@ -91,3 +91,4 @@ gnome = import('gnome')
 
 subdir('src')
 subdir('tests')
+subdir('examples/app')
