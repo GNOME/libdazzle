@@ -707,6 +707,15 @@ dzl_suggestion_popover_connect (DzlSuggestionPopover *self)
 
   /* select the first row */
   dzl_suggestion_popover_move_by (self, 1);
+
+  /* If we started animating, cancel it to avoid such jarring movement. */
+  if (self->scroll_anim != NULL)
+    {
+      dzl_animation_stop (self->scroll_anim);
+      dzl_clear_weak_pointer (&self->scroll_anim);
+    }
+
+  gtk_adjustment_set_value (gtk_scrolled_window_get_vadjustment (self->scrolled_window), 0.0);
 }
 
 static void
