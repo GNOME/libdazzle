@@ -222,6 +222,17 @@ suggestion_activated (DzlSuggestionEntry *entry,
   gtk_entry_set_text (GTK_ENTRY (entry), uri);
 }
 
+static void
+load_css (void)
+{
+  g_autoptr(GtkCssProvider) provider = NULL;
+
+  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
+  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                             GTK_STYLE_PROVIDER (provider),
+                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 int
 main (gint   argc,
       gchar *argv[])
@@ -234,6 +245,8 @@ main (gint   argc,
   GtkWidget *scroller;
 
   gtk_init (&argc, &argv);
+
+  load_css ();
 
   search_index = dzl_fuzzy_mutable_index_new (FALSE);
 
