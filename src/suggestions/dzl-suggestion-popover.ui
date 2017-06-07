@@ -25,7 +25,9 @@
                     <property name="propagate-natural-height">true</property>
                     <property name="visible">true</property>
                     <child>
-                      <object class="GtkListBox" id="list_box">
+                      <object class="DzlListBox" id="list_box">
+                        <property name="property-name">suggestion</property>
+                        <property name="row-type-name">DzlSuggestionRow</property>
                         <property name="selection-mode">browse</property>
                         <property name="visible">true</property>
                       </object>

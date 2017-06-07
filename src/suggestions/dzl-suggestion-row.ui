@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="DzlSuggestionRow" parent="GtkListBoxRow">
+  <template class="DzlSuggestionRow" parent="DzlListBoxRow">
     <child>
       <object class="GtkBox">
         <property name="orientation">horizontal</property>

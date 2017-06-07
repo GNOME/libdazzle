@@ -21,17 +21,18 @@
 
 #include <gtk/gtk.h>
 
-#include "dzl-suggestion.h"
+#include "suggestions/dzl-suggestion.h"
+#include "widgets/dzl-list-box-row.h"
 
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION_ROW (dzl_suggestion_row_get_type())
 
-G_DECLARE_DERIVABLE_TYPE (DzlSuggestionRow, dzl_suggestion_row, DZL, SUGGESTION_ROW, GtkListBoxRow)
+G_DECLARE_DERIVABLE_TYPE (DzlSuggestionRow, dzl_suggestion_row, DZL, SUGGESTION_ROW, DzlListBoxRow)
 
 struct _DzlSuggestionRowClass
 {
-  GtkListBoxRowClass parent_class;
+  DzlListBoxRowClass parent_class;
 
   gpointer _reserved1;
   gpointer _reserved2;

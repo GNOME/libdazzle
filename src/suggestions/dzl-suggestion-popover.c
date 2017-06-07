@@ -21,11 +21,12 @@
 #include <glib/gi18n.h>
 
 #include "animation/dzl-animation.h"
-#include "widgets/dzl-elastic-bin.h"
 #include "suggestions/dzl-suggestion.h"
 #include "suggestions/dzl-suggestion-popover.h"
 #include "suggestions/dzl-suggestion-row.h"
 #include "util/dzl-util-private.h"
+#include "widgets/dzl-elastic-bin.h"
+#include "widgets/dzl-list-box.h"
 
 struct _DzlSuggestionPopover
 {
@@ -35,7 +36,7 @@ struct _DzlSuggestionPopover
   GtkWindow          *transient_for;
   GtkRevealer        *revealer;
   GtkScrolledWindow  *scrolled_window;
-  GtkListBox         *list_box;
+  DzlListBox         *list_box;
 
   DzlAnimation       *scroll_anim;
 
@@ -107,7 +108,7 @@ dzl_suggestion_popover_select_row (DzlSuggestionPopover *self,
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
   g_assert (GTK_IS_LIST_BOX_ROW (row));
 
-  gtk_list_box_select_row (self->list_box, row);
+  gtk_list_box_select_row (GTK_LIST_BOX (self->list_box), row);
 
   gtk_widget_get_allocation (GTK_WIDGET (row), &alloc);
 
@@ -546,6 +547,8 @@ dzl_suggestion_popover_class_init (DzlSuggestionPopoverClass *klass)
   gtk_widget_class_set_css_name (widget_class, "dzlsuggestionpopover");
 
   g_type_ensure (DZL_TYPE_ELASTIC_BIN);
+  g_type_ensure (DZL_TYPE_LIST_BOX);
+  g_type_ensure (DZL_TYPE_SUGGESTION_ROW);
 }
 
 static void
@@ -648,25 +651,6 @@ dzl_suggestion_popover_popdown (DzlSuggestionPopover *self)
   gtk_revealer_set_reveal_child (self->revealer, FALSE);
 }
 
-static GtkWidget *
-dzl_suggestion_popover_create_row (gpointer item,
-                                   gpointer user_data)
-{
-  DzlSuggestionPopover *self = user_data;
-  DzlSuggestionRow *row;
-  DzlSuggestion *suggestion = item;
-
-  g_assert (DZL_IS_SUGGESTION (suggestion));
-  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
-
-  row = g_object_new (self->row_type,
-                      "suggestion", suggestion,
-                      "visible", TRUE,
-                      NULL);
-
-  return GTK_WIDGET (row);
-}
-
 static void
 dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
                                       guint                 position,
@@ -706,11 +690,7 @@ dzl_suggestion_popover_connect (DzlSuggestionPopover *self)
   if (self->model == NULL)
     return;
 
-  gtk_list_box_bind_model (self->list_box,
-                           self->model,
-                           dzl_suggestion_popover_create_row,
-                           self,
-                           NULL);
+  dzl_list_box_set_model (self->list_box, self->model);
 
   self->items_changed_handler =
     g_signal_connect_object (self->model,
@@ -740,7 +720,7 @@ dzl_suggestion_popover_disconnect (DzlSuggestionPopover *self)
   g_signal_handler_disconnect (self->model, self->items_changed_handler);
   self->items_changed_handler = 0;
 
-  gtk_list_box_bind_model (self->list_box, NULL, NULL, NULL, NULL);
+  dzl_list_box_set_model (self->list_box, NULL);
 }
 
 void
@@ -814,10 +794,10 @@ dzl_suggestion_popover_move_by (DzlSuggestionPopover *self,
 
   g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
 
-  if (NULL == (row = gtk_list_box_get_row_at_index (self->list_box, 0)))
+  if (NULL == (row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (self->list_box), 0)))
     return;
 
-  if (NULL == gtk_list_box_get_selected_row (self->list_box))
+  if (NULL == gtk_list_box_get_selected_row (GTK_LIST_BOX (self->list_box)))
     {
       dzl_suggestion_popover_select_row (self, row);
       return;
@@ -840,7 +820,7 @@ dzl_suggestion_popover_move_by (DzlSuggestionPopover *self,
    * in a text editor, we'll want to restrategize (including avoiding
    * the creation of unnecessary rows and row reuse).
    */
-  row = gtk_list_box_get_selected_row (self->list_box);
+  row = gtk_list_box_get_selected_row (GTK_LIST_BOX (self->list_box));
 
   row_lookup.row = GTK_WIDGET (row);
   row_lookup.counter = 0;
@@ -853,7 +833,7 @@ dzl_suggestion_popover_move_by (DzlSuggestionPopover *self,
   row_lookup.index += amount;
   row_lookup.index = CLAMP (row_lookup.index, -0, (gint)g_list_model_get_n_items (self->model) - 1);
 
-  row = gtk_list_box_get_row_at_index (self->list_box, row_lookup.index);
+  row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (self->list_box), row_lookup.index);
   dzl_suggestion_popover_select_row (self, row);
 }
 
@@ -886,7 +866,7 @@ dzl_suggestion_popover_set_selected (DzlSuggestionPopover *self,
   g_return_if_fail (!suggestion || DZL_IS_SUGGESTION (suggestion));
 
   if (suggestion == NULL)
-    row = gtk_list_box_get_row_at_index (self->list_box, 0);
+    row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (self->list_box), 0);
   else
     gtk_container_foreach (GTK_CONTAINER (self->list_box), find_suggestion_row, &lookup);
 
@@ -909,7 +889,7 @@ dzl_suggestion_popover_get_selected (DzlSuggestionPopover *self)
 
   g_return_val_if_fail (DZL_IS_SUGGESTION_POPOVER (self), NULL);
 
-  row = DZL_SUGGESTION_ROW (gtk_list_box_get_selected_row (self->list_box));
+  row = DZL_SUGGESTION_ROW (gtk_list_box_get_selected_row (GTK_LIST_BOX (self->list_box)));
   if (row != NULL)
     return dzl_suggestion_row_get_suggestion (row);
 
