@@ -1,0 +1,6 @@
+dzlgraphview.view {
+  background-color: transparent;
+  background-size: 8px 8px;
+  background-image: repeating-linear-gradient(0deg, alpha(@borders,0.25), alpha(@borders,0.25) 1px, transparent 1px, transparent 8px),
+                    repeating-linear-gradient(-90deg, alpha(@borders,0.25), alpha(@borders,0.25) 1px, transparent 1px, transparent 8px);
+}
