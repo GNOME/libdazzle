@@ -150,6 +150,7 @@ libdazzle_public_headers = [
   'widgets/dzl-entry-box.h',
   'widgets/dzl-file-chooser-entry.h',
   'widgets/dzl-list-box.h',
+  'widgets/dzl-list-box-row.h',
   'widgets/dzl-multi-paned.h',
   'widgets/dzl-pill-box.h',
   'widgets/dzl-priority-box.h',
@@ -289,6 +290,7 @@ libdazzle_public_sources = [
   'widgets/dzl-entry-box.c',
   'widgets/dzl-file-chooser-entry.c',
   'widgets/dzl-list-box.c',
+  'widgets/dzl-list-box-row.c',
   'widgets/dzl-multi-paned.c',
   'widgets/dzl-pill-box.c',
   'widgets/dzl-priority-box.c',
@@ -336,6 +338,7 @@ libdazzle_sources = [
 
   'util/dzl-util-private.h',
 
+  'widgets/dzl-list-box-private.h',
   'widgets/dzl-rect-helper.c',
   'widgets/dzl-rect-helper.h',
 

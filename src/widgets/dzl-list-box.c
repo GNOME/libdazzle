@@ -28,9 +28,12 @@
  *
  * This mostly just avoids the overhead of reparsing the template XML
  * on every widget (re)creation.
+ *
+ * You must subclass DzlListBoxRow for your rows.
  */
 
 #include "dzl-list-box.h"
+#include "dzl-list-box-row.h"
 
 typedef struct
 {
@@ -53,54 +56,72 @@ enum {
 
 static GParamSpec *properties [N_PROPS];
 
+gboolean
+_dzl_list_box_cache (DzlListBox    *self,
+                     DzlListBoxRow *row)
+{
+  DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
+
+  g_assert (DZL_IS_LIST_BOX (self));
+  g_assert (DZL_IS_LIST_BOX_ROW (row));
+
+  if (gtk_widget_get_parent (GTK_WIDGET (row)) != GTK_WIDGET (self))
+    {
+      g_warning ("Attempt to cache row not belonging to list box");
+      return FALSE;
+    }
+
+  if (gtk_widget_in_destruction (GTK_WIDGET (self)))
+    return FALSE;
+
+  if (priv->trashed_rows.length < priv->recycle_max)
+    {
+      g_autoptr(GtkWidget) held = g_object_ref (row);
+
+      gtk_list_box_unselect_row (GTK_LIST_BOX (self), GTK_LIST_BOX_ROW (row));
+      gtk_container_remove (GTK_CONTAINER (self), GTK_WIDGET (row));
+      g_object_set (held, priv->property_name, NULL, NULL);
+      g_object_force_floating (G_OBJECT (held));
+      g_queue_push_head (&priv->trashed_rows, g_steal_pointer (&held));
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 static GtkWidget *
 dzl_list_box_create_row (gpointer item,
                          gpointer user_data)
 {
   DzlListBox *self = user_data;
   DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
+  GtkListBoxRow *row;
 
   g_assert (G_IS_OBJECT (item));
   g_assert (DZL_IS_LIST_BOX (self));
 
   if (priv->trashed_rows.length > 0)
     {
-      GtkListBoxRow *row = g_queue_pop_tail (&priv->trashed_rows);
+      row = g_queue_pop_tail (&priv->trashed_rows);
+
+      g_assert (DZL_IS_LIST_BOX_ROW (row));
+      g_assert (priv->property_name != NULL);
+      g_assert (item != NULL);
 
       g_object_set (row, priv->property_name, item, NULL);
-      g_object_force_floating (G_OBJECT (row));
-      g_object_unref (row);
-
-      return GTK_WIDGET (row);
     }
-
-  return g_object_new (priv->row_type,
-                       "visible", TRUE,
-                       priv->property_name, item,
-                       NULL);
-}
-
-static void
-dzl_list_box_remove (GtkContainer *container,
-                     GtkWidget    *widget)
-{
-  DzlListBox *self = (DzlListBox *)container;
-  DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
-
-  g_assert (DZL_IS_LIST_BOX (self));
-  g_assert (GTK_IS_LIST_BOX_ROW (widget));
-
-  g_object_ref (widget);
-
-  GTK_CONTAINER_CLASS (dzl_list_box_parent_class)->remove (container, widget);
-
-  if (priv->trashed_rows.length < priv->recycle_max)
+  else
     {
-      g_object_set (widget, priv->property_name, NULL, NULL);
-      g_queue_push_head (&priv->trashed_rows, g_steal_pointer (&widget));
+      row = g_object_new (priv->row_type,
+                          "visible", TRUE,
+                          priv->property_name, item,
+                          NULL);
     }
 
-  g_clear_object (&widget);
+  g_return_val_if_fail (DZL_IS_LIST_BOX_ROW (row), NULL);
+
+  return GTK_WIDGET (row);
 }
 
 static void
@@ -224,7 +245,6 @@ dzl_list_box_class_init (DzlListBoxClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
   object_class->constructed = dzl_list_box_constructed;
   object_class->finalize = dzl_list_box_finalize;
@@ -232,8 +252,6 @@ dzl_list_box_class_init (DzlListBoxClass *klass)
   object_class->set_property = dzl_list_box_set_property;
 
   widget_class->destroy = dzl_list_box_destroy;
-
-  container_class->remove = dzl_list_box_remove;
 
   properties [PROP_ROW_TYPE] =
     g_param_spec_gtype ("row-type",
