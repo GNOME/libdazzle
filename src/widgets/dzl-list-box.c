@@ -42,6 +42,7 @@ typedef struct
   GType       row_type;
   guint       recycle_max;
   GQueue      trashed_rows;
+  guint       destroying : 1;
 } DzlListBoxPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlListBox, dzl_list_box, GTK_TYPE_LIST_BOX)
@@ -157,11 +158,19 @@ dzl_list_box_destroy (GtkWidget *widget)
 {
   DzlListBox *self = (DzlListBox *)widget;
   DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
+  GList *rows;
 
   g_assert (DZL_IS_LIST_BOX (self));
 
-  g_queue_foreach (&priv->trashed_rows, (GFunc)g_object_unref, NULL);
-  g_queue_clear (&priv->trashed_rows);
+  priv->destroying = TRUE;
+  priv->recycle_max = 0;
+
+  rows = priv->trashed_rows.head;
+  priv->trashed_rows.tail = NULL;
+  priv->trashed_rows.length = 0;
+
+  g_list_foreach (rows, (GFunc)gtk_widget_destroy, NULL);
+  g_list_free (rows);
 
   GTK_WIDGET_CLASS (dzl_list_box_parent_class)->destroy (widget);
 }
