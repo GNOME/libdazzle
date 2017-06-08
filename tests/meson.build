@@ -238,3 +238,9 @@ test_preferences = executable('test-preferences', 'test-preferences.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_int_pair = executable('test-int-pair', 'test-int-pair.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)

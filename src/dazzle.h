@@ -122,6 +122,7 @@ G_BEGIN_DECLS
 #include "util/dzl-gdk.h"
 #include "util/dzl-gtk.h"
 #include "util/dzl-heap.h"
+#include "util/dzl-int-pair.h"
 #include "util/dzl-pango.h"
 #include "util/dzl-rgba.h"
 #include "util/dzl-ring.h"
