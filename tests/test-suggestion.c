@@ -313,7 +313,5 @@ main (gint   argc,
 
   gtk_main ();
 
-  gtk_widget_destroy (window);
-
   return 0;
 }
