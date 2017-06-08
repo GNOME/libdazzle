@@ -309,9 +309,17 @@ dzl_stack_list_begin_anim (DzlStackList       *self,
 
   if (pos != 0)
     {
+      GdkMonitor *monitor;
+      GdkDisplay *display;
+      GdkWindow *window;
       guint distance = ABS (end_area->y - begin_area->y);
 
-      duration = CLAMP (distance, 100, MAX (SLIDE_DURATION, distance / 5));
+      display = gtk_widget_get_display (GTK_WIDGET (self));
+      window = gtk_widget_get_window (GTK_WIDGET (self));
+      monitor = gdk_display_get_monitor_at_window (display, window);
+
+      duration = dzl_animation_calculate_duration (monitor, 0, distance);
+      duration = CLAMP (duration, 0, 500);
     }
 
   priv->animation = dzl_object_animate_full (priv->animating_rect,
