@@ -79,6 +79,17 @@ row_activated (DzlStackList  *stack_list,
                        g_object_unref);
 }
 
+static void
+load_css (void)
+{
+  g_autoptr(GtkCssProvider) provider = NULL;
+
+  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
+  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                             GTK_STYLE_PROVIDER (provider),
+                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -93,6 +104,8 @@ main (gint   argc,
   gdk_set_allowed_backends ("x11");
 
   gtk_init (&argc, &argv);
+
+  load_css ();
 
   root = g_file_new_for_path ("/");
   file_system_model = dzl_directory_model_new (root);
