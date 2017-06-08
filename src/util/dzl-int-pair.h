@@ -66,6 +66,9 @@ typedef struct
 G_STATIC_ASSERT (sizeof (DzlIntPair) == 8);
 G_STATIC_ASSERT (sizeof (DzlUIntPair) == 8);
 
+/**
+ * dzl_int_pair_new: (skip)
+ */
 static inline DzlIntPair *
 dzl_int_pair_new (gint first, gint second)
 {
@@ -77,6 +80,9 @@ dzl_int_pair_new (gint first, gint second)
 #endif
 }
 
+/**
+ * dzl_uint_pair_new: (skip)
+ */
 static inline DzlUIntPair *
 dzl_uint_pair_new (guint first, guint second)
 {
@@ -88,6 +94,9 @@ dzl_uint_pair_new (guint first, guint second)
 #endif
 }
 
+/**
+ * dzl_int_pair_first: (skip)
+ */
 static inline gint
 dzl_int_pair_first (DzlIntPair *pair)
 {
@@ -100,6 +109,9 @@ dzl_int_pair_first (DzlIntPair *pair)
   return p.first;
 }
 
+/**
+ * dzl_int_pair_second: (skip)
+ */
 static inline gint
 dzl_int_pair_second (DzlIntPair *pair)
 {
@@ -112,6 +124,9 @@ dzl_int_pair_second (DzlIntPair *pair)
   return p.second;
 }
 
+/**
+ * dzl_uint_pair_first: (skip)
+ */
 static inline guint
 dzl_uint_pair_first (DzlUIntPair *pair)
 {
@@ -124,6 +139,9 @@ dzl_uint_pair_first (DzlUIntPair *pair)
   return p.first;
 }
 
+/**
+ * dzl_uint_pair_second: (skip)
+ */
 static inline guint
 dzl_uint_pair_second (DzlUIntPair *pair)
 {
@@ -136,6 +154,9 @@ dzl_uint_pair_second (DzlUIntPair *pair)
   return p.second;
 }
 
+/**
+ * dzl_int_pair_free: (skip)
+ */
 static inline void
 dzl_int_pair_free (DzlIntPair *pair)
 {
@@ -146,6 +167,9 @@ dzl_int_pair_free (DzlIntPair *pair)
 #endif
 }
 
+/**
+ * dzl_uint_pair_free: (skip)
+ */
 static inline void
 dzl_uint_pair_free (DzlUIntPair *pair)
 {

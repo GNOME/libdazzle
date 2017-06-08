@@ -26,6 +26,10 @@ libdazzle_generated_headers = [
   dzl_version_h,
 ]
 
+non_introspectable_public_headers = [
+  'util/dzl-int-pair.h',
+]
+
 libdazzle_public_headers = [
   'dazzle.h',
 
@@ -308,6 +312,7 @@ libdazzle_public_sources = [
 ]
 
 libdazzle_sources = [
+  non_introspectable_public_headers,
   libdazzle_generated_headers,
   libdazzle_public_headers,
   libdazzle_public_sources,
@@ -408,7 +413,7 @@ if get_option('with_introspection')
 endif
 
 # TODO: This is ugly and should be handled upstream
-foreach header: libdazzle_public_headers
+foreach header: libdazzle_public_headers + non_introspectable_public_headers
   header_split = header.split('/')
   if header_split.length() == 2
     header_path = join_paths(libdazzle_header_subdir, header_split[0])
