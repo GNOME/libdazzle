@@ -23,6 +23,7 @@
 #include "search/dzl-fuzzy-index-cursor.h"
 #include "search/dzl-fuzzy-index-match.h"
 #include "search/dzl-fuzzy-index-private.h"
+#include "util/dzl-int-pair.h"
 
 struct _DzlFuzzyIndexCursor
 {
@@ -282,7 +283,7 @@ fuzzy_do_match (const DzlFuzzyLookup    *lookup,
 
   for (; state [0] < n_elements; state [0]++)
     {
-      gpointer lookup_score;
+      DzlIntPair *lookup_pair;
       gboolean contains_document;
 
       iter = &table [state [0]];
@@ -306,12 +307,12 @@ fuzzy_do_match (const DzlFuzzyLookup    *lookup,
       contains_document = g_hash_table_lookup_extended (lookup->matches,
                                                         GUINT_TO_POINTER (item->lookaside_id),
                                                         NULL,
-                                                        (gpointer *)&lookup_score);
+                                                        (gpointer *)&lookup_pair);
 
-      if (!contains_document || iter_score < GPOINTER_TO_INT (lookup_score))
+      if (!contains_document || iter_score < dzl_int_pair_first (lookup_pair))
         g_hash_table_insert (lookup->matches,
                              GUINT_TO_POINTER (item->lookaside_id),
-                             GINT_TO_POINTER (iter_score));
+                             dzl_int_pair_new (iter_score, iter->position));
 
       return TRUE;
     }
@@ -356,7 +357,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
 
   tables = g_ptr_array_new ();
   tables_n_elements = g_array_new (FALSE, FALSE, sizeof (gsize));
-  matches = g_hash_table_new (NULL, NULL);
+  matches = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify)dzl_int_pair_free);
 
   for (str = query; *str; str = g_utf8_next_char (str))
     {
@@ -428,6 +429,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                         &match.key,
                                                         &match.priority,
                                                         item->position,
+                                                        item->position,
                                                         &match.score))
                 continue;
 
@@ -447,10 +449,12 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
 
   while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      guint lookaside_id = GPOINTER_TO_UINT (key);
-      guint score = GPOINTER_TO_UINT (value);
+      DzlIntPair *pair = value;
+      guint score = dzl_int_pair_first (pair);
+      guint last_offset = dzl_int_pair_second (pair);
       gpointer other_score;
       DzlFuzzyMatch match;
+      guint lookaside_id = GPOINTER_TO_UINT (key);
 
       if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,
                                                 lookaside_id,
@@ -458,6 +462,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
                                                 &match.key,
                                                 &match.priority,
                                                 score,
+                                                last_offset,
                                                 &match.score))
         continue;
 

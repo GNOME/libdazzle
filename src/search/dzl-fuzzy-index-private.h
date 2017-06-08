@@ -31,6 +31,7 @@ gboolean     _dzl_fuzzy_index_resolve         (DzlFuzzyIndex  *self,
                                                const gchar   **key,
                                                guint          *priority,
                                                guint           in_score,
+                                               guint           last_offset,
                                                gfloat         *out_score);
 
 G_END_DECLS

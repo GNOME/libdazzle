@@ -464,6 +464,7 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
                           const gchar   **key,
                           guint          *priority,
                           guint           in_score,
+                          guint           last_offset,
                           gfloat         *out_score)
 {
   const LookasideEntry *entry;
