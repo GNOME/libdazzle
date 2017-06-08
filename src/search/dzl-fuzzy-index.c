@@ -498,7 +498,7 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
     *document_id = entry->document_id;
 
   *priority = (entry->key_id & 0xFF000000) >> 24;
-  *out_score = ((1.0 / 256.0) / (strlen (local_key) + in_score)) + ((255.0 - *priority) / 256.0);
+  *out_score = ((1.0 / 256.0) / (1 + last_offset + in_score)) + ((255.0 - *priority) / 256.0);
 
   return TRUE;
 }
