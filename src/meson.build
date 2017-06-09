@@ -1,5 +1,5 @@
 
-libdazzle_header_subdir = 'libdazzle-' + apiversion
+libdazzle_header_subdir = join_paths(package_subdir, 'libdazzle-' + apiversion)
 libdazzle_header_dir = join_paths(get_option('includedir'), libdazzle_header_subdir)
 
 libdazzle_resources = gnome.compile_resources(
@@ -374,6 +374,7 @@ libdazzle = library(
      soversion: soversion,
        version: libversion,
        install: true,
+   install_dir: libdir,
 )
 
 libdazzle_dep = declare_dependency(
@@ -427,11 +428,12 @@ pkgg = import('pkgconfig')
 
 pkgg.generate(
     libraries: [libdazzle],
-      subdirs: 'libdazzle-@0@'.format(apiversion),
+      subdirs: libdazzle_header_subdir,
       version: meson.project_version(),
          name: 'Dazzle',
      filebase: 'libdazzle-@0@'.format(apiversion),
   description: 'Razzle Dazzle for Gtk+ 3.x applications',
      requires: 'gtk+-3.0',
+  install_dir: join_paths(libdir, 'pkgconfig'),
 )
 
