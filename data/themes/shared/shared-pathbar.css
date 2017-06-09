@@ -1,0 +1,34 @@
+dzlpathbar button {
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0px;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  opacity: 0.75;
+  padding: 3px 3px 0px 3px;
+}
+
+dzlpathbar button image {
+  color: alpha(currentColor, 0.8);
+}
+
+dzlpathbar label.separator {
+  font-size: 0.83333em;
+  opacity: 0.55;
+}
+
+dzlpathbar button:checked {
+  border-bottom: 2px solid @theme_selected_bg_color;
+  font-weight: bold;
+  opacity: 1;
+}
+
+dzlpathbar button:checked:backdrop {
+  border-bottom-color: alpha(@borders,.75);
+}
+
+dzlpathbar button:hover {
+  opacity: 0.9;
+  border-bottom-color: @borders;
+}

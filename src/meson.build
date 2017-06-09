@@ -77,6 +77,10 @@ libdazzle_public_headers = [
   'panel/dzl-tab-strip.h',
   'panel/dzl-tab.h',
 
+  'pathbar/dzl-path.h',
+  'pathbar/dzl-path-bar.h',
+  'pathbar/dzl-path-element.h',
+
   'prefs/dzl-preferences-bin.h',
   'prefs/dzl-preferences-entry.h',
   'prefs/dzl-preferences-file-chooser-button.h',
@@ -214,6 +218,10 @@ libdazzle_public_sources = [
   'panel/dzl-dock.c',
   'panel/dzl-tab-strip.c',
   'panel/dzl-tab.c',
+
+  'pathbar/dzl-path.c',
+  'pathbar/dzl-path-bar.c',
+  'pathbar/dzl-path-element.c',
 
   'prefs/dzl-preferences-bin.c',
   'prefs/dzl-preferences-entry.c',

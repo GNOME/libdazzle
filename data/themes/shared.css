@@ -1,6 +1,7 @@
 /* Theme agnostic or base-layer CSS styling */
 @import url("resource:///org/gnome/dazzle/themes/shared/shared-graphs.css");
 @import url("resource:///org/gnome/dazzle/themes/shared/shared-panels.css");
+@import url("resource:///org/gnome/dazzle/themes/shared/shared-pathbar.css");
 @import url("resource:///org/gnome/dazzle/themes/shared/shared-pillbox.css");
 @import url("resource:///org/gnome/dazzle/themes/shared/shared-preferences.css");
 @import url("resource:///org/gnome/dazzle/themes/shared/shared-progressbutton.css");
