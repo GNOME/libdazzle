@@ -63,16 +63,22 @@ typedef struct
 
 #endif
 
-G_STATIC_ASSERT (sizeof (DzlIntPair) == 8);
-G_STATIC_ASSERT (sizeof (DzlUIntPair) == 8);
-
 /**
  * dzl_int_pair_new: (skip)
  */
 static inline DzlIntPair *
 dzl_int_pair_new (gint first, gint second)
 {
-  DzlIntPair pair = { .first = first, .second = second };
+  DzlIntPair pair;
+
+  /* Avoid tripping g-ir-scanner by putting this
+   * inside the inline function.
+   */
+  G_STATIC_ASSERT (sizeof (DzlIntPair) == 8);
+
+  pair.first = first;
+  pair.second = second;
+
 #if __WORDSIZE >= 64
   return pair.ptr;
 #else
@@ -86,7 +92,16 @@ dzl_int_pair_new (gint first, gint second)
 static inline DzlUIntPair *
 dzl_uint_pair_new (guint first, guint second)
 {
-  DzlUIntPair pair = { .first = first, .second = second };
+  DzlUIntPair pair;
+
+  /* Avoid tripping g-ir-scanner by putting this
+   * inside the inline function.
+   */
+  G_STATIC_ASSERT (sizeof (DzlUIntPair) == 8);
+
+  pair.first = first;
+  pair.second = second;
+
 #if __WORDSIZE >= 64
   return pair.ptr;
 #else
