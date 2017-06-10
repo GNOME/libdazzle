@@ -75,6 +75,8 @@ void     dzl_ring_foreach     (DzlRing         *ring,
 DzlRing *dzl_ring_ref         (DzlRing         *ring);
 void     dzl_ring_unref       (DzlRing         *ring);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (DzlRing, dzl_ring_unref)
+
 G_END_DECLS
 
 #endif /* __DZL_RING_H__ */
