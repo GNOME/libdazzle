@@ -36,6 +36,22 @@ G_BEGIN_DECLS
 #define dzl_ring_append_val(ring, val) dzl_ring_append_vals(ring, &(val), 1)
 
 /**
+ * _dzl_ring_index: (skip)
+ *
+ * Used to convert an index to valid indx within the ring. We only support
+ * offsets within +/- one range of the length of the ring.
+ */
+#define _dzl_ring_index(ring, i)         \
+  ({                                     \
+    gint __idx = (gint)(ring->pos) + i;  \
+    if (__idx < 0)                       \
+      __idx += (gint)ring->len;          \
+    else if (__idx >= (gint)(ring)->len) \
+      __idx -= (gint)ring->len;          \
+    __idx;                               \
+  })
+
+/**
  * dzl_ring_get_index:
  * @ring: A #DzlRing.
  * @type: The type to extract.
@@ -53,13 +69,15 @@ G_BEGIN_DECLS
  * Returns: The value at the given index.
  */
 #define dzl_ring_get_index(ring, type, i) \
-  ((((type*)(ring)->data))[((i) + (ring)->pos) % (ring)->len])
+  ((((type *)(gpointer)(ring)->data))[_dzl_ring_index(ring, i)])
 
 typedef struct
 {
 	guint8 *data;
 	guint   len;
 	guint   pos;
+
+  /*< private >*/
 } DzlRing;
 
 GType    dzl_ring_get_type    (void);
