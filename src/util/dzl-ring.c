@@ -52,8 +52,8 @@ G_DEFINE_BOXED_TYPE (DzlRing, dzl_ring, dzl_ring_ref, dzl_ring_unref)
  */
 DzlRing*
 dzl_ring_sized_new (guint          element_size,
-                     guint          reserved_size,
-                     GDestroyNotify element_destroy)
+                    guint          reserved_size,
+                    GDestroyNotify element_destroy)
 {
   DzlRingImpl *ring_impl;
 
@@ -79,8 +79,8 @@ dzl_ring_sized_new (guint          element_size,
  */
 guint
 dzl_ring_append_vals (DzlRing        *ring,
-                     gconstpointer  data,
-                     guint          len)
+                      gconstpointer  data,
+                      guint          len)
 {
   DzlRingImpl *ring_impl = (DzlRingImpl *)ring;
   gpointer idx;
@@ -122,9 +122,9 @@ dzl_ring_append_vals (DzlRing        *ring,
  * inserted element to the least recently inserted.
  */
 void
-dzl_ring_foreach (DzlRing *ring,
-                   GFunc     func,
-                   gpointer  user_data)
+dzl_ring_foreach (DzlRing  *ring,
+                  GFunc     func,
+                  gpointer  user_data)
 {
   DzlRingImpl *ring_impl = (DzlRingImpl *)ring;
   gint i;
