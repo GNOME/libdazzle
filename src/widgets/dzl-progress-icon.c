@@ -19,6 +19,8 @@
 
 #define G_LOG_DOMAIN "dzl-progress-icon"
 
+#include <math.h>
+
 #include "dzl-progress-icon.h"
 
 struct _DzlProgressIcon
@@ -43,40 +45,50 @@ dzl_progress_icon_draw (GtkWidget *widget,
 {
   DzlProgressIcon *self = (DzlProgressIcon *)widget;
   GtkStyleContext *style_context;
-  GdkRGBA color;
-  gdouble progress;
-  gint width;
-  gint height;
+  GtkAllocation alloc;
+  GdkRGBA rgba;
+  GtkStateFlags state;
+  gdouble alpha;
 
   g_assert (DZL_IS_PROGRESS_ICON (self));
   g_assert (cr != NULL);
 
-  width = gtk_widget_get_allocated_width (widget);
-  height = gtk_widget_get_allocated_height (widget);
-
-  progress = dzl_progress_icon_get_progress (self);
+  gtk_widget_get_allocation (widget, &alloc);
 
   style_context = gtk_widget_get_style_context (widget);
-  gtk_style_context_get_color (style_context, gtk_widget_get_state_flags (widget), &color);
-  color.alpha *= progress == 1 ? 1 : 0.2;
+  state = gtk_style_context_get_state (style_context);
+  gtk_style_context_get_color (style_context, state, &rgba);
 
-  gdk_cairo_set_source_rgba (cr, &color);
-  cairo_move_to (cr, width / 4., 0);
-  cairo_line_to (cr, width - (width / 4.), 0);
-  cairo_line_to (cr, width - (width / 4.), height / 2.);
-  cairo_line_to (cr, width, height / 2.);
-  cairo_line_to (cr, width / 2., height);
-  cairo_line_to (cr, 0, height / 2.);
-  cairo_line_to (cr, width / 4., height / 2.);
-  cairo_line_to (cr, width / 4., 0);
-  cairo_fill_preserve (cr);
+  alpha = rgba.alpha;
+  rgba.alpha = 0.15;
+  gdk_cairo_set_source_rgba (cr, &rgba);
 
-  if (progress > 0 && progress < 1)
+  cairo_arc (cr,
+             alloc.width / 2,
+             alloc.height / 2,
+             alloc.width / 2,
+             0.0,
+             2 * M_PI);
+  cairo_fill (cr);
+
+  if (self->progress > 0.0)
     {
-      cairo_clip (cr);
-      color.alpha = 1;
-      gdk_cairo_set_source_rgba (cr, &color);
-      cairo_rectangle (cr, 0, 0, width, height * progress);
+      rgba.alpha = alpha;
+      gdk_cairo_set_source_rgba (cr, &rgba);
+
+      cairo_arc (cr,
+                 alloc.width / 2,
+                 alloc.height / 2,
+                 alloc.width / 2,
+                 (-.5 * M_PI),
+                 (2 * self->progress * M_PI) - (.5 * M_PI));
+
+      if (self->progress != 1.0)
+        {
+          cairo_line_to (cr, alloc.width / 2, alloc.height / 2);
+          cairo_line_to (cr, alloc.width / 2, 0);
+        }
+
       cairo_fill (cr);
     }
 
