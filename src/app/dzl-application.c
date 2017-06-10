@@ -20,6 +20,27 @@
 
 #include "app/dzl-application.h"
 
+/**
+ * SECTION:dzl-application
+ * @title: DzlApplication
+ * @short_description: Application base class with goodies
+ *
+ * #DzlApplication is an extension of #GtkApplication with extra features to
+ * integrate various libdazzle subsystems with your application. We suggest
+ * subclassing #DzlApplication.
+ *
+ * The #DzlApplication class provides:
+ *
+ *  - Automatic menu merging including the "app-menu".
+ *  - Automatic Icon loading based on resources-base-path.
+ *  - Authmatic theme tracking to load CSS variants based on user themes.
+ *
+ * The #DzlApplication class automatically manages loading alternate CSS based
+ * on the active theme by tracking #GtkSettings:gtk-theme-name. Additionally,
+ * it supports menu merging including the base "app-menu" as loaded by automatic
+ * #GResources in #GApplication:resource-base-path. It will autom
+ */
+
 typedef struct
 {
   /*
