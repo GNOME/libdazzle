@@ -250,3 +250,9 @@ test_path_bar = executable('test-path-bar', 'test-path-bar.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+test_ring = executable('test-ring', 'test-ring.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
