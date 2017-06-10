@@ -44,6 +44,7 @@ void       dzl_progress_menu_button_set_progress      (DzlProgressMenuButton *bu
 gboolean   dzl_progress_menu_button_get_show_theatric (DzlProgressMenuButton *self);
 void       dzl_progress_menu_button_set_show_theatric (DzlProgressMenuButton *self,
                                                        gboolean               show_theatic);
+void       dzl_progress_menu_button_reset_theatrics   (DzlProgressMenuButton *self);
 
 G_END_DECLS
 

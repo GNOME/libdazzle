@@ -31,6 +31,7 @@ typedef struct
   gdouble          progress;
   guint            transition_duration;
   guint            show_theatric : 1;
+  guint            suppress_theatric : 1;
 } DzlProgressMenuButtonPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlProgressMenuButton, dzl_progress_menu_button, GTK_TYPE_MENU_BUTTON)
@@ -133,7 +134,7 @@ dzl_progress_menu_button_begin_theatrics (DzlProgressMenuButton *self)
 
   g_assert (DZL_IS_PROGRESS_MENU_BUTTON (self));
 
-  if (!priv->show_theatric || priv->transition_duration == 0)
+  if (!priv->show_theatric || priv->transition_duration == 0 || priv->suppress_theatric)
     return;
 
   gtk_widget_get_allocation (GTK_WIDGET (self), &rect);
@@ -174,6 +175,8 @@ dzl_progress_menu_button_begin_theatrics (DzlProgressMenuButton *self)
                            "height", rect.height + 120,
                            "alpha", 0.0,
                            NULL);
+
+  priv->suppress_theatric = TRUE;
 }
 
 static void
@@ -298,4 +301,25 @@ dzl_progress_menu_button_init (DzlProgressMenuButton *self)
                     G_CALLBACK (gtk_widget_destroyed),
                     &priv->icon);
   gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->icon));
+}
+
+/**
+ * dzl_progress_menu_button_reset_theatrics:
+ * @self: a #DzlProgressMenuButton
+ *
+ * To avoid suprious animations from the button, you must call this function any
+ * time you want to allow animations to continue. This is because animations are
+ * automatically started upon reaching a progress of 1.0.
+ *
+ * If you are performing operations in the background, calling this function
+ * every time you add an operation is a good strategry.
+ */
+void
+dzl_progress_menu_button_reset_theatrics (DzlProgressMenuButton *self)
+{
+  DzlProgressMenuButtonPrivate *priv = dzl_progress_menu_button_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_PROGRESS_MENU_BUTTON (self));
+
+  priv->suppress_theatric = FALSE;
 }
