@@ -1,3 +1,5 @@
+if get_option('enable-tests')
+
 test_env = [
   'G_TEST_SRCDIR=@0@'.format(meson.current_source_dir()),
   'G_TEST_BUILDDIR=@0@'.format(meson.current_build_dir()),
@@ -256,3 +258,5 @@ test_ring = executable('test-ring', 'test-ring.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+
+endif

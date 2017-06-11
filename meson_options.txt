@@ -14,3 +14,7 @@ option('with_vapi', type: 'boolean', value: true)
 option('package_subdir', type: 'string',
   description: 'Subdirectory to append to all installed files, for use as subproject'
 )
+
+option('enable-tests',
+       type: 'boolean', value: true,
+       description: 'Whether to compile unit tests')
