@@ -18,9 +18,9 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-theme"
 
-#include "dzl-shortcut-private.h"
-#include "dzl-shortcut-chord.h"
-#include "dzl-shortcut-theme.h"
+#include "shortcuts/dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcut-chord.h"
+#include "shortcuts/dzl-shortcut-theme.h"
 
 typedef struct
 {

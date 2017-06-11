@@ -18,10 +18,10 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-shortcuts-window.h"
-#include "dzl-shortcuts-section.h"
-#include "dzl-shortcuts-group.h"
-#include "dzl-shortcuts-shortcut-private.h"
+#include "shortcuts/dzl-shortcuts-window.h"
+#include "shortcuts/dzl-shortcuts-section.h"
+#include "shortcuts/dzl-shortcuts-group.h"
+#include "shortcuts/dzl-shortcuts-shortcut-private.h"
 
 /**
  * SECTION:dzl-shortcuts-window

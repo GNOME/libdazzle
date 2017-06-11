@@ -16,8 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dzl-shortcut-theme.h"
-#include "dzl-shortcut-private.h"
+#define G_LOG_DOMAIN "dzl-shortcut-theme-save"
+
+#include "shortcuts/dzl-shortcut-theme.h"
+#include "shortcuts/dzl-shortcut-private.h"
 
 gboolean
 dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,

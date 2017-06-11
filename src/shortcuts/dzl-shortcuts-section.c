@@ -18,8 +18,8 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-shortcuts-group.h"
-#include "dzl-shortcuts-section.h"
+#include "shortcuts/dzl-shortcuts-group.h"
+#include "shortcuts/dzl-shortcuts-section.h"
 
 /**
  * SECTION:dzl-shortcuts-section

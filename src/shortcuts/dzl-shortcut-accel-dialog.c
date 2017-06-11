@@ -24,9 +24,9 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-shortcut-accel-dialog.h"
-#include "dzl-shortcut-chord.h"
-#include "dzl-shortcut-label.h"
+#include "shortcuts/dzl-shortcut-accel-dialog.h"
+#include "shortcuts/dzl-shortcut-chord.h"
+#include "shortcuts/dzl-shortcut-label.h"
 
 struct _DzlShortcutAccelDialog
 {

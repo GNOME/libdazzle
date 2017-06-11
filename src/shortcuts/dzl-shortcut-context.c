@@ -21,10 +21,10 @@
 #include <gobject/gvaluecollector.h>
 #include <string.h>
 
-#include "dzl-shortcut-chord.h"
-#include "dzl-shortcut-context.h"
-#include "dzl-shortcut-controller.h"
-#include "dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcut-chord.h"
+#include "shortcuts/dzl-shortcut-context.h"
+#include "shortcuts/dzl-shortcut-controller.h"
+#include "shortcuts/dzl-shortcut-private.h"
 
 typedef struct
 {

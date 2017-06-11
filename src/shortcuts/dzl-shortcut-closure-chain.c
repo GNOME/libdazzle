@@ -21,8 +21,8 @@
 #include <gobject/gvaluecollector.h>
 #include <string.h>
 
-#include "dzl-shortcut-closure-chain.h"
-#include "dzl-shortcut-controller.h"
+#include "shortcuts/dzl-shortcut-closure-chain.h"
+#include "shortcuts/dzl-shortcut-controller.h"
 
 typedef enum
 {

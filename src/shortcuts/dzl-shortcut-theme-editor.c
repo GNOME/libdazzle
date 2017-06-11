@@ -20,10 +20,10 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-shortcut-accel-dialog.h"
-#include "dzl-shortcut-model.h"
-#include "dzl-shortcut-private.h"
-#include "dzl-shortcut-theme-editor.h"
+#include "shortcuts/dzl-shortcut-accel-dialog.h"
+#include "shortcuts/dzl-shortcut-model.h"
+#include "shortcuts/dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcut-theme-editor.h"
 
 typedef struct
 {

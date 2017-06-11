@@ -21,8 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dzl-shortcut-chord.h"
-#include "dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcut-chord.h"
+#include "shortcuts/dzl-shortcut-private.h"
 
 #define MAX_CHORD_SIZE 4
 

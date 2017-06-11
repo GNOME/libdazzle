@@ -18,9 +18,9 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-shortcut-label.h"
-#include "dzl-shortcuts-shortcut.h"
-#include "dzl-shortcuts-window-private.h"
+#include "shortcuts/dzl-shortcut-label.h"
+#include "shortcuts/dzl-shortcuts-shortcut.h"
+#include "shortcuts/dzl-shortcuts-window-private.h"
 
 /**
  * SECTION:dzl-shortcuts-shortcut

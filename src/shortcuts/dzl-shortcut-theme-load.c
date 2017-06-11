@@ -20,9 +20,9 @@
 
 #include <string.h>
 
-#include "dzl-shortcut-context.h"
-#include "dzl-shortcut-private.h"
-#include "dzl-shortcut-theme.h"
+#include "shortcuts/dzl-shortcut-context.h"
+#include "shortcuts/dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcut-theme.h"
 
 typedef enum
 {

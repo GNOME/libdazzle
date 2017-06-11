@@ -18,8 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-model"
 
-#include "dzl-shortcut-model.h"
-#include "dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcut-model.h"
+#include "shortcuts/dzl-shortcut-private.h"
 
 struct _DzlShortcutModel
 {

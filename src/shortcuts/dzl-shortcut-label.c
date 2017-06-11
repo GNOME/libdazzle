@@ -18,7 +18,7 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-label"
 
-#include "dzl-shortcut-label.h"
+#include "shortcuts/dzl-shortcut-label.h"
 
 struct _DzlShortcutLabel
 {

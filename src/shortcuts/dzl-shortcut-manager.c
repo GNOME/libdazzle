@@ -18,15 +18,14 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-manager.h"
 
-#include "dzl-shortcut-private.h"
-
-#include "dzl-shortcut-controller.h"
-#include "dzl-shortcut-label.h"
-#include "dzl-shortcut-manager.h"
-#include "dzl-shortcut-private.h"
-#include "dzl-shortcuts-group.h"
-#include "dzl-shortcuts-section.h"
-#include "dzl-shortcuts-shortcut.h"
+#include "shortcuts/dzl-shortcut-controller.h"
+#include "shortcuts/dzl-shortcut-label.h"
+#include "shortcuts/dzl-shortcut-manager.h"
+#include "shortcuts/dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcut-private.h"
+#include "shortcuts/dzl-shortcuts-group.h"
+#include "shortcuts/dzl-shortcuts-section.h"
+#include "shortcuts/dzl-shortcuts-shortcut.h"
 
 typedef struct
 {
