@@ -98,3 +98,7 @@ gnome = import('gnome')
 subdir('src')
 subdir('tests')
 subdir('examples/app')
+
+if get_option('enable-gtk-doc')
+  subdir('doc')
+endif

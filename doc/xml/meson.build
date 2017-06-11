@@ -1,0 +1,11 @@
+ent_conf = configuration_data()
+ent_conf.set('PACKAGE', 'Dazzle')
+ent_conf.set('PACKAGE_BUGREPORT', 'https://bugzilla.gnome.org/enter_bug.cgi?product=gnome-builder')
+ent_conf.set('PACKAGE_NAME', 'Dazzle')
+ent_conf.set('PACKAGE_STRING', 'libdazzle')
+ent_conf.set('PACKAGE_TARNAME', 'libdazzle-' + meson.project_version())
+ent_conf.set('PACKAGE_URL', 'http://wiki.gnome.org/Apps/Builder')
+ent_conf.set('PACKAGE_VERSION', meson.project_version())
+ent_conf.set('PACKAGE_API_VERSION', apiversion)
+configure_file(input: 'gtkdocentities.ent.in', output: 'gtkdocentities.ent', configuration: ent_conf)
+

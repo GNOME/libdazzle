@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
+[
+  <!ENTITY % local.common.attrib "xmlns:xi  CDATA  #FIXED 'http://www.w3.org/2003/XInclude'">
+  <!ENTITY % gtkdocentities SYSTEM "xml/gtkdocentities.ent">
+  %gtkdocentities;
+]>
+<book id="index">
+  <bookinfo>
+    <title>&package_name; Reference Manual</title>
+    <releaseinfo>
+      for &package_string;.
+      The latest version of this documentation can be found on-line at
+      <ulink role="online-location" url="http://library.gnome.org/&package_name;/index.html">http://library.gnome.org/&package_name;/</ulink>.
+    </releaseinfo>
+  </bookinfo>
+
+  <chapter>
+    <title>Dazzle API Reference</title>
+    <xi:include href="xml/dzl-animation.xml"/>
+    <xi:include href="xml/dzl-application.xml"/>
+    <xi:include href="xml/dzl-binding-group.xml"/>
+    <xi:include href="xml/dzl-bin.xml"/>
+    <xi:include href="xml/dzl-bolding-label.xml"/>
+    <xi:include href="xml/dzl-box-theatric.xml"/>
+    <xi:include href="xml/dzl-box.xml"/>
+    <xi:include href="xml/dzl-cairo.xml"/>
+    <xi:include href="xml/dzl-centering-bin.xml"/>
+    <xi:include href="xml/dzl-child-property-action.xml"/>
+    <xi:include href="xml/dzl-column-layout.xml"/>
+    <xi:include href="xml/dzl-counter.xml"/>
+    <xi:include href="xml/dzl-cpu-graph.xml"/>
+    <xi:include href="xml/dzl-cpu-model.xml"/>
+    <xi:include href="xml/dzl-css-provider.xml"/>
+    <xi:include href="xml/dzl-date-time.xml"/>
+    <xi:include href="xml/dzl-directory-model.xml"/>
+    <xi:include href="xml/dzl-directory-reaper.xml"/>
+    <xi:include href="xml/dzl-dnd.xml"/>
+    <xi:include href="xml/dzl-dock-bin-edge.xml"/>
+    <xi:include href="xml/dzl-dock-bin.xml"/>
+    <xi:include href="xml/dzl-dock-item.xml"/>
+    <xi:include href="xml/dzl-dock-manager.xml"/>
+    <xi:include href="xml/dzl-dock-overlay-edge.xml"/>
+    <xi:include href="xml/dzl-dock-overlay.xml"/>
+    <xi:include href="xml/dzl-dock-paned.xml"/>
+    <xi:include href="xml/dzl-dock-revealer.xml"/>
+    <xi:include href="xml/dzl-dock-stack.xml"/>
+    <xi:include href="xml/dzl-dock-transient-grab.xml"/>
+    <xi:include href="xml/dzl-dock-types.xml"/>
+    <xi:include href="xml/dzl-dock-widget.xml"/>
+    <xi:include href="xml/dzl-dock-window.xml"/>
+    <xi:include href="xml/dzl-dock.xml"/>
+    <xi:include href="xml/dzl-elastic-bin.xml"/>
+    <xi:include href="xml/dzl-empty-state.xml"/>
+    <xi:include href="xml/dzl-entry-box.xml"/>
+    <xi:include href="xml/dzl-file-chooser-entry.xml"/>
+    <xi:include href="xml/dzl-file-manager.xml"/>
+    <xi:include href="xml/dzl-frame-source.xml"/>
+    <xi:include href="xml/dzl-fuzzy-index-builder.xml"/>
+    <xi:include href="xml/dzl-fuzzy-index-cursor.xml"/>
+    <xi:include href="xml/dzl-fuzzy-index-match.xml"/>
+    <xi:include href="xml/dzl-fuzzy-index.xml"/>
+    <xi:include href="xml/dzl-fuzzy-mutable-index.xml"/>
+    <xi:include href="xml/dzl-gdk.xml"/>
+    <xi:include href="xml/dzl-graph-column.xml"/>
+    <xi:include href="xml/dzl-graph-line-renderer.xml"/>
+    <xi:include href="xml/dzl-graph-model.xml"/>
+    <xi:include href="xml/dzl-graph-renderer.xml"/>
+    <xi:include href="xml/dzl-graph-view.xml"/>
+    <xi:include href="xml/dzl-gtk.xml"/>
+    <xi:include href="xml/dzl-heap.xml"/>
+    <xi:include href="xml/dzl-int-pair.xml"/>
+    <xi:include href="xml/dzl-levenshtein.xml"/>
+    <xi:include href="xml/dzl-list-box-row.xml"/>
+    <xi:include href="xml/dzl-list-box.xml"/>
+    <xi:include href="xml/dzl-menu-manager.xml"/>
+    <xi:include href="xml/dzl-multi-paned.xml"/>
+    <xi:include href="xml/dzl-pango.xml"/>
+    <xi:include href="xml/dzl-path-bar.xml"/>
+    <xi:include href="xml/dzl-path-element.xml"/>
+    <xi:include href="xml/dzl-path.xml"/>
+    <xi:include href="xml/dzl-pattern-spec.xml"/>
+    <xi:include href="xml/dzl-pill-box.xml"/>
+    <xi:include href="xml/dzl-preferences-bin.xml"/>
+    <xi:include href="xml/dzl-preferences-entry.xml"/>
+    <xi:include href="xml/dzl-preferences-file-chooser-button.xml"/>
+    <xi:include href="xml/dzl-preferences-flow-box.xml"/>
+    <xi:include href="xml/dzl-preferences-font-button.xml"/>
+    <xi:include href="xml/dzl-preferences-group.xml"/>
+    <xi:include href="xml/dzl-preferences-page.xml"/>
+    <xi:include href="xml/dzl-preferences-spin-button.xml"/>
+    <xi:include href="xml/dzl-preferences-switch.xml"/>
+    <xi:include href="xml/dzl-preferences-view.xml"/>
+    <xi:include href="xml/dzl-preferences.xml"/>
+    <xi:include href="xml/dzl-priority-box.xml"/>
+    <xi:include href="xml/dzl-progress-button.xml"/>
+    <xi:include href="xml/dzl-progress-icon.xml"/>
+    <xi:include href="xml/dzl-progress-menu-button.xml"/>
+    <xi:include href="xml/dzl-radio-box.xml"/>
+    <xi:include href="xml/dzl-rect-helper.xml"/>
+    <xi:include href="xml/dzl-rgba.xml"/>
+    <xi:include href="xml/dzl-ring.xml"/>
+    <xi:include href="xml/dzl-scrolled-window.xml"/>
+    <xi:include href="xml/dzl-search-bar.xml"/>
+    <xi:include href="xml/dzl-settings-flag-action.xml"/>
+    <xi:include href="xml/dzl-settings-sandwich.xml"/>
+    <xi:include href="xml/dzl-shortcut-accel-dialog.xml"/>
+    <xi:include href="xml/dzl-shortcut-chord.xml"/>
+    <xi:include href="xml/dzl-shortcut-closure-chain.xml"/>
+    <xi:include href="xml/dzl-shortcut-context.xml"/>
+    <xi:include href="xml/dzl-shortcut-controller.xml"/>
+    <xi:include href="xml/dzl-shortcut-label.xml"/>
+    <xi:include href="xml/dzl-shortcut-manager.xml"/>
+    <xi:include href="xml/dzl-shortcut-model.xml"/>
+    <xi:include href="xml/dzl-shortcuts-group.xml"/>
+    <xi:include href="xml/dzl-shortcuts-section.xml"/>
+    <xi:include href="xml/dzl-shortcuts-shortcut.xml"/>
+    <xi:include href="xml/dzl-shortcuts-window.xml"/>
+    <xi:include href="xml/dzl-shortcut-theme-editor.xml"/>
+    <xi:include href="xml/dzl-shortcut-theme.xml"/>
+    <xi:include href="xml/dzl-signal-group.xml"/>
+    <xi:include href="xml/dzl-simple-label.xml"/>
+    <xi:include href="xml/dzl-simple-popover.xml"/>
+    <xi:include href="xml/dzl-slider.xml"/>
+    <xi:include href="xml/dzl-stack-list.xml"/>
+    <xi:include href="xml/dzl-state-machine.xml"/>
+    <xi:include href="xml/dzl-suggestion-entry-buffer.xml"/>
+    <xi:include href="xml/dzl-suggestion-entry.xml"/>
+    <xi:include href="xml/dzl-suggestion-popover.xml"/>
+    <xi:include href="xml/dzl-suggestion-row.xml"/>
+    <xi:include href="xml/dzl-suggestion.xml"/>
+    <xi:include href="xml/dzl-tab-strip.xml"/>
+    <xi:include href="xml/dzl-tab.xml"/>
+    <xi:include href="xml/dzl-task-cache.xml"/>
+    <xi:include href="xml/dzl-theme-manager.xml"/>
+    <xi:include href="xml/dzl-three-grid.xml"/>
+    <xi:include href="xml/dzl-tree-builder.xml"/>
+    <xi:include href="xml/dzl-tree-node.xml"/>
+    <xi:include href="xml/dzl-tree-types.xml"/>
+    <xi:include href="xml/dzl-tree.xml"/>
+    <xi:include href="xml/dzl-trie.xml"/>
+    <xi:include href="xml/dzl-variant.xml"/>
+    <xi:include href="xml/dzl-version.xml"/>
+    <xi:include href="xml/dzl-widget-action-group.xml"/>
+  </chapter>
+
+  <chapter id="object-tree">
+    <title>Object Hierarchy</title>
+    <xi:include href="xml/tree_index.sgml"/>
+  </chapter>
+
+  <index id="api-index-full">
+    <title>API Index</title>
+    <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
+  </index>
+
+  <index id="deprecated-api-index" role="deprecated">
+    <title>Index of deprecated API</title>
+    <xi:include href="xml/api-index-deprecated.xml"><xi:fallback /></xi:include>
+  </index>
+
+  <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
+</book>
