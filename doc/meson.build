@@ -45,5 +45,5 @@ gnome.gtkdoc('libdazzle',
                        '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gi')),
                        '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gtk3')),
                      ],
-        install_dir: 'dazzle',
+        install_dir: 'libdazzle',
             install: true)
