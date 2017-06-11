@@ -10,78 +10,101 @@
   <bookinfo>
     <title>&package_name; Reference Manual</title>
     <releaseinfo>
-      for &package_string;.
-      The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="http://library.gnome.org/&package_name;/index.html">http://library.gnome.org/&package_name;/</ulink>.
+      <para>This document is the API reference for for &package_name; &package_version;.</para>
+      <para>
+        The latest version of this API reference is also available
+        <ulink role="online-location" url="https://developer.gnome.org/libdazzle/">online</ulink>.
+      </para>
+      <para>
+        If you find any issues in this API reference, please report it
+        using <ulink type="http" url="&package_bugreport;">the online
+          bug reporting tool</ulink> at bugzilla.gnome.org.
+      </para>
     </releaseinfo>
+
+    <copyright>
+      <year>2014-2017</year>
+      <holder>Christian Hergert</holder>
+    </copyright>
+
+    <legalnotice>
+      <para>
+        Permission is granted to copy, distribute and/or modify this
+        document under the terms of the <citetitle>GNU Free
+          Documentation License</citetitle>, Version 1.1 or any later
+        version published by the Free Software Foundation with no
+        Invariant Sections, no Front-Cover Texts, and no Back-Cover
+        Texts. You may obtain a copy of the <citetitle>GNU Free
+          Documentation License</citetitle> from the Free Software
+        Foundation by visiting <ulink type="http"
+          url="http://www.fsf.org">their Web site</ulink> or by writing
+        to:
+
+        <address>
+          The Free Software Foundation, Inc.,
+          <street>59 Temple Place</street> - Suite 330,
+          <city>Boston</city>, <state>MA</state> <postcode>02111-1307</postcode>,
+          <country>USA</country>
+        </address>
+      </para>
+    </legalnotice>
   </bookinfo>
 
-  <chapter>
-    <title>Dazzle API Reference</title>
+  <part id="dazzle-animation">
+    <title>Animations</title>
+    <partintro>
+      <para>
+        Dazzle provides utilities for animations of GtkWidgets and GObjects.
+        They can optionally be synchronized to a frame clock to ensure that you
+        update settings at an optimal time in the draw cycle.
+      </para>
+    </partintro>
     <xi:include href="xml/dzl-animation.xml"/>
-    <xi:include href="xml/dzl-application.xml"/>
-    <xi:include href="xml/dzl-binding-group.xml"/>
-    <xi:include href="xml/dzl-bin.xml"/>
-    <xi:include href="xml/dzl-bolding-label.xml"/>
-    <xi:include href="xml/dzl-box-theatric.xml"/>
-    <xi:include href="xml/dzl-box.xml"/>
-    <xi:include href="xml/dzl-cairo.xml"/>
-    <xi:include href="xml/dzl-centering-bin.xml"/>
-    <xi:include href="xml/dzl-child-property-action.xml"/>
-    <xi:include href="xml/dzl-column-layout.xml"/>
-    <xi:include href="xml/dzl-counter.xml"/>
-    <xi:include href="xml/dzl-cpu-graph.xml"/>
-    <xi:include href="xml/dzl-cpu-model.xml"/>
-    <xi:include href="xml/dzl-css-provider.xml"/>
-    <xi:include href="xml/dzl-date-time.xml"/>
-    <xi:include href="xml/dzl-directory-model.xml"/>
-    <xi:include href="xml/dzl-directory-reaper.xml"/>
-    <xi:include href="xml/dzl-dnd.xml"/>
-    <xi:include href="xml/dzl-dock-bin-edge.xml"/>
-    <xi:include href="xml/dzl-dock-bin.xml"/>
-    <xi:include href="xml/dzl-dock-item.xml"/>
-    <xi:include href="xml/dzl-dock-manager.xml"/>
-    <xi:include href="xml/dzl-dock-overlay-edge.xml"/>
-    <xi:include href="xml/dzl-dock-overlay.xml"/>
-    <xi:include href="xml/dzl-dock-paned.xml"/>
-    <xi:include href="xml/dzl-dock-revealer.xml"/>
-    <xi:include href="xml/dzl-dock-stack.xml"/>
-    <xi:include href="xml/dzl-dock-transient-grab.xml"/>
-    <xi:include href="xml/dzl-dock-types.xml"/>
-    <xi:include href="xml/dzl-dock-widget.xml"/>
-    <xi:include href="xml/dzl-dock-window.xml"/>
-    <xi:include href="xml/dzl-dock.xml"/>
-    <xi:include href="xml/dzl-elastic-bin.xml"/>
-    <xi:include href="xml/dzl-empty-state.xml"/>
-    <xi:include href="xml/dzl-entry-box.xml"/>
-    <xi:include href="xml/dzl-file-chooser-entry.xml"/>
-    <xi:include href="xml/dzl-file-manager.xml"/>
     <xi:include href="xml/dzl-frame-source.xml"/>
-    <xi:include href="xml/dzl-fuzzy-index-builder.xml"/>
-    <xi:include href="xml/dzl-fuzzy-index-cursor.xml"/>
-    <xi:include href="xml/dzl-fuzzy-index-match.xml"/>
-    <xi:include href="xml/dzl-fuzzy-index.xml"/>
-    <xi:include href="xml/dzl-fuzzy-mutable-index.xml"/>
-    <xi:include href="xml/dzl-gdk.xml"/>
-    <xi:include href="xml/dzl-graph-column.xml"/>
-    <xi:include href="xml/dzl-graph-line-renderer.xml"/>
-    <xi:include href="xml/dzl-graph-model.xml"/>
-    <xi:include href="xml/dzl-graph-renderer.xml"/>
-    <xi:include href="xml/dzl-graph-view.xml"/>
-    <xi:include href="xml/dzl-gtk.xml"/>
-    <xi:include href="xml/dzl-heap.xml"/>
-    <xi:include href="xml/dzl-int-pair.xml"/>
-    <xi:include href="xml/dzl-levenshtein.xml"/>
-    <xi:include href="xml/dzl-list-box-row.xml"/>
-    <xi:include href="xml/dzl-list-box.xml"/>
+    <xi:include href="xml/dzl-box-theatric.xml"/>
+    <xi:include href="xml/dzl-rect-helper.xml"/>
+  </part>
+
+  <part id="dazzle-groups">
+    <title>Signals and Bindings</title>
+    <partintro>
+      <para>
+        Managing groups of signals and properties can be challanging to get
+        right. It takes lots of code and detail to ensure you track object
+        lifetimes correctly.
+      </para>
+      <para>
+        To simplify this, Dazzle provides helper objects to attach to bind
+        multiple properties or connect to multiple signals. You can attach
+        and detach them as a set.
+      </para>
+    </partintro>
+    <xi:include href="xml/dzl-binding-group.xml"/>
+    <xi:include href="xml/dzl-signal-group.xml"/>
+  </part>
+
+  <part id="dazzle-application">
+    <title>Applications</title>
+    <partintro>
+      <para>
+        To simplify application creation, we provided a base application to
+        automatically integrate features from libdazzle. Such features include
+        theme management, keyboard shortcut controllers, icon loading, and menu
+        merging.
+      </para>
+      <para>
+        To take advantage of these features, simply subclass the applicaion object.
+      </para>
+    </partintro>
+    <xi:include href="xml/dzl-application.xml"/>
     <xi:include href="xml/dzl-menu-manager.xml"/>
-    <xi:include href="xml/dzl-multi-paned.xml"/>
-    <xi:include href="xml/dzl-pango.xml"/>
-    <xi:include href="xml/dzl-path-bar.xml"/>
-    <xi:include href="xml/dzl-path-element.xml"/>
-    <xi:include href="xml/dzl-path.xml"/>
-    <xi:include href="xml/dzl-pattern-spec.xml"/>
-    <xi:include href="xml/dzl-pill-box.xml"/>
+    <xi:include href="xml/dzl-theme-manager.xml"/>
+    <xi:include href="xml/dzl-css-provider.xml"/>
+  </part>
+
+  <part id="dazzle-prefs">
+    <title>Application Preferences</title>
+    <xi:include href="xml/dzl-preferences.xml"/>
     <xi:include href="xml/dzl-preferences-bin.xml"/>
     <xi:include href="xml/dzl-preferences-entry.xml"/>
     <xi:include href="xml/dzl-preferences-file-chooser-button.xml"/>
@@ -92,19 +115,10 @@
     <xi:include href="xml/dzl-preferences-spin-button.xml"/>
     <xi:include href="xml/dzl-preferences-switch.xml"/>
     <xi:include href="xml/dzl-preferences-view.xml"/>
-    <xi:include href="xml/dzl-preferences.xml"/>
-    <xi:include href="xml/dzl-priority-box.xml"/>
-    <xi:include href="xml/dzl-progress-button.xml"/>
-    <xi:include href="xml/dzl-progress-icon.xml"/>
-    <xi:include href="xml/dzl-progress-menu-button.xml"/>
-    <xi:include href="xml/dzl-radio-box.xml"/>
-    <xi:include href="xml/dzl-rect-helper.xml"/>
-    <xi:include href="xml/dzl-rgba.xml"/>
-    <xi:include href="xml/dzl-ring.xml"/>
-    <xi:include href="xml/dzl-scrolled-window.xml"/>
-    <xi:include href="xml/dzl-search-bar.xml"/>
-    <xi:include href="xml/dzl-settings-flag-action.xml"/>
-    <xi:include href="xml/dzl-settings-sandwich.xml"/>
+  </part>
+
+  <part id="dazzle-shortcuts">
+    <title>Shortcuts</title>
     <xi:include href="xml/dzl-shortcut-accel-dialog.xml"/>
     <xi:include href="xml/dzl-shortcut-chord.xml"/>
     <xi:include href="xml/dzl-shortcut-closure-chain.xml"/>
@@ -119,31 +133,191 @@
     <xi:include href="xml/dzl-shortcuts-window.xml"/>
     <xi:include href="xml/dzl-shortcut-theme-editor.xml"/>
     <xi:include href="xml/dzl-shortcut-theme.xml"/>
-    <xi:include href="xml/dzl-signal-group.xml"/>
+  </part>
+
+  <part id="dazzle-panels">
+    <title>Window Panels</title>
+    <partintro>
+      <para>
+        Many content creation applications need some sort of panel system. Dazzle
+        provides flexible panel widgets and docks for this purpose.
+      </para>
+    </partintro>
+    <xi:include href="xml/dzl-dock-manager.xml"/>
+    <xi:include href="xml/dzl-dock.xml"/>
+    <xi:include href="xml/dzl-dock-bin.xml"/>
+    <xi:include href="xml/dzl-dock-overlay.xml"/>
+    <xi:include href="xml/dzl-dock-stack.xml"/>
+    <xi:include href="xml/dzl-dock-bin-edge.xml"/>
+    <xi:include href="xml/dzl-dock-item.xml"/>
+    <xi:include href="xml/dzl-dock-overlay-edge.xml"/>
+    <xi:include href="xml/dzl-dock-paned.xml"/>
+    <xi:include href="xml/dzl-dock-revealer.xml"/>
+    <xi:include href="xml/dzl-dock-transient-grab.xml"/>
+    <xi:include href="xml/dzl-dock-types.xml"/>
+    <xi:include href="xml/dzl-dock-widget.xml"/>
+    <xi:include href="xml/dzl-dock-window.xml"/>
+  </part>
+
+  <part id="dazzle-search">
+    <title>Searching</title>
+    <chapter>
+      <title>In-Memory Fuzzy Indexes</title>
+      <xi:include href="xml/dzl-fuzzy-mutable-index.xml"/>
+    </chapter>
+    <chapter>
+      <title>Disk-based Fuzzy Indexes</title>
+      <xi:include href="xml/dzl-fuzzy-index-builder.xml"/>
+      <xi:include href="xml/dzl-fuzzy-index.xml"/>
+      <xi:include href="xml/dzl-fuzzy-index-cursor.xml"/>
+      <xi:include href="xml/dzl-fuzzy-index-match.xml"/>
+    </chapter>
+    <xi:include href="xml/dzl-trie.xml"/>
+    <xi:include href="xml/dzl-pattern-spec.xml"/>
+    <xi:include href="xml/dzl-levenshtein.xml"/>
+  </part>
+
+  <part id="dazzle-suggestions">
+    <title>Browser-like auto-completion</title>
+    <partintro>
+      <para>
+        Auto-completion in browsers are fairly ubiquitous these days. Having a
+        widget that looks and feels like them can be useful for applications to
+        feel famliar to users. The suggestion entry of Dazzle can do this.
+        You'll need to bring your own search algorithm though.
+      </para>
+    </partintro>
+    <xi:include href="xml/dzl-suggestion.xml"/>
+    <xi:include href="xml/dzl-suggestion-entry.xml"/>
+    <xi:include href="xml/dzl-suggestion-entry-buffer.xml"/>
+    <xi:include href="xml/dzl-suggestion-popover.xml"/>
+    <xi:include href="xml/dzl-suggestion-row.xml"/>
+  </part>
+
+  <part id="dazzle-tree">
+    <title>Lazy Tree Building</title>
+    <partintro>
+      <para>
+        Building and populating tree views lazily can be a difficult process.
+        The tree builder and associated classes in Dazzle makes this fast,
+        efficient, and easy to perform lazy content creation.
+      </para>
+    </partintro>
+    <xi:include href="xml/dzl-tree.xml"/>
+    <xi:include href="xml/dzl-tree-builder.xml"/>
+    <xi:include href="xml/dzl-tree-node.xml"/>
+    <xi:include href="xml/dzl-tree-types.xml"/>
+  </part>
+
+  <part id="dazzle-listbox">
+    <title>Recycling List Boxes</title>
+    <partintro>
+      <para>
+        One difficulty with GtkListBox is the performance related to creating
+        and destroying rows. To help lower this overhead, Dazzle provides a
+        listbox subclass that re-uses existing rows.
+      </para>
+    </partintro>
+    <xi:include href="xml/dzl-list-box-row.xml"/>
+    <xi:include href="xml/dzl-list-box.xml"/>
+  </part>
+
+  <part id="dazzle-pathbar">
+    <title>Path Bars</title>
+    <xi:include href="xml/dzl-path-bar.xml"/>
+    <xi:include href="xml/dzl-path-element.xml"/>
+    <xi:include href="xml/dzl-path.xml"/>
+  </part>
+
+  <part id="dazzle-graphing">
+    <title>Realtime Graphs</title>
+    <xi:include href="xml/dzl-graph-view.xml"/>
+    <xi:include href="xml/dzl-graph-renderer.xml"/>
+    <xi:include href="xml/dzl-graph-line-renderer.xml"/>
+    <xi:include href="xml/dzl-graph-model.xml"/>
+    <xi:include href="xml/dzl-graph-column.xml"/>
+    <xi:include href="xml/dzl-cpu-graph.xml"/>
+    <xi:include href="xml/dzl-cpu-model.xml"/>
+  </part>
+
+  <para id="dazzle-counters">
+    <title>Performance Counters</title>
+    <xi:include href="xml/dzl-counter.xml"/>
+  </para>
+
+  <part id="dazzle-widgets">
+    <title>Additional Widgets</title>
+    <xi:include href="xml/dzl-bin.xml"/>
+    <xi:include href="xml/dzl-bolding-label.xml"/>
+    <xi:include href="xml/dzl-box.xml"/>
+    <xi:include href="xml/dzl-centering-bin.xml"/>
+    <xi:include href="xml/dzl-column-layout.xml"/>
+    <xi:include href="xml/dzl-elastic-bin.xml"/>
+    <xi:include href="xml/dzl-empty-state.xml"/>
+    <xi:include href="xml/dzl-entry-box.xml"/>
+    <xi:include href="xml/dzl-file-chooser-entry.xml"/>
+    <xi:include href="xml/dzl-multi-paned.xml"/>
+    <xi:include href="xml/dzl-pill-box.xml"/>
+    <xi:include href="xml/dzl-priority-box.xml"/>
+    <xi:include href="xml/dzl-progress-button.xml"/>
+    <xi:include href="xml/dzl-progress-icon.xml"/>
+    <xi:include href="xml/dzl-progress-menu-button.xml"/>
+    <xi:include href="xml/dzl-radio-box.xml"/>
+    <xi:include href="xml/dzl-scrolled-window.xml"/>
+    <xi:include href="xml/dzl-search-bar.xml"/>
     <xi:include href="xml/dzl-simple-label.xml"/>
     <xi:include href="xml/dzl-simple-popover.xml"/>
     <xi:include href="xml/dzl-slider.xml"/>
     <xi:include href="xml/dzl-stack-list.xml"/>
-    <xi:include href="xml/dzl-state-machine.xml"/>
-    <xi:include href="xml/dzl-suggestion-entry-buffer.xml"/>
-    <xi:include href="xml/dzl-suggestion-entry.xml"/>
-    <xi:include href="xml/dzl-suggestion-popover.xml"/>
-    <xi:include href="xml/dzl-suggestion-row.xml"/>
-    <xi:include href="xml/dzl-suggestion.xml"/>
     <xi:include href="xml/dzl-tab-strip.xml"/>
     <xi:include href="xml/dzl-tab.xml"/>
-    <xi:include href="xml/dzl-task-cache.xml"/>
-    <xi:include href="xml/dzl-theme-manager.xml"/>
     <xi:include href="xml/dzl-three-grid.xml"/>
-    <xi:include href="xml/dzl-tree-builder.xml"/>
-    <xi:include href="xml/dzl-tree-node.xml"/>
-    <xi:include href="xml/dzl-tree-types.xml"/>
-    <xi:include href="xml/dzl-tree.xml"/>
-    <xi:include href="xml/dzl-trie.xml"/>
-    <xi:include href="xml/dzl-variant.xml"/>
-    <xi:include href="xml/dzl-version.xml"/>
+  </part>
+
+  <part id="dazzle-data-structures">
+    <title>Data Structures</title>
+    <xi:include href="xml/dzl-int-pair.xml"/>
+    <xi:include href="xml/dzl-heap.xml"/>
+    <xi:include href="xml/dzl-ring.xml"/>
+  </part>
+
+  <part id="dazzle-actions">
+    <title>Action Integration</title>
+    <xi:include href="xml/dzl-child-property-action.xml"/>
     <xi:include href="xml/dzl-widget-action-group.xml"/>
-  </chapter>
+    <xi:include href="xml/dzl-settings-flag-action.xml"/>
+  </part>
+
+  <part id="dazzle-caching">
+    <title>Asynchronous Caching</title>
+    <xi:include href="xml/dzl-task-cache.xml"/>
+  </part>
+
+  <part id="dazzle-directories">
+    <title>Directory Management</title>
+    <xi:include href="xml/dzl-directory-model.xml"/>
+    <xi:include href="xml/dzl-directory-reaper.xml"/>
+  </part>
+
+  <part id="dazzle-states">
+    <title>State Machines</title>
+    <xi:include href="xml/dzl-state-machine.xml"/>
+  </part>
+
+  <part id="dazzle-other">
+    <title>Utility API</title>
+    <xi:include href="xml/dzl-cairo.xml"/>
+    <xi:include href="xml/dzl-date-time.xml"/>
+    <xi:include href="xml/dzl-dnd.xml"/>
+    <xi:include href="xml/dzl-file-manager.xml"/>
+    <xi:include href="xml/dzl-gdk.xml"/>
+    <xi:include href="xml/dzl-gtk.xml"/>
+    <xi:include href="xml/dzl-pango.xml"/>
+    <xi:include href="xml/dzl-rgba.xml"/>
+    <xi:include href="xml/dzl-variant.xml"/>
+    <xi:include href="xml/dzl-settings-sandwich.xml"/>
+    <xi:include href="xml/dzl-version.xml"/>
+  </part>
 
   <chapter id="object-tree">
     <title>Object Hierarchy</title>
