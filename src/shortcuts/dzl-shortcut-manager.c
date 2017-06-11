@@ -34,6 +34,7 @@ typedef struct
   gchar            *user_dir;
   GNode            *root;
   GQueue            search_path;
+  guint             reload_handler;
 } DzlShortcutManagerPrivate;
 
 enum {
@@ -69,6 +70,39 @@ free_node_data (GNode    *node,
   g_slice_free (DzlShortcutNodeData, data);
 
   return FALSE;
+}
+
+static gboolean
+dzl_shortcut_manager_do_reload (gpointer data)
+{
+  DzlShortcutManager *self = data;
+  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+
+  g_assert (DZL_IS_SHORTCUT_MANAGER (self));
+
+  priv->reload_handler = 0;
+
+  for (const GList *iter = priv->search_path.head; iter; iter = iter->next)
+    {
+
+    }
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+dzl_shortcut_manager_queue_reload (DzlShortcutManager *self)
+{
+  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+
+  g_assert (DZL_IS_SHORTCUT_MANAGER (self));
+
+  if (priv->reload_handler == 0)
+    priv->reload_handler =
+      gdk_threads_add_idle_full (G_PRIORITY_LOW,
+                                 dzl_shortcut_manager_do_reload,
+                                 g_object_ref (self),
+                                 g_object_unref);
 }
 
 static void
@@ -680,8 +714,13 @@ dzl_shortcut_manager_remove_search_path (DzlShortcutManager *self,
       if (g_strcmp0 (path, directory) == 0)
         {
           /* TODO: Remove any merged keybindings */
+
           g_queue_delete_link (&priv->search_path, iter);
           g_free (path);
+
+          dzl_shortcut_manager_queue_reload (self);
+
+          break;
         }
     }
 }
@@ -702,7 +741,7 @@ dzl_shortcut_manager_append_search_path (DzlShortcutManager *self,
 
   g_queue_push_tail (&priv->search_path, g_strdup (directory));
 
-  /* TODO: Reload keythemes */
+  dzl_shortcut_manager_queue_reload (self);
 }
 
 void
@@ -721,7 +760,7 @@ dzl_shortcut_manager_prepend_search_path (DzlShortcutManager *self,
 
   g_queue_push_head (&priv->search_path, g_strdup (directory));
 
-  /* TODO: Reload keythemes */
+  dzl_shortcut_manager_queue_reload (self);
 }
 
 /**
