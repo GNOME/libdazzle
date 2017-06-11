@@ -33,7 +33,7 @@
  *
  *  - Automatic menu merging including the "app-menu".
  *  - Automatic Icon loading based on resources-base-path.
- *  - Authmatic theme tracking to load CSS variants based on user themes.
+ *  - Automatic theme tracking to load CSS variants based on user themes.
  *
  * The #DzlApplication class automatically manages loading alternate CSS based
  * on the active theme by tracking #GtkSettings:gtk-theme-name. Additionally,
