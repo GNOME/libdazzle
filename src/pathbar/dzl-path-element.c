@@ -44,7 +44,7 @@ static GParamSpec *properties [N_PROPS];
  * @icon_name: (nullable): An optional icon name for the element
  * @title: The title of the element.
  *
- * Creates a new path element for an #RtfmPath.
+ * Creates a new path element for an #DzlPath.
  *
  * Returns: (transfer full): A #DzlPathElement
  */

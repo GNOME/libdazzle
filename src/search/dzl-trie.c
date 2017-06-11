@@ -36,13 +36,13 @@
  * @title: DzlTrie
  * @short_description: A generic prefix tree.
  *
- * The #Trie struct and its associated functions provide a DzlTrie data structure,
+ * The #DzlTrie struct and its associated functions provide a DzlTrie data structure,
  * where nodes in the tree can contain arbitrary data.
  *
- * To create a new #Trie use dzl_trie_new(). You can free it with dzl_trie_free().
- * To insert a key and value pair into the #Trie use dzl_trie_insert().
- * To remove a key from the #Trie use dzl_trie_remove().
- * To traverse all children of the #Trie from a given key use dzl_trie_traverse().
+ * To create a new #DzlTrie use dzl_trie_new(). You can free it with dzl_trie_free().
+ * To insert a key and value pair into the #DzlTrie use dzl_trie_insert().
+ * To remove a key from the #DzlTrie use dzl_trie_remove().
+ * To traverse all children of the #DzlTrie from a given key use dzl_trie_traverse().
  */
 
 typedef struct _DzlTrieNode      DzlTrieNode;
@@ -73,8 +73,8 @@ G_DEFINE_BOXED_TYPE (DzlTrie, dzl_trie, dzl_trie_ref, dzl_trie_unref)
  * @flags: Flags describing behaviors of the DzlTrieNodeChunk.
  * @count: The number of items added to this chunk.
  * @keys: The keys for @children.
- * @next: The next #TrieNodeChunk if there is one.
- * @children: The children #TrieNodeChunk or %NULL. If the chunk is
+ * @next: The next #DzlTrieNodeChunk if there is one.
+ * @children: The children #DzlTrieNodeChunk or %NULL. If the chunk is
  *   inline the DzlTrieNode, then there will be fewer items.
  */
 #pragma pack(push, 1)
@@ -91,7 +91,7 @@ struct _DzlTrieNodeChunk
 
 /**
  * DzlTrieNode:
- * @parent: The parent #TrieNode. When a node is destroyed, it may need to
+ * @parent: The parent #DzlTrieNode. When a node is destroyed, it may need to
  *    walk up to the parent node and unlink itself.
  * @value: A pointer to the user provided value, or %NULL.
  * @chunk: The first chunk in the chain. Inline chunks have fewer children
@@ -120,7 +120,7 @@ struct _DzlTrie
 
 /**
  * dzl_trie_malloc0:
- * @trie: A #Trie
+ * @trie: A #DzlTrie
  * @size: Number of bytes to allocate.
  *
  * Wrapper function to allocate a memory chunk. This gives us somewhere to
@@ -138,7 +138,7 @@ dzl_trie_malloc0 (DzlTrie *trie,
 
 /**
  * dzl_trie_free:
- * @trie: A #Trie.
+ * @trie: A #DzlTrie.
  * @data: The data to free.
  *
  * Frees a portion of memory allocated by @trie.
@@ -152,7 +152,7 @@ dzl_trie_free (DzlTrie  *trie,
 
 /**
  * dzl_trie_node_new:
- * @trie: A #Trie.
+ * @trie: A #DzlTrie.
  * @parent: The nodes parent or %NULL.
  *
  * Create a new node that can be placed in a DzlTrie. The node contains a chunk
@@ -175,7 +175,7 @@ dzl_trie_node_new (DzlTrie     *trie,
 
 /**
  * dzl_trie_node_chunk_is_full:
- * @chunk: A #TrieNodeChunk.
+ * @chunk: A #DzlTrieNodeChunk.
  *
  * Checks to see if all children slots are full in @chunk.
  *
@@ -192,9 +192,9 @@ dzl_trie_node_chunk_is_full (DzlTrieNodeChunk *chunk)
  * dzl_trie_node_chunk_new:
  * @trie: The DzlTrie that the chunk belongs to.
  *
- * Creates a new #TrieNodeChunk with empty state.
+ * Creates a new #DzlTrieNodeChunk with empty state.
  *
- * Returns: (transfer full): A #TrieNodeChunk.
+ * Returns: (transfer full): A #DzlTrieNodeChunk.
  */
 DzlTrieNodeChunk *
 dzl_trie_node_chunk_new (DzlTrie *trie)
@@ -204,9 +204,9 @@ dzl_trie_node_chunk_new (DzlTrie *trie)
 
 /**
  * dzl_trie_append_to_node:
- * @chunk: A #TrieNodeChunk.
+ * @chunk: A #DzlTrieNodeChunk.
  * @key: The key to append.
- * @child: A #TrieNode to append.
+ * @child: A #DzlTrieNode to append.
  *
  * Appends @child to the chunk. If there is not room in the chunk,
  * then a new chunk will be added and append to @chunk.
@@ -238,8 +238,8 @@ dzl_trie_append_to_node (DzlTrie          *trie,
 
 /**
  * dzl_trie_node_move_to_front:
- * @node: A #TrieNode.
- * @chunk: A #TrieNodeChunk.
+ * @node: A #DzlTrieNode.
+ * @chunk: A #DzlTrieNodeChunk.
  * @idx: The index of the item to move.
  *
  * Moves the key and child found at @idx to the beginning of the first chunk
@@ -286,14 +286,14 @@ dzl_trie_node_move_to_front (DzlTrieNode      *node,
 
 /**
  * dzl_trie_find_node:
- * @trie: The #Trie we are searching.
- * @node: A #TrieNode.
+ * @trie: The #DzlTrie we are searching.
+ * @node: A #DzlTrieNode.
  * @key: The key to find in this node.
  *
  * Searches the chunk chain of the current node for the key provided. If
  * found, the child node for that key is returned.
  *
- * Returns: (transfer none): A #TrieNode or %NULL.
+ * Returns: (transfer none): A #DzlTrieNode or %NULL.
  */
 static DzlTrieNode *
 dzl_trie_find_node (DzlTrie     *trie,
@@ -324,14 +324,14 @@ dzl_trie_find_node (DzlTrie     *trie,
 
 /**
  * dzl_trie_find_or_create_node:
- * @trie: A #Trie.
- * @node: A #TrieNode.
+ * @trie: A #DzlTrie.
+ * @node: A #DzlTrieNode.
  * @key: The key to insert.
  *
  * Attempts to find key within @node. If @key is not found, it is added to the
  * node. The child for the key is returned.
  *
- * Returns: (transfer none): The child #TrieNode for @key.
+ * Returns: (transfer none): The child #DzlTrieNode for @key.
  */
 static DzlTrieNode *
 dzl_trie_find_or_create_node (DzlTrie     *trie,
@@ -368,8 +368,8 @@ dzl_trie_find_or_create_node (DzlTrie     *trie,
 
 /**
  * dzl_trie_node_remove_fast:
- * @node: A #TrieNode.
- * @chunk: A #TrieNodeChunk.
+ * @node: A #DzlTrieNode.
+ * @chunk: A #DzlTrieNodeChunk.
  * @idx: The child within the chunk.
  *
  * Removes child at index @idx from the chunk. The last item in the
@@ -400,7 +400,7 @@ dzl_trie_node_remove_fast (DzlTrieNode      *node,
 
 /**
  * dzl_trie_node_unlink:
- * @node: A #TrieNode.
+ * @node: A #DzlTrieNode.
  *
  * Unlinks @node from the DzlTrie. The parent node has its pointer to @node
  * removed.
@@ -430,11 +430,11 @@ dzl_trie_node_unlink (DzlTrieNode *node)
 
 /**
  * dzl_trie_destroy_node:
- * @trie: A #Trie.
- * @node: A #TrieNode.
+ * @trie: A #DzlTrie.
+ * @node: A #DzlTrieNode.
  * @value_destroy: A #GDestroyNotify or %NULL.
  *
- * Removes @node from the #Trie and releases all memory associated with it.
+ * Removes @node from the #DzlTrie and releases all memory associated with it.
  * If the nodes value is set, @value_destroy will be called to release it.
  *
  * The reclaimation happens as such:
@@ -478,11 +478,11 @@ dzl_trie_destroy_node (DzlTrie        *trie,
  * dzl_trie_new:
  * @value_destroy: A #GDestroyNotify, or %NULL.
  *
- * Creates a new #Trie. When a value is removed from the trie, @value_destroy
+ * Creates a new #DzlTrie. When a value is removed from the trie, @value_destroy
  * will be called to allow you to release any resources.
  *
- * Returns: (transfer full): A newly allocated #Trie that should be freed
- *   with dzl_trie_free().
+ * Returns: (transfer full): A newly allocated #DzlTrie that should be freed
+ *   with dzl_trie_unref().
  */
 DzlTrie *
 dzl_trie_new (GDestroyNotify value_destroy)
@@ -507,7 +507,7 @@ dzl_trie_new (GDestroyNotify value_destroy)
 
 /**
  * dzl_trie_insert:
- * @trie: A #Trie.
+ * @trie: A #DzlTrie.
  * @key: The key to insert.
  * @value: The value to insert.
  *
@@ -540,7 +540,7 @@ dzl_trie_insert (DzlTrie     *trie,
 
 /**
  * dzl_trie_lookup:
- * @trie: A #Trie.
+ * @trie: A #DzlTrie.
  * @key: The key to lookup.
  *
  * Looks up @key in @trie and returns the value associated.
@@ -571,7 +571,7 @@ dzl_trie_lookup (DzlTrie     *trie,
 
 /**
  * dzl_trie_remove:
- * @trie: A #Trie.
+ * @trie: A #DzlTrie.
  * @key: The key to remove.
  *
  * Removes @key from @trie, possibly destroying the value associated with
@@ -620,8 +620,8 @@ dzl_trie_remove (DzlTrie     *trie,
 
 /**
  * dzl_trie_traverse_node_pre_order:
- * @trie: A #Trie.
- * @node: A #TrieNode.
+ * @trie: A #DzlTrie.
+ * @node: A #DzlTrieNode.
  * @str: The prefix for this node.
  * @flags: The flags for which nodes to callback.
  * @max_depth: the maximum depth to process.
@@ -682,8 +682,8 @@ dzl_trie_traverse_node_pre_order (DzlTrie             *trie,
 
 /**
  * dzl_trie_traverse_node_post_order:
- * @trie: A #Trie.
- * @node: A #TrieNode.
+ * @trie: A #DzlTrie.
+ * @node: A #DzlTrieNode.
  * @str: The prefix for this node.
  * @flags: The flags for which nodes to callback.
  * @max_depth: the maximum depth to process.
@@ -742,7 +742,7 @@ dzl_trie_traverse_node_post_order (DzlTrie             *trie,
 
 /**
  * dzl_trie_traverse:
- * @trie: A #Trie.
+ * @trie: A #DzlTrie.
  * @key: The key to start traversal from.
  * @order: The order to traverse.
  * @flags: The flags for which nodes to callback.
@@ -798,7 +798,7 @@ dzl_trie_traverse (DzlTrie             *trie,
 
 /**
  * dzl_trie_unref:
- * @trie: A #Trie or %NULL.
+ * @trie: A #DzlTrie or %NULL.
  *
  * Drops the reference count by one on @trie. When it reaches zero, the
  * structure is freed.
@@ -829,7 +829,7 @@ dzl_trie_ref (DzlTrie *trie)
 
 /**
  * dzl_trie_destroy:
- * @trie: A #Trie or %NULL.
+ * @trie: A #DzlTrie or %NULL.
  *
  * This is an alias for dzl_trie_unref().
  */
