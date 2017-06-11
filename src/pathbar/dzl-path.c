@@ -57,7 +57,7 @@ dzl_path_init (DzlPath *self)
 /**
  * dzl_path_get_elements:
  *
- * Returns: (transfer none) (element-type Rtfm.PathElement): The elements of the path.
+ * Returns: (transfer none) (element-type Dazzle.PathElement): The elements of the path.
  */
 GList *
 dzl_path_get_elements (DzlPath *self)
