@@ -240,10 +240,10 @@
     <xi:include href="xml/dzl-cpu-model.xml"/>
   </part>
 
-  <para id="dazzle-counters">
+  <part id="dazzle-counters">
     <title>Performance Counters</title>
     <xi:include href="xml/dzl-counter.xml"/>
-  </para>
+  </part>
 
   <part id="dazzle-widgets">
     <title>Additional Widgets</title>
