@@ -4,10 +4,10 @@ dzlsuggestionpopover {
 
 dzlsuggestionpopover > revealer > box {
   margin: 0px 0px 60px 0px;
-  border-radius: 0 0 7px 7px;
-  border: 1px solid @borders;
-  border-top: none;
-  box-shadow: 0px -10px 30px #000;
+  border-radius: 0px;
+  border-width: 0px;
+  border-bottom: 1px solid @borders;
+  box-shadow: 0px -6px 12px #000;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow {
