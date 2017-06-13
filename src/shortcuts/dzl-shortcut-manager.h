@@ -85,10 +85,6 @@ DzlShortcutTheme   *dzl_shortcut_manager_get_theme_by_name       (DzlShortcutMan
 gboolean            dzl_shortcut_manager_handle_event            (DzlShortcutManager     *self,
                                                                   const GdkEventKey      *event,
                                                                   GtkWidget              *toplevel);
-void                dzl_shortcut_manager_add_theme               (DzlShortcutManager     *self,
-                                                                  DzlShortcutTheme       *theme);
-void                dzl_shortcut_manager_remove_theme            (DzlShortcutManager     *self,
-                                                                  DzlShortcutTheme       *theme);
 const gchar        *dzl_shortcut_manager_get_user_dir            (DzlShortcutManager     *self);
 void                dzl_shortcut_manager_set_user_dir            (DzlShortcutManager     *self,
                                                                   const gchar            *user_dir);

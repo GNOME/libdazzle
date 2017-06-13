@@ -721,56 +721,6 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item = dzl_shortcut_manager_get_item;
 }
 
-void
-dzl_shortcut_manager_add_theme (DzlShortcutManager *self,
-                                DzlShortcutTheme   *theme)
-{
-  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
-  guint position;
-
-  g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (self));
-  g_return_if_fail (DZL_IS_SHORTCUT_THEME (theme));
-
-  for (guint i = 0; i < priv->themes->len; i++)
-    {
-      if (g_ptr_array_index (priv->themes, i) == theme)
-        {
-          g_warning ("%s named %s has already been added",
-                     G_OBJECT_TYPE_NAME (theme),
-                     dzl_shortcut_theme_get_name (theme));
-          return;
-        }
-    }
-
-  position = priv->themes->len;
-
-  g_ptr_array_add (priv->themes, g_object_ref (theme));
-
-  _dzl_shortcut_theme_set_manager (theme, self);
-
-  g_list_model_items_changed (G_LIST_MODEL (self), position, 0, 1);
-}
-
-void
-dzl_shortcut_manager_remove_theme (DzlShortcutManager *self,
-                                   DzlShortcutTheme   *theme)
-{
-  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
-
-  g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (self));
-  g_return_if_fail (DZL_IS_SHORTCUT_THEME (theme));
-
-  for (guint i = 0; i < priv->themes->len; i++)
-    {
-      if (g_ptr_array_index (priv->themes, i) == theme)
-        {
-          g_ptr_array_remove_index (priv->themes, i);
-          g_list_model_items_changed (G_LIST_MODEL (self), i, 1, 0);
-          break;
-        }
-    }
-}
-
 const gchar *
 dzl_shortcut_manager_get_user_dir (DzlShortcutManager *self)
 {
