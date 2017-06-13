@@ -49,7 +49,7 @@ dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,
   title = dzl_shortcut_theme_get_title (self);
   subtitle = dzl_shortcut_theme_get_subtitle (self);
 
-  if (parent != NULL)
+  if (parent != NULL && !g_str_equal (parent, "__internal__"))
     g_string_append_printf (str, "<theme name=\"%s\" parent=\"%s\">\n", name, parent);
   else
     g_string_append_printf (str, "<theme name=\"%s\">\n", name);
