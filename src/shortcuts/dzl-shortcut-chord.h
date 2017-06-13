@@ -37,6 +37,10 @@ typedef enum
 typedef struct _DzlShortcutChord      DzlShortcutChord;
 typedef struct _DzlShortcutChordTable DzlShortcutChordTable;
 
+typedef void (*DzlShortcutChordTableForeach) (const DzlShortcutChord *chord,
+                                              gpointer                chord_data,
+                                              gpointer                user_data);
+
 GType                   dzl_shortcut_chord_get_type            (void);
 DzlShortcutChord       *dzl_shortcut_chord_new_from_event      (const GdkEventKey           *event);
 DzlShortcutChord       *dzl_shortcut_chord_new_from_string     (const gchar                 *accelerator);
@@ -76,6 +80,9 @@ const DzlShortcutChord *dzl_shortcut_chord_table_lookup_data   (DzlShortcutChord
                                                                 gpointer                     data);
 guint                   dzl_shortcut_chord_table_size          (const DzlShortcutChordTable *self);
 void                    dzl_shortcut_chord_table_printf        (const DzlShortcutChordTable *self);
+void                    dzl_shortcut_chord_table_foreach       (const DzlShortcutChordTable  *self,
+                                                                DzlShortcutChordTableForeach  foreach_func,
+                                                                gpointer                      foreach_data);
 GType                   dzl_shortcut_match_get_type            (void);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (DzlShortcutChord, dzl_shortcut_chord_free)

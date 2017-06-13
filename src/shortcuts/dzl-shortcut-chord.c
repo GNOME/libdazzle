@@ -689,3 +689,35 @@ dzl_shortcut_chord_get_nth_key (const DzlShortcutChord *self,
         *modifier = 0;
     }
 }
+
+/**
+ * dzl_shortcut_chord_foreach:
+ * @self: a #DzlShortcutChordTable
+ * @foreach_func: (scope call) (closure foreach_data): A callback for each chord
+ * @foreach_data: user data for @foreach_func
+ *
+ * This function will call @foreach_func for each chord in the table.
+ */
+void
+dzl_shortcut_chord_table_foreach (const DzlShortcutChordTable  *self,
+                                  DzlShortcutChordTableForeach  foreach_func,
+                                  gpointer                      foreach_data)
+{
+  g_return_if_fail (foreach_func != NULL);
+
+  if (self == NULL)
+    return;
+
+  /*
+   * Walk backwards just in case the caller somehow thinks it is okay to
+   * remove items while iterating the list. We don't officially support that
+   * (which is why self is const), but this is just defensive.
+   */
+
+  for (guint i = self->len; i > 0; i--)
+    {
+      const DzlShortcutChordTableEntry *entry = &self->entries[i-1];
+
+      foreach_func (&entry->chord, entry->data, foreach_data);
+    }
+}
