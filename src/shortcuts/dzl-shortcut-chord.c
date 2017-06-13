@@ -643,6 +643,21 @@ _dzl_shortcut_chord_table_iter_next (DzlShortcutChordTableIter  *iter,
   return FALSE;
 }
 
+void
+_dzl_shortcut_chord_table_iter_steal (DzlShortcutChordTableIter  *iter)
+{
+  g_return_if_fail (iter != NULL);
+  g_return_if_fail (iter->table != NULL);
+
+  if (iter->position > 0 && iter->position < iter->table->len)
+    {
+      dzl_shortcut_chord_table_remove_index (iter->table, --iter->position);
+      return;
+    }
+
+  g_warning ("Attempt to steal item from table that does not exist");
+}
+
 gboolean
 dzl_shortcut_chord_has_modifier (const DzlShortcutChord *self)
 {

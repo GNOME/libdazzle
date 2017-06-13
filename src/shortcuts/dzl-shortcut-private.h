@@ -107,6 +107,7 @@ void                   _dzl_shortcut_chord_table_iter_init      (DzlShortcutChor
 gboolean               _dzl_shortcut_chord_table_iter_next      (DzlShortcutChordTableIter  *iter,
                                                                  const DzlShortcutChord    **chord,
                                                                  gpointer                   *value);
+void                   _dzl_shortcut_chord_table_iter_steal     (DzlShortcutChordTableIter  *iter);
 
 G_END_DECLS
 
