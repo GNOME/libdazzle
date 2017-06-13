@@ -959,7 +959,7 @@ dzl_shortcut_controller_add_command (DzlShortcutController   *self,
         {
           dzl_shortcut_chord_table_add (priv->commands_table, chord, (gpointer)command_id);
           manager = dzl_shortcut_controller_get_manager (self);
-          theme = dzl_shortcut_manager_get_theme_by_name (manager, "default");
+          theme = _dzl_shortcut_manager_get_internal_theme (manager);
           dzl_shortcut_theme_set_chord_for_command (theme, command_id, chord);
 
 #if 0

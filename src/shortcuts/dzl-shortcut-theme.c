@@ -625,3 +625,112 @@ _dzl_shortcut_theme_set_manager (DzlShortcutTheme   *self,
 
   priv->manager = manager;
 }
+
+static void
+copy_chord_to_table (const DzlShortcutChord *chord,
+                     gpointer                data,
+                     gpointer                user_data)
+{
+  DzlShortcutChordTable *dest = user_data;
+  const gchar *interned_string = data;
+
+  g_assert (chord != NULL);
+  g_assert (data != NULL);
+  g_assert (dest != NULL);
+
+  dzl_shortcut_chord_table_add (dest, chord, (gpointer)interned_string);
+}
+
+void
+_dzl_shortcut_theme_merge (DzlShortcutTheme *self,
+                           DzlShortcutTheme *layer)
+{
+  DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+  DzlShortcutThemePrivate *layer_priv = dzl_shortcut_theme_get_instance_private (layer);
+  GHashTableIter hiter;
+  gpointer key;
+  gpointer value;
+
+  g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
+  g_return_if_fail (DZL_IS_SHORTCUT_THEME (layer));
+  g_return_if_fail (self != layer);
+  g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (priv->manager));
+  g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (layer_priv->manager));
+  g_return_if_fail (priv->manager == layer_priv->manager);
+
+  /*
+   * This function will take the values in @layer and apply them to @self.
+   * Doing so will allow us to discard @layer afterwards. What this does for us
+   * is allow the base application and plugins all define aspects of a theme
+   * but have them merged into one.
+   *
+   * This function is destructive to @layer which is why it is private API and
+   * should only be used by the DzlShortcutManager.
+   */
+
+  if (priv->name == NULL && layer_priv->name != NULL)
+    priv->name = g_steal_pointer (&layer_priv->name);
+
+  if (priv->title == NULL && layer_priv->title != NULL)
+    priv->title = g_steal_pointer (&layer_priv->title);
+
+  if (priv->subtitle == NULL && layer_priv->subtitle != NULL)
+    priv->subtitle = g_steal_pointer (&layer_priv->subtitle);
+
+  if (priv->parent_name == NULL && layer_priv->parent_name != NULL)
+    priv->parent_name = g_steal_pointer (&layer_priv->parent_name);
+
+  /*
+   * Steal all of the closure chains from @layer and apply them to our
+   * overriden closure chains.
+   */
+
+  g_hash_table_iter_init (&hiter, layer_priv->chains);
+  while (g_hash_table_iter_next (&hiter, &key, &value))
+    {
+      DzlShortcutClosureChain *chain = value;
+      const gchar *interned_key = key;
+
+      g_hash_table_insert (priv->chains, (gpointer)interned_key, chain);
+      g_hash_table_iter_steal (&hiter);
+    }
+
+  /*
+   * Merge all of the contexts found in the upper layer and apply them
+   * to our contexts. Since there could be additions/removals to the
+   * context, we can't just steal them, but have to merge their contents.
+   */
+  g_hash_table_iter_init (&hiter, layer_priv->contexts);
+  while (g_hash_table_iter_next (&hiter, &key, &value))
+    {
+      DzlShortcutContext *context = value;
+      DzlShortcutContext *base_context;
+      const gchar *interned_key = key;
+
+      base_context = g_hash_table_lookup (priv->contexts, interned_key);
+
+      /*
+       * If we do not contain this context yet, we can cheat and just steal the
+       * whole context rather than merge them.
+       */
+      if (base_context == NULL)
+        {
+          g_hash_table_insert (priv->contexts, (gpointer)interned_key, value);
+          g_hash_table_iter_steal (&hiter);
+          continue;
+        }
+
+      /*
+       * Okay, both layers have the context, so we need to merge them.
+       */
+      _dzl_shortcut_context_merge (base_context, context);
+    }
+
+  /*
+   * Copy our action and commands chords over. These are all const data, so no
+   * need to be tricky about stealing data or what data we are safe to
+   * copy/steal/ref/etc.
+   */
+  dzl_shortcut_chord_table_foreach (layer_priv->actions_table, copy_chord_to_table, priv->actions_table);
+  dzl_shortcut_chord_table_foreach (layer_priv->commands_table, copy_chord_to_table, priv->commands_table);
+}

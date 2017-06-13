@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-manager.h"
 
+#include <glib/gi18n.h>
+
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-label.h"
 #include "shortcuts/dzl-shortcut-manager.h"
@@ -26,15 +28,57 @@
 #include "shortcuts/dzl-shortcuts-group.h"
 #include "shortcuts/dzl-shortcuts-section.h"
 #include "shortcuts/dzl-shortcuts-shortcut.h"
+#include "util/dzl-util-private.h"
 
 typedef struct
 {
+  /*
+   * This is the currently selected theme by the user (or default until
+   * a theme has been set). You can change this with the
+   * dzl_shortcut_manager_set_theme() function.
+   */
   DzlShortcutTheme *theme;
-  GPtrArray        *themes;
-  gchar            *user_dir;
-  GNode            *root;
-  GQueue            search_path;
-  guint             reload_handler;
+
+  /*
+   * To avoid re-implementing lots of behavior, we use an internal theme
+   * to store all the built-in keybindings for shortcut controllers. Then,
+   * when loading themes (particularly default), we copy these into that
+   * theme to give the effect of inheritance.
+   */
+  DzlShortcutTheme *internal_theme;
+
+  /*
+   * This is an array of all of the themes owned by the manager. It does
+   * not, however, contain the @internal_theme instance.
+   */
+  GPtrArray *themes;
+
+  /*
+   * This is the user directory to save changes to the theme so they can
+   * be reloaded later.
+   */
+  gchar *user_dir;
+
+  /*
+   * We store a tree of various shortcut data so that we can build the
+   * shortcut window using the registered controller actions. This is
+   * done in dzl_shortcut_manager_add_shortcuts_to_window().
+   */
+  GNode *root;
+
+  /*
+   * We keep track of the search paths for loading themes here. Each element is
+   * a string containing the path to the file-system resource. If the path
+   * starts with 'resource://" it is assumed a resource embedded in the current
+   * process.
+   */
+  GQueue search_path;
+
+  /*
+   * Upon making changes to @search path, we need to reload the themes. This
+   * is a GSource identifier to indicate our queued reload request.
+   */
+  guint reload_handler;
 } DzlShortcutManagerPrivate;
 
 enum {
@@ -50,8 +94,16 @@ enum {
   N_SIGNALS
 };
 
-static void list_model_iface_init (GListModelInterface *iface);
-static void initable_iface_init   (GInitableIface      *iface);
+static void list_model_iface_init               (GListModelInterface *iface);
+static void initable_iface_init                 (GInitableIface      *iface);
+static void dzl_shortcut_manager_load_directory (DzlShortcutManager  *self,
+                                                 const gchar         *resource_dir,
+                                                 GCancellable        *cancellable);
+static void dzl_shortcut_manager_load_resources (DzlShortcutManager  *self,
+                                                 const gchar         *resource_dir,
+                                                 GCancellable        *cancellable);
+static void dzl_shortcut_manager_merge          (DzlShortcutManager  *self,
+                                                 DzlShortcutTheme    *theme);
 
 G_DEFINE_TYPE_WITH_CODE (DzlShortcutManager, dzl_shortcut_manager, G_TYPE_OBJECT,
                          G_ADD_PRIVATE (DzlShortcutManager)
@@ -72,6 +124,77 @@ free_node_data (GNode    *node,
   return FALSE;
 }
 
+static void
+destroy_theme (gpointer data)
+{
+  g_autoptr(DzlShortcutTheme) theme = data;
+
+  g_assert (DZL_IS_SHORTCUT_THEME (theme));
+
+  _dzl_shortcut_theme_set_manager (theme, NULL);
+}
+
+static void
+dzl_shortcut_manager_reload (DzlShortcutManager *self,
+                             GCancellable       *cancellable)
+{
+  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+  g_autofree gchar *theme_name = NULL;
+  g_autofree gchar *parent_theme_name = NULL;
+  guint previous_len;
+
+  g_assert (DZL_IS_SHORTCUT_MANAGER (self));
+  g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+  if (priv->theme != NULL)
+    {
+      /*
+       * Keep a copy of the current theme name so that we can return to the
+       * same theme if it is still available. If it has disappeared, then we
+       * will try to fallback to the parent theme.
+       */
+      theme_name = g_strdup (dzl_shortcut_theme_get_name (priv->theme));
+      parent_theme_name = g_strdup (dzl_shortcut_theme_get_parent_name (priv->theme));
+      g_clear_object (&priv->theme);
+    }
+
+  /*
+   * Now remove all of our old themes and notify listeners via the GListModel
+   * interface so things like preferences can update. We ensure that we place
+   * a "default" item in the list as we should always have one. We'll append to
+   * it when loading the default theme anyway.
+   *
+   * The default theme always inherits from __internal__ so that we can store
+   * our widget/controller defined shortcuts separate from the mutable default
+   * theme which various applications might want to tweak in their overrides.
+   */
+  previous_len = priv->themes->len;
+  g_ptr_array_remove_range (priv->themes, 0, previous_len);
+  g_ptr_array_add (priv->themes, g_object_new (DZL_TYPE_SHORTCUT_THEME,
+                                               "name", "default",
+                                               "title", _("Default Shortcuts"),
+                                               "parent-name", "__internal__",
+                                               NULL));
+  g_list_model_items_changed (G_LIST_MODEL (self), 0, previous_len, 1);
+
+  /*
+   * Okay, now we can go and load all the files in the search path. After
+   * loading a file, the loader code will call dzl_shortcut_manager_merge()
+   * to layer that theme into any base theme which matches the name. This
+   * allows application plugins to simply load a keytheme file to have it
+   * merged into the parent keytheme.
+   */
+  for (const GList *iter = priv->search_path.tail; iter != NULL; iter = iter->prev)
+    {
+      const gchar *directory = iter->data;
+
+      if (g_str_has_prefix (directory, "resource://"))
+        dzl_shortcut_manager_load_resources (self, directory, cancellable);
+      else
+        dzl_shortcut_manager_load_directory (self, directory, cancellable);
+    }
+}
+
 static gboolean
 dzl_shortcut_manager_do_reload (gpointer data)
 {
@@ -81,12 +204,7 @@ dzl_shortcut_manager_do_reload (gpointer data)
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
 
   priv->reload_handler = 0;
-
-  for (const GList *iter = priv->search_path.head; iter; iter = iter->next)
-    {
-
-    }
-
+  dzl_shortcut_manager_reload (self, NULL);
   return G_SOURCE_REMOVE;
 }
 
@@ -121,6 +239,7 @@ dzl_shortcut_manager_finalize (GObject *object)
   g_clear_pointer (&priv->themes, g_ptr_array_unref);
   g_clear_pointer (&priv->user_dir, g_free);
   g_clear_object (&priv->theme);
+  g_clear_object (&priv->internal_theme);
 
   G_OBJECT_CLASS (dzl_shortcut_manager_parent_class)->finalize (object);
 }
@@ -223,8 +342,11 @@ dzl_shortcut_manager_init (DzlShortcutManager *self)
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
-  priv->themes = g_ptr_array_new_with_free_func (g_object_unref);
+  priv->themes = g_ptr_array_new_with_free_func (destroy_theme);
   priv->root = g_node_new (NULL);
+  priv->internal_theme = g_object_new (DZL_TYPE_SHORTCUT_THEME,
+                                       "name", "__internal__",
+                                       NULL);
 }
 
 static void
@@ -254,7 +376,7 @@ dzl_shortcut_manager_load_directory (DzlShortcutManager  *self,
       theme = dzl_shortcut_theme_new (NULL);
 
       if (dzl_shortcut_theme_load_from_path (theme, path, cancellable, &local_error))
-        dzl_shortcut_manager_add_theme (self, theme);
+        dzl_shortcut_manager_merge (self, theme);
       else
         g_warning ("%s", local_error->message);
     }
@@ -292,7 +414,7 @@ dzl_shortcut_manager_load_resources (DzlShortcutManager *self,
           theme = dzl_shortcut_theme_new (NULL);
 
           if (dzl_shortcut_theme_load_from_data (theme, data, len, &local_error))
-            dzl_shortcut_manager_add_theme (self, theme);
+            dzl_shortcut_manager_merge (self, theme);
           else
             g_warning ("%s", local_error->message);
         }
@@ -305,20 +427,11 @@ dzl_shortcut_manager_initiable_init (GInitable     *initable,
                                      GError       **error)
 {
   DzlShortcutManager *self = (DzlShortcutManager *)initable;
-  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
-  for (const GList *iter = priv->search_path.tail; iter != NULL; iter = iter->prev)
-    {
-      const gchar *directory = iter->data;
-
-      if (g_str_has_prefix (directory, "resource://"))
-        dzl_shortcut_manager_load_resources (self, directory, cancellable);
-      else
-        dzl_shortcut_manager_load_directory (self, directory, cancellable);
-    }
+  dzl_shortcut_manager_reload (self, cancellable);
 
   return TRUE;
 }
@@ -328,7 +441,6 @@ initable_iface_init (GInitableIface *iface)
 {
   iface->init = dzl_shortcut_manager_initiable_init;
 }
-
 
 /**
  * dzl_shortcut_manager_get_default:
@@ -461,7 +573,7 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
 
   while (widget != NULL)
     {
-      g_autoptr(GtkWidget) widget_hold = g_object_ref (widget);
+      G_GNUC_UNUSED g_autoptr(GtkWidget) widget_hold = g_object_ref (widget);
       DzlShortcutController *controller;
       gboolean use_binding_sets = TRUE;
 
@@ -652,7 +764,6 @@ dzl_shortcut_manager_remove_theme (DzlShortcutManager *self,
     {
       if (g_ptr_array_index (priv->themes, i) == theme)
         {
-          _dzl_shortcut_theme_set_manager (theme, NULL);
           g_ptr_array_remove_index (priv->themes, i);
           g_list_model_items_changed (G_LIST_MODEL (self), i, 1, 0);
           break;
@@ -1055,15 +1166,14 @@ dzl_shortcut_manager_add_shortcut_entries (DzlShortcutManager     *self,
                                            guint                   n_shortcuts,
                                            const gchar            *translation_domain)
 {
-  DzlShortcutTheme *theme;
+
+  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
   g_return_if_fail (!self || DZL_IS_SHORTCUT_MANAGER (self));
   g_return_if_fail (shortcuts != NULL || n_shortcuts == 0);
 
   if (self == NULL)
     self = dzl_shortcut_manager_get_default ();
-
-  theme = dzl_shortcut_manager_get_theme_by_name (self, "default");
 
   for (guint i = 0; i < n_shortcuts; i++)
     {
@@ -1076,7 +1186,8 @@ dzl_shortcut_manager_add_shortcut_entries (DzlShortcutManager     *self,
         }
 
       if (entry->default_accel != NULL)
-        dzl_shortcut_theme_set_accel_for_command (theme, entry->command, entry->default_accel);
+        dzl_shortcut_theme_set_accel_for_command (priv->internal_theme,
+                                                  entry->command, entry->default_accel);
 
       dzl_shortcut_manager_add_command (self,
                                         entry->command,
@@ -1115,4 +1226,80 @@ dzl_shortcut_manager_get_theme_by_name (DzlShortcutManager *self,
     }
 
   return NULL;
+}
+
+DzlShortcutTheme *
+_dzl_shortcut_manager_get_internal_theme (DzlShortcutManager *self)
+{
+  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_MANAGER (self), NULL);
+
+  return priv->internal_theme;
+}
+
+static void
+dzl_shortcut_manager_merge (DzlShortcutManager *self,
+                            DzlShortcutTheme   *theme)
+{
+  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+  g_autoptr(DzlShortcutTheme) alloc_layer = NULL;
+  DzlShortcutTheme *base_layer;
+  const gchar *name;
+
+  g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (self));
+  g_return_if_fail (DZL_IS_SHORTCUT_THEME (theme));
+
+  /*
+   * One thing we are trying to avoid here is having separate code paths for
+   * adding the "first theme modification" from merging additional layers from
+   * plugins and the like. Having the same merge path in all situations
+   * hopefully will help us avoid some bugs.
+   */
+
+  name = dzl_shortcut_theme_get_name (theme);
+
+  if (dzl_str_empty0 (name))
+    {
+      g_warning ("Attempt to merge theme with empty name");
+      return;
+    }
+
+  base_layer = dzl_shortcut_manager_get_theme_by_name (self, name);
+
+  if (base_layer == NULL)
+    {
+      const gchar *parent_name;
+      const gchar *title;
+      const gchar *subtitle;
+
+      parent_name = dzl_shortcut_theme_get_parent_name (theme);
+      title = dzl_shortcut_theme_get_title (theme);
+      subtitle = dzl_shortcut_theme_get_subtitle (theme);
+
+      alloc_layer = g_object_new (DZL_TYPE_SHORTCUT_THEME,
+                                  "name", name,
+                                  "parent-name", parent_name,
+                                  "subtitle", subtitle,
+                                  "title", title,
+                                  NULL);
+
+      base_layer = alloc_layer;
+
+      /*
+       * Now notify the GListModel consumers that our internal theme list
+       * has changed to include the newly created base layer.
+       */
+      g_ptr_array_add (priv->themes, g_object_ref (alloc_layer));
+      _dzl_shortcut_theme_set_manager (alloc_layer, self);
+      g_list_model_items_changed (G_LIST_MODEL (self), priv->themes->len - 1, 0, 1);
+    }
+
+  /*
+   * Okay, now we need to go through all the custom contexts, and global
+   * shortcuts in the theme and merge them into the base_layer. However, we
+   * will defer that work to the DzlShortcutTheme module so it has access to
+   * the intenral structures.
+   */
+  _dzl_shortcut_theme_merge (base_layer, theme);
 }
