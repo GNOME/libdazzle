@@ -141,6 +141,7 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
   g_autofree gchar *theme_name = NULL;
   g_autofree gchar *parent_theme_name = NULL;
+  DzlShortcutTheme *theme = NULL;
   guint previous_len;
 
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
@@ -194,6 +195,23 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
       else
         dzl_shortcut_manager_load_directory (self, directory, cancellable);
     }
+
+  /*
+   * Now try to reapply the same theme if we can find it.
+   */
+  if (theme_name != NULL)
+    {
+      theme = dzl_shortcut_manager_get_theme_by_name (self, theme_name);
+      g_set_object (&priv->theme, theme);
+    }
+  if (priv->theme == NULL && parent_theme_name != NULL)
+    {
+      theme = dzl_shortcut_manager_get_theme_by_name (self, parent_theme_name);
+      g_set_object (&priv->theme, theme);
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME]);
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME_NAME]);
 }
 
 static gboolean
