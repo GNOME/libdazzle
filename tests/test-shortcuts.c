@@ -110,23 +110,7 @@ main (gint argc,
                     G_CALLBACK (on_current_chord_notify),
                     &app);
 
-  if (argc > 1 && g_file_test (argv[1], G_FILE_TEST_IS_REGULAR))
-    {
-      g_autoptr(GError) error = NULL;
-      const gchar *path = argv[1];
-
-      theme = dzl_shortcut_theme_new (NULL);
-
-      if (!dzl_shortcut_theme_load_from_path (theme, path, NULL, &error))
-        g_error ("%s", error->message);
-
-      dzl_shortcut_manager_add_theme (manager, theme);
-      dzl_shortcut_manager_set_theme (manager, theme);
-    }
-  else
-    {
-      theme = g_object_ref (dzl_shortcut_manager_get_theme (manager));
-    }
+  theme = g_object_ref (dzl_shortcut_manager_get_theme (manager));
 
   app.header = g_object_new (GTK_TYPE_HEADER_BAR,
                              "show-close-button", TRUE,
