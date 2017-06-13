@@ -621,7 +621,7 @@ _dzl_shortcut_theme_set_manager (DzlShortcutTheme   *self,
 
   g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
   g_return_if_fail (!manager || DZL_IS_SHORTCUT_MANAGER (manager));
-  g_return_if_fail (priv->manager == NULL);
+  g_return_if_fail (priv->manager == NULL || manager == NULL);
 
   priv->manager = manager;
 }
