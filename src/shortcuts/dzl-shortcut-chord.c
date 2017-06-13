@@ -630,7 +630,13 @@ _dzl_shortcut_chord_table_iter_next (DzlShortcutChordTableIter  *iter,
                                      gpointer                   *value)
 {
   g_return_val_if_fail (iter != NULL, FALSE);
-  g_return_val_if_fail (iter->table != NULL, FALSE);
+
+  /*
+   * Be safe against NULL tables which we allow in
+   * _dzl_shortcut_chord_table_iter_init() for convenience.
+   */
+  if (iter->table == NULL)
+    return FALSE;
 
   if (iter->position < iter->table->len)
     {
