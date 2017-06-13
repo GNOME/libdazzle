@@ -105,7 +105,7 @@ dzl_application_real_add_resource_path (DzlApplication *self,
    * resources. We always append so that the application resource dir is
    * loaded before any plugin paths.
    */
-  keythemes_path = g_build_filename (resource_path, "keythemes", NULL);
+  keythemes_path = g_strjoin (NULL, "resources://", resource_path, "/shortcuts", NULL);
   dzl_shortcut_manager_append_search_path (priv->shortcut_manager, keythemes_path);
 }
 
@@ -132,7 +132,7 @@ dzl_application_real_remove_resource_path (DzlApplication *self,
     dzl_menu_manager_remove (priv->menu_manager, merge_id);
 
   /* Remove keythemes path from the shortcuts manager */
-  keythemes_path = g_build_filename (resource_path, "keythemes", NULL);
+  keythemes_path = g_strjoin (NULL, "resources://", resource_path, "/shortcuts", NULL);
   dzl_shortcut_manager_remove_search_path (priv->shortcut_manager, keythemes_path);
 }
 
