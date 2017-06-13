@@ -28,9 +28,21 @@
 
 typedef struct
 {
-  gchar                 *name;
+  /* The name of the context, interned */
+  const gchar *name;
+
+  /* The table of entries in this context which maps to a shortcut.
+   * These need to be copied across when merging down to another
+   * context layer.
+   */
   DzlShortcutChordTable *table;
-  guint                  use_binding_sets : 1;
+
+  /* If we should use binding sets. By default this is true, but
+   * we use a signed 2-bit int for -1 being "unset". That allows
+   * us to know when the value was set on a layer and merge that
+   * value upwards.
+   */
+  gint use_binding_sets : 2;
 } DzlShortcutContextPrivate;
 
 enum {
@@ -338,7 +350,6 @@ dzl_shortcut_context_finalize (GObject *object)
   DzlShortcutContext *self = (DzlShortcutContext *)object;
   DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
 
-  g_clear_pointer (&priv->name, g_free);
   g_clear_pointer (&priv->table, dzl_shortcut_chord_table_free);
 
   G_OBJECT_CLASS (dzl_shortcut_context_parent_class)->finalize (object);
@@ -360,7 +371,7 @@ dzl_shortcut_context_get_property (GObject    *object,
       break;
 
     case PROP_USE_BINDING_SETS:
-      g_value_set_boolean (value, priv->use_binding_sets);
+      g_value_set_boolean (value, !!priv->use_binding_sets);
       break;
 
     default:
@@ -380,7 +391,7 @@ dzl_shortcut_context_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_NAME:
-      priv->name = g_value_dup_string (value);
+      priv->name = g_intern_string (g_value_get_string (value));
       break;
 
     case PROP_USE_BINDING_SETS:
@@ -423,7 +434,7 @@ dzl_shortcut_context_init (DzlShortcutContext *self)
 {
   DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
 
-  priv->use_binding_sets = TRUE;
+  priv->use_binding_sets = -1;
 }
 
 DzlShortcutContext *
