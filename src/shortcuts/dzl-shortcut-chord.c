@@ -712,7 +712,7 @@ dzl_shortcut_chord_get_nth_key (const DzlShortcutChord *self,
 }
 
 /**
- * dzl_shortcut_chord_foreach:
+ * dzl_shortcut_chord_table_foreach:
  * @self: a #DzlShortcutChordTable
  * @foreach_func: (scope call) (closure foreach_data): A callback for each chord
  * @foreach_data: user data for @foreach_func
