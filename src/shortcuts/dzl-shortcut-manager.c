@@ -489,12 +489,21 @@ dzl_shortcut_manager_get_theme (DzlShortcutManager *self)
 
   priv = dzl_shortcut_manager_get_instance_private (self);
 
-  if (priv->theme == NULL)
-    priv->theme = g_object_new (DZL_TYPE_SHORTCUT_THEME,
-                                "name", "default",
-                                NULL);
+  if G_LIKELY (priv->theme != NULL)
+    return priv->theme;
 
-  return priv->theme;
+  for (guint i = 0; i < priv->themes->len; i++)
+    {
+      DzlShortcutTheme *theme = g_ptr_array_index (priv->themes, i);
+
+      if (g_strcmp0 (dzl_shortcut_theme_get_name (theme), "default") == 0)
+        {
+          priv->theme = g_object_ref (theme);
+          return priv->theme;
+        }
+    }
+
+  return priv->internal_theme;
 }
 
 /**
