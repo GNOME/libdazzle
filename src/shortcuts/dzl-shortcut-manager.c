@@ -1157,8 +1157,13 @@ dzl_shortcut_manager_add_shortcut_entries (DzlShortcutManager     *self,
 /**
  * dzl_shortcut_manager_get_theme_by_name:
  * @self: a #DzlShortcutManager
+ * @theme_name: (nullable): the name of a theme or %NULL of the internal theme
  *
  * Locates a theme by the name of the theme.
+ *
+ * If @theme_name is %NULL, then the internal theme is used. You probably dont
+ * need to use that as it is used by various controllers to hook up their
+ * default actions.
  *
  * Returns: (transfer none) (nullable): A #DzlShortcutTheme or %NULL.
  */
@@ -1169,7 +1174,9 @@ dzl_shortcut_manager_get_theme_by_name (DzlShortcutManager *self,
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_MANAGER (self), NULL);
-  g_return_val_if_fail (theme_name != NULL, NULL);
+
+  if (theme_name == NULL || g_strcmp0 (theme_name, "__internal__") == 0)
+    return priv->internal_theme;
 
   for (guint i = 0; i < priv->themes->len; i++)
     {
