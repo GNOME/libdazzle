@@ -592,6 +592,10 @@ dzl_shortcut_chord_table_set_free_func (DzlShortcutChordTable *self,
 guint
 dzl_shortcut_chord_table_size (const DzlShortcutChordTable *self)
 {
+  /* I know this is confusing, but len is the number of items in the
+   * table (which consumers think of as size), and @size is the allocated
+   * size of the ^2 growing array.
+   */
   return self ? self->len : 0;
 }
 
