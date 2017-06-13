@@ -829,3 +829,36 @@ _dzl_shortcut_context_get_table (DzlShortcutContext *self)
 
   return priv->table;
 }
+
+void
+_dzl_shortcut_context_merge (DzlShortcutContext *self,
+                             DzlShortcutContext *layer)
+{
+  DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
+  DzlShortcutContextPrivate *layer_priv = dzl_shortcut_context_get_instance_private (layer);
+  DzlShortcutChordTableIter iter;
+  const DzlShortcutChord *chord;
+  gpointer value;
+
+  g_return_if_fail (DZL_IS_SHORTCUT_CONTEXT (self));
+  g_return_if_fail (DZL_IS_SHORTCUT_CONTEXT (layer));
+  g_return_if_fail (layer != self);
+
+  if (layer_priv->use_binding_sets != -1)
+    priv->use_binding_sets = layer_priv->use_binding_sets;
+
+  _dzl_shortcut_chord_table_iter_init (&iter, layer_priv->table);
+  while (_dzl_shortcut_chord_table_iter_next (&iter, &chord, &value))
+    {
+      Shortcut *sc = value;
+
+      /* Make sure this doesn't exist in the base layer anymore */
+      dzl_shortcut_chord_table_remove (priv->table, chord);
+
+      /* Now add it to our table of chords */
+      dzl_shortcut_context_add (self, chord, sc);
+
+      /* Now we can safely steal this from the upper layer */
+      _dzl_shortcut_chord_table_iter_steal (&iter);
+    }
+}
