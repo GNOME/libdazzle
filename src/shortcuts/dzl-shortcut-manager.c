@@ -175,6 +175,7 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
                                                "title", _("Default Shortcuts"),
                                                "parent-name", "__internal__",
                                                NULL));
+  _dzl_shortcut_theme_set_manager (g_ptr_array_index (priv->themes, 0), self);
   g_list_model_items_changed (G_LIST_MODEL (self), 0, previous_len, 1);
 
   /*
@@ -376,9 +377,11 @@ dzl_shortcut_manager_load_directory (DzlShortcutManager  *self,
       theme = dzl_shortcut_theme_new (NULL);
 
       if (dzl_shortcut_theme_load_from_path (theme, path, cancellable, &local_error))
-        dzl_shortcut_manager_merge (self, theme);
-      else
-        g_warning ("%s", local_error->message);
+        {
+          _dzl_shortcut_theme_set_manager (theme, self);
+          dzl_shortcut_manager_merge (self, theme);
+        }
+      else g_warning ("%s", local_error->message);
     }
 }
 
@@ -414,7 +417,10 @@ dzl_shortcut_manager_load_resources (DzlShortcutManager *self,
           theme = dzl_shortcut_theme_new (NULL);
 
           if (dzl_shortcut_theme_load_from_data (theme, data, len, &local_error))
-            dzl_shortcut_manager_merge (self, theme);
+            {
+              _dzl_shortcut_theme_set_manager (theme, self);
+              dzl_shortcut_manager_merge (self, theme);
+            }
           else
             g_warning ("%s", local_error->message);
         }
