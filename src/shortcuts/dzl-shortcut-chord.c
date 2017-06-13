@@ -630,9 +630,7 @@ _dzl_shortcut_chord_table_iter_next (DzlShortcutChordTableIter  *iter,
                                      gpointer                   *value)
 {
   g_return_val_if_fail (iter != NULL, FALSE);
-
-  if (iter->table == NULL)
-    return FALSE;
+  g_return_val_if_fail (iter->table != NULL, FALSE);
 
   if (iter->position < iter->table->len)
     {
