@@ -64,6 +64,14 @@ typedef struct
    */
   DzlShortcutManager *shortcut_manager;
 
+  /*
+   * Deferred resource loading. This can be used to call
+   * dzl_application_add_resources() before ::startup() has been called. Upon
+   * ::startup(), we'll apply these. If this is set to NULL, ::startup() has
+   * already been called.
+   */
+  GPtrArray *deferred_resources;
+
 } DzlApplicationPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlApplication, dzl_application, GTK_TYPE_APPLICATION)
@@ -180,6 +188,22 @@ dzl_application_startup (GApplication *app)
    */
   app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
   gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
+
+  /*
+   * Now apply our deferred resources.
+   */
+  for (guint i = 0; i < priv->deferred_resources->len; i++)
+    {
+      const gchar *path = g_ptr_array_index (priv->deferred_resources, i);
+      DZL_APPLICATION_GET_CLASS (self)->add_resources (self, path);
+    }
+  g_clear_pointer (&priv->deferred_resources, g_ptr_array_unref);
+
+  /*
+   * Now force reload the keyboard shortcuts without defering to the main
+   * loop or anything.
+   */
+  dzl_shortcut_manager_reload (priv->shortcut_manager, NULL);
 }
 
 static void
@@ -188,6 +212,7 @@ dzl_application_finalize (GObject *object)
   DzlApplication *self = (DzlApplication *)object;
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
 
+  g_clear_pointer (&priv->deferred_resources, g_ptr_array_unref);
   g_clear_pointer (&priv->menu_merge_ids, g_hash_table_unref);
   g_clear_object (&priv->theme_manager);
   g_clear_object (&priv->menu_manager);
@@ -217,6 +242,7 @@ dzl_application_init (DzlApplication *self)
 
   g_application_set_default (G_APPLICATION (self));
 
+  priv->deferred_resources = g_ptr_array_new ();
   priv->theme_manager = dzl_theme_manager_new ();
   priv->menu_manager = dzl_menu_manager_new ();
   priv->menu_merge_ids = g_hash_table_new (NULL, NULL);
@@ -299,8 +325,16 @@ void
 dzl_application_add_resources (DzlApplication *self,
                                const gchar    *resource_path)
 {
+  DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+
   g_return_if_fail (DZL_IS_APPLICATION (self));
   g_return_if_fail (resource_path != NULL);
+
+  if (priv->deferred_resources != NULL)
+    {
+      g_ptr_array_add (priv->deferred_resources, (gpointer)g_intern_string (resource_path));
+      return;
+    }
 
   DZL_APPLICATION_GET_CLASS (self)->add_resources (self, resource_path);
 }
@@ -317,8 +351,16 @@ void
 dzl_application_remove_resources (DzlApplication *self,
                                   const gchar    *resource_path)
 {
+  DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+
   g_return_if_fail (DZL_IS_APPLICATION (self));
   g_return_if_fail (resource_path != NULL);
+
+  if (priv->deferred_resources != NULL)
+    {
+      g_ptr_array_remove (priv->deferred_resources, (gpointer)g_intern_string (resource_path));
+      return;
+    }
 
   DZL_APPLICATION_GET_CLASS (self)->remove_resources (self, resource_path);
 }
