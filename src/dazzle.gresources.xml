@@ -22,6 +22,12 @@
     <file compressed="true" preprocess="xml-stripblanks" alias="enter-keyboard-shortcut.svg">shortcuts/enter-keyboard-shortcut.svg</file>
   </gresource>
 
+  <gresource prefix="/org/gnome/dazzle/icons/16x16/actions">
+    <file compressed="true" preprocess="xml-stripblanks" alias="panel-bottom-pane-symbolic.svg">panel/panel-bottom-pane-symbolic.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="panel-left-pane-symbolic.svg">panel/panel-left-pane-symbolic.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="panel-right-pane-symbolic.svg">panel/panel-right-pane-symbolic.svg</file>
+  </gresource>
+
   <gresource prefix="/org/gnome/dazzle/themes">
     <!-- Arc CSS theme -->
     <file compressed="true" alias="Arc.css">../data/themes/Arc.css</file>
