@@ -134,7 +134,7 @@ destroy_theme (gpointer data)
   _dzl_shortcut_theme_set_manager (theme, NULL);
 }
 
-static void
+void
 dzl_shortcut_manager_reload (DzlShortcutManager *self,
                              GCancellable       *cancellable)
 {
@@ -146,6 +146,16 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
 
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+  /*
+   * If there is a queued reload when we get here, just remove it. When called
+   * from a queued callback, this will already be zeroed.
+   */
+  if (priv->reload_handler != 0)
+    {
+      g_source_remove (priv->reload_handler);
+      priv->reload_handler = 0;
+    }
 
   if (priv->theme != NULL)
     {
@@ -196,20 +206,20 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
         dzl_shortcut_manager_load_directory (self, directory, cancellable);
     }
 
-  /*
-   * Now try to reapply the same theme if we can find it.
-   */
+  /* Now try to reapply the same theme if we can find it. */
   if (theme_name != NULL)
     {
       theme = dzl_shortcut_manager_get_theme_by_name (self, theme_name);
       g_set_object (&priv->theme, theme);
     }
+
   if (priv->theme == NULL && parent_theme_name != NULL)
     {
       theme = dzl_shortcut_manager_get_theme_by_name (self, parent_theme_name);
       g_set_object (&priv->theme, theme);
     }
 
+  /* Notify possibly changed properties */
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME]);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME_NAME]);
 }
@@ -227,7 +237,7 @@ dzl_shortcut_manager_do_reload (gpointer data)
   return G_SOURCE_REMOVE;
 }
 
-static void
+void
 dzl_shortcut_manager_queue_reload (DzlShortcutManager *self)
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
@@ -235,11 +245,17 @@ dzl_shortcut_manager_queue_reload (DzlShortcutManager *self)
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
 
   if (priv->reload_handler == 0)
-    priv->reload_handler =
-      gdk_threads_add_idle_full (G_PRIORITY_LOW,
-                                 dzl_shortcut_manager_do_reload,
-                                 g_object_ref (self),
-                                 g_object_unref);
+    {
+      /*
+       * Reload at a high priority to happen immediately, but defer
+       * until getting to the main loop.
+       */
+      priv->reload_handler =
+        gdk_threads_add_idle_full (G_PRIORITY_HIGH,
+                                   dzl_shortcut_manager_do_reload,
+                                   g_object_ref (self),
+                                   g_object_unref);
+    }
 }
 
 static void

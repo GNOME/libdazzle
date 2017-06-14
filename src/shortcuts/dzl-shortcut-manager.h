@@ -68,6 +68,9 @@ struct _DzlShortcutManagerClass
 };
 
 DzlShortcutManager *dzl_shortcut_manager_get_default             (void);
+void                dzl_shortcut_manager_queue_reload            (DzlShortcutManager     *self);
+void                dzl_shortcut_manager_reload                  (DzlShortcutManager     *self,
+                                                                  GCancellable           *cancellable);
 void                dzl_shortcut_manager_append_search_path      (DzlShortcutManager     *self,
                                                                   const gchar            *directory);
 void                dzl_shortcut_manager_prepend_search_path     (DzlShortcutManager     *self,
