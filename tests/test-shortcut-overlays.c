@@ -1,15 +1,7 @@
 #include <dazzle.h>
 
 static void
-on_startup (DzlApplication *app)
-{
-  dzl_application_add_resources (app, TEST_DATA_DIR"/shortcuts/0");
-  dzl_application_add_resources (app, TEST_DATA_DIR"/shortcuts/1");
-  dzl_application_add_resources (app, TEST_DATA_DIR"/shortcuts/2");
-}
-
-static void
-on_activate (DzlApplication *app)
+ensure_menu_merging (DzlApplication *app)
 {
   g_autofree gchar *id1 = NULL;
   g_autofree gchar *id2 = NULL;
@@ -56,6 +48,32 @@ on_activate (DzlApplication *app)
   g_assert_cmpstr (id3, ==, "section-4-item-1");
 }
 
+static void
+ensure_keybinding_merging (DzlApplication *app)
+{
+  DzlShortcutManager *manager;
+  DzlShortcutTheme *theme;
+
+  g_assert (DZL_IS_APPLICATION (app));
+
+  manager = dzl_application_get_shortcut_manager (app);
+  g_assert (DZL_IS_SHORTCUT_MANAGER (manager));
+
+  theme = dzl_shortcut_manager_get_theme_by_name (manager, "default");
+  g_assert (DZL_IS_SHORTCUT_THEME (theme));
+
+  theme = dzl_shortcut_manager_get_theme_by_name (manager, "secondary");
+  g_assert (DZL_IS_SHORTCUT_THEME (theme));
+  g_assert_cmpstr (dzl_shortcut_theme_get_parent_name (theme), ==, "default");
+}
+
+static void
+on_activate (DzlApplication *app)
+{
+  ensure_menu_merging (app);
+  ensure_keybinding_merging (app);
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
@@ -67,8 +85,12 @@ main (gint   argc,
                       "flags", G_APPLICATION_NON_UNIQUE,
                       NULL);
 
+  /* Queue resource adding, which will happen for real during startup */
+  dzl_application_add_resources (app, TEST_DATA_DIR"/shortcuts/0");
+  dzl_application_add_resources (app, TEST_DATA_DIR"/shortcuts/1");
+  dzl_application_add_resources (app, TEST_DATA_DIR"/shortcuts/2");
+
   g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
-  g_signal_connect (app, "startup", G_CALLBACK (on_startup), NULL);
 
   return g_application_run (G_APPLICATION (app), argc, argv);
 }
