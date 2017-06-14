@@ -60,6 +60,17 @@ typedef struct
   gchar *user_dir;
 
   /*
+   * To simplify the process of registering entries, we allow them to be
+   * called from the instance init function. But we only want to see those
+   * entries once. If we did this from class_init(), we'd run into issues
+   * with gtk not being initialized yet (and we need access to keymaps).
+   *
+   * This allows us to keep a unique pointer to know if we've already
+   * dealt with some entries by discarding them up front.
+   */
+  GHashTable *seen_entries;
+
+  /*
    * We store a tree of various shortcut data so that we can build the
    * shortcut window using the registered controller actions. This is
    * done in dzl_shortcut_manager_add_shortcuts_to_window().
@@ -271,6 +282,7 @@ dzl_shortcut_manager_finalize (GObject *object)
       priv->root = NULL;
     }
 
+  g_clear_pointer (&priv->seen_entries, g_hash_table_unref);
   g_clear_pointer (&priv->themes, g_ptr_array_unref);
   g_clear_pointer (&priv->user_dir, g_free);
   g_clear_object (&priv->theme);
@@ -377,6 +389,7 @@ dzl_shortcut_manager_init (DzlShortcutManager *self)
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
+  priv->seen_entries = g_hash_table_new (NULL, NULL);
   priv->themes = g_ptr_array_new_with_free_func (destroy_theme);
   priv->root = g_node_new (NULL);
   priv->internal_theme = g_object_new (DZL_TYPE_SHORTCUT_THEME,
@@ -1174,6 +1187,15 @@ dzl_shortcut_manager_add_shortcut_entries (DzlShortcutManager     *self,
     self = dzl_shortcut_manager_get_default ();
 
   priv = dzl_shortcut_manager_get_instance_private (self);
+
+  /* Ignore duplicate calls with the same entries. This is out of convenience
+   * to allow registering shortcuts from instance init (and thusly after the
+   * GdkDisplay has been connected.
+   */
+  if (g_hash_table_contains (priv->seen_entries, shortcuts))
+    return;
+
+  g_hash_table_insert (priv->seen_entries, (gpointer)shortcuts, NULL);
 
   for (guint i = 0; i < n_shortcuts; i++)
     {
