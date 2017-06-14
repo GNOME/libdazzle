@@ -96,6 +96,7 @@ endif
 gnome = import('gnome')
 
 subdir('src')
+subdir('tools')
 subdir('tests')
 subdir('examples/app')
 
