@@ -69,8 +69,8 @@ typedef struct
 G_DEFINE_TYPE_WITH_PRIVATE (DzlApplication, dzl_application, GTK_TYPE_APPLICATION)
 
 static void
-dzl_application_real_add_resource_path (DzlApplication *self,
-                                        const gchar    *resource_path)
+dzl_application_real_add_resources (DzlApplication *self,
+                                    const gchar    *resource_path)
 {
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
   g_autoptr(GError) error = NULL;
@@ -88,16 +88,24 @@ dzl_application_real_add_resource_path (DzlApplication *self,
    * Allow the theme manager to monitor the css/Adwaita.css or other themes
    * based on gtk-theme-name. The theme manager also loads icons.
    */
-  dzl_theme_manager_add_resource_path (priv->theme_manager, resource_path);
+  dzl_theme_manager_add_resources (priv->theme_manager, resource_path);
 
   /*
    * If the resource path has a gtk/menus.ui file, we want to auto-load and
    * merge the menus.
    */
   menu_path = g_build_filename (resource_path, "gtk", "menus.ui", NULL);
-  merge_id = dzl_menu_manager_add_resource (priv->menu_manager, menu_path, &error);
+
+  if (g_str_has_prefix (menu_path, "resource://"))
+    merge_id = dzl_menu_manager_add_resource (priv->menu_manager, menu_path, &error);
+  else
+    merge_id = dzl_menu_manager_add_filename (priv->menu_manager, menu_path, &error);
+
   g_hash_table_insert (priv->menu_merge_ids, (gchar *)resource_path, GUINT_TO_POINTER (merge_id));
-  if (error != NULL && !g_error_matches (error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
+
+  if (error != NULL &&
+      !(g_error_matches (error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND) ||
+        g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOENT)))
     g_warning ("%s", error->message);
 
   /*
@@ -105,13 +113,13 @@ dzl_application_real_add_resource_path (DzlApplication *self,
    * resources. We always append so that the application resource dir is
    * loaded before any plugin paths.
    */
-  keythemes_path = g_strjoin (NULL, "resources://", resource_path, "/shortcuts", NULL);
+  keythemes_path = g_build_filename (resource_path, "shortcuts", NULL);
   dzl_shortcut_manager_append_search_path (priv->shortcut_manager, keythemes_path);
 }
 
 static void
-dzl_application_real_remove_resource_path (DzlApplication *self,
-                                           const gchar    *resource_path)
+dzl_application_real_remove_resources (DzlApplication *self,
+                                       const gchar    *resource_path)
 {
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
   g_autofree gchar *keythemes_path = NULL;
@@ -124,7 +132,7 @@ dzl_application_real_remove_resource_path (DzlApplication *self,
   resource_path = g_intern_string (resource_path);
 
   /* Remove any loaded CSS providers for @resource_path/css/. */
-  dzl_theme_manager_remove_resource_path (priv->theme_manager, resource_path);
+  dzl_theme_manager_remove_resources (priv->theme_manager, resource_path);
 
   /* Remove any merged menus from the @resource_path/gtk/menus.ui */
   merge_id = GPOINTER_TO_UINT (g_hash_table_lookup (priv->menu_merge_ids, resource_path));
@@ -132,7 +140,7 @@ dzl_application_real_remove_resource_path (DzlApplication *self,
     dzl_menu_manager_remove (priv->menu_manager, merge_id);
 
   /* Remove keythemes path from the shortcuts manager */
-  keythemes_path = g_strjoin (NULL, "resources://", resource_path, "/shortcuts", NULL);
+  keythemes_path = g_strjoin (NULL, "resource://", resource_path, "/shortcuts", NULL);
   dzl_shortcut_manager_remove_search_path (priv->shortcut_manager, keythemes_path);
 }
 
@@ -141,14 +149,10 @@ dzl_application_startup (GApplication *app)
 {
   DzlApplication *self = (DzlApplication *)app;
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+  const gchar *resource_base_path;
   GMenu *app_menu;
 
   g_assert (DZL_IS_APPLICATION (self));
-
-  priv->theme_manager = dzl_theme_manager_new ();
-  priv->menu_manager = dzl_menu_manager_new ();
-  priv->menu_merge_ids = g_hash_table_new (NULL, NULL);
-  priv->shortcut_manager = g_object_ref (dzl_shortcut_manager_get_default ());
 
   G_APPLICATION_CLASS (dzl_application_parent_class)->startup (app);
 
@@ -156,44 +160,67 @@ dzl_application_startup (GApplication *app)
    * We cannot register resources before chaining startup because
    * the GtkSettings and other plumbing will not yet be initialized.
    */
-  dzl_application_add_resource_path (self, "/org/gnome/dazzle");
-  dzl_application_add_resource_path (self, g_application_get_resource_base_path (app));
+
+  /* Register our resources that are part of libdazzle. */
+  dzl_application_add_resources (self, "resource:///org/gnome/dazzle");
+
+  /* Now register the application resources */
+  if (NULL != (resource_base_path = g_application_get_resource_base_path (app)))
+    {
+      g_autofree gchar *resource_path = NULL;
+
+      resource_path = g_strdup_printf ("resource://%s", resource_base_path);
+      dzl_application_add_resources (self, resource_path);
+    }
+
+  /* If the application has "app-menu" defined in menus.ui, we want to
+   * assign it to the application. If we used the base GtkApplication for
+   * menus, this would be done for us. But since we are doing menu merging,
+   * we need to do it manually.
+   */
   app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
   gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
 }
 
 static void
-dzl_application_shutdown (GApplication *app)
+dzl_application_finalize (GObject *object)
 {
-  DzlApplication *self = (DzlApplication *)app;
+  DzlApplication *self = (DzlApplication *)object;
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
-
-  g_assert (DZL_IS_APPLICATION (self));
-
-  G_APPLICATION_CLASS (dzl_application_parent_class)->shutdown (app);
 
   g_clear_pointer (&priv->menu_merge_ids, g_hash_table_unref);
   g_clear_object (&priv->theme_manager);
   g_clear_object (&priv->menu_manager);
   g_clear_object (&priv->shortcut_manager);
+
+  G_OBJECT_CLASS (dzl_application_parent_class)->finalize (object);
 }
 
 static void
 dzl_application_class_init (DzlApplicationClass *klass)
 {
   GApplicationClass *g_app_class = G_APPLICATION_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = dzl_application_finalize;
 
   g_app_class->startup = dzl_application_startup;
-  g_app_class->shutdown = dzl_application_shutdown;
 
-  klass->add_resource_path = dzl_application_real_add_resource_path;
-  klass->remove_resource_path = dzl_application_real_remove_resource_path;
+  klass->add_resources = dzl_application_real_add_resources;
+  klass->remove_resources = dzl_application_real_remove_resources;
 }
 
 static void
 dzl_application_init (DzlApplication *self)
 {
+  DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+
   g_application_set_default (G_APPLICATION (self));
+
+  priv->theme_manager = dzl_theme_manager_new ();
+  priv->menu_manager = dzl_menu_manager_new ();
+  priv->menu_merge_ids = g_hash_table_new (NULL, NULL);
+  priv->shortcut_manager = g_object_ref (dzl_shortcut_manager_get_default ());
 }
 
 /**
@@ -255,42 +282,45 @@ dzl_application_get_menu_by_id (DzlApplication *self,
 }
 
 /**
- * dzl_application_add_resource_path:
+ * dzl_application_add_resources:
  * @self: a #DzlApplication
- * @resource_path: a path to a #GResources path
+ * @resource_path: the location of the resources.
  *
- * This adds @resource_path to the list of automatic resources.
+ * This adds @resource_path to the list of "automatic resources".
+ *
+ * If @resource_path starts with "resource://", then the corresponding
+ * #GResources path will be searched for resources. Otherwise, @resource_path
+ * should be a path to a location on disk.
  *
  * The #DzlApplication will locate resources such as CSS themes, icons, and
- * keybindings.
+ * keyboard shortcuts using @resource_path.
  */
 void
-dzl_application_add_resource_path (DzlApplication *self,
-                                   const gchar    *resource_path)
+dzl_application_add_resources (DzlApplication *self,
+                               const gchar    *resource_path)
 {
   g_return_if_fail (DZL_IS_APPLICATION (self));
   g_return_if_fail (resource_path != NULL);
 
-  DZL_APPLICATION_GET_CLASS (self)->add_resource_path (self, resource_path);
+  DZL_APPLICATION_GET_CLASS (self)->add_resources (self, resource_path);
 }
 
 /**
- * dzl_application_remove_resource_path:
+ * dzl_application_remove_resources:
  * @self: a #DzlApplication
- * @resource_path: a path to a #GResources path
+ * @resource_path: the location of the resources.
  *
- * This removes @resource_path to the list of automatic resources. This
- * directory should have been previously registered with
- * dzl_application_add_resource_path().
+ * This attempts to undo as many side-effects as possible from a call to
+ * dzl_application_add_resources().
  */
 void
-dzl_application_remove_resource_path (DzlApplication *self,
-                                      const gchar    *resource_path)
+dzl_application_remove_resources (DzlApplication *self,
+                                  const gchar    *resource_path)
 {
   g_return_if_fail (DZL_IS_APPLICATION (self));
   g_return_if_fail (resource_path != NULL);
 
-  DZL_APPLICATION_GET_CLASS (self)->remove_resource_path (self, resource_path);
+  DZL_APPLICATION_GET_CLASS (self)->remove_resources (self, resource_path);
 }
 
 /**

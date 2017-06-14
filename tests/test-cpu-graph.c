@@ -37,7 +37,7 @@ main (int argc,
   timespan = (gint64)seconds * G_USEC_PER_SEC;
   max_samples = seconds * samples;
 
-  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
+  provider = dzl_css_provider_new ("resource:///org/gnome/dazzle/themes");
   gtk_style_context_add_provider_for_screen (gdk_screen_get_default (), GTK_STYLE_PROVIDER (provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_object_unref (provider);
 

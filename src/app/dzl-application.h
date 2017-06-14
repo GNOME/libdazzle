@@ -40,10 +40,10 @@ struct _DzlApplicationClass
 {
   GtkApplicationClass parent_class;
 
-  void (*add_resource_path)    (DzlApplication *self,
-                                const gchar    *resource_path);
-  void (*remove_resource_path) (DzlApplication *self,
-                                const gchar    *resource_path);
+  void (*add_resources)    (DzlApplication *self,
+                            const gchar    *resource_path);
+  void (*remove_resources) (DzlApplication *self,
+                            const gchar    *resource_path);
 
   gpointer _reserved1;
   gpointer _reserved2;
@@ -60,9 +60,9 @@ DzlShortcutManager *dzl_application_get_shortcut_manager (DzlApplication *self);
 DzlThemeManager    *dzl_application_get_theme_manager    (DzlApplication *self);
 GMenu              *dzl_application_get_menu_by_id       (DzlApplication *self,
                                                           const gchar    *menu_id);
-void                dzl_application_add_resource_path    (DzlApplication *self,
+void                dzl_application_add_resources        (DzlApplication *self,
                                                           const gchar    *resource_path);
-void                dzl_application_remove_resource_path (DzlApplication *self,
+void                dzl_application_remove_resources     (DzlApplication *self,
                                                           const gchar    *resource_path);
 
 G_END_DECLS

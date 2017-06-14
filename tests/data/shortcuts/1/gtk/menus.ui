@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="app-menu">
+    <section id="section-2">
+      <item>
+        <attribute name="id">section-2-item-1</attribute>
+        <attribute name="label">Item 2.1</attribute>
+        <attribute name="action">dummy</attribute>
+      </item>
+    </section>
+    <section id="section-4">
+      <item>
+        <attribute name="id">section-4-item-1</attribute>
+        <attribute name="label">Item 4.1</attribute>
+        <attribute name="action">dummy</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

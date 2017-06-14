@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="app-menu">
+    <section id="section-1"></section>
+    <section id="section-2"></section>
+    <section id="section-3"></section>
+    <section id="section-4"></section>
+  </menu>
+</interface>

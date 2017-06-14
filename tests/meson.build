@@ -139,6 +139,12 @@ test_shortcut_chord = executable('test-shortcut-chord', 'test-shortcut-chord.c',
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_shortcut_overlays = executable('test-shortcut-overlays', 'test-shortcut-overlays.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
 test_shortcut_theme = executable('test-shortcut-theme', 'test-shortcut-theme.c',
         c_args: test_cflags,
      link_args: test_link_args,

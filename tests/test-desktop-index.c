@@ -115,7 +115,7 @@ create_ui (void)
   g_autoptr(GtkCssProvider) provider = NULL;
   gboolean r;
 
-  provider = dzl_css_provider_new ("/org/gnome/dazzle/themes");
+  provider = dzl_css_provider_new ("resource:///org/gnome/dazzle/themes");
   gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
                                              GTK_STYLE_PROVIDER (provider),
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION-1);

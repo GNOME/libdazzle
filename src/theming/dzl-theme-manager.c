@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-theme-manager"
 
+#include <string.h>
+
 #include "theming/dzl-css-provider.h"
 #include "theming/dzl-theme-manager.h"
 
@@ -63,11 +65,15 @@ dzl_theme_manager_new (void)
 }
 
 /**
- * dzl_theme_manager_add_resource_path:
+ * dzl_theme_manager_add_resources:
  * @self: a #DzlThemeManager
  * @resource_path: A path to a #GResources directory
  *
  * This will automatically register resources found within @resource_path.
+ *
+ * If @resource_path starts with "resource://", embedded #GResources will be
+ * used to locate the theme files. Otherwise, @resource_path is expected to be
+ * a path on disk that may or may not exist.
  *
  * If the @resource_path contains a directory named "themes", that directory
  * will be traversed for files matching the theme name and variant. For
@@ -75,18 +81,27 @@ dzl_theme_manager_new (void)
  * the dark variant is being used, "themes/Adwaita-dark.css" will be loaeded. If
  * no matching theme file is located, "themes/shared.css" will be loaded.
  *
+ * When the current theme changes, the CSS will be reloaded to adapt.
+ *
  * The "icons" sub-directory will be used to locate icon themes.
  */
 void
-dzl_theme_manager_add_resource_path (DzlThemeManager *self,
-                                     const gchar     *resource_path)
+dzl_theme_manager_add_resources (DzlThemeManager *self,
+                                 const gchar     *resource_path)
 {
   g_autoptr(GtkCssProvider) provider = NULL;
   g_autofree gchar *css_dir = NULL;
   g_autofree gchar *icons_dir = NULL;
+  GtkIconTheme *theme;
+  const gchar *real_path = resource_path;
 
   g_return_if_fail (DZL_IS_THEME_MANAGER (self));
   g_return_if_fail (resource_path != NULL);
+
+  theme = gtk_icon_theme_get_default ();
+
+  if (g_str_has_prefix (real_path, "resource://"))
+    real_path += strlen ("resource://");
 
   /*
    * Create a CSS provider that will load the proper variant based on the
@@ -94,38 +109,41 @@ dzl_theme_manager_add_resource_path (DzlThemeManager *self,
    * to locate theming files.
    */
   css_dir = g_build_filename (resource_path, "themes", NULL);
+  g_debug ("Including CSS overrides from %s", css_dir);
   provider = dzl_css_provider_new (css_dir);
   g_hash_table_insert (self->providers_by_path, g_strdup (resource_path), g_object_ref (provider));
   gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
                                              GTK_STYLE_PROVIDER (provider),
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-  g_debug ("Including CSS overrides from %s", css_dir);
 
   /*
    * Add the icons sub-directory so that Gtk can locate the themed
    * icons (svg, png, etc).
    */
-  icons_dir = g_build_filename (resource_path, "icons", NULL);
-  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_default (), icons_dir);
+  icons_dir = g_build_filename (real_path, "icons", NULL);
   g_debug ("Loading icon resources from %s", icons_dir);
+  if (!g_str_equal (real_path, resource_path))
+    gtk_icon_theme_add_resource_path (theme, icons_dir);
+  else
+    gtk_icon_theme_append_search_path (theme, icons_dir);
 }
 
 /**
- * dzl_theme_manager_remove_resource_path:
+ * dzl_theme_manager_remove_resources:
  * @self: a #DzlThemeManager
  * @resource_path: A previously registered resources path
  *
  * This removes the CSS providers that were registered using @resource_path.
  *
- * You must have previously called dzl_theme_manager_add_resource_path() for
+ * You must have previously called dzl_theme_manager_add_resources() for
  * this function to do anything.
  *
  * Since icons cannot be unloaded, previously loaded icons will continue to
  * be available even after calling this function.
  */
 void
-dzl_theme_manager_remove_resource_path (DzlThemeManager *self,
-                                        const gchar     *resource_path)
+dzl_theme_manager_remove_resources (DzlThemeManager *self,
+                                    const gchar     *resource_path)
 {
   GtkStyleProvider *provider;
 

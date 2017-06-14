@@ -47,14 +47,52 @@ dzl_css_provider_new (const gchar *base_path)
                        NULL);
 }
 
+static gboolean
+resource_exists (const gchar *resource_path)
+{
+  g_assert (resource_path != NULL);
+
+  if (g_str_has_prefix (resource_path, "resource://"))
+    {
+      gsize len = 0;
+      guint32 flags = 0;
+
+      resource_path += strlen ("resource://");
+
+      return g_resources_get_info (resource_path, G_RESOURCE_LOOKUP_FLAGS_NONE, &len, &flags, NULL);
+    }
+
+  return g_file_test (resource_path, G_FILE_TEST_IS_REGULAR);
+}
+
+static void
+load_resource (DzlCssProvider *self,
+               const gchar    *resource_path)
+{
+  g_assert (DZL_IS_CSS_PROVIDER (self));
+  g_assert (resource_path != NULL);
+
+  if (g_str_has_prefix (resource_path, "resource://"))
+    {
+      resource_path += strlen ("resource://");
+      gtk_css_provider_load_from_resource (GTK_CSS_PROVIDER (self), resource_path);
+    }
+  else
+    {
+      g_autoptr(GError) error = NULL;
+
+      if (!gtk_css_provider_load_from_path (GTK_CSS_PROVIDER (self), resource_path, &error))
+        g_warning ("%s", error->message);
+    }
+
+}
+
 static void
 dzl_css_provider_update (DzlCssProvider *self)
 {
   g_autofree gchar *theme_name = NULL;
   g_autofree gchar *resource_path = NULL;
   GtkSettings *settings;
-  gsize len = 0;
-  guint32 flags = 0;
   gboolean prefer_dark_theme = FALSE;
 
   g_assert (DZL_IS_CSS_PROVIDER (self));
@@ -88,27 +126,26 @@ dzl_css_provider_update (DzlCssProvider *self)
                                    self->base_path,
                                    theme_name, prefer_dark_theme ? "-dark" : "");
 
-  if (!g_resources_get_info (resource_path, G_RESOURCE_LOOKUP_FLAGS_NONE, &len, &flags, NULL))
+  if (!resource_exists (resource_path))
     {
       /* Now try without the theme variant */
       g_free (resource_path);
       resource_path = g_strdup_printf ("%s/%s.css", self->base_path, theme_name);
 
       /* Now fallback to shared styling */
-      if (!g_resources_get_info (resource_path, G_RESOURCE_LOOKUP_FLAGS_NONE, &len, &flags, NULL))
+      if (!resource_exists (resource_path))
         {
           g_free (resource_path);
           resource_path = g_strdup_printf ("%s/shared.css", self->base_path);
+
+          if (!resource_exists (resource_path))
+            return;
         }
     }
 
-  /* Nothing to load */
-  if (!g_resources_get_info (resource_path, G_RESOURCE_LOOKUP_FLAGS_NONE, &len, &flags, NULL))
-    return;
-
   g_debug ("Loading css overrides \"%s\"", resource_path);
 
-  gtk_css_provider_load_from_resource (GTK_CSS_PROVIDER (self), resource_path);
+  load_resource (self, resource_path);
 }
 
 static gboolean

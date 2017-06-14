@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-menu-manager"
+
+#include <string.h>
+
 #include "dzl-menu-manager.h"
 
 struct _DzlMenuManager
@@ -505,6 +509,9 @@ dzl_menu_manager_add_resource (DzlMenuManager  *self,
 
   g_return_val_if_fail (DZL_IS_MENU_MANAGER (self), 0);
   g_return_val_if_fail (resource != NULL, 0);
+
+  if (g_str_has_prefix (resource, "resource://"))
+    resource += strlen ("resource://");
 
   builder = gtk_builder_new ();
 
