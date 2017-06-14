@@ -1165,14 +1165,15 @@ dzl_shortcut_manager_add_shortcut_entries (DzlShortcutManager     *self,
                                            guint                   n_shortcuts,
                                            const gchar            *translation_domain)
 {
-
-  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+  DzlShortcutManagerPrivate *priv;
 
   g_return_if_fail (!self || DZL_IS_SHORTCUT_MANAGER (self));
   g_return_if_fail (shortcuts != NULL || n_shortcuts == 0);
 
   if (self == NULL)
     self = dzl_shortcut_manager_get_default ();
+
+  priv = dzl_shortcut_manager_get_instance_private (self);
 
   for (guint i = 0; i < n_shortcuts; i++)
     {
