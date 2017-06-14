@@ -1085,6 +1085,7 @@ dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager *self,
                                               DzlShortcutsWindow *window)
 {
   DzlShortcutManagerPrivate *priv;
+  DzlShortcutTheme *theme;
   GNode *parent;
 
   g_return_if_fail (!self || DZL_IS_SHORTCUT_MANAGER (self));
@@ -1094,6 +1095,8 @@ dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager *self,
     self = dzl_shortcut_manager_get_default ();
 
   priv = dzl_shortcut_manager_get_instance_private (self);
+
+  theme = dzl_shortcut_manager_get_theme (self);
 
   /*
    * The GNode tree is in four levels. priv->root is the root of the tree and
@@ -1133,9 +1136,9 @@ dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager *self,
               DzlShortcutsShortcut *shortcut;
 
               if (data->type == DZL_SHORTCUT_NODE_ACTION)
-                chord = dzl_shortcut_theme_get_chord_for_action (priv->theme, data->name);
+                chord = dzl_shortcut_theme_get_chord_for_action (theme, data->name);
               else if (data->type == DZL_SHORTCUT_NODE_COMMAND)
-                chord = dzl_shortcut_theme_get_chord_for_command (priv->theme, data->name);
+                chord = dzl_shortcut_theme_get_chord_for_command (theme, data->name);
 
               accel = dzl_shortcut_chord_to_string (chord);
 
