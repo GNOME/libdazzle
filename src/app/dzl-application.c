@@ -74,6 +74,16 @@ typedef struct
 
 } DzlApplicationPrivate;
 
+enum {
+  PROP_0,
+  PROP_MENU_MANAGER,
+  PROP_SHORTCUT_MANAGER,
+  PROP_THEME_MANAGER,
+  N_PROPS
+};
+
+static GParamSpec *properties [N_PROPS];
+
 G_DEFINE_TYPE_WITH_PRIVATE (DzlApplication, dzl_application, GTK_TYPE_APPLICATION)
 
 static void
@@ -222,17 +232,62 @@ dzl_application_finalize (GObject *object)
 }
 
 static void
+dzl_application_get_property (GObject    *object,
+                              guint       prop_id,
+                              GValue     *value,
+                              GParamSpec *pspec)
+{
+  DzlApplication *self = DZL_APPLICATION (object);
+
+  switch (prop_id)
+    {
+    case PROP_MENU_MANAGER:
+      g_value_set_object (value, dzl_application_get_menu_manager (self));
+      break;
+
+    case PROP_SHORTCUT_MANAGER:
+      g_value_set_object (value, dzl_application_get_shortcut_manager (self));
+      break;
+
+    case PROP_THEME_MANAGER:
+      g_value_set_object (value, dzl_application_get_theme_manager (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 dzl_application_class_init (DzlApplicationClass *klass)
 {
   GApplicationClass *g_app_class = G_APPLICATION_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = dzl_application_finalize;
+  object_class->get_property = dzl_application_get_property;
 
   g_app_class->startup = dzl_application_startup;
 
   klass->add_resources = dzl_application_real_add_resources;
   klass->remove_resources = dzl_application_real_remove_resources;
+
+  properties [PROP_MENU_MANAGER] =
+    g_param_spec_object ("menu-manager", NULL, NULL,
+                         DZL_TYPE_MENU_MANAGER,
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_SHORTCUT_MANAGER] =
+    g_param_spec_object ("shortcut-manager", NULL, NULL,
+                         DZL_TYPE_SHORTCUT_MANAGER,
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_THEME_MANAGER] =
+    g_param_spec_object ("theme-manager", NULL, NULL,
+                         DZL_TYPE_THEME_MANAGER,
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
