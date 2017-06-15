@@ -424,14 +424,25 @@ dzl_shortcut_theme_get_chord_for_action (DzlShortcutTheme *self,
                                          const gchar      *detailed_action_name)
 {
   DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+  const DzlShortcutChord *ret;
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (self), NULL);
 
   if (priv->actions_table == NULL)
     return NULL;
 
-  return dzl_shortcut_chord_table_lookup_data (priv->actions_table,
-                                               (gpointer)g_intern_string (detailed_action_name));
+  ret = dzl_shortcut_chord_table_lookup_data (priv->actions_table,
+                                              (gpointer)g_intern_string (detailed_action_name));
+
+  if (ret == NULL)
+    {
+      DzlShortcutTheme *parent = dzl_shortcut_theme_get_parent (self);
+
+      if (parent != NULL)
+        ret = dzl_shortcut_theme_get_chord_for_action (parent, detailed_action_name);
+    }
+
+  return ret;
 }
 
 void
@@ -492,14 +503,25 @@ dzl_shortcut_theme_get_chord_for_command (DzlShortcutTheme *self,
                                           const gchar      *command)
 {
   DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+  const DzlShortcutChord *ret;
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (self), NULL);
 
   if (priv->commands_table == NULL)
     return NULL;
 
-  return dzl_shortcut_chord_table_lookup_data (priv->commands_table,
-                                               (gpointer)g_intern_string (command));
+  ret = dzl_shortcut_chord_table_lookup_data (priv->commands_table,
+                                              (gpointer)g_intern_string (command));
+
+  if (ret == NULL)
+    {
+      DzlShortcutTheme *parent = dzl_shortcut_theme_get_parent (self);
+
+      if (parent != NULL)
+        ret = dzl_shortcut_theme_get_chord_for_command (parent, command);
+    }
+
+  return ret;
 }
 
 /**
