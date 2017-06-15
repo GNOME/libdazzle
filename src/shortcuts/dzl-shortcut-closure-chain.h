@@ -25,10 +25,15 @@ G_BEGIN_DECLS
 
 typedef struct _DzlShortcutClosureChain DzlShortcutClosureChain;
 
+DzlShortcutClosureChain *dzl_shortcut_closure_chain_append               (DzlShortcutClosureChain *chain,
+                                                                          DzlShortcutClosureChain *link);
 DzlShortcutClosureChain *dzl_shortcut_closure_chain_append_signal        (DzlShortcutClosureChain *chain,
                                                                           const gchar             *signal_name,
                                                                           guint                    n_args,
                                                                           va_list                  args);
+DzlShortcutClosureChain *dzl_shortcut_closure_chain_append_signalv       (DzlShortcutClosureChain *chain,
+                                                                          const gchar             *signal_name,
+                                                                          GArray                  *params);
 DzlShortcutClosureChain *dzl_shortcut_closure_chain_append_action        (DzlShortcutClosureChain *chain,
                                                                           const gchar             *group_name,
                                                                           const gchar             *action_name,

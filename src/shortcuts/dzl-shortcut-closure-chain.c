@@ -77,7 +77,7 @@ dzl_shortcut_closure_chain_new (DzlShortcutClosureType type)
   return ret;
 }
 
-static DzlShortcutClosureChain *
+DzlShortcutClosureChain *
 dzl_shortcut_closure_chain_append (DzlShortcutClosureChain *chain,
                                    DzlShortcutClosureChain *element)
 {
@@ -219,18 +219,33 @@ dzl_shortcut_closure_chain_append_action_string (DzlShortcutClosureChain *chain,
 }
 
 DzlShortcutClosureChain *
-dzl_shortcut_closure_chain_append_signal (DzlShortcutClosureChain *chain,
-                                          const gchar             *signal_name,
-                                          guint                    n_args,
-                                          va_list                  args)
+dzl_shortcut_closure_chain_append_signalv (DzlShortcutClosureChain *chain,
+                                           const gchar             *signal_name,
+                                           GArray                  *params)
 {
-  DzlShortcutClosureChain *tail;
-  g_autoptr(GArray) params = NULL;
   g_autofree gchar *truncated_name = NULL;
+  DzlShortcutClosureChain *tail;
+  g_autoptr(GArray) copy = NULL;
   const gchar *detail_str;
   GQuark detail = 0;
 
   g_return_val_if_fail (signal_name != NULL, NULL);
+
+  if (params != NULL)
+    {
+      copy = g_array_sized_new (FALSE, TRUE, sizeof (GValue), params ? params->len : 0);
+      g_array_set_clear_func (copy, (GDestroyNotify)g_value_unset);
+      g_array_set_size (copy, params->len);
+
+      for (guint i = 0; i < params->len; i++)
+        {
+          GValue *src = &g_array_index (params, GValue, i);
+          GValue *dst = &g_array_index (copy, GValue, i);
+
+          g_value_init (dst, G_VALUE_TYPE (src));
+          g_value_copy (src, dst);
+        }
+    }
 
   if (NULL != (detail_str = strstr (signal_name, "::")))
     {
@@ -239,6 +254,24 @@ dzl_shortcut_closure_chain_append_signal (DzlShortcutClosureChain *chain,
       detail_str = &detail_str[2];
       detail = g_quark_try_string (detail_str);
     }
+
+  tail = dzl_shortcut_closure_chain_new (DZL_SHORTCUT_CLOSURE_SIGNAL);
+  tail->signal.name = g_intern_string (signal_name);
+  tail->signal.params = g_steal_pointer (&copy);
+  tail->signal.detail = detail;
+
+  return dzl_shortcut_closure_chain_append (chain, tail);
+}
+
+DzlShortcutClosureChain *
+dzl_shortcut_closure_chain_append_signal (DzlShortcutClosureChain *chain,
+                                          const gchar             *signal_name,
+                                          guint                    n_args,
+                                          va_list                  args)
+{
+  g_autoptr(GArray) params = NULL;
+
+  g_return_val_if_fail (signal_name != NULL, NULL);
 
   params = g_array_new (FALSE, FALSE, sizeof (GValue));
   g_array_set_clear_func (params, (GDestroyNotify)g_value_unset);
@@ -262,12 +295,7 @@ dzl_shortcut_closure_chain_append_signal (DzlShortcutClosureChain *chain,
       g_array_append_val (params, value);
     }
 
-  tail = dzl_shortcut_closure_chain_new (DZL_SHORTCUT_CLOSURE_SIGNAL);
-  tail->signal.name = g_intern_string (signal_name);
-  tail->signal.params = g_steal_pointer (&params);
-  tail->signal.detail = detail;
-
-  return dzl_shortcut_closure_chain_append (chain, tail);
+  return dzl_shortcut_closure_chain_append_signalv (chain, signal_name, params);
 }
 
 gboolean
