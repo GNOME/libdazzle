@@ -23,44 +23,7 @@
 
 #include "shortcuts/dzl-shortcut-closure-chain.h"
 #include "shortcuts/dzl-shortcut-controller.h"
-
-typedef enum
-{
-  DZL_SHORTCUT_CLOSURE_ACTION = 1,
-  DZL_SHORTCUT_CLOSURE_CALLBACK,
-  DZL_SHORTCUT_CLOSURE_COMMAND,
-  DZL_SHORTCUT_CLOSURE_SIGNAL,
-  DZL_SHORTCUT_CLOSURE_LAST
-} DzlShortcutClosureType;
-
-struct _DzlShortcutClosureChain
-{
-  GSList node;
-
-  DzlShortcutClosureType type : 3;
-  guint executing : 1;
-
-  union {
-    struct {
-      const gchar *group;
-      const gchar *name;
-      GVariant    *params;
-    } action;
-    struct {
-      const gchar *name;
-    } command;
-    struct {
-      GQuark       detail;
-      const gchar *name;
-      GArray      *params;
-    } signal;
-    struct {
-      GtkCallback    callback;
-      gpointer       user_data;
-      GDestroyNotify notify;
-    } callback;
-  };
-};
+#include "shortcuts/dzl-shortcut-private.h"
 
 static DzlShortcutClosureChain *
 dzl_shortcut_closure_chain_new (DzlShortcutClosureType type)

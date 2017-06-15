@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "shortcuts/dzl-shortcut-chord.h"
+#include "shortcuts/dzl-shortcut-closure-chain.h"
 #include "shortcuts/dzl-shortcut-context.h"
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-private.h"
@@ -60,289 +61,6 @@ struct _DzlShortcutContext
 G_DEFINE_TYPE_WITH_PRIVATE (DzlShortcutContext, dzl_shortcut_context, G_TYPE_OBJECT)
 
 static GParamSpec *properties [N_PROPS];
-
-static void
-shortcut_free (gpointer data)
-{
-  Shortcut *shortcut = data;
-
-  if (shortcut != NULL)
-    {
-      g_clear_pointer (&shortcut->next, shortcut_free);
-
-      switch (shortcut->type)
-        {
-        case SHORTCUT_ACTION:
-          g_clear_pointer (&shortcut->action.param, g_variant_unref);
-          break;
-
-        case SHORTCUT_COMMAND:
-          break;
-
-        case SHORTCUT_SIGNAL:
-          g_array_unref (shortcut->signal.params);
-          break;
-
-        default:
-          g_assert_not_reached ();
-        }
-
-      g_slice_free (Shortcut, shortcut);
-    }
-}
-
-static gboolean
-widget_action (GtkWidget   *widget,
-               const gchar *prefix,
-               const gchar *action_name,
-               GVariant    *parameter)
-{
-  GtkWidget *toplevel;
-  GApplication *app;
-  GActionGroup *group = NULL;
-
-  g_assert (GTK_IS_WIDGET (widget));
-  g_assert (prefix != NULL);
-  g_assert (action_name != NULL);
-
-  app = g_application_get_default ();
-  toplevel = gtk_widget_get_toplevel (widget);
-
-  while ((group == NULL) && (widget != NULL))
-    {
-      group = gtk_widget_get_action_group (widget, prefix);
-
-      if G_UNLIKELY (GTK_IS_POPOVER (widget))
-        {
-          GtkWidget *relative_to;
-
-          relative_to = gtk_popover_get_relative_to (GTK_POPOVER (widget));
-
-          if (relative_to != NULL)
-            widget = relative_to;
-          else
-            widget = gtk_widget_get_parent (widget);
-        }
-      else
-        {
-          widget = gtk_widget_get_parent (widget);
-        }
-    }
-
-  if (!group && g_str_equal (prefix, "win") && G_IS_ACTION_GROUP (toplevel))
-    group = G_ACTION_GROUP (toplevel);
-
-  if (!group && g_str_equal (prefix, "app") && G_IS_ACTION_GROUP (app))
-    group = G_ACTION_GROUP (app);
-
-  if (group && g_action_group_has_action (group, action_name))
-    {
-      g_action_group_activate_action (group, action_name, parameter);
-      return TRUE;
-    }
-
-  g_warning ("Failed to locate action %s.%s", prefix, action_name);
-
-  return FALSE;
-}
-
-static gboolean
-shortcut_action_activate (Shortcut  *shortcut,
-                          GtkWidget *widget)
-{
-  g_assert (shortcut != NULL);
-  g_assert (GTK_IS_WIDGET (widget));
-
-  return widget_action (widget,
-                        shortcut->action.prefix,
-                        shortcut->action.name,
-                        shortcut->action.param);
-}
-
-static gboolean
-shortcut_command_activate (Shortcut  *shortcut,
-                           GtkWidget *widget)
-{
-  DzlShortcutController *controller;
-
-  g_assert (shortcut != NULL);
-  g_assert (GTK_IS_WIDGET (widget));
-
-  controller = dzl_shortcut_controller_try_find (widget);
-
-  if (controller != NULL)
-    {
-      /* If the controller has a command registered for this command, execute
-       * it. This seems a bit like an inversion of control here, because it
-       * sort of is. Rather than deal with this at the controller level, we
-       * deal with it in the context so that the code-flow is simpler to
-       * follow and requires less duplication.
-       *
-       * Since shortcut->command has been interned, we can be certain command
-       * will be a valid pointer for the lifetime of this function call.
-       */
-
-      return dzl_shortcut_controller_execute_command (controller, shortcut->command);
-    }
-
-  return FALSE;
-}
-
-static gboolean
-find_instance_and_signal (GtkWidget          *widget,
-                          const gchar        *signal_name,
-                          gpointer           *instance,
-                          GSignalQuery       *query)
-{
-  DzlShortcutController *controller;
-
-  g_assert (GTK_IS_WIDGET (widget));
-  g_assert (signal_name != NULL);
-  g_assert (instance != NULL);
-  g_assert (query != NULL);
-
-  *instance = NULL;
-
-  /*
-   * First we want to see if we can resolve the signal on the widgets
-   * controller (if there is one). This allows us to change contexts
-   * from signals without installing signals on the actual widgets.
-   */
-
-  controller = dzl_shortcut_controller_find (widget);
-
-  if (controller != NULL)
-    {
-      guint signal_id;
-
-      signal_id = g_signal_lookup (signal_name, G_OBJECT_TYPE (controller));
-
-      if (signal_id != 0)
-        {
-          g_signal_query (signal_id, query);
-          *instance = controller;
-          return TRUE;
-        }
-    }
-
-  /*
-   * This diverts from Gtk signal keybindings a bit in that we
-   * allow you to activate a signal on any widget in the focus
-   * hierarchy starting from the provided widget up.
-   */
-
-  while (widget != NULL)
-    {
-      guint signal_id;
-
-      signal_id = g_signal_lookup (signal_name, G_OBJECT_TYPE (widget));
-
-      if (signal_id != 0)
-        {
-          g_signal_query (signal_id, query);
-          *instance = widget;
-          return TRUE;
-        }
-
-      widget = gtk_widget_get_parent (widget);
-    }
-
-  return FALSE;
-}
-
-static gboolean
-shortcut_signal_activate (Shortcut  *shortcut,
-                          GtkWidget *widget)
-{
-  GValue *params;
-  GValue return_value = { 0 };
-  GSignalQuery query;
-  gpointer instance = NULL;
-
-  g_assert (shortcut != NULL);
-  g_assert (GTK_IS_WIDGET (widget));
-
-  if (!find_instance_and_signal (widget, shortcut->signal.name, &instance, &query))
-    {
-      g_warning ("Failed to locate signal %s in hierarchy of %s",
-                 shortcut->signal.name, G_OBJECT_TYPE_NAME (widget));
-      return TRUE;
-    }
-
-  if (query.n_params != shortcut->signal.params->len)
-    goto parameter_mismatch;
-
-  for (guint i = 0; i < query.n_params; i++)
-    {
-      if (!G_VALUE_HOLDS (&g_array_index (shortcut->signal.params, GValue, i), query.param_types[i]))
-        goto parameter_mismatch;
-    }
-
-  params = g_new0 (GValue, 1 + query.n_params);
-  g_value_init_from_instance (&params[0], instance);
-  for (guint i = 0; i < query.n_params; i++)
-    {
-      GValue *src_value = &g_array_index (shortcut->signal.params, GValue, i);
-
-      g_value_init (&params[1+i], G_VALUE_TYPE (src_value));
-      g_value_copy (src_value, &params[1+i]);
-    }
-
-  if (query.return_type != G_TYPE_NONE)
-    g_value_init (&return_value, query.return_type);
-
-  g_signal_emitv (params, query.signal_id, shortcut->signal.detail, &return_value);
-
-  for (guint i = 0; i < query.n_params + 1; i++)
-    g_value_unset (&params[i]);
-  g_free (params);
-
-  return GDK_EVENT_STOP;
-
-parameter_mismatch:
-  g_warning ("The parameters are not correct for signal %s",
-             shortcut->signal.name);
-
-  /*
-   * If there was a bug with the signal descriptor, we still want
-   * to swallow the event to keep it from propagating further.
-   */
-
-  return GDK_EVENT_STOP;
-}
-
-static gboolean
-shortcut_activate (Shortcut  *shortcut,
-                   GtkWidget *widget)
-{
-  gboolean handled = FALSE;
-
-  g_assert (shortcut != NULL);
-  g_assert (GTK_IS_WIDGET (widget));
-
-  for (; shortcut != NULL; shortcut = shortcut->next)
-    {
-      switch (shortcut->type)
-        {
-        case SHORTCUT_ACTION:
-          handled |= shortcut_action_activate (shortcut, widget);
-          break;
-
-        case SHORTCUT_COMMAND:
-          handled |= shortcut_command_activate (shortcut, widget);
-          break;
-
-        case SHORTCUT_SIGNAL:
-          handled |= shortcut_signal_activate (shortcut, widget);
-          break;
-
-        default:
-          g_assert_not_reached ();
-        }
-    }
-
-  return handled;
-}
 
 static void
 dzl_shortcut_context_finalize (GObject *object)
@@ -462,7 +180,7 @@ dzl_shortcut_context_activate (DzlShortcutContext     *self,
 {
   DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
   DzlShortcutMatch match = DZL_SHORTCUT_MATCH_NONE;
-  Shortcut *shortcut = NULL;
+  DzlShortcutClosureChain *chain = NULL;
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_CONTEXT (self), DZL_SHORTCUT_MATCH_NONE);
   g_return_val_if_fail (GTK_IS_WIDGET (widget), DZL_SHORTCUT_MATCH_NONE);
@@ -478,7 +196,7 @@ dzl_shortcut_context_activate (DzlShortcutContext     *self,
 #endif
 
   if (priv->table != NULL)
-    match = dzl_shortcut_chord_table_lookup (priv->table, chord, (gpointer *)&shortcut);
+    match = dzl_shortcut_chord_table_lookup (priv->table, chord, (gpointer *)&chain);
 
   if (match == DZL_SHORTCUT_MATCH_EQUAL)
     {
@@ -487,7 +205,7 @@ dzl_shortcut_context_activate (DzlShortcutContext     *self,
        * have another partial match. However, that lands squarely in the land of
        * undefined behavior. So instead we just assume there was no match.
        */
-      if (!shortcut_activate (shortcut, widget))
+      if (!dzl_shortcut_closure_chain_execute (chain, widget))
         return DZL_SHORTCUT_MATCH_NONE;
     }
 
@@ -495,21 +213,23 @@ dzl_shortcut_context_activate (DzlShortcutContext     *self,
 }
 
 static void
-dzl_shortcut_context_add (DzlShortcutContext     *self,
-                          const DzlShortcutChord *chord,
-                          Shortcut               *shortcut)
+dzl_shortcut_context_add (DzlShortcutContext      *self,
+                          const DzlShortcutChord  *chord,
+                          DzlShortcutClosureChain *chain)
 {
   DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
+  DzlShortcutClosureChain *head = NULL;
   DzlShortcutMatch match;
-  Shortcut *head = NULL;
 
   g_assert (DZL_IS_SHORTCUT_CONTEXT (self));
-  g_assert (shortcut != NULL);
+  g_assert (chord != NULL);
+  g_assert (chain != NULL);
 
   if (priv->table == NULL)
     {
       priv->table = dzl_shortcut_chord_table_new ();
-      dzl_shortcut_chord_table_set_free_func (priv->table, shortcut_free);
+      dzl_shortcut_chord_table_set_free_func (priv->table,
+                                              (GDestroyNotify)dzl_shortcut_closure_chain_free);
     }
 
   /*
@@ -521,15 +241,9 @@ dzl_shortcut_context_add (DzlShortcutContext     *self,
   match = dzl_shortcut_chord_table_lookup (priv->table, chord, (gpointer *)&head);
 
   if (match == DZL_SHORTCUT_MATCH_EQUAL)
-    {
-      while (head->next != NULL)
-        head = head->next;
-      head->next = shortcut;
-    }
+    dzl_shortcut_closure_chain_append (head, chain);
   else
-    {
-      dzl_shortcut_chord_table_add (priv->table, chord, shortcut);
-    }
+    dzl_shortcut_chord_table_add (priv->table, chord, chain);
 }
 
 void
@@ -537,14 +251,8 @@ dzl_shortcut_context_add_action (DzlShortcutContext *self,
                                  const gchar        *accel,
                                  const gchar        *detailed_action_name)
 {
-  Shortcut *shortcut;
-  g_autofree gchar *action_name = NULL;
-  g_autofree gchar *prefix = NULL;
-  g_autoptr(GError) error = NULL;
-  g_autoptr(GVariant) action_target = NULL;
   g_autoptr(DzlShortcutChord) chord = NULL;
-  const gchar *dot;
-  const gchar *name;
+  DzlShortcutClosureChain *chain;
 
   g_return_if_fail (DZL_IS_SHORTCUT_CONTEXT (self));
   g_return_if_fail (accel != NULL);
@@ -558,30 +266,9 @@ dzl_shortcut_context_add_action (DzlShortcutContext *self,
       return;
     }
 
-  if (!g_action_parse_detailed_name (detailed_action_name, &action_name, &action_target, &error))
-    {
-      g_warning ("%s", error->message);
-      return;
-    }
+  chain = dzl_shortcut_closure_chain_append_action_string (NULL, detailed_action_name);
 
-  if (NULL != (dot = strchr (action_name, '.')))
-    {
-      name = &dot[1];
-      prefix = g_strndup (action_name, dot - action_name);
-    }
-  else
-    {
-      name = action_name;
-      prefix = NULL;
-    }
-
-  shortcut = g_slice_new0 (Shortcut);
-  shortcut->type = SHORTCUT_ACTION;
-  shortcut->action.prefix = prefix ? g_intern_string (prefix) : NULL;
-  shortcut->action.name = g_intern_string (name);
-  shortcut->action.param = g_steal_pointer (&action_target);
-
-  dzl_shortcut_context_add (self, chord, shortcut);
+  dzl_shortcut_context_add (self, chord, chain);
 }
 
 void
@@ -591,7 +278,7 @@ dzl_shortcut_context_add_command (DzlShortcutContext *self,
 {
   g_autoptr(GError) error = NULL;
   g_autoptr(DzlShortcutChord) chord = NULL;
-  Shortcut *shortcut;
+  DzlShortcutClosureChain *chain;
 
   g_return_if_fail (DZL_IS_SHORTCUT_CONTEXT (self));
   g_return_if_fail (accel != NULL);
@@ -606,11 +293,9 @@ dzl_shortcut_context_add_command (DzlShortcutContext *self,
       return;
     }
 
-  shortcut = g_slice_new0 (Shortcut);
-  shortcut->type = SHORTCUT_COMMAND;
-  shortcut->command = g_intern_string (command);
+  chain = dzl_shortcut_closure_chain_append_command (NULL, command);
 
-  dzl_shortcut_context_add (self, chord, shortcut);
+  dzl_shortcut_context_add (self, chord, chain);
 }
 
 void
@@ -620,12 +305,8 @@ dzl_shortcut_context_add_signal_va_list (DzlShortcutContext *self,
                                          guint               n_args,
                                          va_list             args)
 {
-  g_autoptr(GArray) params = NULL;
   g_autoptr(DzlShortcutChord) chord = NULL;
-  g_autofree gchar *truncated_name = NULL;
-  const gchar *detail_str;
-  Shortcut *shortcut;
-  GQuark detail = 0;
+  DzlShortcutClosureChain *chain;
 
   g_return_if_fail (DZL_IS_SHORTCUT_CONTEXT (self));
   g_return_if_fail (accel != NULL);
@@ -639,43 +320,9 @@ dzl_shortcut_context_add_signal_va_list (DzlShortcutContext *self,
       return;
     }
 
-  if (NULL != (detail_str = strstr (signal_name, "::")))
-    {
-      truncated_name = g_strndup (signal_name, detail_str - signal_name);
-      signal_name = truncated_name;
-      detail_str = &detail_str[2];
-      detail = g_quark_try_string (detail_str);
-    }
+  chain = dzl_shortcut_closure_chain_append_signal (NULL, signal_name, n_args, args);
 
-  params = g_array_new (FALSE, FALSE, sizeof (GValue));
-  g_array_set_clear_func (params, (GDestroyNotify)g_value_unset);
-
-  for (; n_args > 0; n_args--)
-    {
-      g_autofree gchar *errstr = NULL;
-      GValue value = { 0 };
-      GType type;
-
-      type = va_arg (args, GType);
-
-      G_VALUE_COLLECT_INIT (&value, type, args, 0, &errstr);
-
-      if (errstr != NULL)
-        {
-          g_warning ("%s", errstr);
-          break;
-        }
-
-      g_array_append_val (params, value);
-    }
-
-  shortcut = g_slice_new0 (Shortcut);
-  shortcut->type = SHORTCUT_SIGNAL;
-  shortcut->signal.name = g_intern_string (signal_name);
-  shortcut->signal.detail = detail;
-  shortcut->signal.params = g_steal_pointer (&params);
-
-  dzl_shortcut_context_add (self, chord, shortcut);
+  dzl_shortcut_context_add (self, chord, chain);
 }
 
 void
@@ -711,11 +358,8 @@ dzl_shortcut_context_add_signalv (DzlShortcutContext *self,
                                   const gchar        *signal_name,
                                   GArray             *values)
 {
-  g_autofree gchar *truncated_name = NULL;
   g_autoptr(DzlShortcutChord) chord = NULL;
-  const gchar *detail_str;
-  Shortcut *shortcut;
-  GQuark detail = 0;
+  DzlShortcutClosureChain *chain;
 
   g_return_if_fail (DZL_IS_SHORTCUT_CONTEXT (self));
   g_return_if_fail (accel != NULL);
@@ -729,27 +373,9 @@ dzl_shortcut_context_add_signalv (DzlShortcutContext *self,
       return;
     }
 
-  if (values == NULL)
-    {
-      values = g_array_new (FALSE, FALSE, sizeof (GValue));
-      g_array_set_clear_func (values, (GDestroyNotify)g_value_unset);
-    }
+  chain = dzl_shortcut_closure_chain_append_signalv (NULL, signal_name, values);
 
-  if (NULL != (detail_str = strstr (signal_name, "::")))
-    {
-      truncated_name = g_strndup (signal_name, detail_str - signal_name);
-      signal_name = truncated_name;
-      detail_str = &detail_str[2];
-      detail = g_quark_try_string (detail_str);
-    }
-
-  shortcut = g_slice_new0 (Shortcut);
-  shortcut->type = SHORTCUT_SIGNAL;
-  shortcut->signal.name = g_intern_string (signal_name);
-  shortcut->signal.detail = detail;
-  shortcut->signal.params = values;
-
-  dzl_shortcut_context_add (self, chord, shortcut);
+  dzl_shortcut_context_add (self, chord, chain);
 }
 
 gboolean
@@ -848,15 +474,16 @@ _dzl_shortcut_context_merge (DzlShortcutContext *self,
     priv->use_binding_sets = layer_priv->use_binding_sets;
 
   _dzl_shortcut_chord_table_iter_init (&iter, layer_priv->table);
+
   while (_dzl_shortcut_chord_table_iter_next (&iter, &chord, &value))
     {
-      Shortcut *sc = value;
+      DzlShortcutClosureChain *chain = value;
 
       /* Make sure this doesn't exist in the base layer anymore */
       dzl_shortcut_chord_table_remove (priv->table, chord);
 
       /* Now add it to our table of chords */
-      dzl_shortcut_context_add (self, chord, sc);
+      dzl_shortcut_context_add (self, chord, chain);
 
       /* Now we can safely steal this from the upper layer */
       _dzl_shortcut_chord_table_iter_steal (&iter);

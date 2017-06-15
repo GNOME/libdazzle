@@ -65,7 +65,7 @@ dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,
       DzlShortcutChordTableIter citer;
       gboolean use_binding_sets = FALSE;
       const DzlShortcutChord *chord = NULL;
-      Shortcut *shortcut = NULL;
+      DzlShortcutClosureChain *chain = NULL;
 
       table = _dzl_shortcut_context_get_table (context);
       name = dzl_shortcut_context_get_name (context);
@@ -78,39 +78,39 @@ dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,
 
       _dzl_shortcut_chord_table_iter_init (&citer, table);
 
-      while (_dzl_shortcut_chord_table_iter_next (&citer, &chord, (gpointer *)&shortcut))
+      while (_dzl_shortcut_chord_table_iter_next (&citer, &chord, (gpointer *)&chain))
         {
           g_autofree gchar *accel = dzl_shortcut_chord_to_string (chord);
 
           g_string_append_printf (str, "    <shortcut accelerator=\"%s\">\n", accel);
 
-          for (; shortcut != NULL; shortcut = shortcut->next)
+          for (; chain != NULL; chain = chain->node.next->data)
             {
-              if (shortcut->type == SHORTCUT_ACTION)
+              if (chain->type == DZL_SHORTCUT_CLOSURE_ACTION)
                 {
-                  if (shortcut->action.param == NULL)
+                  if (chain->action.params == NULL)
                     {
                       g_string_append_printf (str, "      <action name=\"%s.%s\"/>\n",
-                                              shortcut->action.prefix, shortcut->action.name);
+                                              chain->action.group, chain->action.name);
                     }
                   else
                     {
-                      g_autofree gchar *fmt = g_variant_print (shortcut->action.param, FALSE);
+                      g_autofree gchar *fmt = g_variant_print (chain->action.params, FALSE);
                       g_string_append_printf (str, "      <action name=\"%s.%s::%s\"/>\n",
-                                              shortcut->action.prefix, shortcut->action.name, fmt);
+                                              chain->action.group, chain->action.name, fmt);
                     }
                 }
-              else if (shortcut->type == SHORTCUT_SIGNAL)
+              else if (chain->type == DZL_SHORTCUT_CLOSURE_SIGNAL)
                 {
-                  if (shortcut->signal.detail)
+                  if (chain->signal.detail)
                     g_string_append_printf (str, "      <signal name=\"%s::%s\"",
-                                            shortcut->signal.name,
-                                            g_quark_to_string (shortcut->signal.detail));
+                                            chain->signal.name,
+                                            g_quark_to_string (chain->signal.detail));
                   else
                     g_string_append_printf (str, "      <signal name=\"%s\"",
-                                            shortcut->signal.name);
+                                            chain->signal.name);
 
-                  if (shortcut->signal.params == NULL || shortcut->signal.params->len == 0)
+                  if (chain->signal.params == NULL || chain->signal.params->len == 0)
                     {
                       g_string_append (str, "/>\n");
                       continue;
@@ -118,9 +118,9 @@ dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,
 
                   g_string_append (str, ">\n");
 
-                  for (guint j = 0; j < shortcut->signal.params->len; j++)
+                  for (guint j = 0; j < chain->signal.params->len; j++)
                     {
-                      GValue *value = &g_array_index (shortcut->signal.params, GValue, j);
+                      GValue *value = &g_array_index (chain->signal.params, GValue, j);
 
                       if (G_VALUE_HOLDS_STRING (value))
                         {

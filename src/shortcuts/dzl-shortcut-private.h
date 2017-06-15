@@ -50,34 +50,6 @@ typedef struct
 
 typedef enum
 {
-  SHORTCUT_ACTION = 1,
-  SHORTCUT_SIGNAL,
-  SHORTCUT_COMMAND,
-} ShortcutType;
-
-typedef struct _Shortcut
-{
-  ShortcutType      type;
-  union {
-    struct {
-      const gchar  *prefix;
-      const gchar  *name;
-      GVariant     *param;
-    } action;
-    struct {
-      const gchar  *command;
-    };
-    struct {
-      const gchar  *name;
-      GQuark        detail;
-      GArray       *params;
-    } signal;
-  };
-  struct _Shortcut *next;
-} Shortcut;
-
-typedef enum
-{
   DZL_SHORTCUT_MODEL_COLUMN_TYPE,
   DZL_SHORTCUT_MODEL_COLUMN_ID,
   DZL_SHORTCUT_MODEL_COLUMN_TITLE,
@@ -86,6 +58,44 @@ typedef enum
   DZL_SHORTCUT_MODEL_COLUMN_CHORD,
   DZL_SHORTCUT_MODEL_N_COLUMNS
 } DzlShortcutModelColumn;
+
+typedef enum
+{
+  DZL_SHORTCUT_CLOSURE_ACTION = 1,
+  DZL_SHORTCUT_CLOSURE_CALLBACK,
+  DZL_SHORTCUT_CLOSURE_COMMAND,
+  DZL_SHORTCUT_CLOSURE_SIGNAL,
+  DZL_SHORTCUT_CLOSURE_LAST
+} DzlShortcutClosureType;
+
+struct _DzlShortcutClosureChain
+{
+  GSList node;
+
+  DzlShortcutClosureType type : 3;
+  guint executing : 1;
+
+  union {
+    struct {
+      const gchar *group;
+      const gchar *name;
+      GVariant    *params;
+    } action;
+    struct {
+      const gchar *name;
+    } command;
+    struct {
+      GQuark       detail;
+      const gchar *name;
+      GArray      *params;
+    } signal;
+    struct {
+      GtkCallback    callback;
+      gpointer       user_data;
+      GDestroyNotify notify;
+    } callback;
+  };
+};
 
 gboolean               _dzl_gtk_widget_activate_action          (GtkWidget                  *widget,
                                                                  const gchar                *prefix,
