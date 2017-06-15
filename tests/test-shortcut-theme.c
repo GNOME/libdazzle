@@ -62,7 +62,7 @@ test_shortcut_theme_manager (void)
 
   theme = dzl_shortcut_manager_get_theme_by_name (manager, NULL);
   g_assert (DZL_IS_SHORTCUT_THEME (theme));
-  g_assert (theme == dzl_shortcut_manager_get_theme_by_name (manager, "__internal__"));
+  g_assert (theme == dzl_shortcut_manager_get_theme_by_name (manager, "internal"));
   g_assert_cmpstr (dzl_shortcut_theme_get_parent_name (theme), ==, NULL);
 
   theme = dzl_shortcut_manager_get_theme_by_name (manager, "default");
@@ -75,7 +75,7 @@ test_shortcut_theme_manager (void)
 
   theme = dzl_shortcut_manager_get_theme_by_name (manager, "default");
   g_assert (DZL_IS_SHORTCUT_THEME (theme));
-  g_assert_cmpstr ("__internal__", ==, dzl_shortcut_theme_get_parent_name (theme));
+  g_assert_cmpstr ("internal", ==, dzl_shortcut_theme_get_parent_name (theme));
 
   /* Add a command and make sure we can resolve it */
   window = gtk_offscreen_window_new ();

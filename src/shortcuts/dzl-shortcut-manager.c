@@ -186,7 +186,7 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
    * a "default" item in the list as we should always have one. We'll append to
    * it when loading the default theme anyway.
    *
-   * The default theme always inherits from __internal__ so that we can store
+   * The default theme always inherits from internal so that we can store
    * our widget/controller defined shortcuts separate from the mutable default
    * theme which various applications might want to tweak in their overrides.
    */
@@ -195,7 +195,7 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
   g_ptr_array_add (priv->themes, g_object_new (DZL_TYPE_SHORTCUT_THEME,
                                                "name", "default",
                                                "title", _("Default Shortcuts"),
-                                               "parent-name", "__internal__",
+                                               "parent-name", "internal",
                                                NULL));
   _dzl_shortcut_theme_set_manager (g_ptr_array_index (priv->themes, 0), self);
   g_list_model_items_changed (G_LIST_MODEL (self), 0, previous_len, 1);
@@ -393,7 +393,7 @@ dzl_shortcut_manager_init (DzlShortcutManager *self)
   priv->themes = g_ptr_array_new_with_free_func (destroy_theme);
   priv->root = g_node_new (NULL);
   priv->internal_theme = g_object_new (DZL_TYPE_SHORTCUT_THEME,
-                                       "name", "__internal__",
+                                       "name", "internal",
                                        NULL);
 }
 
@@ -1247,7 +1247,7 @@ dzl_shortcut_manager_get_theme_by_name (DzlShortcutManager *self,
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_MANAGER (self), NULL);
 
-  if (theme_name == NULL || g_strcmp0 (theme_name, "__internal__") == 0)
+  if (theme_name == NULL || g_strcmp0 (theme_name, "internal") == 0)
     return priv->internal_theme;
 
   for (guint i = 0; i < priv->themes->len; i++)
