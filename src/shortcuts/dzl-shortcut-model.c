@@ -46,7 +46,7 @@ dzl_shortcut_model_rebuild (DzlShortcutModel *self)
 
   gtk_tree_store_clear (GTK_TREE_STORE (self));
 
-  if (self->manager != NULL)
+  if (self->manager != NULL && self->theme != NULL)
     {
       GNode *root;
 
