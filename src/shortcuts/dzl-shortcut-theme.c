@@ -565,11 +565,14 @@ dzl_shortcut_theme_get_parent (DzlShortcutTheme *self)
 
   g_assert (DZL_IS_SHORTCUT_THEME (self));
 
-  if (priv->parent_name == NULL)
+  if (g_strcmp0 (priv->name, "internal") == 0)
     return NULL;
 
   if (priv->manager == NULL)
     return NULL;
+
+  if (priv->parent_name == NULL)
+    return _dzl_shortcut_manager_get_internal_theme (priv->manager);
 
   return dzl_shortcut_manager_get_theme_by_name (priv->manager, priv->parent_name);
 }
