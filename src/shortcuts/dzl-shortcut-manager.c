@@ -444,6 +444,9 @@ dzl_shortcut_manager_load_resources (DzlShortcutManager *self,
   g_assert (g_str_has_prefix (resource_dir, "resource://"));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
+  if (g_str_has_prefix (resource_dir, "resource://"))
+    resource_dir += strlen ("resource://");
+
   children = g_resources_enumerate_children (resource_dir, 0, NULL);
 
   if (children != NULL)
