@@ -82,10 +82,15 @@ dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,
         {
           g_autofree gchar *accel = dzl_shortcut_chord_to_string (chord);
 
+          if (chain == NULL || accel == NULL)
+            continue;
+
           g_string_append_printf (str, "    <shortcut accelerator=\"%s\">\n", accel);
 
-          for (; chain != NULL; chain = chain->node.next->data)
+          for (const GSList *node = &chain->node; node != NULL; node = node->next)
             {
+              chain = node->data;
+
               if (chain->type == DZL_SHORTCUT_CLOSURE_ACTION)
                 {
                   if (chain->action.params == NULL)
