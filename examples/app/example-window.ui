@@ -4,6 +4,26 @@
     <child>
       <object class="DzlDockBin" id="dockbin">
         <property name="visible">true</property>
+        <child>
+          <object class="GtkNotebook" id="notebook">
+            <property name="expand">true</property>
+            <property name="visible">true</property>
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="visible">true</property>
+                <child>
+                  <object class="GtkTextView">
+                    <property name="monospace">true</property>
+                    <property name="visible">true</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="tab-label">Document 1</property>
+              </packing>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </template>

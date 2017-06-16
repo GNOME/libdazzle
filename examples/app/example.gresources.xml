@@ -6,5 +6,6 @@
 
   <gresource prefix="/org/gnome/example">
     <file>gtk/menus.ui</file>
+    <file>themes/shared.css</file>
   </gresource>
 </gresources>
