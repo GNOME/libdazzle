@@ -14,7 +14,5 @@ example_application_sources = [
 ]
 
 example_application = executable('example-application', example_application_sources,
-        c_args: test_cflags,
-     link_args: test_link_args,
   dependencies: libdazzle_dep,
 )
