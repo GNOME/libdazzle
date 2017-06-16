@@ -544,6 +544,26 @@ theme_start_element (GMarkupParseContext  *context,
 
       load_state_add_action (state, name);
     }
+  else if (g_strcmp0 (element_name, "resource") == 0)
+    {
+      const gchar *path = NULL;
+      g_autofree gchar *full_path = NULL;
+
+      if (!load_state_check_type (state, LOAD_STATE_THEME, error))
+        return;
+
+      if (!g_markup_collect_attributes (element_name, attr_names, attr_values, error,
+                                        G_MARKUP_COLLECT_STRING, "path", &path,
+                                        G_MARKUP_COLLECT_INVALID))
+        return;
+
+      g_assert (state->self != NULL);
+
+      if (!g_str_has_prefix (path, "resource://"))
+        path = full_path = g_strdup_printf ("resource://%s", path);
+
+      dzl_shortcut_theme_add_css_resource (state->self, path);
+    }
 }
 
 static void
@@ -561,6 +581,12 @@ theme_end_element (GMarkupParseContext  *context,
     {
       if (!load_state_check_type (state, LOAD_STATE_THEME, error))
         return;
+    }
+  else if (g_strcmp0 (element_name, "resource") == 0)
+    {
+      /* nothing to pop, but we want to propagate any errors */
+      load_state_check_type (state, LOAD_STATE_THEME, error);
+      return;
     }
   else if (g_strcmp0 (element_name, "property") == 0)
     {

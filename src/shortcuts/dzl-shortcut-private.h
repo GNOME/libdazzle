@@ -103,6 +103,8 @@ gboolean               _dzl_gtk_widget_activate_action          (GtkWidget      
                                                                  GVariant                   *parameter);
 GNode                 *_dzl_shortcut_manager_get_root           (DzlShortcutManager         *self);
 DzlShortcutTheme      *_dzl_shortcut_manager_get_internal_theme (DzlShortcutManager         *self);
+void                   _dzl_shortcut_theme_attach               (DzlShortcutTheme           *self);
+void                   _dzl_shortcut_theme_detach               (DzlShortcutTheme           *self);
 GtkTreeModel          *_dzl_shortcut_theme_create_model         (DzlShortcutTheme           *self);
 GHashTable            *_dzl_shortcut_theme_get_contexts         (DzlShortcutTheme           *self);
 void                   _dzl_shortcut_theme_set_manager          (DzlShortcutTheme           *self,

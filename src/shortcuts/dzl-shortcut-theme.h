@@ -101,6 +101,10 @@ gboolean                dzl_shortcut_theme_save_to_path          (DzlShortcutThe
                                                                   const gchar             *path,
                                                                   GCancellable            *cancellable,
                                                                   GError                 **error);
+void                    dzl_shortcut_theme_add_css_resource      (DzlShortcutTheme        *self,
+                                                                  const gchar             *path);
+void                    dzl_shortcut_theme_remove_css_resource   (DzlShortcutTheme        *self,
+                                                                  const gchar             *path);
 
 G_END_DECLS
 

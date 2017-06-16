@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-theme"
 
+#include <string.h>
+
 #include "shortcuts/dzl-shortcut-private.h"
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-theme.h"
@@ -41,6 +43,13 @@ typedef struct
    * owns the reference to the context.
    */
   GHashTable *contexts;
+
+  /*
+   * A list of additional CSS resources that should be ingreated with this
+   * theme so that everything is applied together. You might use this if
+   * some of your keytheme needs to use CSS keybinding resources.
+   */
+  GHashTable *resource_providers;
 
   /*
    * Commands and actions can be mapped from a context or directly from the
@@ -751,6 +760,22 @@ _dzl_shortcut_theme_merge (DzlShortcutTheme *self,
       _dzl_shortcut_context_merge (base_context, context);
     }
 
+  /* Merge any associated resources. */
+  if (layer_priv->resource_providers != NULL)
+    {
+      GHashTableIter iter;
+
+      if (priv->resource_providers == NULL)
+        priv->resource_providers = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
+
+      g_hash_table_iter_init (&iter, layer_priv->resource_providers);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          g_hash_table_iter_steal (&iter);
+          g_hash_table_insert (priv->resource_providers, key, value);
+        }
+    }
+
   /*
    * Copy our action and commands chords over. These are all const data, so no
    * need to be tricky about stealing data or what data we are safe to
@@ -758,4 +783,93 @@ _dzl_shortcut_theme_merge (DzlShortcutTheme *self,
    */
   dzl_shortcut_chord_table_foreach (layer_priv->actions_table, copy_chord_to_table, priv->actions_table);
   dzl_shortcut_chord_table_foreach (layer_priv->commands_table, copy_chord_to_table, priv->commands_table);
+}
+
+void
+dzl_shortcut_theme_add_css_resource (DzlShortcutTheme *self,
+                                     const gchar      *path)
+{
+  DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+  g_autoptr(GtkCssProvider) provider = NULL;
+
+  g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
+  g_return_if_fail (path != NULL);
+  g_return_if_fail (*path == '/' || g_str_has_prefix (path, "resource://"));
+
+  if (priv->resource_providers == NULL)
+    priv->resource_providers = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
+
+  path = g_intern_string (path);
+
+  provider = gtk_css_provider_new ();
+
+  if (g_str_has_prefix (path, "resource://"))
+    {
+      const gchar *adjpath = path + strlen ("resource://");
+
+      gtk_css_provider_load_from_resource (provider, adjpath);
+      g_hash_table_insert (priv->resource_providers, (gpointer)path, g_steal_pointer (&provider));
+    }
+  else
+    {
+      g_autoptr(GError) error = NULL;
+
+      if (!gtk_css_provider_load_from_path (provider, path, &error))
+        g_warning ("%s", error->message);
+      else
+        g_hash_table_insert (priv->resource_providers, (gpointer)path, g_steal_pointer (&provider));
+    }
+}
+
+void
+dzl_shortcut_theme_remove_css_resource (DzlShortcutTheme *self,
+                                        const gchar      *path)
+{
+  DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
+  g_return_if_fail (path != NULL);
+
+  if (priv->resource_providers != NULL)
+    g_hash_table_remove (priv->resource_providers, g_intern_string (path));
+}
+
+void
+_dzl_shortcut_theme_attach (DzlShortcutTheme *self)
+{
+  DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
+
+  if (priv->resource_providers != NULL)
+    {
+      GdkScreen *screen = gdk_screen_get_default ();
+      GtkStyleProvider *provider;
+      GHashTableIter iter;
+
+      g_hash_table_iter_init (&iter, priv->resource_providers);
+      while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&provider))
+        gtk_style_context_add_provider_for_screen (screen,
+                                                   provider,
+                                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
+}
+
+void
+_dzl_shortcut_theme_detach (DzlShortcutTheme *self)
+{
+  DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
+
+  if (priv->resource_providers != NULL)
+    {
+      GdkScreen *screen = gdk_screen_get_default ();
+      GtkStyleProvider *provider;
+      GHashTableIter iter;
+
+      g_hash_table_iter_init (&iter, priv->resource_providers);
+      while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&provider))
+        gtk_style_context_remove_provider_for_screen (screen, provider);
+    }
 }

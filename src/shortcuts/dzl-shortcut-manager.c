@@ -177,6 +177,7 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
        */
       theme_name = g_strdup (dzl_shortcut_theme_get_name (priv->theme));
       parent_theme_name = g_strdup (dzl_shortcut_theme_get_parent_name (priv->theme));
+      _dzl_shortcut_theme_detach (priv->theme);
       g_clear_object (&priv->theme);
     }
 
@@ -282,10 +283,15 @@ dzl_shortcut_manager_finalize (GObject *object)
       priv->root = NULL;
     }
 
+  if (priv->theme != NULL)
+    {
+      _dzl_shortcut_theme_detach (priv->theme);
+      g_clear_object (&priv->theme);
+    }
+
   g_clear_pointer (&priv->seen_entries, g_hash_table_unref);
   g_clear_pointer (&priv->themes, g_ptr_array_unref);
   g_clear_pointer (&priv->user_dir, g_free);
-  g_clear_object (&priv->theme);
   g_clear_object (&priv->internal_theme);
 
   G_OBJECT_CLASS (dzl_shortcut_manager_parent_class)->finalize (object);
@@ -578,8 +584,20 @@ dzl_shortcut_manager_set_theme (DzlShortcutManager *self,
    * could be transitioning between incorrect contexts.
    */
 
-  if (g_set_object (&priv->theme, theme))
+  if (priv->theme != theme)
     {
+      if (priv->theme != NULL)
+        {
+          _dzl_shortcut_theme_detach (priv->theme);
+          g_clear_object (&priv->theme);
+        }
+
+      if (theme != NULL)
+        {
+          priv->theme = g_object_ref (theme);
+          _dzl_shortcut_theme_attach (priv->theme);
+        }
+
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME]);
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME_NAME]);
     }
