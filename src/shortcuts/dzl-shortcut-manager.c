@@ -744,9 +744,12 @@ void
 dzl_shortcut_manager_set_theme_name (DzlShortcutManager *self,
                                      const gchar        *name)
 {
-  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+  DzlShortcutManagerPrivate *priv;
 
-  g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (self));
+  if (self == NULL)
+    self = dzl_shortcut_manager_get_default ();
+
+  priv = dzl_shortcut_manager_get_instance_private (self);
 
   if (name == NULL)
     name = "default";
