@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<theme name="vim">
+<keytheme name="vim">
   <property name="title" translatable="yes">Vim</property>
   <property name="subtitle" translatable="yes">Vim theme</property>
-</theme>
+</keytheme>

@@ -50,9 +50,9 @@ dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,
   subtitle = dzl_shortcut_theme_get_subtitle (self);
 
   if (parent != NULL && !g_str_equal (parent, "internal"))
-    g_string_append_printf (str, "<theme name=\"%s\" parent=\"%s\">\n", name, parent);
+    g_string_append_printf (str, "<keytheme name=\"%s\" parent=\"%s\">\n", name, parent);
   else
-    g_string_append_printf (str, "<theme name=\"%s\">\n", name);
+    g_string_append_printf (str, "<keytheme name=\"%s\">\n", name);
 
   g_string_append_printf (str, "  <property name=\"title\" translatable=\"yes\">%s</property>\n", title ? title : "");
   g_string_append_printf (str, "  <property name=\"subtitle\" translatable=\"yes\">%s</property>\n", subtitle ? subtitle : "");
@@ -154,7 +154,7 @@ dzl_shortcut_theme_save_to_stream (DzlShortcutTheme  *self,
       g_string_append (str, "  </context>\n");
     }
 
-  g_string_append (str, "</theme>\n");
+  g_string_append (str, "</keytheme>\n");
 
   return g_output_stream_write_all (stream, str->str, str->len, NULL, cancellable, error);
 }

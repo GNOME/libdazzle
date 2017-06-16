@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<theme name="test" parent="default">
+<keytheme name="test" parent="default">
   <property name="title" translatable="yes">Test</property>
   <property name="subtitle" translatable="yes">Test theme</property>
 
@@ -21,4 +21,4 @@
     </shortcut>
 
   </context>
-</theme>
+</keytheme>

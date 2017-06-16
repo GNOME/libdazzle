@@ -359,7 +359,7 @@ theme_start_element (GMarkupParseContext  *context,
   g_assert (context != NULL);
   g_assert (element_name != NULL);
 
-  if (g_strcmp0 (element_name, "theme") == 0)
+  if (g_strcmp0 (element_name, "keytheme") == 0)
     {
       const gchar *name = NULL;
       const gchar *parent = NULL;
@@ -577,7 +577,7 @@ theme_end_element (GMarkupParseContext  *context,
   g_assert (context != NULL);
   g_assert (element_name != NULL);
 
-  if (g_strcmp0 (element_name, "theme") == 0)
+  if (g_strcmp0 (element_name, "keytheme") == 0)
     {
       if (!load_state_check_type (state, LOAD_STATE_THEME, error))
         return;

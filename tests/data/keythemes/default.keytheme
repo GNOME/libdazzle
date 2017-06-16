@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<theme name="default">
+<keytheme name="default">
   <property name="title">Default</property>
   <property name="subtitle">The default theme</property>
   <shortcut accelerator="<Control>f" command="a.b.c.a"/>
-</theme>
+</keytheme>
