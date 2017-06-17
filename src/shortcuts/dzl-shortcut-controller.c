@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "dzl-debug.h"
+
 #include "shortcuts/dzl-shortcut-closure-chain.h"
 #include "shortcuts/dzl-shortcut-context.h"
 #include "shortcuts/dzl-shortcut-controller.h"
@@ -768,6 +770,8 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
   DzlShortcutMatch match;
 
+  DZL_ENTRY;
+
   g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), FALSE);
   g_return_val_if_fail (event != NULL, FALSE);
 
@@ -803,7 +807,7 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
     {
       priv->current_chord = dzl_shortcut_chord_new_from_event (event);
       if (priv->current_chord == NULL)
-        return GDK_EVENT_PROPAGATE;
+        DZL_RETURN (GDK_EVENT_PROPAGATE);
     }
   else
     {
@@ -811,7 +815,7 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
         {
           g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
           g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
-          return GDK_EVENT_PROPAGATE;
+          DZL_RETURN (GDK_EVENT_PROPAGATE);
         }
     }
 
@@ -861,7 +865,14 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
     }
 
-  return (match ? GDK_EVENT_STOP : GDK_EVENT_PROPAGATE);
+  DZL_TRACE_MSG ("match = %s",
+		 match == DZL_SHORTCUT_MATCH_NONE ? "none" :
+		 match == DZL_SHORTCUT_MATCH_PARTIAL ? "partial" : "equal");
+
+  if (match != DZL_SHORTCUT_MATCH_NONE)
+    DZL_RETURN (GDK_EVENT_STOP);
+
+  DZL_RETURN (GDK_EVENT_PROPAGATE);
 }
 
 /**

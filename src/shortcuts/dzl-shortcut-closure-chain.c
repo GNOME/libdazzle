@@ -21,6 +21,8 @@
 #include <gobject/gvaluecollector.h>
 #include <string.h>
 
+#include "dzl-debug.h"
+
 #include "shortcuts/dzl-shortcut-closure-chain.h"
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-private.h"
@@ -478,19 +480,23 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
   switch (chain->type)
     {
     case DZL_SHORTCUT_CLOSURE_ACTION:
+      DZL_TRACE_MSG ("executing closure action");
       ret |= _dzl_gtk_widget_activate_action (widget, chain->action.group, chain->action.name, chain->action.params);
       break;
 
     case DZL_SHORTCUT_CLOSURE_CALLBACK:
+      DZL_TRACE_MSG ("executing closure callback");
       chain->callback.callback (widget, chain->callback.user_data);
       ret = TRUE;
       break;
 
     case DZL_SHORTCUT_CLOSURE_SIGNAL:
+      DZL_TRACE_MSG ("executing closure signal");
       ret |= signal_activate (chain, widget);
       break;
 
     case DZL_SHORTCUT_CLOSURE_COMMAND:
+      DZL_TRACE_MSG ("executing closure command");
       ret |= command_activate (chain, widget);
       break;
 
