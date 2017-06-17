@@ -9,6 +9,7 @@ struct _ExampleWindow
 {
   GtkApplicationWindow parent_instance;
   DzlDockBin *dockbin;
+  GtkHeaderBar *header_bar;
   GtkNotebook *notebook;
   DzlEmptyState *empty_state;
   GtkStack *stack;
@@ -111,7 +112,10 @@ close_document_cb (GSimpleAction *action,
     gtk_widget_destroy (GTK_WIDGET (view));
 
   if (gtk_notebook_get_n_pages (self->notebook) == 0)
-    gtk_stack_set_visible_child (self->stack, GTK_WIDGET (self->empty_state));
+    {
+      gtk_stack_set_visible_child (self->stack, GTK_WIDGET (self->empty_state));
+      gtk_header_bar_set_subtitle (self->header_bar, NULL);
+    }
 }
 
 static const GActionEntry actions[] = {
@@ -120,14 +124,36 @@ static const GActionEntry actions[] = {
 };
 
 static void
+on_page_changed (GtkNotebook   *notebook,
+                 GParamSpec    *pspec,
+                 ExampleWindow *self)
+{
+  gint page = gtk_notebook_get_current_page (notebook);
+  g_autofree gchar *subtitle = NULL;
+
+  if (page >= 0)
+    {
+      GtkWidget *view;
+      g_autoptr(ExampleDocument) document = NULL;
+
+      view = gtk_notebook_get_nth_page (self->notebook, page);
+      g_object_get (view, "document", &document, NULL);
+      g_object_get (document, "title", &subtitle, NULL);
+    }
+
+  gtk_header_bar_set_subtitle (self->header_bar, subtitle);
+}
+
+static void
 example_window_class_init (ExampleWindowClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/example/ui/example-window.ui");
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, dockbin);
-  gtk_widget_class_bind_template_child (widget_class, ExampleWindow, notebook);
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, empty_state);
+  gtk_widget_class_bind_template_child (widget_class, ExampleWindow, header_bar);
+  gtk_widget_class_bind_template_child (widget_class, ExampleWindow, notebook);
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, stack);
 }
 
@@ -139,6 +165,12 @@ example_window_init (ExampleWindow *self)
   g_autoptr(GPropertyAction) right = NULL;
 
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  g_signal_connect (self->notebook,
+                    "notify::page",
+                    G_CALLBACK (on_page_changed),
+                    self);
+
   dzl_shortcut_manager_add_shortcut_entries (NULL, shortcuts, G_N_ELEMENTS (shortcuts), GETTEXT_PACKAGE);
 
   controller = dzl_shortcut_controller_find (GTK_WIDGET (self));
