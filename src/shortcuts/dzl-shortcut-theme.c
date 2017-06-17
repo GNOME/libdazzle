@@ -20,6 +20,8 @@
 
 #include <string.h>
 
+#include "dzl-debug.h"
+
 #include "shortcuts/dzl-shortcut-private.h"
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-theme.h"
@@ -849,9 +851,12 @@ _dzl_shortcut_theme_attach (DzlShortcutTheme *self)
 
       g_hash_table_iter_init (&iter, priv->resource_providers);
       while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&provider))
-        gtk_style_context_add_provider_for_screen (screen,
-                                                   provider,
-                                                   GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        {
+          DZL_TRACE_MSG ("adding CSS provider %p", provider);
+          gtk_style_context_add_provider_for_screen (screen,
+                                                     provider,
+                                                     GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        }
     }
 }
 
@@ -859,6 +864,8 @@ void
 _dzl_shortcut_theme_detach (DzlShortcutTheme *self)
 {
   DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+
+  DZL_ENTRY;
 
   g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
 
@@ -870,6 +877,11 @@ _dzl_shortcut_theme_detach (DzlShortcutTheme *self)
 
       g_hash_table_iter_init (&iter, priv->resource_providers);
       while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&provider))
-        gtk_style_context_remove_provider_for_screen (screen, provider);
+        {
+          DZL_TRACE_MSG ("removing CSS provider %p", provider);
+          gtk_style_context_remove_provider_for_screen (screen, provider);
+        }
     }
+
+  DZL_EXIT;
 }

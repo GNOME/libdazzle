@@ -20,6 +20,8 @@
 
 #include <glib/gi18n.h>
 
+#include "dzl-debug.h"
+
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-label.h"
 #include "shortcuts/dzl-shortcut-manager.h"
@@ -155,8 +157,13 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
   DzlShortcutTheme *theme = NULL;
   guint previous_len;
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+  DZL_TRACE_MSG ("reloading shortcuts, current theme is “%s”",
+                 priv->theme ? dzl_shortcut_theme_get_name (priv->theme) : "internal");
 
   /*
    * If there is a queued reload when we get here, just remove it. When called
@@ -218,6 +225,9 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
         dzl_shortcut_manager_load_directory (self, directory, cancellable);
     }
 
+  DZL_TRACE_MSG ("Attempting to reset theme to %s",
+                 theme_name ?: parent_theme_name ?: "internal");
+
   /* Now try to reapply the same theme if we can find it. */
   if (theme_name != NULL)
     {
@@ -236,6 +246,8 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
   /* Notify possibly changed properties */
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME]);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME_NAME]);
+
+  DZL_EXIT;
 }
 
 static gboolean
@@ -256,6 +268,8 @@ dzl_shortcut_manager_queue_reload (DzlShortcutManager *self)
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
 
   if (priv->reload_handler == 0)
@@ -270,6 +284,8 @@ dzl_shortcut_manager_queue_reload (DzlShortcutManager *self)
                                    g_object_ref (self),
                                    g_object_unref);
     }
+
+  DZL_EXIT;
 }
 
 static void
@@ -413,15 +429,19 @@ dzl_shortcut_manager_load_directory (DzlShortcutManager  *self,
   g_autoptr(GDir) dir = NULL;
   const gchar *name;
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (directory != NULL);
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
+  DZL_TRACE_MSG ("directory = %s", directory);
+
   if (!g_file_test (directory, G_FILE_TEST_IS_DIR))
-    return;
+    DZL_EXIT;
 
   if (NULL == (dir = g_dir_open (directory, 0, NULL)))
-    return;
+    DZL_EXIT;
 
   while (NULL != (name = g_dir_read_name (dir)))
     {
@@ -436,8 +456,11 @@ dzl_shortcut_manager_load_directory (DzlShortcutManager  *self,
           _dzl_shortcut_theme_set_manager (theme, self);
           dzl_shortcut_manager_merge (self, theme);
         }
-      else g_warning ("%s", local_error->message);
+      else
+        g_warning ("%s", local_error->message);
     }
+
+  DZL_EXIT;
 }
 
 static void
@@ -447,10 +470,14 @@ dzl_shortcut_manager_load_resources (DzlShortcutManager *self,
 {
   g_auto(GStrv) children = NULL;
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (resource_dir != NULL);
   g_assert (g_str_has_prefix (resource_dir, "resource://"));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+  DZL_TRACE_MSG ("resource_dir = %s", resource_dir);
 
   if (g_str_has_prefix (resource_dir, "resource://"))
     resource_dir += strlen ("resource://");
@@ -483,6 +510,8 @@ dzl_shortcut_manager_load_resources (DzlShortcutManager *self,
             g_warning ("%s", local_error->message);
         }
     }
+
+  DZL_EXIT;
 }
 
 static gboolean
@@ -577,6 +606,8 @@ dzl_shortcut_manager_set_theme (DzlShortcutManager *self,
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
+  DZL_ENTRY;
+
   g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (self));
   g_return_if_fail (DZL_IS_SHORTCUT_THEME (theme));
 
@@ -599,6 +630,9 @@ dzl_shortcut_manager_set_theme (DzlShortcutManager *self,
           priv->theme = g_object_ref (theme);
           _dzl_shortcut_theme_attach (priv->theme);
         }
+
+      DZL_TRACE_MSG ("theme set to “%s”",
+                     theme ? dzl_shortcut_theme_get_name (theme) : "internal");
 
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME]);
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_THEME_NAME]);
@@ -628,6 +662,8 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
   GtkWidget *focus;
   GdkModifierType modifier;
 
+  DZL_ENTRY;
+
   g_return_val_if_fail (!self || DZL_IS_SHORTCUT_MANAGER (self), FALSE);
   g_return_val_if_fail (!toplevel || GTK_IS_WINDOW (toplevel), FALSE);
   g_return_val_if_fail (event != NULL, FALSE);
@@ -647,7 +683,7 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
     }
 
   if (event->type != GDK_KEY_PRESS)
-    return GDK_EVENT_PROPAGATE;
+    DZL_RETURN (GDK_EVENT_PROPAGATE);
 
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (GTK_IS_WINDOW (toplevel));
@@ -679,7 +715,7 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
            * Now try to activate the event using the controller.
            */
           if (dzl_shortcut_controller_handle_event (controller, event))
-            return GDK_EVENT_STOP;
+            DZL_RETURN (GDK_EVENT_STOP);
         }
 
       /*
@@ -705,7 +741,7 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
                   GtkBindingSet *set = g_ptr_array_index (sets, i);
 
                   if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (widget)))
-                    return GDK_EVENT_STOP;
+                    DZL_RETURN (GDK_EVENT_STOP);
                 }
             }
 
@@ -718,14 +754,14 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
               GtkBindingSet *set = gtk_binding_set_by_class (G_OBJECT_GET_CLASS (widget));
 
               if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (widget)))
-                return GDK_EVENT_STOP;
+                DZL_RETURN (GDK_EVENT_STOP);
             }
         }
 
       widget = gtk_widget_get_parent (widget);
     }
 
-  return GDK_EVENT_PROPAGATE;
+  DZL_RETURN (GDK_EVENT_PROPAGATE);
 }
 
 const gchar *
@@ -1305,6 +1341,8 @@ dzl_shortcut_manager_merge (DzlShortcutManager *self,
   DzlShortcutTheme *base_layer;
   const gchar *name;
 
+  DZL_ENTRY;
+
   g_return_if_fail (DZL_IS_SHORTCUT_MANAGER (self));
   g_return_if_fail (DZL_IS_SHORTCUT_THEME (theme));
 
@@ -1320,7 +1358,7 @@ dzl_shortcut_manager_merge (DzlShortcutManager *self,
   if (dzl_str_empty0 (name))
     {
       g_warning ("Attempt to merge theme with empty name");
-      return;
+      DZL_EXIT;
     }
 
   base_layer = dzl_shortcut_manager_get_theme_by_name (self, name);
@@ -1360,4 +1398,6 @@ dzl_shortcut_manager_merge (DzlShortcutManager *self,
    * the intenral structures.
    */
   _dzl_shortcut_theme_merge (base_layer, theme);
+
+  DZL_EXIT;
 }
