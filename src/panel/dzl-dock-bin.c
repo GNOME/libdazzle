@@ -257,25 +257,6 @@ get_visible (DzlDockBin  *self,
   return FALSE;
 }
 
-static gboolean
-set_visible (DzlDockBin  *self,
-             const gchar *action_name,
-             gboolean     value)
-{
-  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
-  GAction *action;
-
-  g_assert (DZL_IS_DOCK_BIN (self));
-  g_assert (action_name != NULL);
-
-  action = g_action_map_lookup_action (G_ACTION_MAP (priv->actions), action_name);
-
-  if (action != NULL)
-    g_simple_action_set_state (G_SIMPLE_ACTION (action), g_variant_new_boolean (value));
-
-  return FALSE;
-}
-
 static void
 dzl_dock_bin_update_actions (DzlDockBin *self)
 {
@@ -1760,23 +1741,36 @@ dzl_dock_bin_set_property (GObject      *object,
                            GParamSpec   *pspec)
 {
   DzlDockBin *self = DZL_DOCK_BIN (object);
+  DzlDockBinChild *child;
 
   switch (prop_id)
     {
     case PROP_LEFT_VISIBLE:
-      set_visible (self, "left-visible", g_value_get_boolean (value));
+      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_LEFT);
+      if (child->widget)
+        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
+                                            g_value_get_boolean (value));
       break;
 
     case PROP_RIGHT_VISIBLE:
-      set_visible (self, "right-visible", g_value_get_boolean (value));
+      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_RIGHT);
+      if (child->widget)
+        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
+                                            g_value_get_boolean (value));
       break;
 
     case PROP_TOP_VISIBLE:
-      set_visible (self, "top-visible", g_value_get_boolean (value));
+      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_TOP);
+      if (child->widget)
+        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
+                                            g_value_get_boolean (value));
       break;
 
     case PROP_BOTTOM_VISIBLE:
-      set_visible (self, "bottom-visible", g_value_get_boolean (value));
+      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_BOTTOM);
+      if (child->widget)
+        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
+                                            g_value_get_boolean (value));
       break;
 
     case PROP_MANAGER:
@@ -1825,28 +1819,28 @@ dzl_dock_bin_class_init (DzlDockBinClass *klass)
                           "Left Visible",
                           "If the left panel is visible.",
                           FALSE,
-                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_RIGHT_VISIBLE] =
     g_param_spec_boolean ("right-visible",
                           "Right Visible",
                           "If the right panel is visible.",
                           FALSE,
-                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_TOP_VISIBLE] =
     g_param_spec_boolean ("top-visible",
                           "Top Visible",
                           "If the top panel is visible.",
                           FALSE,
-                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_BOTTOM_VISIBLE] =
     g_param_spec_boolean ("bottom-visible",
                           "Bottom Visible",
                           "If the bottom panel is visible.",
                           FALSE,
-                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
