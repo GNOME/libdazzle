@@ -294,6 +294,7 @@ static void
 dzl_application_init (DzlApplication *self)
 {
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
+  g_autoptr(GPropertyAction) shortcut_theme_action = NULL;
 
   g_application_set_default (G_APPLICATION (self));
 
@@ -302,6 +303,9 @@ dzl_application_init (DzlApplication *self)
   priv->menu_manager = dzl_menu_manager_new ();
   priv->menu_merge_ids = g_hash_table_new (NULL, NULL);
   priv->shortcut_manager = g_object_ref (dzl_shortcut_manager_get_default ());
+
+  shortcut_theme_action = g_property_action_new ("shortcut-theme", priv->shortcut_manager, "theme-name");
+  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (shortcut_theme_action));
 }
 
 /**
