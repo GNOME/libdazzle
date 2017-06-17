@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="ExampleDocumentView" parent="GtkBin">
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">true</property>
+        <child>
+          <object class="GtkTextView" id="text_view">
+            <property name="monospace">true</property>
+            <property name="visible">true</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

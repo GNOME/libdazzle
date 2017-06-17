@@ -1,25 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <template class="ExampleWindow" parent="GtkWindow">
+  <template class="ExampleWindow" parent="GtkApplicationWindow">
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="header_bar">
+        <property name="show-close-button">true</property>
+        <property name="visible">true</property>
+        <child>
+          <object class="GtkButton">
+            <property name="action-name">win.new-document</property>
+            <property name="visible">true</property>
+            <child>
+              <object class="GtkImage">
+                <property name="icon-name">document-new-symbolic</property>
+                <property name="visible">true</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">start</property>
+          </packing>
+        </child>
+      </object>
+    </child>
     <child>
       <object class="DzlDockBin" id="dockbin">
         <property name="visible">true</property>
         <child>
-          <object class="GtkNotebook" id="notebook">
+          <object class="GtkStack" id="stack">
             <property name="expand">true</property>
+            <property name="transition-type">crossfade</property>
             <property name="visible">true</property>
             <child>
-              <object class="GtkScrolledWindow">
+              <object class="DzlEmptyState" id="empty_state">
+                <property name="icon-name">document-new-symbolic</property>
+                <property name="pixel-size">128</property>
+                <property name="title" translatable="yes">No documents are open</property>
+                <property name="subtitle" translatable="yes">Open a document to see it’s contents</property>
                 <property name="visible">true</property>
-                <child>
-                  <object class="GtkTextView">
-                    <property name="monospace">true</property>
-                    <property name="visible">true</property>
-                  </object>
-                </child>
               </object>
               <packing>
-                <property name="tab-label">Document 1</property>
+                <property name="name">empty_state</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkNotebook" id="notebook">
+                <property name="visible">true</property>
+              </object>
+              <packing>
+                <property name="name">notebook</property>
               </packing>
             </child>
           </object>
