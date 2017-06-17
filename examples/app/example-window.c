@@ -14,8 +14,8 @@ struct _ExampleWindow
 G_DEFINE_TYPE (ExampleWindow, example_window, GTK_TYPE_WINDOW)
 
 static const DzlShortcutEntry shortcuts[] = {
-  { "com.example.window.NewDoc", "<control>n", N_("Editing"), N_("Documents"), N_("New Document"), N_("Create a new document") },
-  { "com.example.window.CloseDoc", "<control>w", N_("Editing"), N_("Documents"), N_("Close Document"), N_("Close the current document") },
+  { "com.example.window.NewDoc", NULL, N_("Editing"), N_("Documents"), N_("New Document"), N_("Create a new document") },
+  { "com.example.window.CloseDoc", NULL, N_("Editing"), N_("Documents"), N_("Close Document"), N_("Close the current document") },
 };
 
 static void
@@ -24,6 +24,7 @@ new_document_cb (ExampleWindow *self,
 {
   g_assert (EXAMPLE_IS_WINDOW (self));
 
+  g_print ("New document!\n");
 }
 
 static void
@@ -32,6 +33,7 @@ close_document_cb (ExampleWindow *self,
 {
   g_assert (EXAMPLE_IS_WINDOW (self));
 
+  g_print ("Close document!\n");
 }
 
 static void
@@ -57,12 +59,12 @@ example_window_init (ExampleWindow *self)
 
   dzl_shortcut_controller_add_command_callback (controller,
                                                 "com.example.window.NewDoc",
-                                                "<control>n",
+                                                NULL,
                                                 (GtkCallback) new_document_cb, NULL, NULL);
 
   dzl_shortcut_controller_add_command_callback (controller,
                                                 "com.example.window.CloseDoc",
-                                                "<control>w",
+                                                NULL,
                                                 (GtkCallback) close_document_cb, NULL, NULL);
 
   g_signal_connect_swapped (self,
