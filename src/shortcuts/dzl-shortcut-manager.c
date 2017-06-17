@@ -222,13 +222,15 @@ dzl_shortcut_manager_reload (DzlShortcutManager *self,
   if (theme_name != NULL)
     {
       theme = dzl_shortcut_manager_get_theme_by_name (self, theme_name);
-      g_set_object (&priv->theme, theme);
+      if (theme != NULL)
+        dzl_shortcut_manager_set_theme (self, theme);
     }
 
   if (priv->theme == NULL && parent_theme_name != NULL)
     {
       theme = dzl_shortcut_manager_get_theme_by_name (self, parent_theme_name);
-      g_set_object (&priv->theme, theme);
+      if (theme != NULL)
+        dzl_shortcut_manager_set_theme (self, theme);
     }
 
   /* Notify possibly changed properties */
