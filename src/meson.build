@@ -22,7 +22,16 @@ dzl_version_h = configure_file(
         install: true,
   configuration: version_data)
 
+debug_data = configuration_data()
+debug_data.set10('ENABLE_TRACING', get_option('enable_tracing'))
+
+dzl_debug_h = configure_file(
+          input: 'dzl-debug.h.in',
+         output: 'dzl-debug.h',
+  configuration: debug_data)
+
 libdazzle_generated_headers = [
+  dzl_debug_h,
   dzl_version_h,
 ]
 
