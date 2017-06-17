@@ -692,6 +692,9 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
   modifier = event->state & gtk_accelerator_get_default_mod_mask ();
   widget = focus = gtk_window_get_focus (GTK_WINDOW (toplevel));
 
+  if (widget == NULL)
+    widget = focus = toplevel;
+
   while (widget != NULL)
     {
       G_GNUC_UNUSED g_autoptr(GtkWidget) widget_hold = g_object_ref (widget);
