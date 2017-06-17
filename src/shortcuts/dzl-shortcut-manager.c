@@ -729,15 +729,15 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
 const gchar *
 dzl_shortcut_manager_get_theme_name (DzlShortcutManager *self)
 {
-  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
-  const gchar *ret = NULL;
+  DzlShortcutTheme *theme;
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_MANAGER (self), NULL);
 
-  if (priv->theme != NULL)
-    ret = dzl_shortcut_theme_get_name (priv->theme);
+  theme = dzl_shortcut_manager_get_theme (self);
 
-  return ret;
+  g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (theme), NULL);
+
+  return dzl_shortcut_theme_get_name (theme);
 }
 
 void
