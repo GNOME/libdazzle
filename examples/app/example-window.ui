@@ -20,6 +20,41 @@
             <property name="pack-type">start</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">true</property>
+            <style>
+              <class name="linked"/>
+            </style>
+            <child>
+              <object class="GtkToggleButton">
+                <property name="visible">true</property>
+                <property name="action-name">win.show-left-panel</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="icon-name">panel-left-pane-symbolic</property>
+                    <property name="visible">true</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkToggleButton">
+                <property name="visible">true</property>
+                <property name="action-name">win.show-right-panel</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="icon-name">panel-right-pane-symbolic</property>
+                    <property name="visible">true</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
+          </packing>
+        </child>
       </object>
     </child>
     <child>
@@ -44,11 +79,36 @@
             </child>
             <child>
               <object class="GtkNotebook" id="notebook">
+                <property name="show-border">false</property>
                 <property name="visible">true</property>
               </object>
               <packing>
                 <property name="name">notebook</property>
               </packing>
+            </child>
+          </object>
+        </child>
+        <child type="left">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="visible">true</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Left</property>
+                <property name="visible">true</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child type="right">
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="visible">true</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">Right</property>
+                <property name="visible">true</property>
+              </object>
             </child>
           </object>
         </child>

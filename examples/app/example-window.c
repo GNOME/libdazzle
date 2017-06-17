@@ -135,6 +135,8 @@ static void
 example_window_init (ExampleWindow *self)
 {
   DzlShortcutController *controller;
+  g_autoptr(GPropertyAction) left = NULL;
+  g_autoptr(GPropertyAction) right = NULL;
 
   gtk_widget_init_template (GTK_WIDGET (self));
   dzl_shortcut_manager_add_shortcut_entries (NULL, shortcuts, G_N_ELEMENTS (shortcuts), GETTEXT_PACKAGE);
@@ -152,6 +154,12 @@ example_window_init (ExampleWindow *self)
                             dzl_shortcut_manager_get_default ());
 
   g_action_map_add_action_entries (G_ACTION_MAP (self), actions, G_N_ELEMENTS (actions), self);
+
+  left = g_property_action_new ("show-left-panel", self->dockbin, "left-visible");
+  right = g_property_action_new ("show-right-panel", self->dockbin, "right-visible");
+
+  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (left));
+  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (right));
 }
 
 GtkWidget *
