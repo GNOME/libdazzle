@@ -135,10 +135,13 @@ load_state_add_action (LoadState   *state,
                        const gchar *action)
 {
   DzlShortcutContext *context = NULL;
+  DzlShortcutTheme *theme = NULL;
   const gchar *accel = NULL;
 
   g_assert (state != NULL);
   g_assert (action != NULL);
+
+  /* NOTE: Keep this in sync with load_state_add_command() */
 
   for (LoadStateFrame *iter = state->stack; iter != NULL; iter = iter->next)
     {
@@ -146,13 +149,20 @@ load_state_add_action (LoadState   *state,
         accel = iter->accelerator;
       else if (iter->type == LOAD_STATE_CONTEXT)
         context = iter->context;
+      else if (iter->type == LOAD_STATE_THEME)
+        theme = state->self;
 
-      if (accel && context)
+      if (accel && (context || theme))
         break;
     }
 
-  if (accel && context)
-    dzl_shortcut_context_add_action (context, accel, action);
+  if (accel != NULL)
+    {
+      if (context != NULL)
+        dzl_shortcut_context_add_action (context, accel, action);
+      else if (theme != NULL)
+        dzl_shortcut_theme_set_accel_for_action (theme, action, accel);
+    }
 }
 
 static void
@@ -165,6 +175,8 @@ load_state_add_command (LoadState   *state,
 
   g_assert (state != NULL);
   g_assert (command != NULL);
+
+  /* NOTE: Keep this in sync with load_state_add_action() */
 
   for (LoadStateFrame *iter = state->stack; iter != NULL; iter = iter->next)
     {
