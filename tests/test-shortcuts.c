@@ -118,7 +118,7 @@ main (gint argc,
                              NULL);
 
   app.search = g_object_new (GTK_TYPE_SEARCH_ENTRY,
-                             "placeholder-text", "ctrl+x ctrl+f to focus",
+                             "placeholder-text", "ctrl+y ctrl+y to focus",
                              "width-chars", 30,
                              "visible", TRUE,
                              NULL);
@@ -137,7 +137,7 @@ main (gint argc,
   app.search_controller = dzl_shortcut_controller_new (GTK_WIDGET (app.search));
   dzl_shortcut_controller_add_command_signal (app.search_controller,
                                               "com.example.foo.search",
-                                              "<ctrl>x|<ctrl>f",
+                                              "<ctrl>y|<ctrl>y",
                                               "grab-focus",
                                               0);
   dzl_shortcut_controller_add_command_callback (app.search_controller,
