@@ -480,8 +480,12 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
   switch (chain->type)
     {
     case DZL_SHORTCUT_CLOSURE_ACTION:
-      DZL_TRACE_MSG ("executing closure action");
-      ret |= _dzl_gtk_widget_activate_action (widget, chain->action.group, chain->action.name, chain->action.params);
+      DZL_TRACE_MSG ("executing closure action %s.%s",
+                     chain->action.group, chain->action.name);
+      ret |= _dzl_gtk_widget_activate_action (widget,
+                                              chain->action.group,
+                                              chain->action.name,
+                                              chain->action.params);
       break;
 
     case DZL_SHORTCUT_CLOSURE_CALLBACK:
@@ -496,7 +500,7 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
       break;
 
     case DZL_SHORTCUT_CLOSURE_COMMAND:
-      DZL_TRACE_MSG ("executing closure command");
+      DZL_TRACE_MSG ("executing closure command \"%s\"", chain->command.name);
       ret |= command_activate (chain, widget);
       break;
 
