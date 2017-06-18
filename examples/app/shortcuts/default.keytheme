@@ -4,5 +4,7 @@
 
   <shortcut accelerator="<primary>n" command="com.example.window.NewDoc"/>
   <shortcut accelerator="<primary>w" command="com.example.window.CloseDoc"/>
+  <shortcut accelerator="<primary><shift>question" action="app.shortcuts"/>
+  <shortcut accelerator="<primary>q" action="app.quit"/>
 
 </keytheme>
