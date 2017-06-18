@@ -21,7 +21,6 @@
 #include <glib/gi18n.h>
 
 #include "cache/dzl-task-cache.h"
-#include "util/dzl-counter.h"
 #include "util/dzl-heap.h"
 
 typedef struct
@@ -75,13 +74,6 @@ struct _DzlTaskCache
 };
 
 G_DEFINE_TYPE (DzlTaskCache, dzl_task_cache, G_TYPE_OBJECT)
-
-DZL_DEFINE_COUNTER (instances,  "DzlTaskCache", "Instances",  "Number of DzlTaskCache instances")
-DZL_DEFINE_COUNTER (in_flight,  "DzlTaskCache", "In Flight",  "Number of in flight operations")
-DZL_DEFINE_COUNTER (queued,     "DzlTaskCache", "Queued",     "Number of queued operations")
-DZL_DEFINE_COUNTER (cached,     "DzlTaskCache", "Cache Size", "Number of cached items")
-DZL_DEFINE_COUNTER (hits,       "DzlTaskCache", "Cache Hits", "Number of cache hits")
-DZL_DEFINE_COUNTER (misses,     "DzlTaskCache", "Cache Miss", "Number of cache misses")
 
 enum {
   PROP_0,
@@ -299,8 +291,6 @@ dzl_task_cache_evict_full (DzlTaskCache  *self,
 
       g_hash_table_remove (self->cache, key);
 
-      DZL_COUNTER_DEC (cached);
-
       g_debug ("Evicted 1 item from %s", self->name ?: "unnamed cache");
 
       if (self->evict_source != NULL)
@@ -322,11 +312,7 @@ dzl_task_cache_evict (DzlTaskCache  *self,
 void
 dzl_task_cache_evict_all (DzlTaskCache *self)
 {
-  guint size;
-
   g_return_if_fail (DZL_IS_TASK_CACHE (self));
-
-  size = g_hash_table_size (self->cache);
 
   while (self->evict_heap->len > 0)
     {
@@ -337,8 +323,6 @@ dzl_task_cache_evict_all (DzlTaskCache *self)
     }
 
   g_hash_table_remove_all (self->cache);
-
-  DZL_COUNTER_SUB (cached, size);
 
   if (self->evict_source != NULL)
     evict_source_rearm (self->evict_source);
@@ -367,11 +351,8 @@ dzl_task_cache_peek (DzlTaskCache  *self,
 
   g_return_val_if_fail (DZL_IS_TASK_CACHE (self), NULL);
 
-  if ((item = g_hash_table_lookup (self->cache, key)))
-    {
-      DZL_COUNTER_INC (hits);
-      return item->value;
-    }
+  if (NULL != (item = g_hash_table_lookup (self->cache, key)))
+    return item->value;
 
   return NULL;
 }
@@ -386,16 +367,13 @@ dzl_task_cache_propagate_error (DzlTaskCache  *self,
   g_assert (DZL_IS_TASK_CACHE (self));
   g_assert (error != NULL);
 
-  if ((queued = g_hash_table_lookup (self->queued, key)))
+  if (NULL != (queued = g_hash_table_lookup (self->queued, key)))
     {
-      gint64 count = queued->len;
-      gsize i;
-
       /* we can't use steal because we want the key freed */
       g_ptr_array_ref (queued);
       g_hash_table_remove (self->queued, key);
 
-      for (i = 0; i < queued->len; i++)
+      for (guint i = 0; i < queued->len; i++)
         {
           GTask *task;
 
@@ -404,8 +382,6 @@ dzl_task_cache_propagate_error (DzlTaskCache  *self,
         }
 
       g_ptr_array_unref (queued);
-
-      DZL_COUNTER_SUB (queued, count);
     }
 }
 
@@ -425,8 +401,6 @@ dzl_task_cache_populate (DzlTaskCache  *self,
   g_hash_table_insert (self->cache, item->key, item);
   dzl_heap_insert_val (self->evict_heap, item);
 
-  DZL_COUNTER_INC (cached);
-
   if (self->evict_source != NULL)
     evict_source_rearm (self->evict_source);
 }
@@ -440,27 +414,21 @@ dzl_task_cache_propagate_pointer (DzlTaskCache  *self,
 
   g_assert (DZL_IS_TASK_CACHE (self));
 
-  if ((queued = g_hash_table_lookup (self->queued, key)))
+  if (NULL != (queued = g_hash_table_lookup (self->queued, key)))
     {
-      gint64 count = queued->len;
-      gsize i;
-
       g_ptr_array_ref (queued);
       g_hash_table_remove (self->queued, key);
 
-      for (i = 0; i < queued->len; i++)
+      for (guint i = 0; i < queued->len; i++)
         {
-          GTask *task;
+          GTask *task = g_ptr_array_index (queued, i);
 
-          task = g_ptr_array_index (queued, i);
           g_task_return_pointer (task,
                                  self->value_copy_func (value),
                                  self->value_destroy_func);
         }
 
       g_ptr_array_unref (queued);
-
-      DZL_COUNTER_SUB (queued, count);
     }
 }
 
@@ -500,8 +468,6 @@ dzl_task_cache_cancel_in_idle (gpointer user_data)
             {
               cancelled = g_task_return_error_if_cancelled (task);
               g_ptr_array_remove_index_fast (queued, i);
-
-              DZL_COUNTER_DEC (queued);
               break;
             }
         }
@@ -586,8 +552,6 @@ dzl_task_cache_fetch_cb (GObject      *object,
 
   self->key_destroy_func (key);
   g_object_unref (task);
-
-  DZL_COUNTER_DEC (in_flight);
 }
 
 void
@@ -622,8 +586,6 @@ dzl_task_cache_get_async (DzlTaskCache        *self,
       return;
     }
 
-  DZL_COUNTER_INC (misses);
-
   /*
    * Always queue the request. If we need to dispatch the worker to
    * fetch the result, that will happen with another task.
@@ -637,7 +599,6 @@ dzl_task_cache_get_async (DzlTaskCache        *self,
     }
 
   g_ptr_array_add (queued, g_object_ref (task));
-  DZL_COUNTER_INC (queued);
 
   /*
    * The in_flight hashtable will have a bit set if we have queued
@@ -674,8 +635,6 @@ dzl_task_cache_get_async (DzlTaskCache        *self,
                                key,
                                g_object_ref (fetch_task),
                                self->populate_callback_data);
-
-      DZL_COUNTER_INC (in_flight);
     }
 }
 
@@ -803,17 +762,6 @@ dzl_task_cache_constructed (GObject *object)
 }
 
 static void
-count_queued_cb (gpointer key,
-                 gpointer value,
-                 gpointer user_data)
-{
-  GPtrArray *ar = value;
-  gint64 *count = user_data;
-
-  (*count) += ar->len;
-}
-
-static void
 dzl_task_cache_dispose (GObject *object)
 {
   DzlTaskCache *self = (DzlTaskCache *)object;
@@ -836,29 +784,13 @@ dzl_task_cache_dispose (GObject *object)
 
       g_debug ("Evicted cache of %"G_GINT64_FORMAT" items from %s",
                count, self->name ?: "unnamed cache");
-
-      DZL_COUNTER_SUB (cached, count);
     }
 
   if (self->queued != NULL)
-    {
-      gint64 count = 0;
-
-      g_hash_table_foreach (self->queued, count_queued_cb, &count);
-      g_clear_pointer (&self->queued, g_hash_table_unref);
-
-      DZL_COUNTER_SUB (queued, count);
-    }
+    g_clear_pointer (&self->queued, g_hash_table_unref);
 
   if (self->in_flight != NULL)
-    {
-      gint64 count;
-
-      count = g_hash_table_size (self->in_flight);
-      g_clear_pointer (&self->in_flight, (GDestroyNotify)g_hash_table_unref);
-
-      DZL_COUNTER_SUB (in_flight, count);
-    }
+    g_clear_pointer (&self->in_flight, (GDestroyNotify)g_hash_table_unref);
 
   if (self->populate_callback_data)
     {
@@ -877,8 +809,6 @@ dzl_task_cache_finalize (GObject *object)
   g_clear_pointer (&self->name, g_free);
 
   G_OBJECT_CLASS (dzl_task_cache_parent_class)->finalize (object);
-
-  DZL_COUNTER_DEC (instances);
 }
 
 static void
@@ -1023,10 +953,7 @@ dzl_task_cache_class_init (DzlTaskCacheClass *klass)
 void
 dzl_task_cache_init (DzlTaskCache *self)
 {
-  DZL_COUNTER_INC (instances);
-
-  self->evict_heap = dzl_heap_new (sizeof (gpointer),
-                                   cache_item_compare_evict_at);
+  self->evict_heap = dzl_heap_new (sizeof (gpointer), cache_item_compare_evict_at);
 }
 
 /**
