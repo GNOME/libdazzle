@@ -339,7 +339,6 @@ libdazzle_sources = [
   'animation/dzl-frame-source.c',
   'animation/dzl-frame-source.h',
 
-  'graphing/dzl-column-private.h',
   'graphing/dzl-graph-column-private.h',
 
   'panel/dzl-dock-bin-edge-private.h',
