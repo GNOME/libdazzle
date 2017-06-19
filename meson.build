@@ -100,6 +100,6 @@ subdir('tools')
 subdir('tests')
 subdir('examples/app')
 
-if get_option('enable-gtk-doc')
+if get_option('enable_gtk_doc')
   subdir('doc')
 endif
