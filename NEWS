@@ -1,0 +1,11 @@
+==============
+Version 3.25.3
+==============
+
+This is our first release of libdazzle. While we would love for a perfect first
+release, we expect you'll find issues. So please help us get things stable as
+we move towards GNOME 3.26.
+
+Our focus is building a utility kit GNOME applications. If you want to see
+practical examples of using Dazzle, we suggestion looking at the GNOME Builder
+project which uses Dazzle extensively.
