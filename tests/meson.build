@@ -24,6 +24,7 @@ test_application = executable('test-application', 'test-application.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-application', test_application, env: test_env)
 
 test_menu_manager = executable('test-menu-manager', 'test-menu-manager.c',
         c_args: test_cflags,
@@ -36,30 +37,35 @@ test_state_machine = executable('test-state-machine', 'test-state-machine.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-state-machine', test_state_machine, env: test_env)
 
 test_binding_group = executable('test-binding-group', 'test-binding-group.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-binding-group', test_binding_group, env: test_env)
 
 test_signal_group = executable('test-signal-group', 'test-signal-group.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-signal-group', test_binding_group, env: test_env)
 
 test_task_cache = executable('test-task-cache', 'test-task-cache.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-task-cache', test_task_cache, env: test_env)
 
 test_heap = executable('test-heap', 'test-heap.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-heap', test_heap, env: test_env)
 
 test_radio_box = executable('test-radio-box', 'test-radio-box.c',
         c_args: test_cflags,
@@ -102,12 +108,14 @@ test_suggestion_buffer = executable('test-suggestion-buffer', 'test-suggestion-b
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-suggestion-buffer', test_suggestion_buffer, env: test_env)
 
 test_fuzzy_index = executable('test-fuzzy-index', 'test-fuzzy-index.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-fuzzy-index', test_fuzzy_index, env: test_env)
 
 test_bin = executable('test-bin', 'test-bin.c',
         c_args: test_cflags,
@@ -138,18 +146,21 @@ test_shortcut_chord = executable('test-shortcut-chord', 'test-shortcut-chord.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-shortcut-chord', test_shortcut_chord, env: test_env)
 
 test_shortcut_overlays = executable('test-shortcut-overlays', 'test-shortcut-overlays.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-shortcut-overlays', test_shortcut_overlays, env: test_env)
 
 test_shortcut_theme = executable('test-shortcut-theme', 'test-shortcut-theme.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-shortcut-theme', test_shortcut_theme, env: test_env)
 
 test_shortcuts = executable('test-shortcuts', 'test-shortcuts.c',
         c_args: test_cflags,
@@ -228,12 +239,14 @@ test_trie = executable('test-trie', 'test-trie.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-trie', test_trie, env: test_env)
 
 test_levenshtein = executable('test-levenshtein', 'test-levenshtein.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-levenshtein', test_levenshtein, env: test_env)
 
 test_pill_box = executable('test-pill-box', 'test-pill-box.c',
         c_args: test_cflags,
@@ -252,6 +265,7 @@ test_int_pair = executable('test-int-pair', 'test-int-pair.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-int-pair', test_int_pair, env: test_env)
 
 test_path_bar = executable('test-path-bar', 'test-path-bar.c',
         c_args: test_cflags,
@@ -264,6 +278,7 @@ test_ring = executable('test-ring', 'test-ring.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-ring', test_ring, env: test_env)
 
 test_counters_window = executable('test-counters-window', 'test-counters-window.c',
         c_args: test_cflags,
