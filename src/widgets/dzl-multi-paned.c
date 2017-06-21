@@ -1273,7 +1273,7 @@ allocation_stage_expand (DzlMultiPaned   *self,
               if (gtk_widget_get_hexpand (child->widget))
                 {
                   child->alloc.width += adjust;
-                  state->avail_height -= adjust;
+                  state->avail_width -= adjust;
                   x_adjust += adjust;
                 }
             }
