@@ -51,6 +51,7 @@ G_BEGIN_DECLS
 #include "graphing/dzl-graph-model.h"
 #include "graphing/dzl-graph-renderer.h"
 #include "graphing/dzl-graph-view.h"
+#include "menus/dzl-joined-menu.h"
 #include "menus/dzl-menu-manager.h"
 #include "panel/dzl-dock-bin-edge.h"
 #include "panel/dzl-dock-bin.h"
