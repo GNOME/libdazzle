@@ -1867,6 +1867,11 @@ dzl_multi_paned_set_property (GObject      *object,
     {
     case PROP_ORIENTATION:
       priv->orientation = g_value_get_enum (value);
+      for (guint i = 0; i < priv->children->len; i++)
+        {
+          DzlMultiPanedChild *child = &g_array_index (priv->children, DzlMultiPanedChild, i);
+          child->position_set = FALSE;
+        }
       dzl_multi_paned_update_child_handles (self);
       gtk_widget_queue_resize (GTK_WIDGET (self));
       break;
