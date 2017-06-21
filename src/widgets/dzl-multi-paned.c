@@ -947,14 +947,13 @@ allocation_stage_naturals (DzlMultiPaned   *self,
 {
   gint x_adjust = 0;
   gint y_adjust = 0;
-  guint i;
 
   g_assert (DZL_IS_MULTI_PANED (self));
   g_assert (state != NULL);
   g_assert (state->children != NULL);
   g_assert (state->n_children > 0);
 
-  for (i = 0; i < state->n_children; i++)
+  for (guint i = 0; i < state->n_children; i++)
     {
       DzlMultiPanedChild *child = state->children [i];
 
@@ -1203,7 +1202,6 @@ allocation_stage_expand (DzlMultiPaned   *self,
   gint y_adjust = 0;
   gint n_expand = 0;
   gint adjust;
-  guint i;
 
   g_assert (DZL_IS_MULTI_PANED (self));
   g_assert (state != NULL);
@@ -1234,7 +1232,7 @@ allocation_stage_expand (DzlMultiPaned   *self,
       return;
     }
 
-  for (i = 0; i < state->n_children; i++)
+  for (guint i = 0; i < state->n_children; i++)
     {
       DzlMultiPanedChild *child = state->children [i];
 
@@ -1261,7 +1259,7 @@ allocation_stage_expand (DzlMultiPaned   *self,
   else
     adjust = state->avail_height / n_expand;
 
-  for (i = 0; i < state->n_children; i++)
+  for (guint i = 0; i < state->n_children; i++)
     {
       DzlMultiPanedChild *child = state->children [i];
 
@@ -1315,14 +1313,12 @@ static void
 allocation_stage_allocate (DzlMultiPaned   *self,
                            AllocationState *state)
 {
-  guint i;
-
   g_assert (DZL_IS_MULTI_PANED (self));
   g_assert (state != NULL);
   g_assert (state->children != NULL);
   g_assert (state->n_children > 0);
 
-  for (i = 0; i < state->n_children; i++)
+  for (guint i = 0; i < state->n_children; i++)
     {
       DzlMultiPanedChild *child = state->children [i];
 
