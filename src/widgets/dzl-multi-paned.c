@@ -1332,7 +1332,7 @@ allocation_stage_allocate (DzlMultiPaned   *self,
         {
           if (state->n_children != (i + 1))
             {
-              if (state->orientation == GTK_ORIENTATION_HORIZONTAL)
+              if (IS_HORIZONTAL (state->orientation))
                 {
                   gdk_window_move_resize (child->handle,
                                           child->alloc.x + child->alloc.width - (HANDLE_WIDTH / 2),
