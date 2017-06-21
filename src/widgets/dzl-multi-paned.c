@@ -1926,7 +1926,7 @@ dzl_multi_paned_class_init (DzlMultiPanedClass *klass)
                        "Orientation",
                        GTK_TYPE_ORIENTATION,
                        GTK_ORIENTATION_VERTICAL,
-                       (G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+                       (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
@@ -1975,6 +1975,7 @@ dzl_multi_paned_init (DzlMultiPaned *self)
 
   gtk_widget_set_has_window (GTK_WIDGET (self), FALSE);
 
+  priv->orientation = GTK_ORIENTATION_VERTICAL;
   priv->children = g_array_new (FALSE, TRUE, sizeof (DzlMultiPanedChild));
 
   dzl_multi_paned_create_pan_gesture (self);
