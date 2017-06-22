@@ -598,6 +598,8 @@ dzl_multi_paned_remove (GtkContainer *container,
   dzl_multi_paned_reset_positions (self);
 
   gtk_gesture_set_state (GTK_GESTURE (priv->gesture), GTK_EVENT_SEQUENCE_DENIED);
+
+  gtk_widget_queue_resize (GTK_WIDGET (self));
 }
 
 static void
