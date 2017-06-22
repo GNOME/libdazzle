@@ -328,3 +328,42 @@ dzl_gtk_widget_add_style_class (GtkWidget   *widget,
 
   gtk_style_context_add_class (gtk_widget_get_style_context (widget), class_name);
 }
+
+void
+dzl_gtk_widget_action_set (GtkWidget   *widget,
+                           const gchar *group,
+                           const gchar *name,
+                           const gchar *first_property,
+                           ...)
+{
+  GAction *action = NULL;
+  va_list args;
+
+  g_return_if_fail (GTK_IS_WIDGET (widget));
+  g_return_if_fail (group != NULL);
+  g_return_if_fail (name != NULL);
+  g_return_if_fail (first_property != NULL);
+
+  for (; widget; widget = gtk_widget_get_parent (widget))
+    {
+      GActionGroup *actions = gtk_widget_get_action_group (widget, group);
+
+      if (G_IS_ACTION_MAP (actions))
+        {
+          action = g_action_map_lookup_action (G_ACTION_MAP (actions), name);
+
+          if (action != NULL)
+            break;
+        }
+    }
+
+  if (action == NULL)
+    {
+      g_warning ("Failed to locate action %s.%s", group, name);
+      return;
+    }
+
+  va_start (args, first_property);
+  g_object_set_valist (G_OBJECT (action), first_property, args);
+  va_end (args);
+}

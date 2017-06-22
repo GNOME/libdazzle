@@ -23,6 +23,11 @@
 
 G_BEGIN_DECLS
 
+void          dzl_gtk_widget_action_set          (GtkWidget               *widget,
+                                                  const gchar             *group,
+                                                  const gchar             *name,
+                                                  const gchar             *first_property,
+                                                  ...) G_GNUC_NULL_TERMINATED;
 gboolean      dzl_gtk_widget_action              (GtkWidget               *widget,
                                                   const gchar             *group,
                                                   const gchar             *name,
