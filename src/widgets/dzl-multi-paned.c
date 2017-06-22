@@ -1298,14 +1298,11 @@ allocation_stage_expand (DzlMultiPaned   *self,
        * allocation stages in this case.
        */
 
-      if (IS_HORIZONTAL (state->orientation))
+      if (gtk_widget_compute_expand (child->widget, state->orientation))
         {
-          if (gtk_widget_get_hexpand (child->widget))
+          if (IS_HORIZONTAL (state->orientation))
             child->alloc.width = state->top_alloc.width;
-        }
-      else
-        {
-          if (gtk_widget_get_vexpand (child->widget))
+          else
             child->alloc.height = state->top_alloc.height;
         }
 
@@ -1329,16 +1326,8 @@ allocation_stage_expand (DzlMultiPaned   *self,
 
       if (!child->position_set)
         {
-          if (IS_HORIZONTAL (state->orientation))
-            {
-              if (gtk_widget_get_hexpand (child->widget))
-                g_ptr_array_add (expanding, child);
-            }
-          else
-            {
-              if (gtk_widget_get_vexpand (child->widget))
-                g_ptr_array_add (expanding, child);
-            }
+          if (gtk_widget_compute_expand (child->widget, state->orientation))
+            g_ptr_array_add (expanding, child);
         }
     }
 
@@ -1422,18 +1411,15 @@ allocation_stage_expand (DzlMultiPaned   *self,
 
       if (!child->position_set)
         {
-          if (IS_HORIZONTAL (state->orientation))
+          if (gtk_widget_compute_expand (child->widget, state->orientation))
             {
-              if (gtk_widget_get_hexpand (child->widget))
+              if (IS_HORIZONTAL (state->orientation))
                 {
                   child->alloc.width += adjust;
                   state->avail_width -= adjust;
                   x_adjust += adjust;
                 }
-            }
-          else
-            {
-              if (gtk_widget_get_vexpand (child->widget))
+              else
                 {
                   child->alloc.height += adjust;
                   state->avail_height -= adjust;
