@@ -2159,3 +2159,28 @@ dzl_multi_paned_get_n_children (DzlMultiPaned *self)
 
   return priv->children ? priv->children->len : 0;
 }
+
+/**
+ * dzl_multi_paned_get_nth_child:
+ * @self: a #DzlMultiPaned
+ *
+ * Gets the @nth child of the #DzlMultiPaned.
+ *
+ * It is an error to call this function with a value >= the result of
+ * dzl_multi_paned_get_nth_child().
+ *
+ * The index starts from 0.
+ *
+ * Returns: (transfer none): A #GtkWidget
+ */
+GtkWidget *
+dzl_multi_paned_get_nth_child (DzlMultiPaned *self,
+                               guint          nth)
+{
+  DzlMultiPanedPrivate *priv = dzl_multi_paned_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_MULTI_PANED (self), NULL);
+  g_return_val_if_fail (nth < priv->children->len, NULL);
+
+  return g_array_index (priv->children, DzlMultiPanedChild, nth).widget;
+}

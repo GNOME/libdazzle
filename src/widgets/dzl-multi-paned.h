@@ -53,6 +53,8 @@ struct _DzlMultiPanedClass
 
 GtkWidget *dzl_multi_paned_new            (void);
 guint      dzl_multi_paned_get_n_children (DzlMultiPaned *self);
+GtkWidget *dzl_multi_paned_get_nth_child  (DzlMultiPaned *self,
+                                           guint          nth);
 
 G_END_DECLS
 
