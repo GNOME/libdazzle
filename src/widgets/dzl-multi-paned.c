@@ -1355,21 +1355,23 @@ allocation_stage_expand (DzlMultiPaned   *self,
 
       if (IS_HORIZONTAL (state->orientation))
         {
-          g_assert (next->alloc.width >= child->alloc.width);
-          adjust = next->alloc.width - child->alloc.width;
-        }
-      else
-        {
-          g_assert (next->alloc.height >= child->alloc.height);
-          adjust = next->alloc.height - child->alloc.height;
-        }
+          guint j;
 
-      if (IS_HORIZONTAL (state->orientation))
-        {
-          adjust = MIN (state->avail_width, adjust);
+          g_assert (next->alloc.width >= child->alloc.width);
+
+          adjust = next->alloc.width - child->alloc.width;
+          if (adjust > state->avail_width)
+            adjust = state->avail_width;
 
           child->alloc.width += adjust;
           state->avail_width -= adjust;
+
+          /* Adjust X of children following */
+          for (j = 0; j < state->n_children; j++)
+            if (state->children[j] == child)
+              break;
+          for (++j; j < state->n_children; j++)
+            state->children[j]->alloc.x += adjust;
 
           g_assert (state->avail_width >= 0);
 
@@ -1378,10 +1380,23 @@ allocation_stage_expand (DzlMultiPaned   *self,
         }
       else
         {
-          adjust = MIN (state->avail_height, adjust);
+          guint j;
+
+          g_assert (next->alloc.height >= child->alloc.height);
+
+          adjust = next->alloc.height - child->alloc.height;
+          if (adjust > state->avail_height)
+            adjust = state->avail_height;
 
           child->alloc.height += adjust;
           state->avail_height -= adjust;
+
+          /* Adjust Y of children following */
+          for (j = 0; j < state->n_children; j++)
+            if (state->children[j] == child)
+              break;
+          for (++j; j < state->n_children; j++)
+            state->children[j]->alloc.y += adjust;
 
           g_assert (state->avail_height >= 0);
 
