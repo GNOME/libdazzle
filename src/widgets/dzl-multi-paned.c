@@ -422,12 +422,11 @@ dzl_multi_paned_get_child (DzlMultiPaned *self,
                            GtkWidget     *widget)
 {
   DzlMultiPanedPrivate *priv = dzl_multi_paned_get_instance_private (self);
-  guint i;
 
   g_assert (DZL_IS_MULTI_PANED (self));
   g_assert (GTK_IS_WIDGET (widget));
 
-  for (i = 0; i < priv->children->len; i++)
+  for (guint i = 0; i < priv->children->len; i++)
     {
       DzlMultiPanedChild *child = &g_array_index (priv->children, DzlMultiPanedChild, i);
 
@@ -473,9 +472,9 @@ dzl_multi_paned_set_child_index (DzlMultiPaned *self,
   g_assert (priv->children->len > 0);
 
   if (index < 0)
-    index = priv->children->len;
+    index = priv->children->len - 1;
 
-  index = MIN (index, priv->children->len - 1);
+  index = CLAMP (index, 0, priv->children->len - 1);
 
   for (guint i = 0; i < priv->children->len; i++)
     {
