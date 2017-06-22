@@ -483,7 +483,12 @@ dzl_multi_paned_set_child_index (DzlMultiPaned *self,
 
       if (ele->widget == widget)
         {
-          DzlMultiPanedChild copy = *ele;
+          DzlMultiPanedChild copy = { 0 };
+
+          copy.widget = ele->widget;
+          copy.handle = ele->handle;
+          copy.position = -1;
+          copy.position_set = FALSE;
 
           g_array_remove_index (priv->children, i);
           g_array_insert_val (priv->children, index, copy);
