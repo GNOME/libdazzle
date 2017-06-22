@@ -1514,8 +1514,7 @@ dzl_multi_paned_size_allocate (GtkWidget     *widget,
   DzlMultiPaned *self = (DzlMultiPaned *)widget;
   DzlMultiPanedPrivate *priv = dzl_multi_paned_get_instance_private (self);
   AllocationState state = { 0 };
-  GPtrArray *children;
-  guint i;
+  g_autoptr(GPtrArray) children = NULL;
 
   g_assert (DZL_IS_MULTI_PANED (self));
   g_assert (allocation != NULL);
@@ -1527,7 +1526,7 @@ dzl_multi_paned_size_allocate (GtkWidget     *widget,
 
   children = g_ptr_array_new ();
 
-  for (i = 0; i < priv->children->len; i++)
+  for (guint i = 0; i < priv->children->len; i++)
     {
       DzlMultiPanedChild *child = &g_array_index (priv->children, DzlMultiPanedChild, i);
 
@@ -1548,10 +1547,7 @@ dzl_multi_paned_size_allocate (GtkWidget     *widget,
   state.n_children = children->len;
 
   if (state.n_children == 0)
-    {
-      g_ptr_array_free (children, TRUE);
-      return;
-    }
+    return;
 
   gtk_widget_style_get (GTK_WIDGET (self),
                         "handle-size", &state.handle_size,
@@ -1562,11 +1558,10 @@ dzl_multi_paned_size_allocate (GtkWidget     *widget,
   state.avail_width = allocation->width;
   state.avail_height = allocation->height;
 
-  for (i = 0; i < G_N_ELEMENTS (allocation_stages); i++)
+  for (guint i = 0; i < G_N_ELEMENTS (allocation_stages); i++)
     allocation_stages [i] (self, &state);
 
   gtk_widget_queue_draw (GTK_WIDGET (self));
-  g_ptr_array_free (children, TRUE);
 }
 
 static void
