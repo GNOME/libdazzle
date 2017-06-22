@@ -167,6 +167,7 @@ enum {
 
 enum {
   CHILD_PROP_0,
+  CHILD_PROP_INDEX,
   CHILD_PROP_POSITION,
   N_CHILD_PROPS
 };
@@ -437,6 +438,62 @@ dzl_multi_paned_get_child (DzlMultiPaned *self,
   g_assert_not_reached ();
 
   return NULL;
+}
+
+static gint
+dzl_multi_paned_get_child_index (DzlMultiPaned *self,
+                                 GtkWidget     *widget)
+{
+  DzlMultiPanedPrivate *priv = dzl_multi_paned_get_instance_private (self);
+
+  g_assert (DZL_IS_MULTI_PANED (self));
+  g_assert (GTK_IS_WIDGET (widget));
+
+  for (guint i = 0; i < priv->children->len; i++)
+    {
+      const DzlMultiPanedChild *ele = &g_array_index (priv->children, DzlMultiPanedChild, i);
+
+      if (ele->widget == widget)
+        return i;
+    }
+
+  return -1;
+}
+
+static void
+dzl_multi_paned_set_child_index (DzlMultiPaned *self,
+                                 GtkWidget     *widget,
+                                 gint           index)
+{
+  DzlMultiPanedPrivate *priv = dzl_multi_paned_get_instance_private (self);
+
+  g_assert (DZL_IS_MULTI_PANED (self));
+  g_assert (GTK_IS_WIDGET (widget));
+  g_assert (index >= -1);
+  g_assert (priv->children->len > 0);
+
+  if (index < 0)
+    index = priv->children->len;
+
+  index = MIN (index, priv->children->len - 1);
+
+  for (guint i = 0; i < priv->children->len; i++)
+    {
+      const DzlMultiPanedChild *ele = &g_array_index (priv->children, DzlMultiPanedChild, i);
+
+      if (ele->widget == widget)
+        {
+          DzlMultiPanedChild copy = *ele;
+
+          g_array_remove_index (priv->children, i);
+          g_array_insert_val (priv->children, index, copy);
+          gtk_container_child_notify_by_pspec (GTK_CONTAINER (self), widget,
+                                               child_properties [CHILD_PROP_INDEX]);
+          gtk_widget_queue_resize (GTK_WIDGET (self));
+
+          break;
+        }
+    }
 }
 
 static gint
@@ -1198,7 +1255,6 @@ static gint
 sort_children_horizontal (const DzlMultiPanedChild * const *first,
                           const DzlMultiPanedChild * const *second)
 {
-  
   return (*first)->alloc.width - (*second)->alloc.width;
 }
 
@@ -1876,6 +1932,10 @@ dzl_multi_paned_get_child_property (GtkContainer *container,
 
   switch (prop_id)
     {
+    case CHILD_PROP_INDEX:
+      g_value_set_int (value, dzl_multi_paned_get_child_index (self, widget));
+      break;
+
     case CHILD_PROP_POSITION:
       g_value_set_int (value, dzl_multi_paned_get_child_position (self, widget));
       break;
@@ -1896,6 +1956,10 @@ dzl_multi_paned_set_child_property (GtkContainer *container,
 
   switch (prop_id)
     {
+    case CHILD_PROP_INDEX:
+      dzl_multi_paned_set_child_index (self, widget, g_value_get_int (value));
+      break;
+
     case CHILD_PROP_POSITION:
       dzl_multi_paned_set_child_position (self, widget, g_value_get_int (value));
       break;
@@ -2019,6 +2083,15 @@ dzl_multi_paned_class_init (DzlMultiPanedClass *klass)
                        (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  child_properties [CHILD_PROP_INDEX] =
+    g_param_spec_int ("index",
+                      "Index",
+                      "The index of the child",
+                      -1,
+                      G_MAXINT,
+                      -1,
+                      (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   child_properties [CHILD_PROP_POSITION] =
     g_param_spec_int ("position",
