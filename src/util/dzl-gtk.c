@@ -367,3 +367,71 @@ dzl_gtk_widget_action_set (GtkWidget   *widget,
   g_object_set_valist (G_OBJECT (action), first_property, args);
   va_end (args);
 }
+
+/**
+ * dzl_gtk_widget_mux_action_groups:
+ * @widget: a #GtkWidget
+ * @from_widget: A #GtkWidget containing the groups to copy
+ * @mux_key: a unique key to represent the muxing
+ *
+ * This function will find all of the actions on @from_widget in various
+ * groups and add them to @widget. As this just copies the action groups
+ * over, note that it does not allow for muxing items within the same
+ * group.
+ *
+ * You should specify a key for @mux_key so that if the same mux key is
+ * seen again, the previous muxings will be removed.
+ */
+void
+dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
+                                  GtkWidget   *from_widget,
+                                  const gchar *mux_key)
+{
+  const gchar * const *old_prefixes = NULL;
+  const gchar **prefixes = NULL;
+
+  g_return_if_fail (GTK_IS_WIDGET (widget));
+  g_return_if_fail (!from_widget || GTK_IS_WIDGET (from_widget));
+  g_return_if_fail (mux_key != NULL);
+
+  /*
+   * First check to see if there are any old action groups that
+   * were muxed for which we need to unmux.
+   */
+
+  old_prefixes = g_object_get_data (G_OBJECT (widget), mux_key);
+
+  if (old_prefixes != NULL)
+    {
+      for (guint i = 0; old_prefixes [i]; i++)
+        gtk_widget_insert_action_group (widget, old_prefixes [i], NULL);
+    }
+
+  /*
+   * Now, if there is a from_widget to mux, get all of their action
+   * groups and mux them across to our target widget.
+   */
+
+  if (from_widget != NULL)
+    {
+      prefixes = gtk_widget_list_action_prefixes (from_widget);
+      if (prefixes == NULL)
+        return;
+
+      for (guint i = 0; prefixes [i]; i++)
+        {
+          GActionGroup *group = gtk_widget_get_action_group (from_widget, prefixes [i]);
+
+          if G_UNLIKELY (group == NULL)
+            continue;
+
+          gtk_widget_insert_action_group (widget, prefixes [i], group);
+        }
+    }
+
+  /* Store the set of muxed prefixes so that we can unmux them later. */
+
+  g_object_set_data_full (G_OBJECT (widget), mux_key,
+                          g_strdupv ((gchar **)prefixes),
+                          (GDestroyNotify) g_strfreev);
+}
