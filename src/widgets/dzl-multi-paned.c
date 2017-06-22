@@ -1194,13 +1194,28 @@ allocation_stage_drag_overflow (DzlMultiPaned   *self,
     }
 }
 
+static gint
+sort_children_horizontal (const DzlMultiPanedChild * const *first,
+                          const DzlMultiPanedChild * const *second)
+{
+  
+  return (*first)->alloc.width - (*second)->alloc.width;
+}
+
+static gint
+sort_children_vertical (const DzlMultiPanedChild * const *first,
+                        const DzlMultiPanedChild * const *second)
+{
+  return (*first)->alloc.height - (*second)->alloc.height;
+}
+
 static void
 allocation_stage_expand (DzlMultiPaned   *self,
                          AllocationState *state)
 {
+  g_autoptr(GPtrArray) expanding = NULL;
   gint x_adjust = 0;
   gint y_adjust = 0;
-  gint n_expand = 0;
   gint adjust;
 
   g_assert (DZL_IS_MULTI_PANED (self));
@@ -1232,6 +1247,17 @@ allocation_stage_expand (DzlMultiPaned   *self,
       return;
     }
 
+  /*
+   * First, we need to collect all of the children who are expanding
+   * in the direction matching our orientation. After that, we will
+   * sort them by their allocation size so that we can divy out extra
+   * allocation starting from the smallest. This will give us an effect
+   * of homogeneous size when all children are set to expand and enough
+   * space is available.
+   */
+
+  expanding = g_ptr_array_new ();
+
   for (guint i = 0; i < state->n_children; i++)
     {
       DzlMultiPanedChild *child = state->children [i];
@@ -1241,23 +1267,86 @@ allocation_stage_expand (DzlMultiPaned   *self,
           if (IS_HORIZONTAL (state->orientation))
             {
               if (gtk_widget_get_hexpand (child->widget))
-                n_expand++;
+                g_ptr_array_add (expanding, child);
             }
           else
             {
               if (gtk_widget_get_vexpand (child->widget))
-                n_expand++;
+                g_ptr_array_add (expanding, child);
             }
         }
     }
 
-  if (n_expand == 0)
+  if (expanding->len == 0)
     goto fill_last;
 
+  /* Now sort, smallest first, based on size in given orientation. */
   if (IS_HORIZONTAL (state->orientation))
-    adjust = state->avail_width / n_expand;
+    g_ptr_array_sort (expanding, (GCompareFunc) sort_children_horizontal);
   else
-    adjust = state->avail_height / n_expand;
+    g_ptr_array_sort (expanding, (GCompareFunc) sort_children_vertical);
+
+  /*
+   * While we have additional space available to hand out, allocate
+   * as much space as it takes to get to the next item in the array.
+   * If we run out of additional space, that is okay (as long as we
+   * dont hand out more than we have).
+   */
+
+  g_assert (expanding->len > 0);
+
+  for (guint i = 0; i < expanding->len - 1; i++)
+    {
+      DzlMultiPanedChild *child = g_ptr_array_index (expanding, i);
+      DzlMultiPanedChild *next = g_ptr_array_index (expanding, i + 1);
+
+      if (IS_HORIZONTAL (state->orientation))
+        {
+          g_assert (next->alloc.width >= child->alloc.width);
+          adjust = next->alloc.width - child->alloc.width;
+        }
+      else
+        {
+          g_assert (next->alloc.height >= child->alloc.height);
+          adjust = next->alloc.height - child->alloc.height;
+        }
+
+      if (IS_HORIZONTAL (state->orientation))
+        {
+          adjust = MIN (state->avail_width, adjust);
+
+          child->alloc.width += adjust;
+          state->avail_width -= adjust;
+
+          g_assert (state->avail_width >= 0);
+
+          if (state->avail_width == 0)
+            break;
+        }
+      else
+        {
+          adjust = MIN (state->avail_height, adjust);
+
+          child->alloc.height += adjust;
+          state->avail_height -= adjust;
+
+          g_assert (state->avail_height >= 0);
+
+          if (state->avail_height == 0)
+            break;
+        }
+    }
+
+  /*
+   * If we still have more space we can divy out, then do the normal
+   * expansion case now that we are starting with evenly sized
+   * children.
+   */
+
+  if (IS_HORIZONTAL (state->orientation))
+    adjust = state->avail_width / expanding->len;
+  else
+    adjust = state->avail_height / expanding->len;
 
   for (guint i = 0; i < state->n_children; i++)
     {
