@@ -1558,6 +1558,7 @@ dzl_multi_paned_size_allocate (GtkWidget     *widget,
   for (i = 0; i < G_N_ELEMENTS (allocation_stages); i++)
     allocation_stages [i] (self, &state);
 
+  gtk_widget_queue_draw (GTK_WIDGET (self));
   g_ptr_array_free (children, TRUE);
 }
 
