@@ -415,21 +415,21 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
   if (from_widget != NULL)
     {
       prefixes = gtk_widget_list_action_prefixes (from_widget);
-      if (prefixes == NULL)
-        goto replace_key;
 
-      for (guint i = 0; prefixes [i]; i++)
+      if (prefixes != NULL)
         {
-          GActionGroup *group = gtk_widget_get_action_group (from_widget, prefixes [i]);
+          for (guint i = 0; prefixes [i]; i++)
+            {
+              GActionGroup *group = gtk_widget_get_action_group (from_widget, prefixes [i]);
 
-          if G_UNLIKELY (group == NULL)
-            continue;
+              if G_UNLIKELY (group == NULL)
+                continue;
 
-          gtk_widget_insert_action_group (widget, prefixes [i], group);
+              gtk_widget_insert_action_group (widget, prefixes [i], group);
+            }
         }
     }
 
-replace_key:
   /* Store the set of muxed prefixes so that we can unmux them later. */
   g_object_set_data_full (G_OBJECT (widget), mux_key,
                           g_strdupv ((gchar **)prefixes),
