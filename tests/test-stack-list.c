@@ -6,6 +6,7 @@ create_child_func (gpointer item,
 {
   GFileInfo *file_info = G_FILE_INFO (item);
   g_autofree gchar *display_name = NULL;
+  GObject *icon = NULL;
   GtkListBoxRow *row;
   GtkWidget *label;
   GFile *parent = user_data;
@@ -23,7 +24,10 @@ create_child_func (gpointer item,
         display_name = g_file_get_basename (parent);
     }
   else
-    display_name = g_strdup (g_file_info_get_display_name (file_info));
+    {
+      display_name = g_strdup (g_file_info_get_display_name (file_info));
+      icon = g_file_info_get_attribute_object (file_info, G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON);
+    }
 
 
   box = g_object_new (GTK_TYPE_BOX,
@@ -32,7 +36,7 @@ create_child_func (gpointer item,
 
   image = g_object_new (GTK_TYPE_IMAGE,
                         "visible", TRUE,
-                        "icon-name", "gtk-missing-symbolic",
+                        "gicon", icon,
                         NULL);
   gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (image));
 
@@ -98,10 +102,7 @@ main (gint   argc,
   g_autoptr(GFile) root = NULL;
   DzlStackList *stack_list;
   GtkWidget *window;
-
-  /* TODO: Figure out brokenness with wayland positining */
-
-  gdk_set_allowed_backends ("x11");
+  GtkWidget *header;
 
   gtk_init (&argc, &argv);
 
@@ -111,10 +112,16 @@ main (gint   argc,
   file_system_model = dzl_directory_model_new (root);
 
   window = g_object_new (GTK_TYPE_WINDOW,
-                         "title", "Stack List Test",
                          "default-width", 250,
                          "default-height", 600,
                          NULL);
+
+  header = g_object_new (GTK_TYPE_HEADER_BAR,
+                         "title", "Stack List Test",
+                         "show-close-button", TRUE,
+                         "visible", TRUE,
+			 NULL);
+  gtk_window_set_titlebar (GTK_WINDOW (window), header);
 
   stack_list = g_object_new (DZL_TYPE_STACK_LIST,
                              "visible", TRUE,
