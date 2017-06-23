@@ -416,7 +416,7 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
     {
       prefixes = gtk_widget_list_action_prefixes (from_widget);
       if (prefixes == NULL)
-        return;
+        goto replace_key;
 
       for (guint i = 0; prefixes [i]; i++)
         {
@@ -429,8 +429,8 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
         }
     }
 
+replace_key:
   /* Store the set of muxed prefixes so that we can unmux them later. */
-
   g_object_set_data_full (G_OBJECT (widget), mux_key,
                           g_strdupv ((gchar **)prefixes),
                           (GDestroyNotify) g_strfreev);
