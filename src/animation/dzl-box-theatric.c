@@ -55,6 +55,7 @@ enum {
   PROP_WIDTH,
   PROP_X,
   PROP_Y,
+  PROP_SURFACE,
   LAST_PROP
 };
 
@@ -143,9 +144,10 @@ on_toplevel_draw (GtkWidget      *widget,
     {
       cairo_translate (cr, area.x, area.y);
       cairo_rectangle (cr, 0, 0, area.width, area.height);
-      cairo_scale (cr,
-                   area.width / (gdouble)self->icon_surface_size,
-                   area.height / (gdouble)self->icon_surface_size);
+      if (self->icon_surface_size != 0)
+        cairo_scale (cr,
+                     area.width / (gdouble)self->icon_surface_size,
+                     area.height / (gdouble)self->icon_surface_size);
       cairo_set_source_surface (cr, self->icon_surface, 0, 0);
       cairo_paint_with_alpha (cr, self->alpha);
     }
@@ -300,6 +302,13 @@ dzl_box_theatric_set_property (GObject      *object,
       theatric->pixbuf_failed = FALSE;
       break;
 
+    case PROP_SURFACE:
+      g_clear_pointer (&theatric->icon_surface, cairo_surface_destroy);
+      theatric->icon_surface = g_value_get_pointer (value);
+      if (theatric->icon_surface != NULL)
+        cairo_surface_reference (theatric->icon_surface);
+      break;
+
     case PROP_TARGET:
       theatric->target = g_value_get_object (value);
       theatric->toplevel = gtk_widget_get_toplevel (theatric->target);
@@ -410,10 +419,17 @@ dzl_box_theatric_class_init (DzlBoxTheatricClass *klass)
                       0,
                       (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_SURFACE] =
+    g_param_spec_pointer ("surface",
+                          "Surface",
+                          "Surface",
+                          (G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, LAST_PROP, properties);
 }
 
 static void
 dzl_box_theatric_init (DzlBoxTheatric *theatric)
 {
+  theatric->alpha = 1.0;
 }
