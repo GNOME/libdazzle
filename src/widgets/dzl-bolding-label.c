@@ -38,6 +38,14 @@ struct _DzlBoldingLabel
 
 G_DEFINE_TYPE (DzlBoldingLabel, dzl_bolding_label, GTK_TYPE_LABEL)
 
+enum {
+  PROP_0,
+  PROP_BOLD,
+  N_PROPS
+};
+
+static GParamSpec *properties [N_PROPS];
+
 static void
 dzl_bolding_label_get_preferred_width (GtkWidget *widget,
                                        gint      *min_width,
@@ -88,11 +96,42 @@ dzl_bolding_label_get_preferred_width (GtkWidget *widget,
 }
 
 static void
+dzl_bolding_label_set_property (GObject      *object,
+                                guint         prop_id,
+                                const GValue *value,
+                                GParamSpec   *pspec)
+{
+  DzlBoldingLabel *self = DZL_BOLDING_LABEL (object);
+
+  switch (prop_id)
+    {
+    case PROP_BOLD:
+      dzl_bolding_label_set_bold (self, g_value_get_boolean (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 dzl_bolding_label_class_init (DzlBoldingLabelClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->set_property = dzl_bolding_label_set_property;
 
   widget_class->get_preferred_width = dzl_bolding_label_get_preferred_width;
+
+  properties [PROP_BOLD] =
+    g_param_spec_boolean ("bold",
+                          "Bold",
+                          "Set the bold weight for the label",
+                          FALSE,
+                          (G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -128,4 +167,13 @@ dzl_bolding_label_set_weight (DzlBoldingLabel *self,
   gtk_label_set_attributes (GTK_LABEL (self), copy);
   gtk_widget_queue_draw (GTK_WIDGET (self));
   pango_attr_list_unref (copy);
+}
+
+void
+dzl_bolding_label_set_bold (DzlBoldingLabel *self,
+                            gboolean         bold)
+{
+  g_return_if_fail (DZL_IS_BOLDING_LABEL (self));
+
+  dzl_bolding_label_set_weight (self, bold ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
 }

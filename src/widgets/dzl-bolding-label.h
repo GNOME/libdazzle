@@ -29,6 +29,8 @@ G_DECLARE_FINAL_TYPE (DzlBoldingLabel, dzl_bolding_label, DZL, BOLDING_LABEL, Gt
 
 void dzl_bolding_label_set_weight (DzlBoldingLabel *self,
                                    PangoWeight      weight);
+void dzl_bolding_label_set_bold   (DzlBoldingLabel *self,
+                                   gboolean         bold);
 
 G_END_DECLS
 
