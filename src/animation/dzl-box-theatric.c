@@ -154,6 +154,14 @@ on_toplevel_draw (GtkWidget      *widget,
 
   self->last_area = area;
 
+  /* The invalidation rectangle does not appear to be inclusive.
+   * This means that occcasionly we seem to have a stragler line.
+   * But setting this to one seems to make that go away for the
+   * current tests I have.
+   */
+  self->last_area.width += 1;
+  self->last_area.height += 1;
+
   return FALSE;
 }
 
