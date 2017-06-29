@@ -180,7 +180,7 @@ dzl_application_startup (GApplication *app)
    */
 
   /* Register our resources that are part of libdazzle. */
-  dzl_application_add_resources (self, "resource:///org/gnome/dazzle");
+  DZL_APPLICATION_GET_CLASS (self)->add_resources (self, "resource:///org/gnome/dazzle");
 
   /* Now register the application resources */
   if (NULL != (resource_base_path = g_application_get_resource_base_path (app)))
@@ -188,7 +188,7 @@ dzl_application_startup (GApplication *app)
       g_autofree gchar *resource_path = NULL;
 
       resource_path = g_strdup_printf ("resource://%s", resource_base_path);
-      dzl_application_add_resources (self, resource_path);
+      DZL_APPLICATION_GET_CLASS (self)->add_resources (self, resource_path);
     }
 
   /* If the application has "app-menu" defined in menus.ui, we want to
