@@ -8,7 +8,7 @@ dzlstacklist row label.dim-label {
 dzlstacklist row:backdrop {
   color: @theme_unfocused_fg_color;
 }
-dzlstacklist row image {
+dzlstacklist row > box > image:first-child {
   margin: 6px 12px;
   min-height: 16px;
   min-width: 16px;
