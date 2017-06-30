@@ -34,7 +34,7 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row .title {
-  color: @theme_selected_bg_color;
+  color: @theme_fg_color;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row:first-child:selected {
