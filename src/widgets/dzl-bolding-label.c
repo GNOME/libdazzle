@@ -69,6 +69,7 @@ dzl_bolding_label_get_preferred_width (GtkWidget *widget,
       PangoFontDescription *font_desc_copy;
       PangoLayout *layout;
       const gchar *text;
+      PangoEllipsizeMode ellipsize;
       gint height;
       gint width;
 
@@ -80,12 +81,22 @@ dzl_bolding_label_get_preferred_width (GtkWidget *widget,
       else
         font_desc_copy = pango_font_description_new ();
 
+      ellipsize = gtk_label_get_ellipsize (GTK_LABEL (widget));
+
       pango_font_description_set_weight (font_desc_copy, PANGO_WEIGHT_BOLD);
       pango_layout_set_font_description (layout, font_desc_copy);
+      pango_layout_set_ellipsize (layout, ellipsize);
       pango_layout_get_pixel_size (layout, &width, &height);
 
-      if (width > *min_width)
-        *min_width = width;
+      if (ellipsize == PANGO_ELLIPSIZE_NONE)
+        {
+          /*
+           * Only apply min_width if we cannot ellipsize, if we can, that
+           * effects things differently.
+           */
+          if (width > *min_width)
+            *min_width = width;
+        }
 
       if (width > *nat_width)
         *nat_width = width;
