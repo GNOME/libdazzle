@@ -162,18 +162,6 @@ dzl_shortcut_chord_append_event (DzlShortcutChord  *self,
   return FALSE;
 }
 
-static inline gboolean
-dzl_shortcut_key_equal (const DzlShortcutKey *keya,
-                        const DzlShortcutKey *keyb)
-{
-  if (keya == keyb)
-    return TRUE;
-  else if (keya == NULL || keyb == NULL)
-    return FALSE;
-
-  return memcmp (keya, keyb, sizeof *keya) == 0;
-}
-
 static inline guint
 dzl_shortcut_chord_count_keys (const DzlShortcutChord *self)
 {
