@@ -62,10 +62,8 @@ struct _DzlSignalGroupClass
 {
   GObjectClass parent_class;
 
-  void (*bind)   (DzlSignalGroup *self,
-                  GObject        *target);
-  void (*unbind) (DzlSignalGroup *self,
-                  GObject        *target);
+  void (*bind) (DzlSignalGroup *self,
+                GObject        *target);
 };
 
 typedef struct
