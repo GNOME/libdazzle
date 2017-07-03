@@ -53,9 +53,10 @@ dzl_pattern_spec_new (const gchar *needle)
   DzlPatternSpec *self;
   const gchar *tmp;
 
-  g_return_val_if_fail (needle, NULL);
+  if (needle == NULL)
+    needle = "";
 
-  self = g_new0 (DzlPatternSpec, 1);
+  self = g_slice_new0 (DzlPatternSpec);
   self->ref_count = 1;
   self->needle = g_strdup (needle);
   self->parts = g_strsplit (needle, " ", 0);
@@ -84,9 +85,9 @@ dzl_pattern_spec_get_text (DzlPatternSpec *self)
 static void
 dzl_pattern_spec_free (DzlPatternSpec *self)
 {
-  g_strfreev (self->parts);
-  g_free (self->needle);
-  g_free (self);
+  g_clear_pointer (&self->parts, g_strfreev);
+  g_clear_pointer (&self->needle, g_free);
+  g_slice_free (DzlPatternSpec, self);
 }
 
 static inline gboolean
@@ -127,8 +128,8 @@ dzl_pattern_spec_match (DzlPatternSpec *self,
 {
   gsize i;
 
-  g_return_val_if_fail (self, FALSE);
-  g_return_val_if_fail (haystack, FALSE);
+  if (self == NULL || haystack == NULL)
+    return FALSE;
 
   for (i = 0; (haystack != NULL) && self->parts [i]; i++)
     {
