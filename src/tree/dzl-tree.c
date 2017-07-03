@@ -1587,13 +1587,16 @@ dzl_tree_model_filter_recursive (GtkTreeModel *model,
 
           gtk_tree_model_get (model, &child, 0, &node, -1);
 
-          if ((node != NULL) && !_dzl_tree_node_get_needs_build (node))
+          if (node != NULL)
             {
               if (filter->filter_func (filter->self, node, filter->filter_data))
                 return TRUE;
 
-              if (dzl_tree_model_filter_recursive (model, &child, filter))
-                return TRUE;
+              if (!_dzl_tree_node_get_needs_build (node))
+                {
+                  if (dzl_tree_model_filter_recursive (model, &child, filter))
+                    return TRUE;
+                }
             }
         }
       while (gtk_tree_model_iter_next (model, &child));
