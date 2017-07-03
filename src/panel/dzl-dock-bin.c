@@ -127,6 +127,9 @@ typedef struct
 static void dzl_dock_bin_init_buildable_iface (GtkBuildableIface    *iface);
 static void dzl_dock_bin_init_dock_iface      (DzlDockInterface     *iface);
 static void dzl_dock_bin_init_dock_item_iface (DzlDockItemInterface *iface);
+static void dzl_dock_bin_create_edge          (DzlDockBin           *self,
+                                               DzlDockBinChild      *child,
+                                               DzlDockBinChildType   type);
 
 G_DEFINE_TYPE_EXTENDED (DzlDockBin, dzl_dock_bin, GTK_TYPE_CONTAINER, 0,
                         G_ADD_PRIVATE (DzlDockBin)
@@ -155,6 +158,105 @@ enum {
 
 static GParamSpec *properties [N_PROPS];
 static GParamSpec *child_properties [N_CHILD_PROPS];
+static const gchar *pinned_names[] = {
+  "left-pinned",
+  "right-pinned",
+  "top-pinned",
+  "bottom-pinned",
+  NULL,
+  NULL
+};
+static const gchar *visible_names[] = {
+  "left-visible",
+  "right-visible",
+  "top-visible",
+  "bottom-visible",
+  NULL,
+  NULL
+};
+
+static DzlDockBinChild *
+dzl_dock_bin_get_child_typed (DzlDockBin          *self,
+                              DzlDockBinChildType  type)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
+  g_assert (type < LAST_DZL_DOCK_BIN_CHILD);
+
+  for (guint i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      if (priv->children[i].type == type)
+        return &priv->children[i];
+    }
+
+  g_assert_not_reached ();
+
+  return NULL;
+}
+
+static GtkWidget *
+get_child_widget (DzlDockBin          *self,
+                  DzlDockBinChildType  type)
+{
+  switch (type)
+    {
+    case DZL_DOCK_BIN_CHILD_LEFT:
+      return dzl_dock_bin_get_left_edge (self);
+
+    case DZL_DOCK_BIN_CHILD_RIGHT:
+      return dzl_dock_bin_get_right_edge (self);
+
+    case DZL_DOCK_BIN_CHILD_TOP:
+      return dzl_dock_bin_get_top_edge (self);
+
+    case DZL_DOCK_BIN_CHILD_BOTTOM:
+      return dzl_dock_bin_get_bottom_edge (self);
+
+    case DZL_DOCK_BIN_CHILD_CENTER:
+    case LAST_DZL_DOCK_BIN_CHILD:
+    default:
+      return NULL;
+    }
+}
+
+static gboolean
+get_visible (DzlDockBin          *self,
+             DzlDockBinChildType  type)
+{
+  GtkWidget *child;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
+  g_assert (type <= DZL_DOCK_BIN_CHILD_BOTTOM);
+
+  child = get_child_widget (self, type);
+
+  return DZL_IS_DOCK_REVEALER (child) &&
+         dzl_dock_revealer_get_reveal_child (DZL_DOCK_REVEALER (child));
+}
+
+static void
+set_visible (DzlDockBin          *self,
+             DzlDockBinChildType  type,
+             gboolean             visible)
+{
+  GtkWidget *child;
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
+  g_assert (type <= DZL_DOCK_BIN_CHILD_BOTTOM);
+
+  child = get_child_widget (self, type);
+
+  if (DZL_IS_DOCK_REVEALER (child))
+    {
+      dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child), visible);
+      g_object_notify (G_OBJECT (self), visible_names [type]);
+      gtk_widget_queue_resize (GTK_WIDGET (self));
+    }
+}
 
 static gint
 dzl_dock_bin_child_compare (gconstpointer a,
@@ -196,116 +298,6 @@ dzl_dock_bin_resort_children (DzlDockBin *self)
   gtk_widget_queue_allocate (GTK_WIDGET (self));
 }
 
-static GAction *
-dzl_dock_bin_get_visible_action_for_type (DzlDockBin          *self,
-                                          DzlDockBinChildType  type)
-{
-  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
-  const gchar *name = NULL;
-
-  g_assert (DZL_IS_DOCK_BIN (self));
-
-  switch (type)
-    {
-    case DZL_DOCK_BIN_CHILD_LEFT:
-      name = "left-visible";
-      break;
-
-    case DZL_DOCK_BIN_CHILD_RIGHT:
-      name = "right-visible";
-      break;
-
-    case DZL_DOCK_BIN_CHILD_TOP:
-      name = "top-visible";
-      break;
-
-    case DZL_DOCK_BIN_CHILD_BOTTOM:
-      name = "bottom-visible";
-      break;
-
-    case DZL_DOCK_BIN_CHILD_CENTER:
-    case LAST_DZL_DOCK_BIN_CHILD:
-    default:
-      g_assert_not_reached ();
-    }
-
-  return g_action_map_lookup_action (G_ACTION_MAP (priv->actions), name);
-}
-
-static gboolean
-get_visible (DzlDockBin  *self,
-             const gchar *action_name)
-{
-  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
-  GAction *action;
-
-  g_assert (DZL_IS_DOCK_BIN (self));
-  g_assert (action_name != NULL);
-
-  action = g_action_map_lookup_action (G_ACTION_MAP (priv->actions), action_name);
-
-  if (action != NULL)
-    {
-      GVariant *v = g_action_get_state (action);
-      gboolean ret = v ? g_variant_get_boolean (v) : FALSE;
-
-      g_clear_pointer (&v, g_variant_unref);
-
-      return ret;
-    }
-
-  return FALSE;
-}
-
-static void
-dzl_dock_bin_update_actions (DzlDockBin *self)
-{
-  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
-  guint i;
-
-  g_assert (DZL_IS_DOCK_BIN (self));
-
-  /*
-   * We need to walk each of the children edges looking for widgets
-   * that are visible. If so, we need to keep the edge action enabled.
-   * Otherwise disable it, so any buttons representing the action get
-   * properly desensitized.
-   */
-
-  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
-    {
-      DzlDockBinChild *child = &priv->children [i];
-      GAction *action;
-      gboolean enabled = FALSE;
-
-      if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
-        continue;
-
-      action = dzl_dock_bin_get_visible_action_for_type (self, child->type);
-
-      if (child->widget != NULL)
-        enabled = dzl_dock_item_has_widgets (DZL_DOCK_ITEM (child->widget));
-
-      g_simple_action_set_enabled (G_SIMPLE_ACTION (action), enabled);
-    }
-}
-
-static gboolean
-map_boolean_to_variant (GBinding     *binding,
-                        const GValue *from_value,
-                        GValue       *to_value,
-                        gpointer      user_data)
-{
-  g_assert (G_IS_BINDING (binding));
-
-  if (g_value_get_boolean (from_value))
-    g_value_set_variant (to_value, g_variant_new_boolean (TRUE));
-  else
-    g_value_set_variant (to_value, g_variant_new_boolean (FALSE));
-
-  return TRUE;
-}
-
 static DzlDockBinChild *
 dzl_dock_bin_get_child (DzlDockBin *self,
                         GtkWidget  *widget)
@@ -321,30 +313,6 @@ dzl_dock_bin_get_child (DzlDockBin *self,
       DzlDockBinChild *child = &priv->children [i];
 
       if ((GtkWidget *)child->widget == widget)
-        return child;
-    }
-
-  g_assert_not_reached ();
-
-  return NULL;
-}
-
-static DzlDockBinChild *
-dzl_dock_bin_get_child_typed (DzlDockBin          *self,
-                              DzlDockBinChildType  type)
-{
-  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
-  guint i;
-
-  g_assert (DZL_IS_DOCK_BIN (self));
-  g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
-  g_assert (type < LAST_DZL_DOCK_BIN_CHILD);
-
-  for (i = 0; i < G_N_ELEMENTS (priv->children); i++)
-    {
-      DzlDockBinChild *child = &priv->children [i];
-
-      if (child->type == type)
         return child;
     }
 
@@ -990,41 +958,6 @@ dzl_dock_bin_size_allocate (GtkWidget     *widget,
 }
 
 static void
-dzl_dock_bin_visible_change_state (GSimpleAction *action,
-                                   GVariant      *state,
-                                   gpointer       user_data)
-{
-  DzlDockBin *self = user_data;
-  DzlDockBinChild *child;
-  DzlDockBinChildType type;
-  const gchar *action_name;
-  gboolean reveal_child;
-
-  g_assert (DZL_IS_DOCK_BIN (self));
-  g_assert (G_IS_SIMPLE_ACTION (action));
-  g_assert (state != NULL);
-  g_assert (g_variant_is_of_type (state, G_VARIANT_TYPE_BOOLEAN));
-
-  action_name = g_action_get_name (G_ACTION (action));
-  reveal_child = g_variant_get_boolean (state);
-
-  if (g_str_has_prefix (action_name, "left"))
-    type = DZL_DOCK_BIN_CHILD_LEFT;
-  else if (g_str_has_prefix (action_name, "right"))
-    type = DZL_DOCK_BIN_CHILD_RIGHT;
-  else if (g_str_has_prefix (action_name, "top"))
-    type = DZL_DOCK_BIN_CHILD_TOP;
-  else if (g_str_has_prefix (action_name, "bottom"))
-    type = DZL_DOCK_BIN_CHILD_BOTTOM;
-  else
-    return;
-
-  child = dzl_dock_bin_get_child_typed (self, type);
-
-  dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget), reveal_child);
-}
-
-static void
 dzl_dock_bin_set_child_pinned (DzlDockBin *self,
                                GtkWidget  *widget,
                                gboolean    pinned)
@@ -1531,9 +1464,9 @@ dzl_dock_bin_create_edge (DzlDockBin          *self,
   DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
   g_autoptr(GSimpleActionGroup) map = NULL;
   g_autoptr(GAction) pinned = NULL;
-  const gchar *name = NULL;
-  GAction *action;
-  gboolean reveal_child = FALSE;
+  g_autoptr(GPropertyAction) visible = NULL;
+  const gchar *visible_name;
+  const gchar *pinned_name;
 
   g_assert (DZL_IS_DOCK_BIN (self));
   g_assert (child != NULL);
@@ -1556,67 +1489,43 @@ dzl_dock_bin_create_edge (DzlDockBin          *self,
       return;
     }
 
-  /*
-   * If the user set the initial state for the edge before we created the
-   * edge, the value for it will be the state to the action. We need to
-   * grab that and apply it for our initial state.
-   */
-  switch (type)
-    {
-    case DZL_DOCK_BIN_CHILD_LEFT:   reveal_child = get_visible (self, "left-visible");   break;
-    case DZL_DOCK_BIN_CHILD_RIGHT:  reveal_child = get_visible (self, "right-visible");  break;
-    case DZL_DOCK_BIN_CHILD_TOP:    reveal_child = get_visible (self, "top-visible");    break;
-    case DZL_DOCK_BIN_CHILD_BOTTOM: reveal_child = get_visible (self, "bottom-visible"); break;
-    case DZL_DOCK_BIN_CHILD_CENTER:
-    case LAST_DZL_DOCK_BIN_CHILD:
-    default:
-      break;
-    }
-
   g_object_set (child->widget,
                 "edge", (GtkPositionType)type,
-                "reveal-child", reveal_child,
+                "reveal-child", FALSE,
                 NULL);
 
   gtk_widget_set_parent (g_object_ref_sink (child->widget), GTK_WIDGET (self));
-
-  action = dzl_dock_bin_get_visible_action_for_type (self, type);
-  g_object_bind_property_full (child->widget, "reveal-child",
-                               action, "state",
-                               G_BINDING_SYNC_CREATE,
-                               map_boolean_to_variant,
-                               NULL, NULL, NULL);
 
   dzl_dock_item_adopt (DZL_DOCK_ITEM (self), DZL_DOCK_ITEM (child->widget));
 
   /* Action for panel children to easily activate */
   map = g_simple_action_group_new ();
-  pinned = dzl_child_property_action_new ("pinned",
-                                          GTK_CONTAINER (self),
-                                          child->widget,
-                                          "pinned");
+  pinned = dzl_child_property_action_new ("pinned", GTK_CONTAINER (self), child->widget, "pinned");
   g_action_map_add_action (G_ACTION_MAP (map), pinned);
   gtk_widget_insert_action_group (child->widget, "panel", G_ACTION_GROUP (map));
   g_clear_object (&pinned);
 
-  /* Action for global widgetry to activate */
-  if (child->type == DZL_DOCK_BIN_CHILD_LEFT)
-    name = "left-pinned";
-  else if (child->type == DZL_DOCK_BIN_CHILD_RIGHT)
-    name = "right-pinned";
-  else if (child->type == DZL_DOCK_BIN_CHILD_TOP)
-    name = "top-pinned";
-  else if (child->type == DZL_DOCK_BIN_CHILD_BOTTOM)
-    name = "bottom-pinned";
-  pinned = dzl_child_property_action_new (name,
+  visible_name = visible_names [child->type];
+  pinned_name = pinned_names [child->type];
+
+  /* Add our pinned action */
+  pinned = dzl_child_property_action_new (pinned_name,
                                           GTK_CONTAINER (self),
                                           child->widget,
                                           "pinned");
   g_action_map_add_action (G_ACTION_MAP (priv->actions), pinned);
 
+  /* Add our visible action */
+  visible = g_property_action_new (visible_name, self, visible_name);
+  g_action_map_add_action (G_ACTION_MAP (priv->actions), G_ACTION (visible));
+
   if (child->pinned)
     gtk_style_context_add_class (gtk_widget_get_style_context (child->widget),
                                  DZL_DOCK_BIN_STYLE_CLASS_PINNED);
+
+  g_object_notify (G_OBJECT (self), visible_name);
+
+  gtk_widget_queue_resize (GTK_WIDGET (self));
 }
 
 static void
@@ -1710,19 +1619,19 @@ dzl_dock_bin_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_LEFT_VISIBLE:
-      g_value_set_boolean (value, get_visible (self, "left-visible"));
+      g_value_set_boolean (value, get_visible (self, DZL_DOCK_BIN_CHILD_LEFT));
       break;
 
     case PROP_RIGHT_VISIBLE:
-      g_value_set_boolean (value, get_visible (self, "right-visible"));
+      g_value_set_boolean (value, get_visible (self, DZL_DOCK_BIN_CHILD_RIGHT));
       break;
 
     case PROP_TOP_VISIBLE:
-      g_value_set_boolean (value, get_visible (self, "top-visible"));
+      g_value_set_boolean (value, get_visible (self, DZL_DOCK_BIN_CHILD_TOP));
       break;
 
     case PROP_BOTTOM_VISIBLE:
-      g_value_set_boolean (value, get_visible (self, "bottom-visible"));
+      g_value_set_boolean (value, get_visible (self, DZL_DOCK_BIN_CHILD_BOTTOM));
       break;
 
     case PROP_MANAGER:
@@ -1741,36 +1650,23 @@ dzl_dock_bin_set_property (GObject      *object,
                            GParamSpec   *pspec)
 {
   DzlDockBin *self = DZL_DOCK_BIN (object);
-  DzlDockBinChild *child;
 
   switch (prop_id)
     {
     case PROP_LEFT_VISIBLE:
-      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_LEFT);
-      if (child->widget)
-        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
-                                            g_value_get_boolean (value));
+      set_visible (self, DZL_DOCK_BIN_CHILD_LEFT, g_value_get_boolean (value));
       break;
 
     case PROP_RIGHT_VISIBLE:
-      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_RIGHT);
-      if (child->widget)
-        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
-                                            g_value_get_boolean (value));
+      set_visible (self, DZL_DOCK_BIN_CHILD_RIGHT, g_value_get_boolean (value));
       break;
 
     case PROP_TOP_VISIBLE:
-      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_TOP);
-      if (child->widget)
-        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
-                                            g_value_get_boolean (value));
+      set_visible (self, DZL_DOCK_BIN_CHILD_TOP, g_value_get_boolean (value));
       break;
 
     case PROP_BOTTOM_VISIBLE:
-      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_BOTTOM);
-      if (child->widget)
-        dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget),
-                                            g_value_get_boolean (value));
+      set_visible (self, DZL_DOCK_BIN_CHILD_BOTTOM, g_value_get_boolean (value));
       break;
 
     case PROP_MANAGER:
@@ -1880,20 +1776,12 @@ dzl_dock_bin_init (DzlDockBin *self)
   static GtkTargetEntry drag_entries[] = {
     { (gchar *)"DZL_DOCK_BIN_WIDGET", GTK_TARGET_SAME_APP, 0 },
   };
-  static const GActionEntry entries[] = {
-    { "left-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
-    { "right-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
-    { "top-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
-    { "bottom-visible", NULL, NULL, "false", dzl_dock_bin_visible_change_state },
-  };
+  g_autoptr(GPropertyAction) left = NULL;
+  g_autoptr(GPropertyAction) right = NULL;
+  g_autoptr(GPropertyAction) bottom = NULL;
+  g_autoptr(GPropertyAction) top = NULL;
 
   gtk_widget_set_has_window (GTK_WIDGET (self), TRUE);
-
-  priv->actions = g_simple_action_group_new ();
-  g_action_map_add_action_entries (G_ACTION_MAP (priv->actions),
-                                   entries, G_N_ELEMENTS (entries),
-                                   self);
-  gtk_widget_insert_action_group (GTK_WIDGET (self), "dockbin", G_ACTION_GROUP (priv->actions));
 
   dzl_dock_bin_create_pan_gesture (self);
 
@@ -1911,6 +1799,9 @@ dzl_dock_bin_init (DzlDockBin *self)
   dzl_dock_bin_init_child (self, &priv->children [2], DZL_DOCK_BIN_CHILD_BOTTOM);
   dzl_dock_bin_init_child (self, &priv->children [3], DZL_DOCK_BIN_CHILD_TOP);
   dzl_dock_bin_init_child (self, &priv->children [4], DZL_DOCK_BIN_CHILD_CENTER);
+
+  priv->actions = g_simple_action_group_new ();
+  gtk_widget_insert_action_group (GTK_WIDGET (self), "dockbin", G_ACTION_GROUP (priv->actions));
 }
 
 GtkWidget *
@@ -2064,8 +1955,7 @@ dzl_dock_bin_add_child (GtkBuildable *buildable,
   else
     parent = dzl_dock_bin_get_left_edge (self);
 
-  if (DZL_IS_DOCK_BIN_EDGE (parent))
-    gtk_container_add (GTK_CONTAINER (parent), GTK_WIDGET (child));
+  gtk_container_add (GTK_CONTAINER (parent), GTK_WIDGET (child));
 }
 
 static GObject *
@@ -2114,9 +2004,9 @@ dzl_dock_bin_present_child (DzlDockItem *item,
       DzlDockBinChild *child = &priv->children [i];
 
       if (DZL_IS_DOCK_BIN_EDGE (child->widget) &&
-          gtk_widget_is_ancestor (GTK_WIDGET (child->widget), child->widget))
+          gtk_widget_is_ancestor (GTK_WIDGET (widget), child->widget))
         {
-          dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child->widget), TRUE);
+          set_visible (self, child->type, TRUE);
           return;
         }
     }
@@ -2212,21 +2102,10 @@ dzl_dock_bin_minimize (DzlDockItem     *item,
 }
 
 static void
-dzl_dock_bin_update_visibility (DzlDockItem *item)
-{
-  DzlDockBin *self = (DzlDockBin *)item;
-
-  g_assert (DZL_IS_DOCK_BIN (self));
-
-  dzl_dock_bin_update_actions (self);
-}
-
-static void
 dzl_dock_bin_init_dock_item_iface (DzlDockItemInterface *iface)
 {
   iface->present_child = dzl_dock_bin_present_child;
   iface->get_child_visible = dzl_dock_bin_get_child_visible;
   iface->set_child_visible = dzl_dock_bin_set_child_visible;
   iface->minimize = dzl_dock_bin_minimize;
-  iface->update_visibility = dzl_dock_bin_update_visibility;
 }
