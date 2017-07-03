@@ -404,7 +404,12 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
   if (old_prefixes != NULL)
     {
       for (guint i = 0; old_prefixes [i]; i++)
-        gtk_widget_insert_action_group (widget, old_prefixes [i], NULL);
+        {
+          if (g_str_equal (old_prefixes [i], "win") || g_str_equal (old_prefixes [i], "app"))
+            continue;
+
+          gtk_widget_insert_action_group (widget, old_prefixes [i], NULL);
+        }
     }
 
   /*
@@ -421,6 +426,9 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
           for (guint i = 0; prefixes [i]; i++)
             {
               GActionGroup *group = gtk_widget_get_action_group (from_widget, prefixes [i]);
+
+              if (g_str_equal (prefixes [i], "win") || g_str_equal (prefixes [i], "app"))
+                continue;
 
               if G_UNLIKELY (group == NULL)
                 continue;
