@@ -390,6 +390,25 @@ dzl_dock_bin_add (GtkContainer *container,
 }
 
 static void
+dzl_dock_bin_notify_reveal_child (DzlDockBin *self,
+                                  GParamSpec *pspec,
+                                  GtkWidget  *child)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_WIDGET (child));
+
+  for (guint i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      DzlDockBinChild *ele = &priv->children [i];
+
+      if (ele->widget == child)
+        g_object_notify (G_OBJECT (self), visible_names [ele->type]);
+    }
+}
+
+static void
 dzl_dock_bin_remove (GtkContainer *container,
                      GtkWidget    *widget)
 {
@@ -402,6 +421,13 @@ dzl_dock_bin_remove (GtkContainer *container,
   child = dzl_dock_bin_get_child (self, widget);
   gtk_widget_unparent (child->widget);
   g_clear_object (&child->widget);
+
+  g_signal_handlers_disconnect_by_func (widget,
+                                        G_CALLBACK (gtk_widget_destroyed),
+                                        &child->widget);
+  g_signal_handlers_disconnect_by_func (widget,
+                                        G_CALLBACK (dzl_dock_bin_notify_reveal_child),
+                                        self);
 
   gtk_widget_queue_resize (GTK_WIDGET (self));
 }
@@ -1493,6 +1519,17 @@ dzl_dock_bin_create_edge (DzlDockBin          *self,
                 "edge", (GtkPositionType)type,
                 "reveal-child", FALSE,
                 NULL);
+
+  g_signal_connect (child->widget,
+                    "destroy",
+                    G_CALLBACK (gtk_widget_destroyed),
+                    &child->widget);
+
+  g_signal_connect_object (child->widget,
+                           "notify::reveal-child",
+                           G_CALLBACK (dzl_dock_bin_notify_reveal_child),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   gtk_widget_set_parent (g_object_ref_sink (child->widget), GTK_WIDGET (self));
 
