@@ -262,39 +262,33 @@ dzl_dock_revealer_set_reveal_child (DzlDockRevealer *self,
 
   if (reveal_child != priv->reveal_child)
     {
+      GtkWidget *child = gtk_bin_get_child (GTK_BIN (self));
       DzlAnimation *animation;
-      GtkWidget *child;
+      guint duration;
 
       priv->reveal_child = reveal_child;
 
-      child = gtk_bin_get_child (GTK_BIN (self));
-
-      if (child != NULL)
-        {
-          guint duration;
-
-          if (priv->animation != NULL)
-            {
-              dzl_animation_stop (priv->animation);
-              dzl_clear_weak_pointer (&priv->animation);
-            }
-
-          gtk_widget_set_child_visible (child, TRUE);
-
-          duration = dzl_dock_revealer_calculate_duration (self);
-
-          animation = dzl_object_animate_full (priv->adjustment,
-                                               DZL_ANIMATION_EASE_IN_OUT_CUBIC,
-                                               duration,
-                                               gtk_widget_get_frame_clock (GTK_WIDGET (self)),
-                                               dzl_dock_revealer_animation_done,
-                                               g_object_ref (self),
-                                               "value", reveal_child ? 1.0 : 0.0,
-                                               NULL);
-          dzl_set_weak_pointer (&priv->animation, animation);
-        }
+      dzl_animation_stop (priv->animation);
+      dzl_clear_weak_pointer (&priv->animation);
 
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_REVEAL_CHILD]);
+
+      if (child == NULL)
+        return;
+
+      gtk_widget_set_child_visible (child, TRUE);
+
+      duration = dzl_dock_revealer_calculate_duration (self);
+
+      animation = dzl_object_animate_full (priv->adjustment,
+                                           DZL_ANIMATION_EASE_IN_OUT_CUBIC,
+                                           duration,
+                                           gtk_widget_get_frame_clock (GTK_WIDGET (self)),
+                                           dzl_dock_revealer_animation_done,
+                                           g_object_ref (self),
+                                           "value", reveal_child ? 1.0 : 0.0,
+                                           NULL);
+      dzl_set_weak_pointer (&priv->animation, animation);
     }
 }
 
@@ -603,6 +597,7 @@ dzl_dock_revealer_add (GtkContainer *container,
   GTK_CONTAINER_CLASS (dzl_dock_revealer_parent_class)->add (container, widget);
 
   gtk_widget_set_child_visible (widget, priv->reveal_child);
+  gtk_widget_queue_resize (GTK_WIDGET (self));
 }
 
 static gboolean
