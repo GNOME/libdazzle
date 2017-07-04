@@ -662,17 +662,19 @@ dzl_animation_notify (DzlAnimation *self)
 
 /**
  * dzl_animation_stop:
- * @animation: (in): A #DzlAnimation.
+ * @animation: (nullable): A #DzlAnimation.
  *
  * Stops a running animation. The internal reference to the animation is
  * dropped and therefore may cause the object to finalize.
  *
- * Side effects: None.
+ * As a convenience, this function accepts %NULL for @animation but
+ * does nothing if that should occur.
  */
 void
 dzl_animation_stop (DzlAnimation *animation)
 {
-  g_return_if_fail (DZL_IS_ANIMATION (animation));
+  if (animation == NULL)
+    return;
 
   if (animation->tween_handler)
     {
