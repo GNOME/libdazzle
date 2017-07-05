@@ -452,7 +452,6 @@ dzl_fuzzy_index_builder_write_worker (GTask        *task,
   DzlFuzzyIndexBuilder *self = source_object;
   g_autoptr(GVariant) variant = NULL;
   g_autoptr(GVariant) documents = NULL;
-  g_autoptr(GPtrArray) array_of_keys = NULL;
   GVariantDict dict;
   GFile *file = task_data;
   GError *error = NULL;
