@@ -443,3 +443,103 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
                           g_strdupv ((gchar **)prefixes),
                           (GDestroyNotify) g_strfreev);
 }
+
+/**
+ * dzl_gtk_list_store_insert_sorted:
+ * @store: A #GtkListStore
+ * @iter: (out): A location for a #GtkTextIter
+ * @key: A key to compare to when binary searching
+ * @compare_column: the column containing the data to compare
+ * @compare_func: (scope call) (closure compare_data): A callback to compare
+ * @compare_data: data for @compare_func
+ *
+ * This function will binary search the contents of @store looking for the
+ * location to insert a new row.
+ *
+ * @compare_column must be the index of a column that is a %G_TYPE_POINTER,
+ * %G_TYPE_BOXED or %G_TYPE_OBJECT based column.
+ *
+ * @compare_func will be called with @key as the first parameter, and the
+ * value from the column as the second parameter. The final parameter will
+ * be the @compare_data passed to this function.
+ *
+ * Since: 3.26
+ */
+void
+dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
+                                  GtkTreeIter      *iter,
+                                  gconstpointer     key,
+                                  guint             compare_column,
+                                  GCompareDataFunc  compare_func,
+                                  gpointer          compare_data)
+{
+  g_auto(GValue) value = G_VALUE_INIT;
+  gpointer (*get_func) (const GValue *) = NULL;
+  GtkTreeModel *model = (GtkTreeModel *)store;
+  GType type;
+  gint left;
+  gint right;
+  gint middle;
+  gint cmpval;
+
+  g_return_if_fail (GTK_IS_LIST_STORE (store));
+  g_return_if_fail (GTK_IS_LIST_STORE (model));
+  g_return_if_fail (iter != NULL);
+  g_return_if_fail (compare_column < gtk_tree_model_get_n_columns (GTK_TREE_MODEL (store)));
+  g_return_if_fail (compare_func != NULL);
+
+  type = gtk_tree_model_get_column_type (GTK_TREE_MODEL (store), compare_column);
+
+  if (g_type_is_a (type, G_TYPE_POINTER))
+    get_func = g_value_get_pointer;
+  else if (g_type_is_a (type, G_TYPE_BOXED))
+    get_func = g_value_get_boxed;
+  else if (g_type_is_a (type, G_TYPE_OBJECT))
+    get_func = g_value_get_object;
+  else
+    {
+      g_warning ("%s() only supports pointer, boxed, or object columns",
+                 G_STRFUNC);
+      gtk_list_store_append (store, iter);
+      return;
+    }
+
+  g_value_init (&value, type);
+
+  cmpval = 1;
+  left = 0;
+  middle = 0;
+  right = gtk_tree_model_iter_n_children (model, NULL) - 1;
+
+  /* Binary search to locate the target position */
+
+  while (left <= right)
+    {
+      GtkTreeIter cur;
+
+      middle = (left + right) / 2;
+
+      gtk_tree_model_iter_nth_child (model, &cur, NULL, middle);
+      gtk_tree_model_get_value (model, &cur, compare_column, &value);
+
+      cmpval = compare_func (key, get_func (&value), compare_data);
+
+      g_value_reset (&value);
+
+      if (cmpval < 0)
+        left = middle + 1;
+      else if (cmpval > 0)
+        right = middle - 1;
+      else
+        break;
+    }
+
+  /*
+   * If we binary searched and middle was compared previous
+   * to our new position, advance one position.
+   */
+  if (cmpval < 0)
+    middle++;
+
+  gtk_list_store_insert (store, iter, middle);
+}

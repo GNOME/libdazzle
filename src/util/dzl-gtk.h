@@ -50,6 +50,12 @@ void          dzl_gtk_text_buffer_remove_tag     (GtkTextBuffer           *buffe
                                                   const GtkTextIter       *start,
                                                   const GtkTextIter       *end,
                                                   gboolean                 minimal_damage);
+void          dzl_gtk_list_store_insert_sorted   (GtkListStore            *store,
+                                                  GtkTreeIter             *iter,
+                                                  gconstpointer            key,
+                                                  guint                    compare_column,
+                                                  GCompareDataFunc         compare_func,
+                                                  gpointer                 compare_data);
 
 G_END_DECLS
 
