@@ -1259,7 +1259,8 @@ dzl_tree_set_root (DzlTree     *self,
       GtkTreeSelection *selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
       GtkTreeModel *current;
 
-      gtk_tree_selection_unselect_all (selection);
+      if (selection != NULL)
+        gtk_tree_selection_unselect_all (selection);
 
       if (priv->root != NULL)
         {
