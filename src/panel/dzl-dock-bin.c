@@ -91,6 +91,12 @@ typedef struct
    * an unpinned child is floating above teh center child.
    */
   guint pinned : 1;
+
+  /*
+   * Tracks if the widget was pinned before the start of an animation
+   * sequence, as we may change the pinned state during the animation.
+   */
+  guint pre_anim_pinned : 1;
 } DzlDockBinChild;
 
 typedef struct
@@ -242,19 +248,37 @@ set_visible (DzlDockBin          *self,
              DzlDockBinChildType  type,
              gboolean             visible)
 {
-  GtkWidget *child;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  GtkWidget *widget;
 
   g_assert (DZL_IS_DOCK_BIN (self));
   g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
   g_assert (type <= DZL_DOCK_BIN_CHILD_BOTTOM);
 
-  child = get_child_widget (self, type);
+  /* Ensure the panel is created */
+  widget = get_child_widget (self, type);
 
-  if (DZL_IS_DOCK_REVEALER (child))
+  /*
+   * When animating, we should set the panel as "unpinned" and then
+   * swap the pinned status after the animation completes. That will
+   * allow us to have more smooth animations without having to keep
+   * updating all that sizing machinery.
+   */
+
+  if (DZL_IS_DOCK_REVEALER (widget))
     {
-      dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (child), visible);
-      g_object_notify (G_OBJECT (self), visible_names [type]);
-      gtk_widget_queue_resize (GTK_WIDGET (self));
+      DzlDockBinChild *child = &priv->children[type];
+
+      if (visible != dzl_dock_revealer_get_reveal_child (DZL_DOCK_REVEALER (widget)))
+        {
+          child->pre_anim_pinned = child->pinned;
+          child->pinned = FALSE;
+
+          dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (widget), visible);
+
+          g_object_notify (G_OBJECT (self), visible_names [type]);
+          gtk_widget_queue_resize (GTK_WIDGET (self));
+        }
     }
 }
 
@@ -409,6 +433,29 @@ dzl_dock_bin_notify_reveal_child (DzlDockBin *self,
 }
 
 static void
+dzl_dock_bin_notify_child_revealed (DzlDockBin *self,
+                                    GParamSpec *pspec,
+                                    GtkWidget  *child)
+{
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (GTK_IS_WIDGET (child));
+
+  for (guint i = 0; i < G_N_ELEMENTS (priv->children); i++)
+    {
+      DzlDockBinChild *ele = &priv->children [i];
+
+      if (ele->widget == child)
+        {
+          ele->pinned = ele->pre_anim_pinned;
+          gtk_widget_queue_resize (GTK_WIDGET (self));
+          break;
+        }
+    }
+}
+
+static void
 dzl_dock_bin_remove (GtkContainer *container,
                      GtkWidget    *widget)
 {
@@ -427,6 +474,9 @@ dzl_dock_bin_remove (GtkContainer *container,
                                         &child->widget);
   g_signal_handlers_disconnect_by_func (widget,
                                         G_CALLBACK (dzl_dock_bin_notify_reveal_child),
+                                        self);
+  g_signal_handlers_disconnect_by_func (widget,
+                                        G_CALLBACK (dzl_dock_bin_notify_child_revealed),
                                         self);
 
   gtk_widget_queue_resize (GTK_WIDGET (self));
@@ -1008,6 +1058,8 @@ dzl_dock_bin_set_child_pinned (DzlDockBin *self,
   else
     gtk_style_context_remove_class (style_context, DZL_DOCK_BIN_STYLE_CLASS_PINNED);
 
+  child->pre_anim_pinned = child->pinned;
+
   dzl_dock_bin_resort_children (self);
 
   gtk_widget_queue_resize (GTK_WIDGET (self));
@@ -1531,6 +1583,12 @@ dzl_dock_bin_create_edge (DzlDockBin          *self,
                            self,
                            G_CONNECT_SWAPPED);
 
+  g_signal_connect_object (child->widget,
+                           "notify::child-revealed",
+                           G_CALLBACK (dzl_dock_bin_notify_child_revealed),
+                           self,
+                           G_CONNECT_SWAPPED);
+
   gtk_widget_set_parent (g_object_ref_sink (child->widget), GTK_WIDGET (self));
 
   dzl_dock_item_adopt (DZL_DOCK_ITEM (self), DZL_DOCK_ITEM (child->widget));
@@ -1578,6 +1636,7 @@ dzl_dock_bin_init_child (DzlDockBin          *self,
   child->type = type;
   child->priority = (int)type * 100;
   child->pinned = TRUE;
+  child->pre_anim_pinned = TRUE;
 }
 
 static void
