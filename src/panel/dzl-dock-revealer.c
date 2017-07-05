@@ -1007,3 +1007,23 @@ dzl_dock_revealer_animate_to_position (DzlDockRevealer *self,
         g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_REVEAL_CHILD]);
     }
 }
+
+/**
+ * dzl_dock_revealer_is_animating:
+ * @self: a #DzlDockRevealer
+ *
+ * This is a helper to check if the revealer is animating. You probably don't
+ * want to poll this function. Connect to notify::child-revealed or
+ * notify::reveal-child instead.
+ *
+ * Returns: %TRUE if an animation is in progress.
+ */
+gboolean
+dzl_dock_revealer_is_animating (DzlDockRevealer *self)
+{
+  DzlDockRevealerPrivate *priv = dzl_dock_revealer_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_DOCK_REVEALER (self), FALSE);
+
+  return (priv->animation != NULL);
+}

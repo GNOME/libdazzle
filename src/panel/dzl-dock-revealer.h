@@ -76,6 +76,7 @@ void                           dzl_dock_revealer_set_position_set         (DzlDo
 guint                          dzl_dock_revealer_get_transition_duration  (DzlDockRevealer               *self);
 void                           dzl_dock_revealer_set_transition_duration  (DzlDockRevealer               *self,
                                                                            guint                          transition_duration);
+gboolean                       dzl_dock_revealer_is_animating             (DzlDockRevealer               *self);
 
 G_END_DECLS
 
