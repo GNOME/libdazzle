@@ -286,4 +286,10 @@ test_counters_window = executable('test-counters-window', 'test-counters-window.
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_list_store = executable('test-list-store', 'test-list-store.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
 endif

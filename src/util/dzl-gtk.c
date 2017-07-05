@@ -444,6 +444,42 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
                           (GDestroyNotify) g_strfreev);
 }
 
+static gboolean
+list_store_iter_middle (GtkListStore      *store,
+                        const GtkTreeIter *begin,
+                        const GtkTreeIter *end,
+                        GtkTreeIter       *middle)
+{
+  g_assert (store != NULL);
+  g_assert (begin != NULL);
+  g_assert (end != NULL);
+  g_assert (middle != NULL);
+  g_assert (middle->stamp == begin->stamp);
+  g_assert (middle->stamp == end->stamp);
+
+  /*
+   * middle MUST ALREADY BE VALID as it saves us some copying
+   * as well as just makes things easier when binary searching.
+   */
+
+  middle->user_data = g_sequence_range_get_midpoint (begin->user_data, end->user_data);
+
+  if (g_sequence_iter_is_end (middle->user_data))
+    {
+      middle->stamp = 0;
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static inline gboolean
+list_store_iter_equal (const GtkTreeIter *a,
+                       const GtkTreeIter *b)
+{
+  return a->user_data == b->user_data;
+}
+
 /**
  * dzl_gtk_list_store_insert_sorted:
  * @store: A #GtkListStore
@@ -459,9 +495,9 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
  * @compare_column must be the index of a column that is a %G_TYPE_POINTER,
  * %G_TYPE_BOXED or %G_TYPE_OBJECT based column.
  *
- * @compare_func will be called with the column data as the first
- * parameter and @key as the second parameter.  The final parameter will
- * be the @compare_data passed to this function.
+ * @compare_func will be called with @key as the first parameter and the
+ * value from the #GtkListStore row as the second parameter. The third and
+ * final parameter is @compare_data.
  *
  * Since: 3.26
  */
@@ -476,11 +512,12 @@ dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
   GValue value = G_VALUE_INIT;
   gpointer (*get_func) (const GValue *) = NULL;
   GtkTreeModel *model = (GtkTreeModel *)store;
+  GtkTreeIter begin;
+  GtkTreeIter end;
+  GtkTreeIter middle;
+  guint n_children;
+  gint cmpval = 0;
   GType type;
-  gint left;
-  gint right;
-  gint middle;
-  gint cmpval;
 
   g_return_if_fail (GTK_IS_LIST_STORE (store));
   g_return_if_fail (GTK_IS_LIST_STORE (model));
@@ -504,40 +541,53 @@ dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
       return;
     }
 
-  cmpval = 1;
-  left = 0;
-  middle = 0;
-  right = gtk_tree_model_iter_n_children (model, NULL) - 1;
-
-  /* Binary search to locate the target position */
-
-  while (left <= right)
+  /* Try to get the first iter instead of calling n_children to
+   * avoid walking the GSequence all the way to the right. If this
+   * matches, we know there are some children.
+   */
+  if (!gtk_tree_model_get_iter_first (model, &begin))
     {
-      GtkTreeIter cur;
-
-      middle = (left + right) / 2;
-
-      gtk_tree_model_iter_nth_child (model, &cur, NULL, middle);
-      gtk_tree_model_get_value (model, &cur, compare_column, &value);
-
-      cmpval = compare_func (get_func (&value), key, compare_data);
-
-      g_value_unset (&value);
-
-      if (cmpval < 0)
-        left = middle + 1;
-      else if (cmpval > 0)
-        right = middle - 1;
-      else
-        break;
+      gtk_list_store_append (store, iter);
+      return;
     }
 
-  /*
-   * If we binary searched and middle was compared previous
-   * to our new position, advance one position.
-   */
-  if (cmpval < 0)
-    middle++;
+  n_children = gtk_tree_model_iter_n_children (model, NULL);
+  if (!gtk_tree_model_iter_nth_child (model, &end, NULL, n_children - 1))
+    g_assert_not_reached ();
 
-  gtk_list_store_insert (store, iter, middle);
+  middle = begin;
+
+  while (list_store_iter_middle (store, &begin, &end, &middle))
+    {
+      gtk_tree_model_get_value (model, &middle, compare_column, &value);
+      cmpval = compare_func (key, get_func (&value), compare_data);
+      g_value_unset (&value);
+
+      if (cmpval == 0 || list_store_iter_equal (&begin, &end))
+        break;
+
+      if (cmpval < 0)
+        {
+          end = middle;
+
+          if (!list_store_iter_equal (&begin, &end) &&
+              !gtk_tree_model_iter_previous (model, &end))
+            break;
+        }
+      else if (cmpval > 0)
+        {
+          begin = middle;
+
+          if (!list_store_iter_equal (&begin, &end) &&
+              !gtk_tree_model_iter_next (model, &begin))
+            break;
+        }
+      else
+        g_assert_not_reached ();
+    }
+
+  if (cmpval < 0)
+    gtk_list_store_insert_before (store, iter, &middle);
+  else
+    gtk_list_store_insert_after (store, iter, &middle);
 }
