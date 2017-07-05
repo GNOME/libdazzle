@@ -291,5 +291,6 @@ test_list_store = executable('test-list-store', 'test-list-store.c',
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-list-store', test_list_store, env: test_env)
 
 endif
