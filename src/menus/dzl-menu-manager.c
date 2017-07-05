@@ -183,10 +183,23 @@ find_position_for_item (GMenuModel *model,
     before = NULL;
 
   if (after != NULL)
-    after_pos = find_with_attribute_string (model, G_MENU_ATTRIBUTE_LABEL, after);
+    {
+      after_pos = find_with_attribute_string (model, G_MENU_ATTRIBUTE_LABEL, after);
+
+      /* Adding an "id" is non-standard, but can be useful as an alternative to
+       * translated strings.
+       */
+      if (after_pos == -1)
+        after_pos = find_with_attribute_string (model, "id", after);
+    }
 
   if (before != NULL)
-    before_pos = find_with_attribute_string (model, G_MENU_ATTRIBUTE_LABEL, before);
+    {
+      before_pos = find_with_attribute_string (model, G_MENU_ATTRIBUTE_LABEL, before);
+
+      if (before_pos == -1)
+        before_pos = find_with_attribute_string (model, "id", before);
+    }
 
   /*
    * TODO: Perform resort after all items have been inserted.
