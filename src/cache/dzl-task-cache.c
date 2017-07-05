@@ -484,9 +484,9 @@ dzl_task_cache_cancel_in_idle (gpointer user_data)
               g_cancellable_cancel (fetch_cancellable);
             }
         }
-    }
 
-  g_return_val_if_fail (cancelled, G_SOURCE_REMOVE);
+      g_return_val_if_fail (cancelled, G_SOURCE_REMOVE);
+    }
 
   return G_SOURCE_REMOVE;
 }
