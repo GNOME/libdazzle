@@ -271,7 +271,12 @@ set_visible (DzlDockBin          *self,
 
       if (visible != dzl_dock_revealer_get_reveal_child (DZL_DOCK_REVEALER (widget)))
         {
-          child->pre_anim_pinned = child->pinned;
+          /* Only stash state if there is not an animation in progress.
+           * Otherwise we stomp on our previous state.
+           */
+          if (!dzl_dock_revealer_is_animating (DZL_DOCK_REVEALER (widget)))
+            child->pre_anim_pinned = child->pinned;
+
           child->pinned = FALSE;
 
           dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (widget), visible);
