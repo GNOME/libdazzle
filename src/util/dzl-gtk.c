@@ -459,8 +459,8 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
  * @compare_column must be the index of a column that is a %G_TYPE_POINTER,
  * %G_TYPE_BOXED or %G_TYPE_OBJECT based column.
  *
- * @compare_func will be called with @key as the first parameter, and the
- * value from the column as the second parameter. The final parameter will
+ * @compare_func will be called with the column data as the first
+ * parameter and @key as the second parameter.  The final parameter will
  * be the @compare_data passed to this function.
  *
  * Since: 3.26
@@ -522,7 +522,7 @@ dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
       gtk_tree_model_iter_nth_child (model, &cur, NULL, middle);
       gtk_tree_model_get_value (model, &cur, compare_column, &value);
 
-      cmpval = compare_func (key, get_func (&value), compare_data);
+      cmpval = compare_func (get_func (&value), key, compare_data);
 
       g_value_reset (&value);
 
