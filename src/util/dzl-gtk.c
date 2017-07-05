@@ -473,7 +473,7 @@ dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
                                   GCompareDataFunc  compare_func,
                                   gpointer          compare_data)
 {
-  g_auto(GValue) value = G_VALUE_INIT;
+  GValue value = G_VALUE_INIT;
   gpointer (*get_func) (const GValue *) = NULL;
   GtkTreeModel *model = (GtkTreeModel *)store;
   GType type;
@@ -504,8 +504,6 @@ dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
       return;
     }
 
-  g_value_init (&value, type);
-
   cmpval = 1;
   left = 0;
   middle = 0;
@@ -524,7 +522,7 @@ dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
 
       cmpval = compare_func (get_func (&value), key, compare_data);
 
-      g_value_reset (&value);
+      g_value_unset (&value);
 
       if (cmpval < 0)
         left = middle + 1;
