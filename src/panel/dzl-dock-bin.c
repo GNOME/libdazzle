@@ -277,7 +277,14 @@ set_visible (DzlDockBin          *self,
           if (!dzl_dock_revealer_is_animating (DZL_DOCK_REVEALER (widget)))
             child->pre_anim_pinned = child->pinned;
 
-          child->pinned = FALSE;
+          /*
+           * We only want to "unpin" the panel when we animate out. Generally,
+           * shrinking widgets can be made fast by re-using their existing
+           * content, but making things bigger has very large performance
+           * costs.  Expecially with textviews/treeviews.
+           */
+          if (!visible)
+            child->pinned = FALSE;
 
           dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (widget), visible);
 
