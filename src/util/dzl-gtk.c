@@ -372,7 +372,7 @@ dzl_gtk_widget_action_set (GtkWidget   *widget,
  * dzl_gtk_widget_mux_action_groups:
  * @widget: a #GtkWidget
  * @from_widget: A #GtkWidget containing the groups to copy
- * @mux_key: a unique key to represent the muxing
+ * @mux_key: (nullable): a unique key to represent the muxing
  *
  * This function will find all of the actions on @from_widget in various
  * groups and add them to @widget. As this just copies the action groups
@@ -392,7 +392,10 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
 
   g_return_if_fail (GTK_IS_WIDGET (widget));
   g_return_if_fail (!from_widget || GTK_IS_WIDGET (from_widget));
-  g_return_if_fail (mux_key != NULL);
+  g_return_if_fail (widget != from_widget);
+
+  if (mux_key == NULL)
+    mux_key = "DZL_GTK_MUX_ACTIONS";
 
   /*
    * First check to see if there are any old action groups that
