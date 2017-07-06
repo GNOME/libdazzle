@@ -26,8 +26,7 @@ G_BEGIN_DECLS
 #define DZL_TYPE_ANIMATION      (dzl_animation_get_type())
 #define DZL_TYPE_ANIMATION_MODE (dzl_animation_mode_get_type())
 
-G_DECLARE_FINAL_TYPE (DzlAnimation, dzl_animation,
-                      DZL, ANIMATION, GInitiallyUnowned)
+G_DECLARE_FINAL_TYPE (DzlAnimation, dzl_animation, DZL, ANIMATION, GInitiallyUnowned)
 
 typedef enum   _DzlAnimationMode    DzlAnimationMode;
 
