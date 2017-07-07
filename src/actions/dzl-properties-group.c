@@ -72,12 +72,12 @@ struct _DzlPropertiesGroup
 
 typedef struct
 {
-  const gchar             *action_name;
-  const GVariantType      *param_type;
-  const GVariantType      *state_type;
-  const gchar             *property_name;
-  GType                    property_type;
-  DzlPropertiesGroupFlags  flags;
+  const gchar        *action_name;
+  const GVariantType *param_type;
+  const GVariantType *state_type;
+  const gchar        *property_name;
+  GType               property_type;
+  DzlPropertiesFlags  flags;
 } Mapping;
 
 enum {
@@ -455,8 +455,8 @@ dzl_properties_group_notify (DzlPropertiesGroup *self,
 }
 
 static const GVariantType *
-get_param_type_for_type (GType                   type,
-                         DzlPropertiesGroupFlags flags)
+get_param_type_for_type (GType              type,
+                         DzlPropertiesFlags flags)
 {
   switch (type)
     {
@@ -665,10 +665,10 @@ dzl_properties_group_new (GObject *object)
  * Since: 3.26
  */
 void
-dzl_properties_group_add_property_full (DzlPropertiesGroup      *self,
-                                        const gchar             *name,
-                                        const gchar             *property_name,
-                                        DzlPropertiesGroupFlags  flags)
+dzl_properties_group_add_property_full (DzlPropertiesGroup *self,
+                                        const gchar        *name,
+                                        const gchar        *property_name,
+                                        DzlPropertiesFlags  flags)
 {
   g_autoptr(GObject) object = NULL;
   GObjectClass *object_class;
