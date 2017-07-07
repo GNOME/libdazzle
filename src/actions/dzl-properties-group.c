@@ -670,8 +670,8 @@ dzl_properties_group_add_property (DzlPropertiesGroup *self,
     }
 
   mapping.action_name = g_intern_string (name);
-  mapping.param_type = get_state_type_for_type (pspec->value_type);
-  mapping.state_type = get_param_type_for_type (pspec->value_type);
+  mapping.param_type = get_param_type_for_type (pspec->value_type);
+  mapping.state_type = get_state_type_for_type (pspec->value_type);
   mapping.property_name = pspec->name;
   mapping.property_type = pspec->value_type;
 
