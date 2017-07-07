@@ -34,6 +34,7 @@ G_BEGIN_DECLS
 #define DAZZLE_INSIDE
 #include "dzl-version.h"
 #include "actions/dzl-child-property-action.h"
+#include "actions/dzl-properties-group.h"
 #include "actions/dzl-settings-flag-action.h"
 #include "actions/dzl-widget-action-group.h"
 #include "animation/dzl-animation.h"
