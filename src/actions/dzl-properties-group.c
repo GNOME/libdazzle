@@ -749,4 +749,18 @@ dzl_properties_group_remove (DzlPropertiesGroup *self,
 {
   g_return_if_fail (DZL_IS_PROPERTIES_GROUP (self));
   g_return_if_fail (name != NULL);
+
+  name = g_intern_string (name);
+
+  for (guint i = 0; i < self->mappings->len; i++)
+    {
+      const Mapping *mapping = &g_array_index (self->mappings, Mapping, i);
+
+      if (mapping->action_name == name)
+        {
+          g_array_remove_index_fast (self->mappings, i);
+          g_action_group_action_removed (G_ACTION_GROUP (self), name);
+          break;
+        }
+    }
 }
