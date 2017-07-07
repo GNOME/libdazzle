@@ -162,7 +162,12 @@ dzl_properties_group_query_action (GActionGroup        *group,
             *state_hint = NULL;
 
           if (state)
-            *state = get_action_state (object, mapping);
+            {
+              if (object)
+                *state = get_action_state (object, mapping);
+              else
+                *state = NULL;
+            }
 
           return TRUE;
         }
