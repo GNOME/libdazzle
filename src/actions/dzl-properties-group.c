@@ -118,6 +118,7 @@ get_action_state (GObject       *object,
 
     case G_TYPE_BOOLEAN:
       ret = g_variant_new_boolean (g_value_get_boolean (&value));
+      break;
 
     default:
       g_assert_not_reached ();
@@ -332,6 +333,7 @@ dzl_properties_group_change_action_state (GActionGroup *group,
             case G_TYPE_DOUBLE:
               g_value_init (&value, G_TYPE_DOUBLE);
               g_value_set_double (&value, g_variant_get_double (variant));
+              break;
 
             default:
               g_assert_not_reached ();
