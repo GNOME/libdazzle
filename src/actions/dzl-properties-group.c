@@ -72,11 +72,12 @@ struct _DzlPropertiesGroup
 
 typedef struct
 {
-  const gchar        *action_name;
-  const GVariantType *param_type;
-  const GVariantType *state_type;
-  const gchar        *property_name;
-  GType               property_type;
+  const gchar             *action_name;
+  const GVariantType      *param_type;
+  const GVariantType      *state_type;
+  const gchar             *property_name;
+  GType                    property_type;
+  DzlPropertiesGroupFlags  flags;
 } Mapping;
 
 enum {
@@ -247,7 +248,17 @@ dzl_properties_group_get_action_parameter_type (GActionGroup *group,
       const Mapping *mapping = &g_array_index (self->mappings, Mapping, i);
 
       if (g_strcmp0 (name, mapping->action_name) == 0)
-        return mapping->param_type;
+        {
+          /* Normal parameter type for boolean actions is NULL. But if
+           * we are treating them statefully, where the new state is the
+           * activation state, then handle that here.
+           */
+          if (mapping->property_type == G_TYPE_BOOLEAN &&
+              (mapping->flags & DZL_PROPERTIES_FLAGS_STATEFUL_BOOLEANS) != 0)
+            return G_VARIANT_TYPE_BOOLEAN;
+
+          return mapping->param_type;
+        }
     }
 
   return NULL;
@@ -376,7 +387,8 @@ dzl_properties_group_activate_action (GActionGroup *group,
 
       if (g_strcmp0 (name, mapping->action_name) == 0)
         {
-          if (mapping->property_type == G_TYPE_BOOLEAN)
+          if (mapping->property_type == G_TYPE_BOOLEAN &&
+              (mapping->flags & DZL_PROPERTIES_FLAGS_STATEFUL_BOOLEANS) == 0)
             {
               gboolean value = FALSE;
 
@@ -443,15 +455,21 @@ dzl_properties_group_notify (DzlPropertiesGroup *self,
 }
 
 static const GVariantType *
-get_param_type_for_type (GType type)
+get_param_type_for_type (GType                   type,
+                         DzlPropertiesGroupFlags flags)
 {
   switch (type)
     {
     case G_TYPE_INT:     return G_VARIANT_TYPE_INT32;
     case G_TYPE_UINT:    return G_VARIANT_TYPE_UINT32;
-    case G_TYPE_BOOLEAN: return NULL;
     case G_TYPE_STRING:  return G_VARIANT_TYPE_STRING;
     case G_TYPE_DOUBLE:  return G_VARIANT_TYPE_DOUBLE;
+
+    case G_TYPE_BOOLEAN:
+      if (flags & DZL_PROPERTIES_FLAGS_STATEFUL_BOOLEANS)
+        return G_VARIANT_TYPE_BOOLEAN;
+      return NULL;
+
     default:
       g_warning ("%s is not a supported type", g_type_name (type));
       return NULL;
@@ -633,20 +651,24 @@ dzl_properties_group_new (GObject *object)
 }
 
 /**
- * dzl_properties_group_add_property:
+ * dzl_properties_group_add_property_full:
  * @self: a #DzlPropertiesGroup
  * @name: the name of the action
  * @property_name: the name of the property
+ * @flags: optional flags for the action
  *
  * Adds a new stateful action named @name which maps to the underlying
  * property @property_name of #DzlPropertiesGroup:object.
  *
+ * Seting @flags allows you to tweak some settings about the action.
+ *
  * Since: 3.26
  */
 void
-dzl_properties_group_add_property (DzlPropertiesGroup *self,
-                                   const gchar        *name,
-                                   const gchar        *property_name)
+dzl_properties_group_add_property_full (DzlPropertiesGroup      *self,
+                                        const gchar             *name,
+                                        const gchar             *property_name,
+                                        DzlPropertiesGroupFlags  flags)
 {
   g_autoptr(GObject) object = NULL;
   GObjectClass *object_class;
@@ -676,10 +698,11 @@ dzl_properties_group_add_property (DzlPropertiesGroup *self,
     }
 
   mapping.action_name = g_intern_string (name);
-  mapping.param_type = get_param_type_for_type (pspec->value_type);
+  mapping.param_type = get_param_type_for_type (pspec->value_type, flags);
   mapping.state_type = get_state_type_for_type (pspec->value_type);
   mapping.property_name = pspec->name;
   mapping.property_type = pspec->value_type;
+  mapping.flags = flags;
 
   /* we already warned, ignore this */
   if (mapping.state_type == NULL)
@@ -688,6 +711,25 @@ dzl_properties_group_add_property (DzlPropertiesGroup *self,
   g_array_append_val (self->mappings, mapping);
 
   g_action_group_action_added (G_ACTION_GROUP (self), mapping.action_name);
+}
+
+/**
+ * dzl_properties_group_add_property:
+ * @self: a #DzlPropertiesGroup
+ * @name: the name of the action
+ * @property_name: the name of the property
+ *
+ * Adds a new stateful action named @name which maps to the underlying
+ * property @property_name of #DzlPropertiesGroup:object.
+ *
+ * Since: 3.26
+ */
+void
+dzl_properties_group_add_property (DzlPropertiesGroup *self,
+                                   const gchar        *name,
+                                   const gchar        *property_name)
+{
+  dzl_properties_group_add_property_full (self, name, property_name, 0);
 }
 
 /**

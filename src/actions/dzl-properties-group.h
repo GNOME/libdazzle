@@ -26,11 +26,21 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlPropertiesGroup, dzl_properties_group, DZL, PROPERTIES_GROUP, GObject)
 
-DzlPropertiesGroup *dzl_properties_group_new          (GObject            *object);
-void                dzl_properties_group_add_property (DzlPropertiesGroup *self,
-                                                       const gchar        *name,
-                                                       const gchar        *property_name);
-void                dzl_properties_group_remove       (DzlPropertiesGroup *self,
-                                                       const gchar        *name);
+typedef enum
+{
+  DZL_PROPERTIES_FLAGS_NONE,
+  DZL_PROPERTIES_FLAGS_STATEFUL_BOOLEANS = 1 << 0,
+} DzlPropertiesGroupFlags;
+
+DzlPropertiesGroup *dzl_properties_group_new               (GObject                 *object);
+void                dzl_properties_group_add_property      (DzlPropertiesGroup      *self,
+                                                            const gchar             *name,
+                                                            const gchar             *property_name);
+void                dzl_properties_group_add_property_full (DzlPropertiesGroup      *self,
+                                                            const gchar             *name,
+                                                            const gchar             *property_name,
+                                                            DzlPropertiesGroupFlags  flags);
+void                dzl_properties_group_remove            (DzlPropertiesGroup      *self,
+                                                            const gchar             *name);
 
 G_END_DECLS
