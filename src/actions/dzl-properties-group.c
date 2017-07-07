@@ -638,6 +638,9 @@ dzl_properties_group_init (DzlPropertiesGroup *self)
  * action name mapping for this group. Until you've called this,
  * no actions are mapped.
  *
+ * Note that #DzlPropertiesGroup only holds a weak reference to
+ * @object and therefore you must keep @object alive elsewhere.
+ *
  * Returns: (transfer full): A #DzlPropertiesGroup
  *
  * Since: 3.26
@@ -760,6 +763,58 @@ dzl_properties_group_remove (DzlPropertiesGroup *self,
         {
           g_array_remove_index_fast (self->mappings, i);
           g_action_group_action_removed (G_ACTION_GROUP (self), name);
+          break;
+        }
+    }
+}
+
+/**
+ * dzl_properties_group_add_all_properties:
+ * @self: A #DzlPropertiesGroup
+ *
+ * This function will try to add all properties found on the target
+ * instance to the group. Only properties that are supported by the
+ * #DzlPropertiesGroup will be added.
+ *
+ * The action name of all added properties will be identical to their
+ * property name.
+ *
+ * Since: 3.26
+ */
+void
+dzl_properties_group_add_all_properties (DzlPropertiesGroup *self)
+{
+  g_autoptr(GObject) object = NULL;
+  g_autofree GParamSpec **pspec = NULL;
+  GObjectClass *object_class;
+  guint n_pspec = 0;
+
+  g_return_if_fail (DZL_IS_PROPERTIES_GROUP (self));
+
+  object = g_weak_ref_get (&self->object_ref);
+
+  if (object == NULL)
+    {
+      g_warning ("Cannot add properties, object has already been disposed");
+      return;
+    }
+
+  object_class = G_OBJECT_GET_CLASS (object);
+  pspec = g_object_class_list_properties (object_class, &n_pspec);
+
+  for (guint i = 0; i < n_pspec; i++)
+    {
+      switch (pspec[i]->value_type)
+        {
+        case G_TYPE_BOOLEAN:
+        case G_TYPE_DOUBLE:
+        case G_TYPE_INT:
+        case G_TYPE_STRING:
+        case G_TYPE_UINT:
+          dzl_properties_group_add_property (self, pspec[i]->name, pspec[i]->name);
+          break;
+
+        default:
           break;
         }
     }
