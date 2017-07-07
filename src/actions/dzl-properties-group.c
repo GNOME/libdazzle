@@ -402,8 +402,7 @@ action_group_iface_init (GActionGroupInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (DzlPropertiesGroup, dzl_properties_group, G_TYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (G_TYPE_ACTION_GROUP,
-                                                action_group_iface_init))
+                         G_IMPLEMENT_INTERFACE (G_TYPE_ACTION_GROUP, action_group_iface_init))
 
 static GParamSpec *properties [N_PROPS];
 
