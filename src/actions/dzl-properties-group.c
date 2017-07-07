@@ -664,7 +664,8 @@ dzl_properties_group_add_property (DzlPropertiesGroup *self,
 
   if (pspec == NULL)
     {
-      g_warning ("No such property \"%s\", property_name", property_name);
+      g_warning ("No such property \"%s\" on type %s",
+                 property_name, G_OBJECT_TYPE_NAME (object));
       return;
     }
 
