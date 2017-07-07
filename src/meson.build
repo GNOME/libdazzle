@@ -43,6 +43,7 @@ libdazzle_public_headers = [
   'dazzle.h',
 
   'actions/dzl-child-property-action.h',
+  'actions/dzl-properties-group.h',
   'actions/dzl-settings-flag-action.h',
   'actions/dzl-widget-action-group.h',
 
@@ -188,6 +189,7 @@ libdazzle_public_headers = [
 
 libdazzle_public_sources = [
   'actions/dzl-child-property-action.c',
+  'actions/dzl-properties-group.c',
   'actions/dzl-settings-flag-action.c',
   'actions/dzl-widget-action-group.c',
 
