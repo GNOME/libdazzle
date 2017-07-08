@@ -289,6 +289,9 @@ dzl_application_window_set_focus (GtkWindow *window,
               g_source_remove (priv->fullscreen_reveal_source);
               priv->fullscreen_reveal_source = 0;
             }
+
+          /* If this was just focused, we might need to make it visible */
+          gtk_revealer_set_reveal_child (priv->titlebar_revealer, TRUE);
         }
       else if (titlebar_had_focus)
         {
