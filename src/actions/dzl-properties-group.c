@@ -307,10 +307,19 @@ dzl_properties_group_change_action_state (GActionGroup *group,
 {
   DzlPropertiesGroup *self = (DzlPropertiesGroup *)group;
   g_autoptr(GObject) object = NULL;
+  const GVariantType *expected;
 
   g_assert (DZL_IS_PROPERTIES_GROUP (self));
   g_assert (name != NULL);
-  g_assert (variant != NULL);
+
+  expected = dzl_properties_group_get_action_state_type (group, name);
+
+  if (variant == NULL || !g_variant_is_of_type (variant, expected))
+    {
+      g_warning ("Invalid state for action \"%s\". Expected %s.",
+                 name, (const gchar *)expected);
+      return;
+    }
 
   object = g_weak_ref_get (&self->object_ref);
 
