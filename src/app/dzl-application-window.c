@@ -19,6 +19,7 @@
 #define G_LOG_DOMAIN "dzl-application-window"
 
 #include "app/dzl-application-window.h"
+#include "util/dzl-gtk.h"
 
 #define DEFAULT_DISMISSAL_SECONDS   3
 #define SHOW_HEADER_WITHIN_DISTANCE 5
@@ -126,7 +127,8 @@ dzl_application_window_event_box_motion (DzlApplicationWindow *self,
    * killed the GSource in set_focus().
    */
   focus = gtk_window_get_focus (GTK_WINDOW (self));
-  if (focus && gtk_widget_is_ancestor (focus, GTK_WIDGET (priv->titlebar_revealer)))
+  if (focus != NULL &&
+      dzl_gtk_widget_is_ancestor_or_relative (focus, GTK_WIDGET (priv->titlebar_revealer)))
     return GDK_EVENT_PROPAGATE;
 
   /* The widget is stored in GdkWindow user_data */
@@ -138,7 +140,7 @@ dzl_application_window_event_box_motion (DzlApplicationWindow *self,
    * small distance of the edge of the window (and monitor), ensure
    * that the titlebar is displayed and queue our next dismissal.
    */
-  if (gtk_widget_is_ancestor (widget, GTK_WIDGET (priv->titlebar_revealer)) ||
+  if (dzl_gtk_widget_is_ancestor_or_relative (widget, GTK_WIDGET (priv->titlebar_revealer)) ||
       gtk_widget_translate_coordinates (widget, GTK_WIDGET (self), motion->x, motion->y, &x, &y))
     {
       if (y < SHOW_HEADER_WITHIN_DISTANCE)
@@ -270,7 +272,8 @@ dzl_application_window_set_focus (GtkWindow *window,
 
   /* Check if we have titlebar focus already */
   old_focus = gtk_window_get_focus (window);
-  if (old_focus && gtk_widget_is_ancestor (old_focus, GTK_WIDGET (priv->titlebar_revealer)))
+  if (old_focus != NULL &&
+      dzl_gtk_widget_is_ancestor_or_relative (old_focus, GTK_WIDGET (priv->titlebar_revealer)))
     titlebar_had_focus = TRUE;
 
   /* Chain-up first */
@@ -281,7 +284,7 @@ dzl_application_window_set_focus (GtkWindow *window,
 
   if (widget != NULL)
     {
-      if (gtk_widget_is_ancestor (widget, GTK_WIDGET (priv->titlebar_revealer)))
+      if (dzl_gtk_widget_is_ancestor_or_relative (widget, GTK_WIDGET (priv->titlebar_revealer)))
         {
           /* Disable transition while the revealer is focused */
           if (priv->fullscreen_reveal_source != 0)
