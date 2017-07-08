@@ -55,6 +55,22 @@
             <property name="pack-type">end</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkMenuButton" id="gear_menu">
+            <property name="visible">true</property>
+            <property name="popover">gear_popover</property>
+            <child>
+              <object class="GtkImage">
+                <property name="icon-name">open-menu-symbolic</property>
+                <property name="visible">true</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">0</property>
+            <property name="pack-type">end</property>
+          </packing>
+        </child>
       </object>
     </child>
     <child>
@@ -115,4 +131,6 @@
       </object>
     </child>
   </template>
+  <object class="GtkPopover" id="gear_popover">
+  </object>
 </interface>

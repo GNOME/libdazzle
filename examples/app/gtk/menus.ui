@@ -17,4 +17,12 @@
       </item>
     </section>
   </menu>
+  <menu id="gear-menu">
+    <section id="gear-menu-fullscreen">
+      <item>
+        <attribute name="label" translatable="yes">_Fullscreen</attribute>
+        <attribute name="action">win.fullscreen</attribute>
+      </item>
+    </section>
+  </menu>
 </interface>
