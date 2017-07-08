@@ -168,13 +168,18 @@ static gint
 find_position_for_item (GMenuModel *model,
                         GMenuItem  *item)
 {
+  g_autofree gchar *label = NULL;
+  g_autofree gchar *id = NULL;
   const gchar *after;
   const gchar *before;
+  gint n_items;
   gint before_pos = -1;
   gint after_pos = -1;
 
   g_assert (G_IS_MENU_MODEL (model));
   g_assert (G_IS_MENU_ITEM (item));
+
+  n_items = g_menu_model_get_n_items (model);
 
   if (!g_menu_item_get_attribute (item, DZL_MENU_ATTRIBUTE_AFTER, "&s", &after))
     after = NULL;
@@ -202,13 +207,48 @@ find_position_for_item (GMenuModel *model,
     }
 
   /*
-   * TODO: Perform resort after all items have been inserted.
-   *
-   *       We cannot resolve all positions incrementally as we add them since
-   *       plugin ordering cannot be guaranteed (and some relative positions
-   *       may not yet be available). If relations were symmetrical, that
-   *       wouldn't be a problem.
+   * Now that we've positioned ourselves within the range we care about,
+   * we need to see if any item within that range has reverse-preferences
+   * about their position related to us.
    */
+
+  if (!g_menu_item_get_attribute (item, "id", "s", &id))
+    id = NULL;
+
+  if (!g_menu_item_get_attribute (item, G_MENU_ATTRIBUTE_LABEL, "s", &label))
+    label = NULL;
+
+  for (gint i = 0; i < n_items; i++)
+    {
+      g_autofree gchar *item_before = NULL;
+      g_autofree gchar *item_after = NULL;
+
+      if (g_menu_model_get_item_attribute (model, i, "before", "s", &item_before))
+        {
+          /* If this item requires it is before us, we need to ensure we
+           * come after this position.
+           */
+          if ((item_before && id && g_strcmp0 (item_before, id) == 0) ||
+              (item_before && label && g_strcmp0 (item_before, label) == 0))
+            {
+              if (after_pos == -1 || after_pos < i)
+                after_pos = i;
+            }
+        }
+
+      if (g_menu_model_get_item_attribute (model, i, "after", "s", &item_after))
+        {
+          /* If this item requires it is after us, we need to ensure we
+           * come before this position.
+           */
+          if ((item_after && id && g_strcmp0 (item_after, id) == 0) ||
+              (item_after && label && g_strcmp0 (item_after, label) == 0))
+            {
+              if (before_pos == -1 || before_pos > i)
+                before_pos = i;
+            }
+        }
+    }
 
   if (before_pos >= 0)
     return MAX (0, before_pos - 1);
