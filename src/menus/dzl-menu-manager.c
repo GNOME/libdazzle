@@ -228,8 +228,8 @@ find_position_for_item (GMenuModel *model,
           /* If this item requires it is before us, we need to ensure we
            * come after this position.
            */
-          if ((item_before && id && g_strcmp0 (item_before, id) == 0) ||
-              (item_before && label && g_strcmp0 (item_before, label) == 0))
+          if ((item_before && id && strcmp (item_before, id) == 0) ||
+              (item_before && label && strcmp (item_before, label) == 0))
             {
               if (after_pos == -1 || after_pos < i)
                 after_pos = i;
@@ -241,8 +241,8 @@ find_position_for_item (GMenuModel *model,
           /* If this item requires it is after us, we need to ensure we
            * come before this position.
            */
-          if ((item_after && id && g_strcmp0 (item_after, id) == 0) ||
-              (item_after && label && g_strcmp0 (item_after, label) == 0))
+          if ((item_after && id && strcmp (item_after, id) == 0) ||
+              (item_after && label && strcmp (item_after, label) == 0))
             {
               if (before_pos == -1 || before_pos > i)
                 before_pos = i;
