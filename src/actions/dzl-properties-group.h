@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef DZL_PROPERTIES_GROUP_H
+#define DZL_PROPERTIES_GROUP_H
 
 #include <gio/gio.h>
 
@@ -46,3 +47,5 @@ void                dzl_properties_group_remove             (DzlPropertiesGroup 
                                                              const gchar        *name);
 
 G_END_DECLS
+
+#endif /* DZL_PROPERTIES_GROUP_H */
