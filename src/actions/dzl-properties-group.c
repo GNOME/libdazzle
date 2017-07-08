@@ -51,6 +51,11 @@ struct _DzlPropertiesGroup
   GObject parent_instance;
 
   /*
+   * All subsequent set_object() calls must be this type.
+   */
+  GType prerequisite;
+
+  /*
    * Weak ref to the object we are monitoring for property changes.
    * We hold both a GWeakRef and a g_object_weak_ref() on the object
    * so that we can get notified of destruction *AND* know when we
@@ -83,6 +88,7 @@ typedef struct
 enum {
   PROP_0,
   PROP_OBJECT,
+  PROP_OBJECT_TYPE,
   N_PROPS
 };
 
@@ -493,22 +499,13 @@ get_state_type_for_type (GType type)
 }
 
 static void
-dzl_properties_group_weak_notify (gpointer  data,
-                                  GObject  *where_object_was)
+dzl_properties_group_notify_all_disabled (DzlPropertiesGroup *self)
 {
-  DzlPropertiesGroup *self = data;
-
   g_assert (DZL_IS_PROPERTIES_GROUP (self));
-
-  /*
-   * Mark all of the actions as disabled due to losing our reference
-   * on the source object.
-   */
 
   for (guint i = 0; i < self->mappings->len; i++)
     {
       const Mapping *mapping = &g_array_index (self->mappings, Mapping, i);
-
       g_action_group_action_enabled_changed (G_ACTION_GROUP (self),
                                              mapping->action_name,
                                              FALSE);
@@ -516,15 +513,50 @@ dzl_properties_group_weak_notify (gpointer  data,
 }
 
 static void
+dzl_properties_group_weak_notify (gpointer  data,
+                                  GObject  *where_object_was)
+{
+  DzlPropertiesGroup *self = data;
+
+  g_assert (DZL_IS_PROPERTIES_GROUP (self));
+
+  dzl_properties_group_notify_all_disabled (self);
+}
+
+static void
 dzl_properties_group_set_object (DzlPropertiesGroup *self,
                                  GObject            *object)
 {
+  g_autoptr(GObject) old_object = NULL;
+
   g_assert (DZL_IS_PROPERTIES_GROUP (self));
   g_assert (!object || G_IS_OBJECT (object));
 
+  old_object = g_weak_ref_get (&self->object_ref);
+
+  /* Nothing to do if we aren't changing anything */
+  if (object == old_object)
+    return;
+
+  if (self->prerequisite == G_TYPE_INVALID && object != NULL)
+    self->prerequisite = G_OBJECT_TYPE (object);
+
+  /* Disconnect previous life-cycle tracking */
+  if (old_object != NULL)
+    {
+      g_signal_handlers_disconnect_by_func (old_object,
+                                            G_CALLBACK (dzl_properties_group_notify),
+                                            self);
+      g_object_weak_unref (old_object,
+                           dzl_properties_group_weak_notify,
+                           self);
+      g_weak_ref_set (&self->object_ref, NULL);
+    }
+
+  /* Mark all actions as disabled if we lost our object */
   if (object == NULL)
     {
-      g_critical ("DzlPropertiesGroup: object must be non-NULL.");
+      dzl_properties_group_notify_all_disabled (self);
       return;
     }
 
@@ -541,6 +573,17 @@ dzl_properties_group_set_object (DzlPropertiesGroup *self,
   g_object_weak_ref (G_OBJECT (object),
                      dzl_properties_group_weak_notify,
                      self);
+
+  /* Emit state changes for all properties */
+  for (guint i = 0; i < self->mappings->len; i++)
+    {
+      const Mapping *mapping = &g_array_index (self->mappings, Mapping, i);
+      g_autoptr(GVariant) state = get_action_state (object, mapping);
+
+      g_action_group_action_state_changed (G_ACTION_GROUP (self),
+                                           mapping->action_name,
+                                           state);
+    }
 }
 
 static void
@@ -550,10 +593,17 @@ dzl_properties_group_finalize (GObject *object)
   g_autoptr(GObject) weak_obj = NULL;
 
   weak_obj = g_weak_ref_get (&self->object_ref);
+
   if (weak_obj != NULL)
-    g_object_weak_unref (weak_obj,
-                         dzl_properties_group_weak_notify,
-                         self);
+    {
+      /*
+       * No need to disconnect signal handler as we are in finalize and
+       * g_signal_connect_object() tracks this for us.
+       */
+      g_object_weak_unref (weak_obj,
+                           dzl_properties_group_weak_notify,
+                           self);
+    }
 
   g_weak_ref_clear (&self->object_ref);
 
@@ -576,6 +626,10 @@ dzl_properties_group_get_property (GObject    *object,
       g_value_take_object (value, g_weak_ref_get (&self->object_ref));
       break;
 
+    case PROP_OBJECT_TYPE:
+      g_value_set_gtype (value, self->prerequisite);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -593,6 +647,12 @@ dzl_properties_group_set_property (GObject      *object,
     {
     case PROP_OBJECT:
       dzl_properties_group_set_object (self, g_value_get_object (value));
+      break;
+
+    case PROP_OBJECT_TYPE:
+      if (g_value_get_gtype (value) != G_TYPE_INVALID &&
+          g_value_get_gtype (value) != G_TYPE_OBJECT)
+        self->prerequisite = g_value_get_gtype (value);
       break;
 
     default:
@@ -614,7 +674,14 @@ dzl_properties_group_class_init (DzlPropertiesGroupClass *klass)
                          "Object",
                          "The source object for the properties",
                          G_TYPE_OBJECT,
-                         (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_OBJECT_TYPE] =
+    g_param_spec_gtype ("object-type",
+                        "Object Type",
+                        "A type the object must conform to.",
+                        G_TYPE_OBJECT,
+                        (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -648,8 +715,11 @@ dzl_properties_group_init (DzlPropertiesGroup *self)
 DzlPropertiesGroup *
 dzl_properties_group_new (GObject *object)
 {
+  g_return_val_if_fail (G_IS_OBJECT (object), NULL);
+
   return g_object_new (DZL_TYPE_PROPERTIES_GROUP,
                        "object", object,
+                       "object-type", G_OBJECT_TYPE (object),
                        NULL);
 }
 
@@ -673,8 +743,7 @@ dzl_properties_group_add_property_full (DzlPropertiesGroup *self,
                                         const gchar        *property_name,
                                         DzlPropertiesFlags  flags)
 {
-  g_autoptr(GObject) object = NULL;
-  GObjectClass *object_class;
+  GObjectClass *object_class = NULL;
   GParamSpec *pspec;
   Mapping mapping = { 0 };
 
@@ -682,22 +751,27 @@ dzl_properties_group_add_property_full (DzlPropertiesGroup *self,
   g_return_if_fail (name != NULL);
   g_return_if_fail (property_name != NULL);
 
-  object = g_weak_ref_get (&self->object_ref);
-
-  if (object == NULL)
+  if (self->prerequisite == G_TYPE_INVALID)
     {
-      g_warning ("Cannot add property, object was already disposed.");
+      g_warning ("Cannot add properties before object has been set.");
       return;
     }
 
-  object_class = G_OBJECT_GET_CLASS (object);
+  object_class = g_type_class_ref (self->prerequisite);
+
+  if (object_class == NULL || !G_IS_OBJECT_CLASS (object_class))
+    {
+      g_warning ("Implausable result for prerequisite, not a GObjectClass");
+      goto failure;
+    }
+
   pspec = g_object_class_find_property (object_class, property_name);
 
   if (pspec == NULL)
     {
       g_warning ("No such property \"%s\" on type %s",
-                 property_name, G_OBJECT_TYPE_NAME (object));
-      return;
+                 property_name, G_OBJECT_CLASS_NAME (object_class));
+      goto failure;
     }
 
   mapping.action_name = g_intern_string (name);
@@ -709,11 +783,14 @@ dzl_properties_group_add_property_full (DzlPropertiesGroup *self,
 
   /* we already warned, ignore this */
   if (mapping.state_type == NULL)
-    return;
+    goto failure;
 
   g_array_append_val (self->mappings, mapping);
 
   g_action_group_action_added (G_ACTION_GROUP (self), mapping.action_name);
+
+failure:
+  g_clear_pointer (&object_class, g_type_class_unref);
 }
 
 /**
@@ -784,22 +861,26 @@ dzl_properties_group_remove (DzlPropertiesGroup *self,
 void
 dzl_properties_group_add_all_properties (DzlPropertiesGroup *self)
 {
-  g_autoptr(GObject) object = NULL;
   g_autofree GParamSpec **pspec = NULL;
-  GObjectClass *object_class;
+  GObjectClass *object_class = NULL;
   guint n_pspec = 0;
 
   g_return_if_fail (DZL_IS_PROPERTIES_GROUP (self));
 
-  object = g_weak_ref_get (&self->object_ref);
-
-  if (object == NULL)
+  if (self->prerequisite == G_TYPE_INVALID)
     {
-      g_warning ("Cannot add properties, object has already been disposed");
+      g_warning ("Cannot add properties, no object has been set");
       return;
     }
 
-  object_class = G_OBJECT_GET_CLASS (object);
+  object_class = g_type_class_ref (self->prerequisite);
+
+  if (object_class == NULL || !G_IS_OBJECT_CLASS (object_class))
+    {
+      g_warning ("Implausable result, not a GObjectClass");
+      goto failure;
+    }
+
   pspec = g_object_class_list_properties (object_class, &n_pspec);
 
   for (guint i = 0; i < n_pspec; i++)
@@ -818,4 +899,28 @@ dzl_properties_group_add_all_properties (DzlPropertiesGroup *self)
           break;
         }
     }
+
+failure:
+  g_clear_pointer (&object_class, g_type_class_unref);
+}
+
+/**
+ * dzl_properties_group_new_for_type:
+ * @object_type: A #GObjectClass based type
+ *
+ * This creates a new #DzlPropertiesGroup for which the initial object is
+ * %NULL.
+ *
+ * Set @object_type to a type of a class which is a #GObject-based type.
+ *
+ * Returns: (transfer none): A #DzlPropertiesGroup.
+ */
+DzlPropertiesGroup *
+dzl_properties_group_new_for_type (GType object_type)
+{
+  g_return_val_if_fail (g_type_is_a (object_type, G_TYPE_OBJECT), NULL);
+
+  return g_object_new (DZL_TYPE_PROPERTIES_GROUP,
+                       "object-type", object_type,
+                       NULL);
 }

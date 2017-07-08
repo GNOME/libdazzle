@@ -33,6 +33,7 @@ typedef enum
 } DzlPropertiesFlags;
 
 DzlPropertiesGroup *dzl_properties_group_new                (GObject            *object);
+DzlPropertiesGroup *dzl_properties_group_new_for_type       (GType               object_type);
 void                dzl_properties_group_add_property       (DzlPropertiesGroup *self,
                                                              const gchar        *name,
                                                              const gchar        *property_name);
