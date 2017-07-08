@@ -594,3 +594,57 @@ dzl_gtk_list_store_insert_sorted (GtkListStore     *store,
   else
     gtk_list_store_insert_after (store, iter, &middle);
 }
+
+static GtkWidget *
+get_parent_or_relative (GtkWidget *widget)
+{
+  GtkWidget *parent = NULL;
+
+  g_assert (GTK_IS_WIDGET (widget));
+
+  if (GTK_IS_POPOVER (widget))
+    parent = gtk_popover_get_relative_to (GTK_POPOVER (widget));
+  else if (GTK_IS_WINDOW (widget))
+    parent = (GtkWidget *)gtk_window_get_transient_for (GTK_WINDOW (widget));
+  else if (GTK_IS_MENU (widget))
+    parent = gtk_menu_get_attach_widget (GTK_MENU (widget));
+
+  if (parent == NULL)
+    parent = gtk_widget_get_parent (widget);
+
+  return parent;
+}
+
+/**
+ * dzl_gtk_widget_is_ancestor_or_relative:
+ * @widget: a #GtkWidget
+ * @ancestor: a #GtkWidget that might be an ancestor
+ *
+ * This function is like gtk_widget_is_ancestor() except that it checks
+ * various relative widgets that are not in the direct hierarchy of
+ * widgets. That includes #GtkMenu:attach-widget,
+ * #GtkPopover:relative-to, and #GtkWindow:transient-for.
+ *
+ * Returns: %TRUE if @ancestor is an ancestor or relative for @widget.
+ *
+ * Since: 3.26
+ */
+gboolean
+dzl_gtk_widget_is_ancestor_or_relative (GtkWidget *widget,
+                                        GtkWidget *ancestor)
+{
+  g_return_val_if_fail (!widget || GTK_IS_WIDGET (widget), FALSE);
+  g_return_val_if_fail (!ancestor || GTK_IS_WIDGET (ancestor), FALSE);
+
+  if (widget == NULL || ancestor == NULL)
+    return FALSE;
+
+  do
+    {
+      if (widget == ancestor)
+        return TRUE;
+    }
+  while (NULL != (widget = get_parent_or_relative (widget)));
+
+  return FALSE;
+}
