@@ -290,6 +290,7 @@
   <part id="dazzle-actions">
     <title>Action Integration</title>
     <xi:include href="xml/dzl-child-property-action.xml"/>
+    <xi:include href="xml/dzl-properties-group.xml"/>
     <xi:include href="xml/dzl-widget-action-group.xml"/>
     <xi:include href="xml/dzl-settings-flag-action.xml"/>
   </part>
