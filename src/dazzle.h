@@ -40,6 +40,7 @@ G_BEGIN_DECLS
 #include "animation/dzl-animation.h"
 #include "animation/dzl-box-theatric.h"
 #include "app/dzl-application.h"
+#include "app/dzl-application-window.h"
 #include "bindings/dzl-binding-group.h"
 #include "bindings/dzl-signal-group.h"
 #include "cache/dzl-task-cache.h"

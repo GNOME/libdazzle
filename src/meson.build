@@ -51,6 +51,7 @@ libdazzle_public_headers = [
   'animation/dzl-box-theatric.h',
 
   'app/dzl-application.h',
+  'app/dzl-application-window.h',
 
   'bindings/dzl-binding-group.h',
   'bindings/dzl-signal-group.h',
@@ -197,6 +198,7 @@ libdazzle_public_sources = [
   'animation/dzl-box-theatric.c',
 
   'app/dzl-application.c',
+  'app/dzl-application-window.c',
 
   'bindings/dzl-binding-group.c',
   'bindings/dzl-signal-group.c',
