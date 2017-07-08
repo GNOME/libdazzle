@@ -108,7 +108,7 @@ get_action_state (GObject       *object,
   switch (mapping->property_type)
     {
     case G_TYPE_INT:
-      ret = g_variant_new_boolean (g_value_get_int (&value));
+      ret = g_variant_new_int32 (g_value_get_int (&value));
       break;
 
     case G_TYPE_UINT:
