@@ -1,13 +1,12 @@
 #include "config.h"
 
-#include <dazzle.h>
 #include <glib/gi18n.h>
 
 #include "example-window.h"
 
 struct _ExampleWindow
 {
-  GtkApplicationWindow parent_instance;
+  DzlApplicationWindow parent_instance;
   DzlDockBin *dockbin;
   GtkHeaderBar *header_bar;
   GtkNotebook *notebook;
@@ -15,11 +14,12 @@ struct _ExampleWindow
   GtkStack *stack;
 };
 
-G_DEFINE_TYPE (ExampleWindow, example_window, GTK_TYPE_APPLICATION_WINDOW)
+G_DEFINE_TYPE (ExampleWindow, example_window, DZL_TYPE_APPLICATION_WINDOW)
 
 static const DzlShortcutEntry shortcuts[] = {
   { "com.example.window.NewDoc", NULL, N_("Editing"), N_("Documents"), N_("New Document"), N_("Create a new document") },
   { "com.example.window.CloseDoc", NULL, N_("Editing"), N_("Documents"), N_("Close Document"), N_("Close the current document") },
+  { "com.example.window.Fullscreen", "F11", N_("Editing"), N_("General"), N_("Fullscreen"), N_("Toggle window fullscreen") },
 };
 
 ExampleDocumentView *
@@ -177,6 +177,7 @@ example_window_init (ExampleWindow *self)
 
   dzl_shortcut_controller_add_command_action (controller, "com.example.window.NewDoc", NULL, "win.new-document");
   dzl_shortcut_controller_add_command_action (controller, "com.example.window.CloseDoc", NULL, "win.close-document");
+  dzl_shortcut_controller_add_command_action (controller, "com.example.window.Fullscreen", NULL, "win.fullscreen");
 
   g_signal_connect_swapped (self,
                             "key-press-event",
