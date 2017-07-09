@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <object class="GtkPopover" id="popover">
+    <style>
+      <class name="dzlmenubutton"/>
+    </style>
     <child>
       <object class="DzlBox" id="popover_box">
         <property name="orientation">vertical</property>
