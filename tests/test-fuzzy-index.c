@@ -132,7 +132,6 @@ test_index_basic_query_cb (GObject      *object,
                            gpointer      user_data)
 {
   DzlFuzzyIndex *index = (DzlFuzzyIndex *)object;
-  g_autoptr(GFile) file = user_data;
   g_autoptr(GListModel) matches = NULL;
   GError *error = NULL;
   guint n_items;
