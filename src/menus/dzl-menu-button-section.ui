@@ -11,7 +11,7 @@
       </object>
     </child>
     <child>
-      <object class="GtkBox" id="items_box">
+      <object class="DzlBox" id="items_box">
         <property name="orientation">vertical</property>
         <property name="visible">true</property>
       </object>

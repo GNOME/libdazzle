@@ -24,6 +24,7 @@
 #include "menus/dzl-menu-button-section.h"
 #include "menus/dzl-menu-button-item.h"
 #include "util/dzl-gtk.h"
+#include "widgets/dzl-box.h"
 
 typedef struct
 {
@@ -34,7 +35,7 @@ typedef struct
   GtkPopover     *popover;
   GtkImage       *image;
   GtkImage       *pan_down_image;
-  GtkBox         *popover_box;
+  DzlBox         *popover_box;
 
   guint           show_accels : 1;
   guint           show_icons : 1;
@@ -91,36 +92,6 @@ update_image_and_accels (DzlMenuButton *self)
     }
 }
 
-static GtkWidget *
-get_nth_child (DzlMenuButton *self,
-               guint          nth)
-{
-  DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
-  GList *children = gtk_container_get_children (GTK_CONTAINER (priv->popover_box));
-  GtkWidget *ret = g_list_nth_data (children, nth);
-  g_list_free (children);
-  return ret;
-}
-
-static void
-update_positions (DzlMenuButton *self)
-{
-  DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
-  GList *children = gtk_container_get_children (GTK_CONTAINER (priv->popover_box));
-  guint i = 0;
-
-  for (const GList *iter = children; iter; iter = iter->next)
-    {
-      GtkWidget *widget = iter->data;
-
-      gtk_container_child_set (GTK_CONTAINER (priv->popover_box), widget,
-                               "position", i++,
-                               NULL);
-    }
-
-  g_list_free (children);
-}
-
 static void
 dzl_menu_button_add_linked_model (DzlMenuButton *self,
                                   guint          position,
@@ -138,9 +109,7 @@ dzl_menu_button_add_linked_model (DzlMenuButton *self,
                           "model", model,
                           "visible", TRUE,
                           NULL);
-  gtk_container_add_with_properties (GTK_CONTAINER (priv->popover_box), GTK_WIDGET (section),
-                                     "position", position,
-                                     NULL);
+  dzl_box_insert (priv->popover_box, GTK_WIDGET (section), position);
 }
 
 static void
@@ -150,16 +119,16 @@ dzl_menu_button_items_changed (DzlMenuButton *self,
                                guint          added,
                                GMenuModel    *menu)
 {
+  DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
+
   g_assert (DZL_IS_MENU_BUTTON (self));
   g_assert (G_IS_MENU_MODEL (menu));
 
   for (guint i = 0; i < removed; i++)
     {
-      GtkWidget *widget = get_nth_child (self, i);
-      gtk_widget_destroy (widget);
+      GtkWidget *child = dzl_box_get_nth_child (priv->popover_box, i);
+      gtk_widget_destroy (child);
     }
-
-  update_positions (self);
 
   for (guint i = position; i < position + added; i++)
     {

@@ -2,7 +2,7 @@
 <interface>
   <object class="GtkPopover" id="popover">
     <child>
-      <object class="GtkBox" id="popover_box">
+      <object class="DzlBox" id="popover_box">
         <property name="orientation">vertical</property>
         <property name="visible">true</property>
       </object>

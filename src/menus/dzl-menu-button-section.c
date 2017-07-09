@@ -21,6 +21,7 @@
 #include "bindings/dzl-signal-group.h"
 #include "menus/dzl-menu-button-section.h"
 #include "menus/dzl-menu-button-item.h"
+#include "widgets/dzl-box.h"
 
 struct _DzlMenuButtonSection
 {
@@ -31,7 +32,7 @@ struct _DzlMenuButtonSection
 
   /* Template references */
   GtkLabel       *label;
-  GtkBox         *items_box;
+  DzlBox         *items_box;
 };
 
 enum {
@@ -45,34 +46,6 @@ G_DEFINE_TYPE (DzlMenuButtonSection, dzl_menu_button_section, GTK_TYPE_BOX)
 
 static GParamSpec *properties [N_PROPS];
 
-static GtkWidget *
-get_nth_child (DzlMenuButtonSection *self,
-               guint                 nth)
-{
-  GList *children = gtk_container_get_children (GTK_CONTAINER (self->items_box));
-  GtkWidget *ret = g_list_nth_data (children, nth);
-  g_list_free (children);
-  return ret;
-}
-
-static void
-update_positions (DzlMenuButtonSection *self)
-{
-  GList *children = gtk_container_get_children (GTK_CONTAINER (self->items_box));
-  guint i = 0;
-
-  for (const GList *iter = children; iter; iter = iter->next)
-    {
-      GtkWidget *widget = iter->data;
-
-      gtk_container_child_set (GTK_CONTAINER (self->items_box), widget,
-                               "position", i++,
-                               NULL);
-    }
-
-  g_list_free (children);
-}
-
 static void
 dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
                                        guint                 position,
@@ -85,11 +58,9 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
 
   for (guint i = 0; i < removed; i++)
     {
-      GtkWidget *widget = get_nth_child (self, i);
-      gtk_widget_destroy (widget);
+      GtkWidget *child = dzl_box_get_nth_child (self->items_box, i);
+      gtk_widget_destroy (child);
     }
-
-  update_positions (self);
 
   for (guint i = position; i < position + added; i++)
     {
@@ -113,9 +84,7 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
                            "accel", accel,
                            "visible", TRUE,
                            NULL);
-      gtk_container_add_with_properties (GTK_CONTAINER (self->items_box), GTK_WIDGET (item),
-                                         "position", i,
-                                         NULL);
+      dzl_box_insert (self->items_box, GTK_WIDGET (item), i);
     }
 }
 
