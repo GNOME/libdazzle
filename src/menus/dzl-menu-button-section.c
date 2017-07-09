@@ -65,6 +65,7 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
   for (guint i = position; i < position + added; i++)
     {
       DzlMenuButtonItem *item;
+      g_autoptr(GVariant) target = NULL;
       g_autofree gchar *accel = NULL;
       g_autofree gchar *action = NULL;
       g_autofree gchar *label = NULL;
@@ -74,9 +75,11 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
       g_menu_model_get_item_attribute (menu, i, "verb-icon-name", "s", &verb_icon_name);
       g_menu_model_get_item_attribute (menu, i, "accel", "s", &accel);
       g_menu_model_get_item_attribute (menu, i, "action", "s", &action);
+      target = g_menu_model_get_item_attribute_value (menu, i, "target", NULL);
 
       item = g_object_new (DZL_TYPE_MENU_BUTTON_ITEM,
                            "action-name", action,
+                           "action-target", target,
                            "show-image", TRUE,
                            "show-accel", TRUE,
                            "icon-name", verb_icon_name,
