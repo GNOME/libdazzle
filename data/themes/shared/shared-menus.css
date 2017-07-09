@@ -1,0 +1,25 @@
+dzlmenubuttonsection {
+  margin: 18px 15px 15px 12px;
+}
+dzlmenubuttonsection > label.title {
+  font-weight: bold;
+  font-size: 0.8333em;
+  opacity: 0.5;
+  margin-bottom: 6px;
+}
+dzlmenubuttonsection box.vertical checkbutton.dzlmenubuttonitem,
+dzlmenubuttonsection box.vertical button.dzlmenubuttonitem {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 3px;
+}
+dzlmenubuttonsection box.vertical checkbutton.dzlmenubuttonitem:hover,
+dzlmenubuttonsection box.vertical button.dzlmenubuttonitem:hover {
+  background-color: alpha(@theme_fg_color, 0.05);
+}
+dzlmenubuttonsection box.vertical checkbutton.dzlmenubuttonitem > box > image:first-child,
+dzlmenubuttonsection box.vertical button.dzlmenubuttonitem > box > image:first-child {
+  margin: 3px 6px 3px 0px;
+  color: @theme_fg_color;
+}

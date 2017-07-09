@@ -4,6 +4,8 @@
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-counters-window.ui">widgets/dzl-counters-window.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-simple-popover.ui">widgets/dzl-simple-popover.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-empty-state.ui">widgets/dzl-empty-state.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-menu-button.ui">menus/dzl-menu-button.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks" alias="dzl-menu-button-section.ui">menus/dzl-menu-button-section.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-pill-box.ui">widgets/dzl-pill-box.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-file-chooser-button.ui">prefs/dzl-preferences-file-chooser-button.ui</file>
     <file compressed="true" preprocess="xml-stripblanks" alias="dzl-preferences-entry.ui">prefs/dzl-preferences-entry.ui</file>
@@ -51,6 +53,7 @@
     <!-- Default and Fallback Theme -->
     <file compressed="true" alias="shared.css">../data/themes/shared.css</file>
     <file compressed="true" alias="shared/shared-graphs.css">../data/themes/shared/shared-graphs.css</file>
+    <file compressed="true" alias="shared/shared-menus.css">../data/themes/shared/shared-menus.css</file>
     <file compressed="true" alias="shared/shared-panels.css">../data/themes/shared/shared-panels.css</file>
     <file compressed="true" alias="shared/shared-pathbar.css">../data/themes/shared/shared-pathbar.css</file>
     <file compressed="true" alias="shared/shared-pillbox.css">../data/themes/shared/shared-pillbox.css</file>

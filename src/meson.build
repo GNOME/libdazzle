@@ -70,6 +70,9 @@ libdazzle_public_headers = [
   'graphing/dzl-graph-view.h',
 
   'menus/dzl-joined-menu.h',
+  'menus/dzl-menu-button.h',
+  'menus/dzl-menu-button-item.h',
+  'menus/dzl-menu-button-section.h',
   'menus/dzl-menu-manager.h',
 
   'panel/dzl-dock-bin-edge.h',
@@ -217,6 +220,9 @@ libdazzle_public_sources = [
   'graphing/dzl-graph-view.c',
 
   'menus/dzl-joined-menu.c',
+  'menus/dzl-menu-button.c',
+  'menus/dzl-menu-button-item.c',
+  'menus/dzl-menu-button-section.c',
   'menus/dzl-menu-manager.c',
 
   'panel/dzl-dock-bin-edge.c',

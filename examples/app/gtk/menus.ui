@@ -3,7 +3,10 @@
   <menu id="app-menu">
     <section id="app-menu-help-section">
       <attribute name="id">help-section</attribute>
+      <attribute name="label" translatable="yes">Help</attribute>
       <item>
+        <!-- Dazzle supports the special attribute "verb-icon-name" -->
+        <attribute name="verb-icon-name">preferences-desktop-keyboard-shortcuts-symbolic</attribute>
         <attribute name="label" translatable="yes">Keyboard _Shortcuts</attribute>
         <attribute name="action">app.shortcuts</attribute>
       </item>
@@ -21,6 +24,7 @@
     <section id="gear-menu-fullscreen">
       <item>
         <attribute name="label" translatable="yes">_Fullscreen</attribute>
+        <attribute name="verb-icon-name">view-fullscreen-symbolic</attribute>
         <attribute name="action">win.fullscreen</attribute>
       </item>
     </section>

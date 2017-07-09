@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkPopover" id="popover">
+    <child>
+      <object class="GtkBox" id="popover_box">
+        <property name="orientation">vertical</property>
+        <property name="visible">true</property>
+      </object>
+    </child>
+  </object>
+  <template class="DzlMenuButton" parent="GtkMenuButton">
+    <property name="popover">popover</property>
+    <child>
+      <object class="GtkBox">
+        <property name="halign">center</property>
+        <property name="orientation">horizontal</property>
+        <property name="spacing">6</property>
+        <property name="visible">true</property>
+        <style>
+          <class name="image-button"/>
+        </style>
+        <child>
+          <object class="GtkImage" id="image">
+            <property name="visible">true</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkImage" id="pan_down_image">
+            <property name="icon-name">pan-down-symbolic</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

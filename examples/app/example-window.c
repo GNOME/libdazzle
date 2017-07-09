@@ -12,7 +12,6 @@ struct _ExampleWindow
   GtkNotebook *notebook;
   DzlEmptyState *empty_state;
   GtkStack *stack;
-  GtkPopover *gear_popover;
 };
 
 G_DEFINE_TYPE (ExampleWindow, example_window, DZL_TYPE_APPLICATION_WINDOW)
@@ -153,7 +152,6 @@ example_window_class_init (ExampleWindowClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/example/ui/example-window.ui");
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, dockbin);
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, empty_state);
-  gtk_widget_class_bind_template_child (widget_class, ExampleWindow, gear_popover);
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, header_bar);
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, notebook);
   gtk_widget_class_bind_template_child (widget_class, ExampleWindow, stack);
@@ -165,8 +163,6 @@ example_window_init (ExampleWindow *self)
   DzlShortcutController *controller;
   g_autoptr(GPropertyAction) left = NULL;
   g_autoptr(GPropertyAction) right = NULL;
-  DzlApplication *app;
-  GMenu *menu;
 
   gtk_widget_init_template (GTK_WIDGET (self));
 
@@ -195,10 +191,6 @@ example_window_init (ExampleWindow *self)
 
   g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (left));
   g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (right));
-
-  app = DZL_APPLICATION (g_application_get_default ());
-  menu = dzl_application_get_menu_by_id (app, "gear-menu");
-  gtk_popover_bind_model (self->gear_popover, G_MENU_MODEL (menu), NULL);
 }
 
 GtkWidget *
