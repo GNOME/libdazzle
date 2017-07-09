@@ -13,6 +13,7 @@ dzlmenubuttonsection box.vertical button.dzlmenubuttonitem {
   background: none;
   box-shadow: none;
   padding: 3px;
+  outline-offset: -3px;
 }
 dzlmenubuttonsection box.vertical checkbutton.dzlmenubuttonitem:hover,
 dzlmenubuttonsection box.vertical button.dzlmenubuttonitem:hover {
