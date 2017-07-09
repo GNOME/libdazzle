@@ -22,6 +22,7 @@
 #include "menus/dzl-menu-button-section.h"
 #include "menus/dzl-menu-button-item.h"
 #include "widgets/dzl-box.h"
+#include "util/dzl-util-private.h"
 
 struct _DzlMenuButtonSection
 {
@@ -170,7 +171,8 @@ dzl_menu_button_section_set_property (GObject      *object,
 
     case PROP_LABEL:
       gtk_label_set_label (self->label, g_value_get_string (value));
-      gtk_widget_set_visible (GTK_WIDGET (self->label), !!g_value_get_string (value));
+      gtk_widget_set_visible (GTK_WIDGET (self->label),
+                              !dzl_str_empty0 (g_value_get_string (value)));
       break;
 
     default:

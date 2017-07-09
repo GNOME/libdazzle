@@ -20,7 +20,8 @@
 
 #include <string.h>
 
-#include "dzl-menu-manager.h"
+#include "menus/dzl-menu-manager.h"
+#include "util/dzl-util-private.h"
 
 struct _DzlMenuManager
 {
@@ -31,8 +32,6 @@ struct _DzlMenuManager
 };
 
 G_DEFINE_TYPE (DzlMenuManager, dzl_menu_manager, G_TYPE_OBJECT)
-
-#define str_equal0(a,b) (g_strcmp0(a,b) == 0)
 
 #define DZL_MENU_ATTRIBUTE_BEFORE   "before"
 #define DZL_MENU_ATTRIBUTE_AFTER    "after"
@@ -244,7 +243,7 @@ dzl_menu_manager_resolve_constraints (GMenu *menu)
           g_menu_model_get_item_attribute (model, j, "id", "s", &j_id);
           g_menu_model_get_item_attribute (model, j, "label", "s", &j_label);
 
-          if (str_equal0 (i_after, j_id) || str_equal0 (i_after, j_label))
+          if (dzl_str_equal0 (i_after, j_id) || dzl_str_equal0 (i_after, j_label))
             {
               /* You might think we need to place the item *AFTER*
                * our position "j". But since we remove the row where
@@ -284,7 +283,7 @@ dzl_menu_manager_resolve_constraints (GMenu *menu)
           g_menu_model_get_item_attribute (model, j, "id", "s", &j_id);
           g_menu_model_get_item_attribute (model, j, "label", "s", &j_label);
 
-          if (str_equal0 (i_before, j_id) || str_equal0 (i_before, j_label))
+          if (dzl_str_equal0 (i_before, j_id) || dzl_str_equal0 (i_before, j_label))
             {
               /*
                * This item needs to be placed before this item we just found.
