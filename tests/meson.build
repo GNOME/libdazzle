@@ -32,6 +32,13 @@ test_menu_manager = executable('test-menu-manager', 'test-menu-manager.c',
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_menu_manager2 = executable('test-menu-manager2', 'test-menu-manager2.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-menu-manager2', test_menu_manager2, env: test_env)
+
 test_state_machine = executable('test-state-machine', 'test-state-machine.c',
         c_args: test_cflags,
      link_args: test_link_args,

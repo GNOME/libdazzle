@@ -34,6 +34,9 @@ guint           dzl_menu_manager_add_filename   (DzlMenuManager  *self,
 guint           dzl_menu_manager_add_resource   (DzlMenuManager  *self,
                                                  const gchar     *resource,
                                                  GError         **error);
+guint           dzl_menu_manager_merge          (DzlMenuManager  *self,
+                                                 const gchar     *menu_id,
+                                                 GMenuModel      *model);
 void            dzl_menu_manager_remove         (DzlMenuManager  *self,
                                                  guint            merge_id);
 GMenu          *dzl_menu_manager_get_menu_by_id (DzlMenuManager  *self,

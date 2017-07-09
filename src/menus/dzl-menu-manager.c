@@ -32,6 +32,8 @@ struct _DzlMenuManager
 
 G_DEFINE_TYPE (DzlMenuManager, dzl_menu_manager, G_TYPE_OBJECT)
 
+#define str_equal0(a,b) (g_strcmp0(a,b) == 0)
+
 #define DZL_MENU_ATTRIBUTE_BEFORE   "before"
 #define DZL_MENU_ATTRIBUTE_AFTER    "after"
 #define DZL_MENU_ATTRIBUTE_MERGE_ID "dazzle-merge-id"
@@ -164,99 +166,137 @@ model_copy_attributes_to_item (GMenuModel *model,
   g_object_unref (iter);
 }
 
-static gint
-find_position_for_item (GMenuModel *model,
-                        GMenuItem  *item)
+static void
+model_copy_links_to_item (GMenuModel *model,
+                          guint       position,
+                          GMenuItem  *item)
 {
-  g_autofree gchar *label = NULL;
-  g_autofree gchar *id = NULL;
-  const gchar *after;
-  const gchar *before;
-  gint n_items;
-  gint before_pos = -1;
-  gint after_pos = -1;
+  g_autoptr(GMenuLinkIter) link_iter = NULL;
 
   g_assert (G_IS_MENU_MODEL (model));
   g_assert (G_IS_MENU_ITEM (item));
 
-  n_items = g_menu_model_get_n_items (model);
+  link_iter = g_menu_model_iterate_item_links (model, position);
 
-  if (!g_menu_item_get_attribute (item, DZL_MENU_ATTRIBUTE_AFTER, "&s", &after))
-    after = NULL;
-
-  if (!g_menu_item_get_attribute (item, DZL_MENU_ATTRIBUTE_BEFORE, "&s", &before))
-    before = NULL;
-
-  if (after != NULL)
+  while (g_menu_link_iter_next (link_iter))
     {
-      after_pos = find_with_attribute_string (model, G_MENU_ATTRIBUTE_LABEL, after);
+      g_autoptr(GMenuModel) link_model = NULL;
+      const gchar *link_name;
 
-      /* Adding an "id" is non-standard, but can be useful as an alternative to
-       * translated strings.
-       */
-      if (after_pos == -1)
-        after_pos = find_with_attribute_string (model, "id", after);
+      link_name = g_menu_link_iter_get_name (link_iter);
+      link_model = g_menu_link_iter_get_value (link_iter);
+
+      g_menu_item_set_link (item, link_name, link_model);
     }
+}
 
-  if (before != NULL)
-    {
-      before_pos = find_with_attribute_string (model, G_MENU_ATTRIBUTE_LABEL, before);
+static void
+menu_move_item_to (GMenu *menu,
+                   guint  position,
+                   guint  new_position)
+{
+  g_autoptr(GMenuItem) item = NULL;
 
-      if (before_pos == -1)
-        before_pos = find_with_attribute_string (model, "id", before);
-    }
+  g_assert (G_IS_MENU (menu));
+
+  item = g_menu_item_new (NULL, NULL);
+  model_copy_attributes_to_item (G_MENU_MODEL (menu), position, item);
+  model_copy_links_to_item (G_MENU_MODEL (menu), position, item);
+
+  g_menu_remove (menu, position);
+  g_menu_insert_item (menu, new_position, item);
+}
+
+static void
+dzl_menu_manager_resolve_constraints (GMenu *menu)
+{
+  GMenuModel *model = (GMenuModel *)menu;
+  gint n_items;
+
+  g_assert (G_IS_MENU (menu));
+
+  n_items = (gint)g_menu_model_get_n_items (G_MENU_MODEL (menu));
 
   /*
-   * Now that we've positioned ourselves within the range we care about,
-   * we need to see if any item within that range has reverse-preferences
-   * about their position related to us.
+   * We start iterating forwards. As we look at each row, we start
+   * again from the end working backwards to see if we need to be
+   * moved after that row.
+   *
+   * This way we know we see the furthest we might need to jump first.
    */
-
-  if (!g_menu_item_get_attribute (item, "id", "s", &id))
-    id = NULL;
-
-  if (!g_menu_item_get_attribute (item, G_MENU_ATTRIBUTE_LABEL, "s", &label))
-    label = NULL;
 
   for (gint i = 0; i < n_items; i++)
     {
-      g_autofree gchar *item_before = NULL;
-      g_autofree gchar *item_after = NULL;
+      g_autofree gchar *i_after = NULL;
 
-      if (g_menu_model_get_item_attribute (model, i, "before", "s", &item_before))
-        {
-          /* If this item requires it is before us, we need to ensure we
-           * come after this position.
-           */
-          if ((item_before && id && strcmp (item_before, id) == 0) ||
-              (item_before && label && strcmp (item_before, label) == 0))
-            {
-              if (after_pos == -1 || after_pos < i)
-                after_pos = i;
-            }
-        }
+      g_menu_model_get_item_attribute (model, i, "after", "s", &i_after);
+      if (i_after == NULL)
+        continue;
 
-      if (g_menu_model_get_item_attribute (model, i, "after", "s", &item_after))
+      /* Work our way backwards from the end back to
+       * our current position (but not overlapping).
+       */
+      for (gint j = n_items - 1; j > i; j--)
         {
-          /* If this item requires it is after us, we need to ensure we
-           * come before this position.
-           */
-          if ((item_after && id && strcmp (item_after, id) == 0) ||
-              (item_after && label && strcmp (item_after, label) == 0))
+          g_autofree gchar *j_id = NULL;
+          g_autofree gchar *j_label = NULL;
+
+          g_menu_model_get_item_attribute (model, j, "id", "s", &j_id);
+          g_menu_model_get_item_attribute (model, j, "label", "s", &j_label);
+
+          if (str_equal0 (i_after, j_id) || str_equal0 (i_after, j_label))
             {
-              if (before_pos == -1 || before_pos > i)
-                before_pos = i;
+              /* You might think we need to place the item *AFTER*
+               * our position "j". But since we remove the row where
+               * "i" currently is, we get the proper location.
+               */
+              menu_move_item_to (menu, i, j);
+              i--;
+              break;
             }
         }
     }
 
-  if (before_pos >= 0)
-    return MAX (0, before_pos - 1);
+  /*
+   * Now we need to apply the same thing but for the "before" links
+   * in our model. To do this, we also want to ensure we find the
+   * furthest jump first. So we start from the end and work our way
+   * towards the front and for each of those nodes, start from the
+   * front and work our way back.
+   */
 
-  if (after_pos >= 0)
-    return after_pos + 1;
+  for (gint i = n_items - 1; i >= 0; i--)
+    {
+      g_autofree gchar *i_before = NULL;
 
-  return -1;
+      g_menu_model_get_item_attribute (model, i, "before", "s", &i_before);
+      if (i_before == NULL)
+        continue;
+
+      /* Work our way from the front back towards our current position
+       * that would cause our position to jump.
+       */
+      for (gint j = 0; j < i; j++)
+        {
+          g_autofree gchar *j_id = NULL;
+          g_autofree gchar *j_label = NULL;
+
+          g_menu_model_get_item_attribute (model, j, "id", "s", &j_id);
+          g_menu_model_get_item_attribute (model, j, "label", "s", &j_label);
+
+          if (str_equal0 (i_before, j_id) || str_equal0 (i_before, j_label))
+            {
+              /*
+               * This item needs to be placed before this item we just found.
+               * Since that is the furthest we could jump, just stop
+               * afterwards.
+               */
+              menu_move_item_to (menu, i, j);
+              i++;
+              break;
+            }
+        }
+    }
 }
 
 static void
@@ -264,14 +304,20 @@ dzl_menu_manager_add_to_menu (DzlMenuManager *self,
                               GMenu          *menu,
                               GMenuItem      *item)
 {
-  gint position;
-
   g_assert (DZL_IS_MENU_MANAGER (self));
   g_assert (G_IS_MENU (menu));
   g_assert (G_IS_MENU_ITEM (item));
 
-  position = find_position_for_item (G_MENU_MODEL (menu), item);
-  g_menu_insert_item (menu, position, item);
+  /*
+   * The proplem here is one that could end up being an infinite
+   * loop if we tried to resolve all the position requirements
+   * until no more position changes were required. So instead we
+   * simplify the problem into an append, and two-passes as trying
+   * to fix up the positions.
+   */
+  g_menu_append_item (menu, item);
+  dzl_menu_manager_resolve_constraints (menu);
+  dzl_menu_manager_resolve_constraints (menu);
 }
 
 static void
@@ -375,9 +421,9 @@ dzl_menu_manager_merge_model (DzlMenuManager *self,
 }
 
 static void
-dzl_menu_manager_merge (DzlMenuManager *self,
-                        GtkBuilder     *builder,
-                        guint           merge_id)
+dzl_menu_manager_merge_builder (DzlMenuManager *self,
+                                GtkBuilder     *builder,
+                                guint           merge_id)
 {
   const GSList *iter;
   GSList *list;
@@ -485,8 +531,34 @@ dzl_menu_manager_add_filename (DzlMenuManager  *self,
     }
 
   merge_id = ++self->last_merge_id;
-  dzl_menu_manager_merge (self, builder, merge_id);
+  dzl_menu_manager_merge_builder (self, builder, merge_id);
   g_object_unref (builder);
+
+  return merge_id;
+}
+
+guint
+dzl_menu_manager_merge (DzlMenuManager *self,
+                        const gchar    *menu_id,
+                        GMenuModel     *menu_model)
+{
+  GMenu *menu;
+  guint merge_id;
+
+  g_return_val_if_fail (DZL_IS_MENU_MANAGER (self), 0);
+  g_return_val_if_fail (menu_id != NULL, 0);
+  g_return_val_if_fail (G_IS_MENU_MODEL (menu_model), 0);
+
+  merge_id = ++self->last_merge_id;
+
+  if (!(menu = g_hash_table_lookup (self->models, menu_id)))
+    {
+      GMenu *new_model = g_menu_new ();
+      g_hash_table_insert (self->models, g_strdup (menu_id), new_model);
+      menu = new_model;
+    }
+
+  dzl_menu_manager_merge_model (self, menu, menu_model, merge_id);
 
   return merge_id;
 }
@@ -575,7 +647,7 @@ dzl_menu_manager_add_resource (DzlMenuManager  *self,
     }
 
   merge_id = ++self->last_merge_id;
-  dzl_menu_manager_merge (self, builder, merge_id);
+  dzl_menu_manager_merge_builder (self, builder, merge_id);
   g_object_unref (builder);
 
   return merge_id;
