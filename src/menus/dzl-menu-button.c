@@ -171,7 +171,7 @@ dzl_menu_button_items_changed (DzlMenuButton *self,
       linked_model = g_menu_model_get_item_link (menu, i, G_MENU_LINK_SECTION);
 
       if (linked_model != NULL)
-        dzl_menu_button_add_linked_model (self, position, linked_model, label);
+        dzl_menu_button_add_linked_model (self, i, linked_model, label);
     }
 
   update_image_and_accels (self);
