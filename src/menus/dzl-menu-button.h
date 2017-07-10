@@ -30,6 +30,11 @@ G_DECLARE_DERIVABLE_TYPE (DzlMenuButton, dzl_menu_button, DZL, MENU_BUTTON, GtkM
 struct _DzlMenuButtonClass
 {
   GtkMenuButtonClass parent_class;
+
+  gpointer _reserved1;
+  gpointer _reserved2;
+  gpointer _reserved3;
+  gpointer _reserved4;
 };
 
 GtkWidget     *dzl_menu_button_new_with_model  (const gchar   *icon_name,
