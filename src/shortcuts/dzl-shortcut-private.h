@@ -21,6 +21,7 @@
 
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-closure-chain.h"
+#include "shortcuts/dzl-shortcut-simple-label.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "shortcuts/dzl-shortcut-theme.h"
 
@@ -103,6 +104,8 @@ gboolean               _dzl_gtk_widget_activate_action          (GtkWidget      
                                                                  GVariant                   *parameter);
 GNode                 *_dzl_shortcut_manager_get_root           (DzlShortcutManager         *self);
 DzlShortcutTheme      *_dzl_shortcut_manager_get_internal_theme (DzlShortcutManager         *self);
+void                   _dzl_shortcut_simple_label_set_size_group(DzlShortcutSimpleLabel     *self,
+                                                                 GtkSizeGroup               *size_group);
 void                   _dzl_shortcut_theme_attach               (DzlShortcutTheme           *self);
 void                   _dzl_shortcut_theme_detach               (DzlShortcutTheme           *self);
 GtkTreeModel          *_dzl_shortcut_theme_create_model         (DzlShortcutTheme           *self);

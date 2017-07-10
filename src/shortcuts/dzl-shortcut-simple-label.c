@@ -155,15 +155,18 @@ dzl_shortcut_simple_label_init (DzlShortcutSimpleLabel *self)
                               "visible", TRUE,
                               "xalign", 0.0f,
                               NULL);
-  dzl_gtk_widget_add_style_class (GTK_WIDGET (self->title), "dim-label");
+  dzl_gtk_widget_add_style_class (GTK_WIDGET (self->title), "title");
   gtk_container_add_with_properties (GTK_CONTAINER (self), GTK_WIDGET (self->title),
                                      "fill", TRUE,
                                      "pack-type", GTK_PACK_START,
                                      NULL);
 
   self->accel_label = g_object_new (GTK_TYPE_LABEL,
+                                    "hexpand", TRUE,
+                                    "halign", GTK_ALIGN_START,
+                                    "margin-start", 12,
                                     "visible", TRUE,
-                                    "xalign", 1.0f,
+                                    "xalign", 0.0f,
                                     NULL);
   dzl_gtk_widget_add_style_class (GTK_WIDGET (self->accel_label), "dim-label");
   gtk_container_add_with_properties (GTK_CONTAINER (self), GTK_WIDGET (self->accel_label),
@@ -275,4 +278,14 @@ dzl_shortcut_simple_label_set_title (DzlShortcutSimpleLabel *self,
 
   gtk_label_set_label (self->title, title);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_TITLE]);
+}
+
+void
+_dzl_shortcut_simple_label_set_size_group(DzlShortcutSimpleLabel *self,
+                                          GtkSizeGroup           *size_group)
+{
+  g_return_if_fail (DZL_IS_SHORTCUT_SIMPLE_LABEL (self));
+
+  if (size_group != NULL)
+    gtk_size_group_add_widget (size_group, GTK_WIDGET (self->title));
 }
