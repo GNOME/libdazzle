@@ -40,6 +40,7 @@ typedef struct
 
   guint           show_accels : 1;
   guint           show_icons : 1;
+  guint           transitions_enabled : 1;
 } DzlMenuButtonPrivate;
 
 enum {
@@ -50,6 +51,7 @@ enum {
   PROP_SHOW_ACCELS,
   PROP_SHOW_ARROW,
   PROP_SHOW_ICONS,
+  PROP_TRANSITIONS_ENABLED,
   N_PROPS
 };
 
@@ -221,6 +223,7 @@ dzl_menu_button_get_property (GObject    *object,
                               GParamSpec *pspec)
 {
   DzlMenuButton *self = DZL_MENU_BUTTON (object);
+  DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
 
   switch (prop_id)
     {
@@ -238,6 +241,10 @@ dzl_menu_button_get_property (GObject    *object,
 
     case PROP_SHOW_ICONS:
       g_value_set_boolean (value, dzl_menu_button_get_show_icons (self));
+      break;
+
+    case PROP_TRANSITIONS_ENABLED:
+      g_value_set_boolean (value, priv->transitions_enabled);
       break;
 
     default:
@@ -280,6 +287,10 @@ dzl_menu_button_set_property (GObject      *object,
       dzl_menu_button_set_show_icons (self, g_value_get_boolean (value));
       break;
 
+    case PROP_TRANSITIONS_ENABLED:
+      priv->transitions_enabled = g_value_get_boolean (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -295,6 +306,13 @@ dzl_menu_button_class_init (DzlMenuButtonClass *klass)
   object_class->set_property = dzl_menu_button_set_property;
 
   widget_class->destroy = dzl_menu_button_destroy;
+
+  properties [PROP_TRANSITIONS_ENABLED] =
+    g_param_spec_boolean ("transitions-enabled",
+                          "Transitions Enabled",
+                          "If transitions should be allowed",
+                          TRUE,
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   /**
    * DzlMenuButton:menu-id:
@@ -361,6 +379,8 @@ static void
 dzl_menu_button_init (DzlMenuButton *self)
 {
   DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
+
+  priv->transitions_enabled = TRUE;
 
   gtk_widget_init_template (GTK_WIDGET (self));
 

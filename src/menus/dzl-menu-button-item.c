@@ -18,6 +18,7 @@
 
 #define G_LOG_DOMAIN "dzl-menu-button-item"
 
+#include "menus/dzl-menu-button.h"
 #include "menus/dzl-menu-button-item.h"
 #include "shortcuts/dzl-shortcut-label.h"
 #include "shortcuts/dzl-shortcut-simple-label.h"
@@ -56,13 +57,22 @@ static GParamSpec *properties [N_PROPS];
 static void
 dzl_menu_button_item_clicked (DzlMenuButtonItem *self)
 {
+  gboolean transitions_enabled = FALSE;
+  GtkWidget *button;
   GtkWidget *popover;
 
   g_assert (DZL_IS_MENU_BUTTON_ITEM (self));
 
+  button = dzl_gtk_widget_get_relative (GTK_WIDGET (self), DZL_TYPE_MENU_BUTTON);
+  if (button != NULL)
+    g_object_get (button, "transitions-enabled", &transitions_enabled, NULL);
+
   popover = gtk_widget_get_ancestor (GTK_WIDGET (self), GTK_TYPE_POPOVER);
-  if (popover != NULL)
+
+  if (transitions_enabled)
     gtk_popover_popdown (GTK_POPOVER (popover));
+  else
+    gtk_widget_hide (popover);
 }
 
 static gboolean
