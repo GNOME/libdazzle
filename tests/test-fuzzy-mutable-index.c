@@ -51,12 +51,18 @@ main (gint   argc,
 
      for (i = 1; i < argc; i++)
        {
+         const gchar *keyword;
          GArray *matches;
 
          g_printerr ("Searching for \"%s\"\n", argv [i]);
 
+         if (g_utf8_validate (argv[i], -1, NULL))
+           keyword = argv[i];
+         else
+           continue;
+
          begin = g_get_monotonic_time();
-         matches = dzl_fuzzy_mutable_index_match (fuzzy, argv[i], 0);
+         matches = dzl_fuzzy_mutable_index_match (fuzzy, keyword, 0);
          end = g_get_monotonic_time();
 
          g_array_sort (matches, compare_match);
