@@ -116,7 +116,7 @@ dzl_menu_button_item_notify_action_name (DzlMenuButtonItem *self,
   if (action_name)
     parts = g_strsplit (action_name, ".", 2);
 
-  if (parts[0] && parts[1])
+  if (parts && parts[0] && parts[1])
     draw = action_is_stateful (GTK_WIDGET (self), parts[0], parts[1]);
 
   g_object_set (self, "draw-indicator", draw, NULL);
