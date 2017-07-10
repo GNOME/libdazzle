@@ -75,12 +75,7 @@ dzl_bolding_label_get_preferred_width (GtkWidget *widget,
 
       text = gtk_label_get_text (GTK_LABEL (widget));
       layout = gtk_widget_create_pango_layout (widget, text);
-
-      if (font_desc != NULL)
-        font_desc_copy = pango_font_description_copy (font_desc);
-      else
-        font_desc_copy = pango_font_description_new ();
-
+      font_desc_copy = pango_font_description_copy (font_desc);
       ellipsize = gtk_label_get_ellipsize (GTK_LABEL (widget));
 
       pango_font_description_set_weight (font_desc_copy, PANGO_WEIGHT_BOLD);
