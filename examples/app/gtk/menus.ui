@@ -9,6 +9,7 @@
         <attribute name="verb-icon-name">preferences-desktop-keyboard-shortcuts-symbolic</attribute>
         <attribute name="label" translatable="yes">Keyboard _Shortcuts</attribute>
         <attribute name="action">app.shortcuts</attribute>
+        <attribute name="accel">&lt;control&gt;&lt;shift&gt;question</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">_About</attribute>
