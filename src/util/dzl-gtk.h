@@ -56,6 +56,8 @@ void          dzl_gtk_list_store_insert_sorted       (GtkListStore            *s
                                                       guint                    compare_column,
                                                       GCompareDataFunc         compare_func,
                                                       gpointer                 compare_data);
+GtkWidget    *dzl_gtk_widget_get_relative            (GtkWidget               *widget,
+                                                      GType                    relative_type);
 gboolean      dzl_gtk_widget_is_ancestor_or_relative (GtkWidget               *widget,
                                                       GtkWidget               *ancestor);
 

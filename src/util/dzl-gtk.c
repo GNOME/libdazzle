@@ -648,3 +648,33 @@ dzl_gtk_widget_is_ancestor_or_relative (GtkWidget *widget,
 
   return FALSE;
 }
+
+/**
+ * dzl_gtk_widget_get_relative:
+ * @widget: a #GtkWidget
+ * @relative_type: the type of widget to locate
+ *
+ * This is similar to gtk_widget_get_ancestor(), but looks for relatives
+ * via properties such as #GtkPopover:relative-to and others.
+ *
+ * Returns: (transfer none) (nullable): A #GtkWidget or %NULL.
+ */
+GtkWidget *
+dzl_gtk_widget_get_relative (GtkWidget *widget,
+                             GType      relative_type)
+{
+  g_return_val_if_fail (!widget || GTK_IS_WIDGET (widget), NULL);
+  g_return_val_if_fail (g_type_is_a (relative_type, GTK_TYPE_WIDGET), NULL);
+
+  if (widget == NULL)
+    return FALSE;
+
+  do
+    {
+      if (g_type_is_a (G_OBJECT_TYPE (widget), relative_type))
+        return widget;
+    }
+  while (NULL != (widget = get_parent_or_relative (widget)));
+
+  return NULL;
+}
