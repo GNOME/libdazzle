@@ -45,9 +45,12 @@ query_cb (GObject      *object,
       g_autofree gchar *subtitle = NULL;
       g_autofree gchar *escape_keyword = NULL;
 
-      g_variant_dict_lookup (dict, "id", "&s", &id);
-      g_variant_dict_lookup (dict, "title", "&s", &title);
-      g_variant_dict_lookup (dict, "icon-name", "&s", &icon_name);
+      if (!g_variant_dict_lookup (dict, "id", "&s", &id))
+        id = NULL;
+      if (!g_variant_dict_lookup (dict, "title", "&s", &title))
+        title = NULL;
+      if (!g_variant_dict_lookup (dict, "icon-name", "&s", &icon_name))
+        icon_name = NULL;
 
       if (g_hash_table_contains (hash, id))
         continue;
