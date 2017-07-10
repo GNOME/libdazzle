@@ -1,6 +1,9 @@
 popover.dzlmenubutton > box {
   margin: 18px 15px 15px 12px;
 }
+dzlmenubuttonsection:not(:first-child) {
+  margin-top: 12px;
+}
 dzlmenubuttonsection > label.title {
   font-weight: bold;
   font-size: 0.8333em;
@@ -12,7 +15,7 @@ dzlmenubuttonsection box.vertical button.dzlmenubuttonitem {
   border: none;
   background: none;
   box-shadow: none;
-  padding: 3px 12px;
+  padding: 4px 12px;
   outline-offset: -3px;
 }
 dzlmenubuttonsection box.vertical checkbutton.dzlmenubuttonitem:hover,
