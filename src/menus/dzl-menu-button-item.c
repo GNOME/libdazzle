@@ -150,7 +150,7 @@ dzl_menu_button_item_set_property (GObject      *object,
       break;
 
     case PROP_SHOW_ACCEL:
-      gtk_widget_set_visible (GTK_WIDGET (self->accel), g_value_get_boolean (value));
+      g_object_set_property (G_OBJECT (self->accel), "show-accel", value);
       break;
 
     case PROP_SHOW_IMAGE:
@@ -267,6 +267,7 @@ dzl_menu_button_item_init (DzlMenuButtonItem *self)
 
   self->accel = g_object_new (DZL_TYPE_SHORTCUT_SIMPLE_LABEL,
                               "hexpand", TRUE,
+                              "visible", TRUE,
                               NULL);
   gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (self->accel));
 }
