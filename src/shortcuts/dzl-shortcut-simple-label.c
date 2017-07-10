@@ -39,6 +39,7 @@ enum {
   PROP_ACCEL,
   PROP_ACTION,
   PROP_COMMAND,
+  PROP_SHOW_ACCEL,
   PROP_TITLE,
   N_PROPS
 };
@@ -67,6 +68,10 @@ dzl_shortcut_simple_label_get_property (GObject    *object,
 
     case PROP_COMMAND:
       g_value_set_static_string (value, dzl_shortcut_simple_label_get_command (self));
+      break;
+
+    case PROP_SHOW_ACCEL:
+      g_object_get_property (G_OBJECT (self->accel_label), "visible", value);
       break;
 
     case PROP_TITLE:
@@ -98,6 +103,10 @@ dzl_shortcut_simple_label_set_property (GObject      *object,
 
     case PROP_COMMAND:
       dzl_shortcut_simple_label_set_command (self, g_value_get_string (value));
+      break;
+
+    case PROP_SHOW_ACCEL:
+      g_object_set_property (G_OBJECT (self->accel_label), "visible", value);
       break;
 
     case PROP_TITLE:
@@ -137,6 +146,11 @@ dzl_shortcut_simple_label_class_init (DzlShortcutSimpleLabelClass *klass)
                          "Command",
                          NULL,
                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_SHOW_ACCEL] =
+    g_param_spec_boolean ("show-accel", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_TITLE] =
     g_param_spec_string ("title",
