@@ -167,6 +167,7 @@ dzl_shortcut_simple_label_init (DzlShortcutSimpleLabel *self)
 {
   self->title = g_object_new (GTK_TYPE_LABEL,
                               "visible", TRUE,
+                              "use-underline", TRUE,
                               "xalign", 0.0f,
                               NULL);
   dzl_gtk_widget_add_style_class (GTK_WIDGET (self->title), "title");
