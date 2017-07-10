@@ -106,23 +106,15 @@ dzl_menu_button_section_bind (DzlMenuButtonSection *self,
   g_assert (G_IS_MENU_MODEL (menu));
   g_assert (DZL_IS_SIGNAL_GROUP (menu_signals));
 
-  n_items = g_menu_model_get_n_items (menu);
-  dzl_menu_button_section_items_changed (self, 0, 0, n_items, menu);
-}
-
-static void
-dzl_menu_button_section_unbind (DzlMenuButtonSection *self,
-                                DzlSignalGroup       *menu_signals)
-{
-  g_assert (DZL_IS_MENU_BUTTON_SECTION (self));
-  g_assert (DZL_IS_SIGNAL_GROUP (menu_signals));
-
-  if (gtk_widget_in_destruction (GTK_WIDGET (self)))
-    return;
-
+  /* Remove on bind instead of unbind to avoid data races
+   * when destroying the widget.
+   */
   gtk_container_foreach (GTK_CONTAINER (self->items_box),
                          (GtkCallback) gtk_widget_destroy,
                          NULL);
+
+  n_items = g_menu_model_get_n_items (menu);
+  dzl_menu_button_section_items_changed (self, 0, 0, n_items, menu);
 }
 
 static void
@@ -232,11 +224,6 @@ dzl_menu_button_section_init (DzlMenuButtonSection *self)
   g_signal_connect_swapped (self->menu_signals,
                             "bind",
                             G_CALLBACK (dzl_menu_button_section_bind),
-                            self);
-
-  g_signal_connect_swapped (self->menu_signals,
-                            "unbind",
-                            G_CALLBACK (dzl_menu_button_section_unbind),
                             self);
 
   dzl_signal_group_connect_swapped (self->menu_signals,

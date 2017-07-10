@@ -156,11 +156,20 @@ dzl_menu_button_menu_signals_bind (DzlMenuButton  *self,
                                    GMenuModel     *menu,
                                    DzlSignalGroup *menu_signals)
 {
+  DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
   guint n_items;
 
   g_assert (DZL_IS_MENU_BUTTON (self));
   g_assert (G_IS_MENU_MODEL (menu));
   g_assert (DZL_IS_SIGNAL_GROUP (menu_signals));
+
+  /* Clear on bind instead of unbind to avoid data races.
+   * We already are insensitive when unbound, so this should
+   * be a fine solution.
+   */
+  gtk_container_foreach (GTK_CONTAINER (priv->popover_box),
+                         (GtkCallback) gtk_widget_destroy,
+                         NULL);
 
   n_items = g_menu_model_get_n_items (menu);
   dzl_menu_button_items_changed (self, 0, 0, n_items, menu);
@@ -172,17 +181,8 @@ static void
 dzl_menu_button_menu_signals_unbind (DzlMenuButton  *self,
                                      DzlSignalGroup *menu_signals)
 {
-  DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
-
   g_assert (DZL_IS_MENU_BUTTON (self));
   g_assert (DZL_IS_SIGNAL_GROUP (menu_signals));
-
-  if (gtk_widget_in_destruction (GTK_WIDGET (self)))
-    return;
-
-  gtk_container_foreach (GTK_CONTAINER (priv->popover_box),
-                         (GtkCallback) gtk_widget_destroy,
-                         NULL);
 
   gtk_widget_set_sensitive (GTK_WIDGET (self), FALSE);
 }
