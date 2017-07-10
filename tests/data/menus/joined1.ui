@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<interface>
+  <menu id="document-menu">
+    <section id="editor-document-section">
+      <attribute name="label" translatable="yes">Document</attribute>
+      <item>
+        <attribute name="id">editor-document-open-in-new-frame</attribute>
+        <attribute name="label" translatable="yes">Open in New Frame</attribute>
+        <attribute name="action">layoutstack.open-in-new-frame</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Split</attribute>
+        <attribute name="action">layoutstack.split-view</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Print…</attribute>
+        <attribute name="action">editor-view.print</attribute>
+      </item>
+    </section>
+    <section id="editor-document-preferences-section">
+      <attribute name="after">editor-document-section</attribute>
+      <item>
+        <attribute name="label" translatable="yes">Document Preferences</attribute>
+      </item>
+    </section>
+    <section id="editor-document-save-section">
+      <attribute name="after">editor-document-preferences-section</attribute>
+      <item>
+        <attribute name="action">editor-view.save</attribute>
+        <attribute name="label" translatable="yes">_Save</attribute>
+      </item>
+      <item>
+        <attribute name="action">editor-view.save-as</attribute>
+        <attribute name="label" translatable="yes">Save _As</attribute>
+      </item>
+    </section>
+    <section id="editor-document-close-section">
+      <attribute name="after">editor-document-save-section</attribute>
+      <item>
+        <attribute name="action">layoutstack.close-view</attribute>
+        <attribute name="label" translatable="yes">Close</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

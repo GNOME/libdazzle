@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<interface>
+  <menu id="frame-menu">
+    <section id="ide-layout-stack-frame-section">
+      <attribute name="label" translatable="yes">Frame</attribute>
+      <item>
+        <attribute name="label" translatable="yes">Move Left</attribute>
+        <attribute name="action">layoutstack.move-left</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Move Right</attribute>
+        <attribute name="action">layoutstack.move-right</attribute>
+      </item>
+      <item>
+        <attribute name="action">layoutgrid.close-stack</attribute>
+        <attribute name="label" translatable="yes">Close</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

@@ -300,4 +300,10 @@ test_list_store = executable('test-list-store', 'test-list-store.c',
 )
 test('test-list-store', test_list_store, env: test_env)
 
+test_joined_menu = executable('test-joined-menu', 'test-joined-menu.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
 endif
