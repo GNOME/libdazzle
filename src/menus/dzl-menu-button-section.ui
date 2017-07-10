@@ -3,6 +3,12 @@
   <template class="DzlMenuButtonSection" parent="GtkBox">
     <property name="orientation">vertical</property>
     <child>
+      <object class="GtkSeparator" id="separator">
+        <property name="orientation">horizontal</property>
+        <property name="visible">true</property>
+      </object>
+    </child>
+    <child>
       <object class="GtkLabel" id="label">
         <property name="xalign">0.5</property>
         <style>

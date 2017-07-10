@@ -6,10 +6,19 @@ button.dzlmenubutton > box > image.arrow {
   margin-left: 3px;
 }
 popover.dzlmenubutton > box {
-  margin: 18px 15px 15px 12px;
+  margin: 15px 15px 15px 12px;
 }
-dzlmenubuttonsection:not(:first-child) {
-  margin-top: 12px;
+dzlmenubuttonsection:first-child separator {
+  background: none;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+dzlmenubuttonsection:not(:first-child) separator {
+  border-color: @borders;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 dzlmenubuttonsection > label.title {
   font-weight: bold;
@@ -22,8 +31,8 @@ dzlmenubuttonsection box.vertical button.dzlmenubuttonitem {
   border: none;
   background: none;
   box-shadow: none;
-  padding: 4px 12px;
-  outline-offset: -3px;
+  padding: 1px 10px;
+  outline-offset: -2px;
 }
 dzlmenubuttonsection box.vertical checkbutton.dzlmenubuttonitem:hover,
 dzlmenubuttonsection box.vertical button.dzlmenubuttonitem:hover {
