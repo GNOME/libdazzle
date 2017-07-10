@@ -198,7 +198,7 @@ dzl_shortcut_closure_chain_append_signalv (DzlShortcutClosureChain *chain,
 
   if (params != NULL)
     {
-      copy = g_array_sized_new (FALSE, TRUE, sizeof (GValue), params ? params->len : 0);
+      copy = g_array_sized_new (FALSE, TRUE, sizeof (GValue), params->len);
       g_array_set_clear_func (copy, (GDestroyNotify)g_value_unset);
       g_array_set_size (copy, params->len);
 
