@@ -30,6 +30,7 @@ struct _DzlMenuButtonSection
 
   /* Owned references */
   DzlSignalGroup *menu_signals;
+  GtkSizeGroup   *text_size_group;
 
   /* Template references */
   GtkLabel       *label;
@@ -40,6 +41,7 @@ enum {
   PROP_0,
   PROP_LABEL,
   PROP_MODEL,
+  PROP_TEXT_SIZE_GROUP,
   N_PROPS
 };
 
@@ -85,6 +87,7 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
                            "show-accel", TRUE,
                            "icon-name", verb_icon_name,
                            "text", label,
+                           "text-size-group", self->text_size_group,
                            "accel", accel,
                            "visible", TRUE,
                            NULL);
@@ -128,6 +131,7 @@ dzl_menu_button_section_destroy (GtkWidget *widget)
   DzlMenuButtonSection *self = (DzlMenuButtonSection *)widget;
 
   g_clear_object (&self->menu_signals);
+  g_clear_object (&self->text_size_group);
 
   GTK_WIDGET_CLASS (dzl_menu_button_section_parent_class)->destroy (widget);
 }
@@ -175,6 +179,10 @@ dzl_menu_button_section_set_property (GObject      *object,
                               !dzl_str_empty0 (g_value_get_string (value)));
       break;
 
+    case PROP_TEXT_SIZE_GROUP:
+      self->text_size_group = g_value_dup_object (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -199,6 +207,11 @@ dzl_menu_button_section_class_init (DzlMenuButtonSectionClass *klass)
   properties [PROP_LABEL] =
     g_param_spec_string ("label", NULL, NULL, NULL,
                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_TEXT_SIZE_GROUP] =
+    g_param_spec_object ("text-size-group", NULL, NULL,
+                         GTK_TYPE_SIZE_GROUP,
+                         (G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 

@@ -36,6 +36,7 @@ typedef struct
   GtkImage       *image;
   GtkImage       *pan_down_image;
   DzlBox         *popover_box;
+  GtkSizeGroup   *text_size_group;
 
   guint           show_accels : 1;
   guint           show_icons : 1;
@@ -107,6 +108,7 @@ dzl_menu_button_add_linked_model (DzlMenuButton *self,
   section = g_object_new (DZL_TYPE_MENU_BUTTON_SECTION,
                           "label", label,
                           "model", model,
+                          "text-size-group", priv->text_size_group,
                           "visible", TRUE,
                           NULL);
   dzl_box_insert (priv->popover_box, GTK_WIDGET (section), position);
@@ -352,6 +354,7 @@ dzl_menu_button_class_init (DzlMenuButtonClass *klass)
   gtk_widget_class_bind_template_child_private (widget_class, DzlMenuButton, pan_down_image);
   gtk_widget_class_bind_template_child_private (widget_class, DzlMenuButton, popover);
   gtk_widget_class_bind_template_child_private (widget_class, DzlMenuButton, popover_box);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlMenuButton, text_size_group);
 }
 
 static void

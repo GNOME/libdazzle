@@ -35,4 +35,7 @@
       </object>
     </child>
   </template>
+  <object class="GtkSizeGroup" id="text_size_group">
+    <property name="mode">horizontal</property>
+  </object>
 </interface>

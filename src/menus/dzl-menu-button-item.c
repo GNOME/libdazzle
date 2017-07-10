@@ -20,21 +20,22 @@
 
 #include "menus/dzl-menu-button-item.h"
 #include "shortcuts/dzl-shortcut-label.h"
+#include "shortcuts/dzl-shortcut-simple-label.h"
 #include "util/dzl-gtk.h"
 
 struct _DzlMenuButtonItem
 {
-  GtkCheckButton    parent_instance;
+  GtkCheckButton          parent_instance;
 
-  const gchar      *action_name;
+  const gchar            *action_name;
 
   /* Template references */
-  GtkLabel         *text;
-  DzlShortcutLabel *accel;
-  GtkImage         *image;
+  GtkLabel               *text;
+  DzlShortcutSimpleLabel *accel;
+  GtkImage               *image;
 
-  guint             has_icon : 1;
-  guint             show_image : 1;
+  guint                   has_icon : 1;
+  guint                   show_image : 1;
 };
 
 enum {
@@ -43,6 +44,7 @@ enum {
   PROP_ICON_NAME,
   PROP_SHOW_ACCEL,
   PROP_SHOW_IMAGE,
+  PROP_TEXT_SIZE_GROUP,
   PROP_TEXT,
   N_PROPS,
 };
@@ -128,7 +130,7 @@ dzl_menu_button_item_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_ACCEL:
-      dzl_shortcut_label_set_accelerator (self->accel, g_value_get_string (value));
+      dzl_shortcut_simple_label_set_accel (self->accel, g_value_get_string (value));
       break;
 
     case PROP_ICON_NAME:
@@ -148,6 +150,11 @@ dzl_menu_button_item_set_property (GObject      *object,
 
     case PROP_TEXT:
       gtk_label_set_label (self->text, g_value_get_string (value));
+      break;
+
+    case PROP_TEXT_SIZE_GROUP:
+      if (g_value_get_object (value))
+        gtk_size_group_add_widget (g_value_get_object (value), GTK_WIDGET (self->text));
       break;
 
     default:
@@ -199,6 +206,11 @@ dzl_menu_button_item_class_init (DzlMenuButtonItemClass *klass)
                          "The text for the menu item",
                          NULL,
                          (G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_TEXT_SIZE_GROUP] =
+    g_param_spec_object ("text-size-group", NULL, NULL,
+                         GTK_TYPE_SIZE_GROUP,
+                         (G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -255,7 +267,8 @@ dzl_menu_button_item_init (DzlMenuButtonItem *self)
                                      "position", 1,
                                      NULL);
 
-  self->accel = g_object_new (DZL_TYPE_SHORTCUT_LABEL,
+  self->accel = g_object_new (DZL_TYPE_SHORTCUT_SIMPLE_LABEL,
+                              "margin-start", 12,
                               "hexpand", FALSE,
                               NULL);
   gtk_container_add_with_properties (GTK_CONTAINER (box), GTK_WIDGET (self->accel),
