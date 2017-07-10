@@ -24,6 +24,7 @@
 #include "shortcuts/dzl-shortcut-model.h"
 #include "shortcuts/dzl-shortcut-private.h"
 #include "shortcuts/dzl-shortcut-theme-editor.h"
+#include "util/dzl-util-private.h"
 
 typedef struct
 {
@@ -138,7 +139,7 @@ dzl_shortcut_theme_editor_filter_changed (DzlShortcutThemeEditor *self,
   filter = gtk_tree_model_filter_new (priv->model, NULL);
   text = gtk_entry_get_text (GTK_ENTRY (entry));
 
-  if (!text || !*text)
+  if (dzl_str_empty0 (text))
     {
       gtk_tree_view_set_model (priv->tree_view, priv->model);
       gtk_tree_view_expand_all (priv->tree_view);
@@ -147,7 +148,7 @@ dzl_shortcut_theme_editor_filter_changed (DzlShortcutThemeEditor *self,
 
   gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (filter),
                                           dzl_shortcut_theme_editor_visible_func,
-                                          text ? g_utf8_casefold (text, -1) : NULL,
+                                          g_utf8_casefold (text, -1),
                                           g_free);
   gtk_tree_view_set_model (priv->tree_view, GTK_TREE_MODEL (filter));
   gtk_tree_view_expand_all (priv->tree_view);
