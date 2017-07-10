@@ -21,6 +21,7 @@
 #include "menus/dzl-menu-button-item.h"
 #include "shortcuts/dzl-shortcut-label.h"
 #include "shortcuts/dzl-shortcut-simple-label.h"
+#include "shortcuts/dzl-shortcut-private.h"
 #include "util/dzl-gtk.h"
 
 struct _DzlMenuButtonItem
@@ -30,7 +31,6 @@ struct _DzlMenuButtonItem
   const gchar            *action_name;
 
   /* Template references */
-  GtkLabel               *text;
   DzlShortcutSimpleLabel *accel;
   GtkImage               *image;
 
@@ -149,12 +149,11 @@ dzl_menu_button_item_set_property (GObject      *object,
       break;
 
     case PROP_TEXT:
-      gtk_label_set_label (self->text, g_value_get_string (value));
+      dzl_shortcut_simple_label_set_title (self->accel, g_value_get_string (value));
       break;
 
     case PROP_TEXT_SIZE_GROUP:
-      if (g_value_get_object (value))
-        gtk_size_group_add_widget (g_value_get_object (value), GTK_WIDGET (self->text));
+      _dzl_shortcut_simple_label_set_size_group (self->accel, g_value_get_object (value));
       break;
 
     default:
@@ -256,22 +255,8 @@ dzl_menu_button_item_init (DzlMenuButtonItem *self)
                                      "position", 0,
                                      NULL);
 
-  self->text = g_object_new (GTK_TYPE_LABEL,
-                             "hexpand", TRUE,
-                             "use-underline", TRUE,
-                             "xalign", 0.0f,
-                             "visible", TRUE,
-                             NULL);
-  gtk_container_add_with_properties (GTK_CONTAINER (box), GTK_WIDGET (self->text),
-                                     "pack-type", GTK_PACK_START,
-                                     "position", 1,
-                                     NULL);
-
   self->accel = g_object_new (DZL_TYPE_SHORTCUT_SIMPLE_LABEL,
-                              "margin-start", 12,
-                              "hexpand", FALSE,
+                              "hexpand", TRUE,
                               NULL);
-  gtk_container_add_with_properties (GTK_CONTAINER (box), GTK_WIDGET (self->accel),
-                                     "pack-type", GTK_PACK_END,
-                                     NULL);
+  gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (self->accel));
 }
