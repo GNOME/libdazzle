@@ -13,6 +13,9 @@
   </object>
   <template class="DzlMenuButton" parent="GtkMenuButton">
     <property name="popover">popover</property>
+    <style>
+      <class name="dzlmenubutton"/>
+    </style>
     <child>
       <object class="GtkBox">
         <property name="halign">center</property>
@@ -30,6 +33,9 @@
         <child>
           <object class="GtkImage" id="pan_down_image">
             <property name="icon-name">pan-down-symbolic</property>
+            <style>
+              <class name="arrow"/>
+            </style>
           </object>
         </child>
       </object>

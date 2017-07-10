@@ -1,3 +1,10 @@
+button.dzlmenubutton > box {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+button.dzlmenubutton > box > image.arrow {
+  margin-left: 3px;
+}
 popover.dzlmenubutton > box {
   margin: 18px 15px 15px 12px;
 }

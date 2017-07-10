@@ -452,15 +452,9 @@ dzl_menu_button_set_show_arrow (DzlMenuButton *self,
                                 gboolean       show_arrow)
 {
   DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
-  GtkWidget *child;
 
   g_return_if_fail (DZL_IS_MENU_BUTTON (self));
 
-  child = gtk_bin_get_child (GTK_BIN (self));
-  g_object_set (child,
-                "margin-start", show_arrow ? 3 : 0,
-                "margin-end", show_arrow ? 3 : 0,
-                NULL);
   gtk_widget_set_visible (GTK_WIDGET (priv->pan_down_image), show_arrow);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SHOW_ARROW]);
 }
