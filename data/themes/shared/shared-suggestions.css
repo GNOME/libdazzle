@@ -3,9 +3,9 @@ dzlsuggestionpopover {
 }
 
 dzlsuggestionpopover > revealer > box {
-  margin: 0px 40px 60px 40px;
+  margin: 5px 6px 6px 6px;
   border: 1px solid @borders;
-  box-shadow: 0px -6px 12px @wm_shadow;
+  box-shadow: 0px 0px 3px @wm_shadow;
   padding: 3px 3px 0px 3px;
   background: @content_view_bg;
   border-radius: 5px;
