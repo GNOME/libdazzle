@@ -35,6 +35,9 @@ struct _DzlMenuButtonItem
   DzlShortcutSimpleLabel *accel;
   GtkImage               *image;
 
+  /* -1 is for unset, otherwise GtkButtonRole */
+  gint                    role;
+
   guint                   has_icon : 1;
   guint                   show_image : 1;
 };
@@ -43,6 +46,7 @@ enum {
   PROP_0,
   PROP_ACCEL,
   PROP_ICON_NAME,
+  PROP_ROLE,
   PROP_SHOW_ACCEL,
   PROP_SHOW_IMAGE,
   PROP_TEXT_SIZE_GROUP,
@@ -126,7 +130,12 @@ static void
 dzl_menu_button_item_hierarchy_changed (GtkWidget *widget,
                                         GtkWidget *old_toplevel)
 {
-  dzl_menu_button_item_notify_action_name (DZL_MENU_BUTTON_ITEM (widget), NULL);
+  DzlMenuButtonItem *self = (DzlMenuButtonItem *)widget;
+
+  g_assert (DZL_IS_MENU_BUTTON_ITEM (self));
+
+  if (self->role > -1)
+    dzl_menu_button_item_notify_action_name (self, NULL);
 }
 
 static void
@@ -147,6 +156,12 @@ dzl_menu_button_item_set_property (GObject      *object,
       self->has_icon = !!g_value_get_string (value);
       g_object_set_property (G_OBJECT (self->image), "icon-name", value);
       gtk_widget_set_visible (GTK_WIDGET (self->image), self->has_icon && self->show_image);
+      break;
+
+    case PROP_ROLE:
+      self->role = g_value_get_int (value);
+      if (self->role == GTK_BUTTON_ROLE_CHECK)
+        g_object_set (self, "draw-indicator", TRUE, NULL);
       break;
 
     case PROP_SHOW_ACCEL:
@@ -195,6 +210,11 @@ dzl_menu_button_item_class_init (DzlMenuButtonItemClass *klass)
                          NULL,
                          (G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS));
 
+  properties [PROP_ROLE] =
+    g_param_spec_int ("role", NULL, NULL,
+                      -1, GTK_BUTTON_ROLE_RADIO, -1,
+                      (G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
   properties [PROP_SHOW_ACCEL] =
     g_param_spec_boolean ("show-accel",
                           "Show Accel",
@@ -229,6 +249,8 @@ dzl_menu_button_item_init (DzlMenuButtonItem *self)
 {
   GtkTextDirection dir;
   GtkBox *box;
+
+  self->role = -1;
 
   dzl_gtk_widget_add_style_class (GTK_WIDGET (self), "dzlmenubuttonitem");
 

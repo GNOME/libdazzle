@@ -118,12 +118,20 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
       g_autofree gchar *action = NULL;
       g_autofree gchar *label = NULL;
       g_autofree gchar *verb_icon_name = NULL;
+      g_autofree gchar *rolestr = NULL;
+      gint role = -1;
 
       g_menu_model_get_item_attribute (menu, i, G_MENU_ATTRIBUTE_LABEL, "s", &label);
       g_menu_model_get_item_attribute (menu, i, "verb-icon-name", "s", &verb_icon_name);
       g_menu_model_get_item_attribute (menu, i, "accel", "s", &accel);
       g_menu_model_get_item_attribute (menu, i, "action", "s", &action);
+      g_menu_model_get_item_attribute (menu, i, "role", "s", &rolestr);
       target = g_menu_model_get_item_attribute_value (menu, i, "target", NULL);
+
+      if (g_strcmp0 (rolestr, "check") == 0)
+        role = GTK_BUTTON_ROLE_CHECK;
+      else if (g_strcmp0 (rolestr, "normal") == 0)
+        role = GTK_BUTTON_ROLE_NORMAL;
 
       item = g_object_new (DZL_TYPE_MENU_BUTTON_ITEM,
                            "action-name", action,
@@ -131,6 +139,7 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
                            "show-image", self->show_icons,
                            "show-accel", self->show_accels,
                            "icon-name", verb_icon_name,
+                           "role", role,
                            "text", label,
                            "text-size-group", self->text_size_group,
                            "accel", accel,
