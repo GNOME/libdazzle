@@ -22,7 +22,9 @@
 
 #include "animation/dzl-animation.h"
 #include "suggestions/dzl-suggestion.h"
+#include "suggestions/dzl-suggestion-entry.h"
 #include "suggestions/dzl-suggestion-popover.h"
+#include "suggestions/dzl-suggestion-private.h"
 #include "suggestions/dzl-suggestion-row.h"
 #include "util/dzl-util-private.h"
 #include "widgets/dzl-elastic-bin.h"
@@ -159,32 +161,10 @@ dzl_suggestion_popover_select_row (DzlSuggestionPopover *self,
 static void
 dzl_suggestion_popover_reposition (DzlSuggestionPopover *self)
 {
-  gint width;
-  gint x;
-  gint y;
-
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
 
-  if (self->relative_to == NULL ||
-      self->transient_for == NULL ||
-      !gtk_widget_get_mapped (self->relative_to) ||
-      !gtk_widget_get_mapped (GTK_WIDGET (self->transient_for)))
-    return;
-
-  gtk_window_get_size (self->transient_for, &width, NULL);
-  gtk_widget_set_size_request (GTK_WIDGET (self), width, -1);
-  gtk_window_get_position (self->transient_for, &x, &y);
-
-  /*
-   * XXX: This is just a hack for testing so we get the placement right.
-   *
-   *      What we should really do is allow hte DzlSuggestionEntry to set our
-   *      relative-to property by wrapping it. That would all the caller to
-   *      place the popover relative to the main content area of the window
-   *      as might be desired for a URL entry or global application search.
-   */
-
-  gtk_window_move (GTK_WINDOW (self), x, y + 47);
+  if (DZL_IS_SUGGESTION_ENTRY (self->relative_to))
+    _dzl_suggestion_entry_reposition (DZL_SUGGESTION_ENTRY (self->relative_to), self);
 }
 
 /**
@@ -358,8 +338,11 @@ dzl_suggestion_popover_screen_changed (GtkWidget *widget,
 static void
 dzl_suggestion_popover_realize (GtkWidget *widget)
 {
+  DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
   GdkScreen *screen;
   GdkVisual *visual;
+
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
 
   screen = gtk_widget_get_screen (widget);
   visual = gdk_screen_get_rgba_visual (screen);
@@ -368,6 +351,8 @@ dzl_suggestion_popover_realize (GtkWidget *widget)
     gtk_widget_set_visual (widget, visual);
 
   GTK_WIDGET_CLASS (dzl_suggestion_popover_parent_class)->realize (widget);
+
+  dzl_suggestion_popover_reposition (self);
 }
 
 static void
@@ -914,4 +899,36 @@ dzl_suggestion_popover_activate_selected (DzlSuggestionPopover *self)
 
   if (NULL != (suggestion = dzl_suggestion_popover_get_selected (self)))
     g_signal_emit (self, signals [SUGGESTION_ACTIVATED], 0, suggestion);
+}
+
+void
+_dzl_suggestion_popover_set_max_height (DzlSuggestionPopover *self,
+                                        gint                  max_height)
+{
+  GdkWindow *window;
+  gint clip_height = 3000; /* something near 4k'ish */
+
+  g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
+
+  window = gtk_widget_get_window (GTK_WIDGET (self));
+
+  if (window != NULL)
+    {
+      GdkDisplay *display = gtk_widget_get_display (GTK_WIDGET (self));
+      GdkMonitor *monitor = gdk_display_get_monitor_at_window (display, window);
+
+      if (monitor != NULL)
+        {
+          GdkRectangle geom;
+
+          gdk_monitor_get_geometry (monitor, &geom);
+          clip_height = geom.height;
+        }
+    }
+
+  max_height = CLAMP (max_height, -1, clip_height);
+
+  g_object_set (self->scrolled_window,
+                "max-content-height", max_height,
+                NULL);
 }

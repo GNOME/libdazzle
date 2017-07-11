@@ -289,6 +289,9 @@ main (gint   argc,
                         "visible", TRUE,
                         "width-chars", 30,
                         NULL);
+  dzl_suggestion_entry_set_position_func (DZL_SUGGESTION_ENTRY (entry),
+                                          dzl_suggestion_entry_window_position_func,
+                                          NULL, NULL);
   gtk_box_set_center_widget (GTK_BOX (box), entry);
   g_signal_connect (entry, "changed", G_CALLBACK (search_changed), NULL);
   g_signal_connect (entry, "suggestion-activated", G_CALLBACK (suggestion_activated), NULL);

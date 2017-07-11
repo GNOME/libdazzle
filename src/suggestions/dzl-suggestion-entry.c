@@ -24,6 +24,7 @@
 #include "suggestions/dzl-suggestion-entry.h"
 #include "suggestions/dzl-suggestion-entry-buffer.h"
 #include "suggestions/dzl-suggestion-popover.h"
+#include "suggestions/dzl-suggestion-private.h"
 #include "util/dzl-util-private.h"
 
 #if 0
@@ -44,10 +45,15 @@
 
 typedef struct
 {
-  DzlSuggestionPopover     *popover;
-  DzlSuggestionEntryBuffer *buffer;
-  GListModel               *model;
-  gulong                    changed_handler;
+  DzlSuggestionPopover      *popover;
+  DzlSuggestionEntryBuffer  *buffer;
+  GListModel                *model;
+
+  gulong                     changed_handler;
+
+  DzlSuggestionPositionFunc  func;
+  gpointer                   func_data;
+  GDestroyNotify             func_data_destroy;
 } DzlSuggestionEntryPrivate;
 
 enum {
@@ -88,6 +94,7 @@ dzl_suggestion_entry_show_suggestions (DzlSuggestionEntry *self)
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
 
+  _dzl_suggestion_entry_reposition (self, priv->popover);
   dzl_suggestion_popover_popup (priv->popover);
 
   DZL_EXIT;
@@ -320,6 +327,14 @@ dzl_suggestion_entry_destroy (GtkWidget *widget)
   DzlSuggestionEntry *self = (DzlSuggestionEntry *)widget;
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
 
+  if (priv->func_data_destroy != NULL)
+    {
+      GDestroyNotify notify = g_steal_pointer (&priv->func_data_destroy);
+      gpointer notify_data = g_steal_pointer (&priv->func_data);
+
+      notify (notify_data);
+    }
+
   if (priv->popover != NULL)
     gtk_widget_destroy (GTK_WIDGET (priv->popover));
 
@@ -471,6 +486,8 @@ static void
 dzl_suggestion_entry_init (DzlSuggestionEntry *self)
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  priv->func = dzl_suggestion_entry_default_position_func;
 
   priv->changed_handler =
     g_signal_connect_after (self,
@@ -641,4 +658,165 @@ dzl_suggestion_entry_get_typed_text (DzlSuggestionEntry *self)
   g_return_val_if_fail (DZL_IS_SUGGESTION_ENTRY (self), NULL);
 
   return dzl_suggestion_entry_buffer_get_typed_text (priv->buffer);
+}
+
+void
+dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,
+                                            GdkRectangle       *area,
+                                            gboolean           *is_absolute,
+                                            gpointer            user_data)
+{
+  GtkAllocation alloc;
+
+  g_return_if_fail (DZL_IS_SUGGESTION_ENTRY (self));
+  g_return_if_fail (area != NULL);
+  g_return_if_fail (is_absolute != NULL);
+
+  *is_absolute = FALSE;
+
+  gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
+
+  area->y += alloc.height;
+  area->height = 300;
+}
+
+/**
+ * dzl_suggestion_entry_window_position_func:
+ *
+ * This is a #DzlSuggestionPositionFunc that can be used to make the suggestion
+ * popover the full width of the window. It is similar to what you might find
+ * in a web browser.
+ */
+void
+dzl_suggestion_entry_window_position_func (DzlSuggestionEntry *self,
+                                           GdkRectangle       *area,
+                                           gboolean           *is_absolute,
+                                           gpointer            user_data)
+{
+  GtkWidget *toplevel;
+
+  g_return_if_fail (DZL_IS_SUGGESTION_ENTRY (self));
+  g_return_if_fail (area != NULL);
+  g_return_if_fail (is_absolute != NULL);
+
+  toplevel = gtk_widget_get_ancestor (GTK_WIDGET (self), GTK_TYPE_WINDOW);
+
+  if (toplevel != NULL)
+    {
+      GtkWidget *child = gtk_bin_get_child (GTK_BIN (toplevel));
+      GtkAllocation alloc;
+      gint x, y;
+      gint height = 300;
+
+      gtk_widget_translate_coordinates (child, toplevel, 0, 0, &x, &y);
+      gtk_widget_get_allocation (child, &alloc);
+      gtk_window_get_size (GTK_WINDOW (toplevel), NULL, &height);
+
+      area->x = x;
+      area->y = y;
+      area->width = alloc.width;
+      area->height = MAX (300, height / 2);
+
+      /* If our widget would get obscurred, adjust it */
+      gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
+      gtk_widget_translate_coordinates (GTK_WIDGET (self), toplevel,
+                                        0, alloc.height, NULL, &y);
+      if (y > area->y)
+        area->y = y;
+
+      *is_absolute = TRUE;
+
+      return;
+    }
+
+  dzl_suggestion_entry_default_position_func (self, area, is_absolute, NULL);
+}
+
+/**
+ * dzl_suggestion_entry_set_position_func:
+ * @self: a #DzlSuggestionEntry
+ * @func: (scope async) (closure func_data) (destroy func_data_destroy) (nullable):
+ *   A function to call to position the popover, or %NULL to set the default.
+ * @func_data: (nullable): closure data for @func
+ * @func_data_destroy: (nullable): a destroy notify for @func_data
+ *
+ * Sets a position func to position the popover.
+ *
+ * In @func, you should set the height of the rectangle to the maximum height
+ * that the popover should be allowed to grow.
+ *
+ * Since: 3.26
+ */
+void
+dzl_suggestion_entry_set_position_func (DzlSuggestionEntry        *self,
+                                        DzlSuggestionPositionFunc  func,
+                                        gpointer                   func_data,
+                                        GDestroyNotify             func_data_destroy)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+  GDestroyNotify notify = NULL;
+  gpointer notify_data = NULL;
+
+  g_return_if_fail (DZL_IS_SUGGESTION_ENTRY (self));
+
+  if (func == NULL)
+    {
+      func = dzl_suggestion_entry_default_position_func;
+      func_data = NULL;
+      func_data_destroy = NULL;
+    }
+
+  if (priv->func_data_destroy != NULL)
+    {
+      notify = priv->func_data_destroy;
+      notify_data = priv->func_data;
+    }
+
+  priv->func = func;
+  priv->func_data = func_data;
+  priv->func_data_destroy = func_data_destroy;
+
+  if (notify)
+    notify (notify_data);
+}
+
+void
+_dzl_suggestion_entry_reposition (DzlSuggestionEntry   *self,
+                                  DzlSuggestionPopover *popover)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+  GtkWidget *toplevel;
+  GtkAllocation alloc;
+  gboolean is_absolute = FALSE;
+
+  g_return_if_fail (DZL_IS_SUGGESTION_ENTRY (self));
+  g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (popover));
+
+  if (!gtk_widget_get_realized (GTK_WIDGET (self)) ||
+      !gtk_widget_get_realized (GTK_WIDGET (popover)))
+    return;
+
+  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (self));
+
+  gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
+
+  alloc.x = 0;
+  alloc.y = 0;
+
+  priv->func (self, &alloc, &is_absolute, priv->func_data);
+
+  _dzl_suggestion_popover_set_max_height (priv->popover, alloc.height);
+
+  if (!is_absolute)
+    {
+      gint x;
+      gint y;
+
+      gtk_widget_translate_coordinates (GTK_WIDGET (self), toplevel, 0, 0, &x, &y);
+      alloc.x += x;
+      alloc.y += y;
+    }
+
+  gtk_widget_set_size_request (GTK_WIDGET (popover), alloc.width, -1);
+  gtk_window_move (GTK_WINDOW (popover), alloc.x, alloc.y);
 }

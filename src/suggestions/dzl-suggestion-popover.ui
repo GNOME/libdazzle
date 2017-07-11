@@ -16,11 +16,6 @@
                 <property name="visible">true</property>
                 <child>
                   <object class="GtkScrolledWindow" id="scrolled_window">
-                    <!-- XXX
-                         We should generate max-content-height based on window position
-                         or some other hueristic. (transient-for maybe?)
-                    -->
-                    <property name="max-content-height">500</property>
                     <property name="hscrollbar-policy">never</property>
                     <property name="propagate-natural-height">true</property>
                     <property name="visible">true</property>

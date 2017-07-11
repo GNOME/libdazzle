@@ -29,6 +29,25 @@ G_BEGIN_DECLS
 
 G_DECLARE_DERIVABLE_TYPE (DzlSuggestionEntry, dzl_suggestion_entry, DZL, SUGGESTION_ENTRY, GtkEntry)
 
+/**
+ * DzlSuggestionPositionFunc:
+ * @self: a #DzlSuggestionEntry
+ * @area: (inout): location to place the popover
+ * @is_absolute: (inout): If the area is in absolute coordinates
+ * @user_data: closure data
+ *
+ * Positions the popover in the coordinates defined by @area.
+ *
+ * If @is_absolute is set to %TRUE, then absolute coordinates are used.
+ * Otherwise, the position is expected to be relative to @entry.
+ *
+ * Since: 3.26
+ */
+typedef void (*DzlSuggestionPositionFunc) (DzlSuggestionEntry *entry,
+                                           GdkRectangle       *area,
+                                           gboolean           *is_absolute,
+                                           gpointer            user_data);
+
 struct _DzlSuggestionEntryClass
 {
   GtkEntryClass parent_class;
@@ -50,14 +69,27 @@ struct _DzlSuggestionEntryClass
   gpointer _reserved8;
 };
 
-GtkWidget     *dzl_suggestion_entry_new            (void);
-void           dzl_suggestion_entry_set_model      (DzlSuggestionEntry *self,
-                                                    GListModel         *model);
-GListModel    *dzl_suggestion_entry_get_model      (DzlSuggestionEntry *self);
-const gchar   *dzl_suggestion_entry_get_typed_text (DzlSuggestionEntry *self);
-DzlSuggestion *dzl_suggestion_entry_get_suggestion (DzlSuggestionEntry *self);
-void           dzl_suggestion_entry_set_suggestion (DzlSuggestionEntry *self,
-                                                    DzlSuggestion      *suggestion);
+GtkWidget     *dzl_suggestion_entry_new               (void);
+void           dzl_suggestion_entry_set_model         (DzlSuggestionEntry        *self,
+                                                       GListModel                *model);
+GListModel    *dzl_suggestion_entry_get_model         (DzlSuggestionEntry        *self);
+const gchar   *dzl_suggestion_entry_get_typed_text    (DzlSuggestionEntry        *self);
+DzlSuggestion *dzl_suggestion_entry_get_suggestion    (DzlSuggestionEntry        *self);
+void           dzl_suggestion_entry_set_suggestion    (DzlSuggestionEntry        *self,
+                                                       DzlSuggestion             *suggestion);
+void           dzl_suggestion_entry_set_position_func (DzlSuggestionEntry        *self,
+                                                       DzlSuggestionPositionFunc  func,
+                                                       gpointer                   func_data,
+                                                       GDestroyNotify             func_data_destroy);
+
+void dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,
+                                                 GdkRectangle       *area,
+                                                 gboolean           *is_absolute,
+                                                 gpointer            user_data);
+void dzl_suggestion_entry_window_position_func  (DzlSuggestionEntry *self,
+                                                 GdkRectangle       *area,
+                                                 gboolean           *is_absolute,
+                                                 gpointer            user_data);
 
 G_END_DECLS
 
