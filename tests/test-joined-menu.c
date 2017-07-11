@@ -35,6 +35,20 @@ main (gint argc,
   g_assert_no_error (error);
   menu1 = dzl_menu_manager_get_menu_by_id (manager, "document-menu");
 
+  {
+    g_autofree gchar *icon = NULL;
+    g_autoptr(GMenuModel) section = NULL;
+    gboolean r;
+
+    section = g_menu_model_get_item_link (G_MENU_MODEL (menu1), 0, "section");
+    g_assert (section != NULL);
+    g_assert_cmpint (g_menu_model_get_n_items (section), ==, 3);
+
+    r = g_menu_model_get_item_attribute (section, 0, "verb-icon-name", "s", &icon);
+    g_assert_true (r);
+    g_assert_cmpstr (icon, ==, "document-open-symbolic");
+  }
+
   dzl_menu_manager_add_filename (manager, filename2, &error);
   g_assert_no_error (error);
   menu2 = dzl_menu_manager_get_menu_by_id (manager, "frame-menu");
@@ -42,6 +56,20 @@ main (gint argc,
   joined = dzl_joined_menu_new ();
   dzl_joined_menu_append_menu (joined, G_MENU_MODEL (menu1));
   dzl_joined_menu_append_menu (joined, G_MENU_MODEL (menu2));
+
+  {
+    g_autofree gchar *icon = NULL;
+    g_autoptr(GMenuModel) section = NULL;
+    gboolean r;
+
+    section = g_menu_model_get_item_link (G_MENU_MODEL (joined), 0, "section");
+    g_assert (section != NULL);
+    g_assert_cmpint (g_menu_model_get_n_items (section), ==, 3);
+
+    r = g_menu_model_get_item_attribute (section, 0, "verb-icon-name", "s", &icon);
+    g_assert_true (r);
+    g_assert_cmpstr (icon, ==, "document-open-symbolic");
+  }
 
   window = g_object_new (GTK_TYPE_WINDOW,
                          "default-width", 100,
