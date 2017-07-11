@@ -33,9 +33,6 @@ struct _DzlBoxClass
 };
 
 GtkWidget *dzl_box_new                   (void);
-void       dzl_box_insert                (DzlBox    *self,
-                                          GtkWidget *widget,
-                                          guint      position);
 GtkWidget *dzl_box_get_nth_child         (DzlBox    *self,
                                           guint      nth);
 gint       dzl_box_get_max_width_request (DzlBox    *self);

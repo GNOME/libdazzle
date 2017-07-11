@@ -91,7 +91,9 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
                            "accel", accel,
                            "visible", TRUE,
                            NULL);
-      dzl_box_insert (self->items_box, GTK_WIDGET (item), i);
+      gtk_container_add_with_properties (GTK_CONTAINER (self->items_box), GTK_WIDGET (item),
+                                         "position", i,
+                                         NULL);
     }
 }
 

@@ -23,7 +23,6 @@
 typedef struct
 {
   gint  max_width_request;
-  guint has_used_insert : 1;
 } DzlBoxPrivate;
 
 enum {
@@ -35,87 +34,6 @@ enum {
 G_DEFINE_TYPE_WITH_PRIVATE (DzlBox, dzl_box, GTK_TYPE_BOX)
 
 static GParamSpec *properties [LAST_PROP];
-
-static gint
-sort_by_position (GtkWidget    *child_a,
-                  GtkWidget    *child_b,
-                  GtkContainer *container)
-{
-  gint pos_a = 0;
-  gint pos_b = 0;
-
-  gtk_container_child_get (container, child_a, "position", &pos_a, NULL);
-  gtk_container_child_get (container, child_b, "position", &pos_b, NULL);
-
-  return pos_a - pos_b;
-}
-
-static void
-dzl_box_resort (DzlBox *self)
-{
-  GList *children;
-  gint i;
-
-  g_assert (DZL_IS_BOX (self));
-
-  if (gtk_widget_in_destruction (GTK_WIDGET (self)))
-    return;
-
-  children = gtk_container_get_children (GTK_CONTAINER (self));
-  children = g_list_sort_with_data (children, (GCompareDataFunc)sort_by_position, self);
-
-  i = 0;
-
-  for (const GList *iter = children; iter; iter = iter->next)
-    {
-      GtkWidget *child = iter->data;
-      guint position = ++i * 2 + 1;
-
-      gtk_container_child_set (GTK_CONTAINER (self), child,
-                               "position", position,
-                               NULL);
-    }
-
-  g_list_free (children);
-}
-
-static void
-dzl_box_remove (GtkContainer *container,
-                GtkWidget    *widget)
-{
-  DzlBox *self = (DzlBox *)container;
-  DzlBoxPrivate *priv = dzl_box_get_instance_private (self);
-
-  g_return_if_fail (DZL_IS_BOX (self));
-
-  GTK_CONTAINER_CLASS (dzl_box_parent_class)->remove (container, widget);
-
-  /* Only reshuffle if we've used insert */
-  if (priv->has_used_insert)
-    dzl_box_resort (self);
-}
-
-void
-dzl_box_insert (DzlBox    *self,
-                GtkWidget *widget,
-                guint      position)
-{
-  DzlBoxPrivate *priv = dzl_box_get_instance_private (self);
-
-  g_return_if_fail (DZL_IS_BOX (self));
-  g_return_if_fail (GTK_IS_WIDGET (widget));
-
-  priv->has_used_insert = TRUE;
-
-  /* We have position*2 so we have enough space to insert things
-   * before their target position. After adding or removing widgets,
-   * we update positions to match.
-   */
-  gtk_container_add_with_properties (GTK_CONTAINER (self), widget,
-                                     "position", position * 2,
-                                     NULL);
-  dzl_box_resort (self);
-}
 
 /**
  * dzl_box_get_nth_child:
@@ -136,7 +54,6 @@ dzl_box_get_nth_child (DzlBox *self,
   g_return_val_if_fail (GTK_IS_BOX (self), NULL);
 
   list = gtk_container_get_children (GTK_CONTAINER (self));
-  list = g_list_sort_with_data (list, (GCompareDataFunc)sort_by_position, self);
   ret = g_list_nth_data (list, nth);
   g_list_free (list);
 
@@ -211,14 +128,11 @@ dzl_box_class_init (DzlBoxClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
-  GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
   object_class->get_property = dzl_box_get_property;
   object_class->set_property = dzl_box_set_property;
 
   widget_class->get_preferred_width = dzl_box_get_preferred_width;
-
-  container_class->remove = dzl_box_remove;
 
   properties [PROP_MAX_WIDTH_REQUEST] =
     g_param_spec_int ("max-width-request",

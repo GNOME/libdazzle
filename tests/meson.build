@@ -306,4 +306,10 @@ test_joined_menu = executable('test-joined-menu', 'test-joined-menu.c',
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_box = executable('test-box', 'test-box.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
 endif

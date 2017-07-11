@@ -113,7 +113,9 @@ dzl_menu_button_add_linked_model (DzlMenuButton *self,
                           "text-size-group", priv->text_size_group,
                           "visible", TRUE,
                           NULL);
-  dzl_box_insert (priv->popover_box, GTK_WIDGET (section), position);
+  gtk_container_add_with_properties (GTK_CONTAINER (priv->popover_box), GTK_WIDGET (section),
+                                     "position", position,
+                                     NULL);
 }
 
 static void
