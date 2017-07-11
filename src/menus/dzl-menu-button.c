@@ -60,39 +60,28 @@ G_DEFINE_TYPE_WITH_PRIVATE (DzlMenuButton, dzl_menu_button, GTK_TYPE_MENU_BUTTON
 static GParamSpec *properties [N_PROPS];
 
 static void
-collect_items_sections (GtkWidget *widget,
-                        GPtrArray *ar)
+collect_items_sections (GtkWidget     *widget,
+                        DzlMenuButton *self)
 {
-  GtkWidget *item;
+  DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
 
-  item = dzl_gtk_widget_find_child_typed (widget, DZL_TYPE_MENU_BUTTON_ITEM);
-  if (item)
-    g_ptr_array_add (ar, item);
+  if (DZL_IS_MENU_BUTTON_SECTION (widget))
+    g_object_set (widget,
+                  "show-accels", priv->show_accels,
+                  "show-icons", priv->show_icons,
+                  NULL);
 }
 
 static void
 update_image_and_accels (DzlMenuButton *self)
 {
   DzlMenuButtonPrivate *priv = dzl_menu_button_get_instance_private (self);
-  g_autoptr(GPtrArray) ar = g_ptr_array_new ();
-  gboolean show_image = dzl_menu_button_get_show_icons (self);
-  gboolean show_accel = dzl_menu_button_get_show_accels (self);
+
+  g_assert (DZL_IS_MENU_BUTTON (self));
 
   gtk_container_foreach (GTK_CONTAINER (priv->popover_box),
                          (GtkCallback) collect_items_sections,
-                         ar);
-
-  for (guint i = 0; i < ar->len; i++)
-    {
-      DzlMenuButtonItem *item = g_ptr_array_index (ar, i);
-
-      g_assert (DZL_IS_MENU_BUTTON_ITEM (item));
-
-      g_object_set (item,
-                    "show-image", show_image,
-                    "show-accel", show_accel,
-                    NULL);
-    }
+                         self);
 }
 
 static void
@@ -110,6 +99,8 @@ dzl_menu_button_add_linked_model (DzlMenuButton *self,
   section = g_object_new (DZL_TYPE_MENU_BUTTON_SECTION,
                           "label", label,
                           "model", model,
+                          "show-accels", priv->show_accels,
+                          "show-icons", priv->show_icons,
                           "text-size-group", priv->text_size_group,
                           "visible", TRUE,
                           NULL);

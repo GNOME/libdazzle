@@ -35,12 +35,17 @@ struct _DzlMenuButtonSection
   /* Template references */
   GtkLabel       *label;
   DzlBox         *items_box;
+
+  guint           show_accels : 1;
+  guint           show_icons : 1;
 };
 
 enum {
   PROP_0,
   PROP_LABEL,
   PROP_MODEL,
+  PROP_SHOW_ACCELS,
+  PROP_SHOW_ICONS,
   PROP_TEXT_SIZE_GROUP,
   N_PROPS
 };
@@ -48,6 +53,46 @@ enum {
 G_DEFINE_TYPE (DzlMenuButtonSection, dzl_menu_button_section, GTK_TYPE_BOX)
 
 static GParamSpec *properties [N_PROPS];
+
+static void
+update_show_accel (GtkWidget            *widget,
+                   DzlMenuButtonSection *self)
+{
+  if (DZL_IS_MENU_BUTTON_ITEM (widget))
+    g_object_set (widget, "show-accel", self->show_accels, NULL);
+}
+
+static void
+dzl_menu_button_section_set_show_accels (DzlMenuButtonSection *self,
+                                         gboolean              show_accels)
+{
+  g_assert (DZL_IS_MENU_BUTTON_SECTION (self));
+
+  self->show_accels = !!show_accels;
+  gtk_container_foreach (GTK_CONTAINER (self->items_box),
+                         (GtkCallback) update_show_accel,
+                         self);
+}
+
+static void
+update_show_icon (GtkWidget            *widget,
+                  DzlMenuButtonSection *self)
+{
+  if (DZL_IS_MENU_BUTTON_ITEM (widget))
+    g_object_set (widget, "show-image", self->show_icons, NULL);
+}
+
+static void
+dzl_menu_button_section_set_show_icons (DzlMenuButtonSection *self,
+                                        gboolean              show_icons)
+{
+  g_assert (DZL_IS_MENU_BUTTON_SECTION (self));
+
+  self->show_icons = !!show_icons;
+  gtk_container_foreach (GTK_CONTAINER (self->items_box),
+                         (GtkCallback) update_show_icon,
+                         self);
+}
 
 static void
 dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
@@ -83,8 +128,8 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
       item = g_object_new (DZL_TYPE_MENU_BUTTON_ITEM,
                            "action-name", action,
                            "action-target", target,
-                           "show-image", TRUE,
-                           "show-accel", TRUE,
+                           "show-image", self->show_icons,
+                           "show-accel", self->show_accels,
                            "icon-name", verb_icon_name,
                            "text", label,
                            "text-size-group", self->text_size_group,
@@ -173,6 +218,14 @@ dzl_menu_button_section_set_property (GObject      *object,
                               !dzl_str_empty0 (g_value_get_string (value)));
       break;
 
+    case PROP_SHOW_ICONS:
+      dzl_menu_button_section_set_show_icons (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SHOW_ACCELS:
+      dzl_menu_button_section_set_show_accels (self, g_value_get_boolean (value));
+      break;
+
     case PROP_TEXT_SIZE_GROUP:
       self->text_size_group = g_value_dup_object (value);
       break;
@@ -192,6 +245,14 @@ dzl_menu_button_section_class_init (DzlMenuButtonSectionClass *klass)
   object_class->set_property = dzl_menu_button_section_set_property;
 
   widget_class->destroy = dzl_menu_button_section_destroy;
+
+  properties [PROP_SHOW_ACCELS] =
+    g_param_spec_boolean ("show-accels", NULL, NULL, FALSE,
+                          (G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_SHOW_ICONS] =
+    g_param_spec_boolean ("show-icons", NULL, NULL, FALSE,
+                          (G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_MODEL] =
     g_param_spec_object ("model", NULL, NULL,

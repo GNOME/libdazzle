@@ -79,6 +79,8 @@ main (gint argc,
                          NULL);
   menu_button = g_object_new (DZL_TYPE_MENU_BUTTON,
                               "show-arrow", TRUE,
+                              "show-accels", TRUE,
+                              "show-icons", TRUE,
                               "icon-name", "document-open-symbolic",
                               "model", joined,
                               "visible", TRUE,
