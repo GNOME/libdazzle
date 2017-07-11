@@ -4,11 +4,11 @@ dzlsuggestionpopover {
 
 dzlsuggestionpopover > revealer > box {
   margin: 0px 40px 60px 40px;
-  border-top: none;
-  border-bottom: 1px solid @borders;
-  border-right: 1px solid @borders;
-  border-left: 1px solid @borders;
+  border: 1px solid @borders;
   box-shadow: 0px -6px 12px @wm_shadow;
+  padding: 3px 3px 0px 3px;
+  background: @content_view_bg;
+  border-radius: 5px;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow {
@@ -24,6 +24,7 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row {
+  border-radius: 3px;
   transition: none;
 }
 
@@ -41,4 +42,5 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row:last-child {
   border-bottom: none;
+  margin-bottom: 3px;
 }
