@@ -817,6 +817,8 @@ _dzl_suggestion_entry_reposition (DzlSuggestionEntry   *self,
       alloc.y += y;
     }
 
+  _dzl_suggestion_popover_adjust_margin (popover, &alloc);
+
   gtk_widget_set_size_request (GTK_WIDGET (popover), alloc.width, -1);
   gtk_window_move (GTK_WINDOW (popover), alloc.x, alloc.y);
 }

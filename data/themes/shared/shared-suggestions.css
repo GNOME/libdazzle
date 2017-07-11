@@ -3,16 +3,16 @@ dzlsuggestionpopover {
 }
 
 dzlsuggestionpopover > revealer > box {
-  margin: 0px 0px 60px 0px;
-  border-radius: 0px;
-  border-width: 0px;
+  margin: 0px 40px 60px 40px;
+  border-top: none;
   border-bottom: 1px solid @borders;
-  box-shadow: 0px -6px 12px #000;
+  border-right: 1px solid @borders;
+  border-left: 1px solid @borders;
+  box-shadow: 0px -6px 12px @wm_shadow;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow {
   background: alpha(@content_view_bg, 0.97);
-  border-radius: 0 0 7px 7px;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list {
@@ -25,8 +25,6 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row {
   transition: none;
-  margin-left: 100px;
-  margin-right: 100px;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row:selected .title {
@@ -35,10 +33,6 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row .title {
   color: @theme_fg_color;
-}
-
-dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row:first-child:selected {
-  border-radius: 0;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row > box {

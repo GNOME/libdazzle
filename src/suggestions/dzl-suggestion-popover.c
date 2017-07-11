@@ -39,6 +39,7 @@ struct _DzlSuggestionPopover
   GtkRevealer        *revealer;
   GtkScrolledWindow  *scrolled_window;
   DzlListBox         *list_box;
+  GtkBox             *top_box;
 
   DzlAnimation       *scroll_anim;
 
@@ -528,6 +529,7 @@ dzl_suggestion_popover_class_init (DzlSuggestionPopoverClass *klass)
   gtk_widget_class_bind_template_child (widget_class, DzlSuggestionPopover, revealer);
   gtk_widget_class_bind_template_child (widget_class, DzlSuggestionPopover, list_box);
   gtk_widget_class_bind_template_child (widget_class, DzlSuggestionPopover, scrolled_window);
+  gtk_widget_class_bind_template_child (widget_class, DzlSuggestionPopover, top_box);
 
   gtk_widget_class_set_css_name (widget_class, "dzlsuggestionpopover");
 
@@ -932,3 +934,32 @@ _dzl_suggestion_popover_set_max_height (DzlSuggestionPopover *self,
                 "max-content-height", max_height,
                 NULL);
 }
+
+void
+_dzl_suggestion_popover_adjust_margin (DzlSuggestionPopover *self,
+                                       GdkRectangle         *area)
+{
+  GtkStyleContext *style_context;
+  GtkBorder margin;
+
+  g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
+  g_return_if_fail (area != NULL);
+
+  /*
+   * This is our last chance to adjust the allocation.  We need to subtract any
+   * margins needed by the box for theming. We style the shadow in the box so
+   * that we can do the show/hide with the revealer and have things come out
+   * looking correct.
+   */
+
+  style_context = gtk_widget_get_style_context (GTK_WIDGET (self->top_box));
+  gtk_style_context_get_margin (style_context,
+                                gtk_style_context_get_state (style_context),
+                                &margin);
+
+  area->x -= margin.right;
+  area->y -= margin.top;
+  area->width += margin.right + margin.left;
+  area->height += margin.top + margin.bottom;
+}
+
