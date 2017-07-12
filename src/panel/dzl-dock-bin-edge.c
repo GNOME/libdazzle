@@ -257,6 +257,8 @@ dzl_dock_bin_edge_init (DzlDockBinEdge *self)
 {
   GtkWidget *child;
 
+  dzl_gtk_widget_add_style_class (GTK_WIDGET (self), "dzldockbinedge");
+
   child = g_object_new (DZL_TYPE_DOCK_PANED,
                         "visible", TRUE,
                         NULL);

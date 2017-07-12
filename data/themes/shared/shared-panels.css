@@ -26,20 +26,20 @@ dzldockpaned .handle {
   border: 1px solid @borders;
 }
 
-dzldockbinedge {
+.dzldockbinedge {
   background-color: @content_view_bg;
   border-color: @borders;
   border-style: solid;
 }
 
-dzldockbinedge.right {
+.dzldockbinedge.right {
   border-left-width: 1px;
 }
 
-dzldockbinedge.left {
+.dzldockbinedge.left {
   border-right-width: 1px;
 }
 
-dzldockbinedge.bottom {
+.dzldockbinedge.bottom {
   border-top-width: 1px;
 }
