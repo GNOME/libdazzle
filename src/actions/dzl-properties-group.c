@@ -120,7 +120,10 @@ get_action_state (GObject       *object,
       break;
 
     case G_TYPE_STRING:
-      ret = g_variant_new_string (g_value_get_string (&value));
+      if (!g_value_get_string (&value))
+        ret = g_variant_new_string ("");
+      else
+        ret = g_variant_new_string (g_value_get_string (&value));
       break;
 
     case G_TYPE_BOOLEAN:
