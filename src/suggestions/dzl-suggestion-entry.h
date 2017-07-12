@@ -31,7 +31,7 @@ G_DECLARE_DERIVABLE_TYPE (DzlSuggestionEntry, dzl_suggestion_entry, DZL, SUGGEST
 
 /**
  * DzlSuggestionPositionFunc:
- * @self: a #DzlSuggestionEntry
+ * @entry: a #DzlSuggestionEntry
  * @area: (inout): location to place the popover
  * @is_absolute: (inout): If the area is in absolute coordinates
  * @user_data: closure data
