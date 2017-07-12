@@ -21,7 +21,7 @@
 
 #include <glib-object.h>
 
-#include "dzl-path-element.h"
+#include "pathbar/dzl-path-element.h"
 
 G_BEGIN_DECLS
 
