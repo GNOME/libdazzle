@@ -1,6 +1,8 @@
 #include <dazzle.h>
 #include <stdlib.h>
 
+static GRand *grand;
+
 static gint
 compare_direct (gconstpointer a,
                 gconstpointer b,
@@ -31,7 +33,7 @@ test_insert_sorted (void)
 
   for (guint i = 0; i < 1000; i++)
     {
-      gpointer value = GINT_TO_POINTER (rand ());
+      gpointer value = GINT_TO_POINTER (g_rand_int (grand));
 
       dzl_gtk_list_store_insert_sorted (store, &iter, value, 0, compare_direct, NULL);
       gtk_list_store_set (store, &iter, 0, value, -1);
@@ -61,6 +63,7 @@ gint
 main (gint argc,
       gchar *argv[])
 {
+  grand = g_rand_new ();
   gtk_init (&argc, &argv);
   g_test_init (&argc, &argv, NULL);
   g_test_add_func ("/Dazzle/GtkListStore/insert_sorted", test_insert_sorted);
