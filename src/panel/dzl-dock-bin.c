@@ -1536,11 +1536,13 @@ dzl_dock_bin_grab_focus (GtkWidget *widget)
 }
 
 static GtkWidget *
-dzl_dock_bin_real_create_edge (DzlDockBin *self)
+dzl_dock_bin_real_create_edge (DzlDockBin      *self,
+                               GtkPositionType  edge)
 {
   g_assert (DZL_IS_DOCK_BIN (self));
 
   return g_object_new (DZL_TYPE_DOCK_BIN_EDGE,
+                       "edge", edge,
                        "visible", TRUE,
                        "reveal-child", FALSE,
                        NULL);
@@ -1561,9 +1563,9 @@ dzl_dock_bin_create_edge (DzlDockBin          *self,
   g_assert (DZL_IS_DOCK_BIN (self));
   g_assert (child != NULL);
   g_assert (type >= DZL_DOCK_BIN_CHILD_LEFT);
-  g_assert (type < LAST_DZL_DOCK_BIN_CHILD);
+  g_assert (type < DZL_DOCK_BIN_CHILD_CENTER);
 
-  child->widget = DZL_DOCK_BIN_GET_CLASS (self)->create_edge (self);
+  child->widget = DZL_DOCK_BIN_GET_CLASS (self)->create_edge (self, (GtkPositionType)type);
 
   if (child->widget == NULL)
     {

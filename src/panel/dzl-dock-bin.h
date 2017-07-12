@@ -33,7 +33,8 @@ struct _DzlDockBinClass
 {
   GtkContainerClass parent;
 
-  GtkWidget *(*create_edge) (DzlDockBin *self);
+  GtkWidget *(*create_edge) (DzlDockBin      *self,
+                             GtkPositionType  edge);
 
   gpointer _reserved1;
   gpointer _reserved2;
