@@ -16,11 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dzl-dock-bin.h"
-#include "dzl-dock-bin-edge.h"
-#include "dzl-dock-bin-edge-private.h"
-#include "dzl-dock-item.h"
-#include "dzl-dock-revealer.h"
+#define G_LOG_DOMAIN "dzl-dock-bin-edge"
+
+#include "panel/dzl-dock-bin.h"
+#include "panel/dzl-dock-bin-edge.h"
+#include "panel/dzl-dock-bin-edge-private.h"
+#include "panel/dzl-dock-item.h"
+#include "panel/dzl-dock-revealer.h"
+#include "util/dzl-gtk.h"
 
 typedef struct
 {
