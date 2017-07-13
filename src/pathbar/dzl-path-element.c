@@ -47,6 +47,8 @@ static GParamSpec *properties [N_PROPS];
  * Creates a new path element for an #DzlPath.
  *
  * Returns: (transfer full): A #DzlPathElement
+ *
+ * Since: 3.26
  */
 DzlPathElement *
 dzl_path_element_new (const gchar *id,
@@ -135,6 +137,14 @@ dzl_path_element_class_init (DzlPathElementClass *klass)
   object_class->get_property = dzl_path_element_get_property;
   object_class->set_property = dzl_path_element_set_property;
 
+  /**
+   * DzlPathElement:icon-name:
+   *
+   * The icon-name of the icon to display next to the path element
+   * in the path bar. Set to %NULL for no icon.
+   *
+   * Since: 3.26
+   */
   properties [PROP_ICON_NAME] =
     g_param_spec_string ("icon-name",
                          "Icon Name",
@@ -142,6 +152,14 @@ dzl_path_element_class_init (DzlPathElementClass *klass)
                          NULL,
                          (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY| G_PARAM_STATIC_STRINGS));
 
+  /**
+   * DzlPathElement:id:
+   *
+   * The id property is an application specific identifier for the
+   * element within the path.
+   *
+   * Since: 3.26
+   */
   properties [PROP_ID] =
     g_param_spec_string ("id",
                          "Identifier",
@@ -149,6 +167,14 @@ dzl_path_element_class_init (DzlPathElementClass *klass)
                          NULL,
                          (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY| G_PARAM_STATIC_STRINGS));
 
+  /**
+   * DzlPathElement:title:
+   *
+   * The title property should contain the display text that should
+   * be shown to represent the element in the #DzlPathBar.
+   *
+   * Since: 3.26
+   */
   properties [PROP_TITLE] =
     g_param_spec_string ("title",
                          "Title",
@@ -164,6 +190,19 @@ dzl_path_element_init (DzlPathElement *self)
 {
 }
 
+/**
+ * dzl_path_element_get_id:
+ * @self: A #DzlPathElement
+ *
+ * Gets the id for the element. Generally, a path is built of
+ * multiple elements and each element should have an id that
+ * is useful to the application that it using it. You might store
+ * the name of a directory, or some other key as the id.
+ *
+ * Returns: (transfer none): The id for the #DzlPathElement.
+ *
+ * Since: 3.26
+ */
 const gchar *
 dzl_path_element_get_id (DzlPathElement *self)
 {
@@ -172,6 +211,17 @@ dzl_path_element_get_id (DzlPathElement *self)
   return self->id;
 }
 
+/**
+ * dzl_path_element_get_icon_name:
+ * @self: A #DzlPathElement
+ *
+ * Gets the #DzlPathElement:icon-name property. This is used by the
+ * path bar to display an icon next to the element of the path.
+ *
+ * Returns: (transfer none) (nullable): The icon-name for the #DzlPathElement.
+ *
+ * Since: 3.26
+ */
 const gchar *
 dzl_path_element_get_icon_name (DzlPathElement *self)
 {
@@ -180,6 +230,17 @@ dzl_path_element_get_icon_name (DzlPathElement *self)
   return self->icon_name;
 }
 
+/**
+ * dzl_path_element_get_title:
+ * @self: A #DzlPathElement
+ *
+ * Gets the #DzlPathElement:title property. This is used by the
+ * path bar to display text representing the element of the path.
+ *
+ * Returns: (transfer none) (nullable): The title for the #DzlPathElement.
+ *
+ * Since: 3.26
+ */
 const gchar *
 dzl_path_element_get_title (DzlPathElement *self)
 {
