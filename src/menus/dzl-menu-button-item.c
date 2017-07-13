@@ -134,7 +134,7 @@ dzl_menu_button_item_hierarchy_changed (GtkWidget *widget,
 
   g_assert (DZL_IS_MENU_BUTTON_ITEM (self));
 
-  if (self->role > -1)
+  if (self->role == -1)
     dzl_menu_button_item_notify_action_name (self, NULL);
 }
 
@@ -162,6 +162,12 @@ dzl_menu_button_item_set_property (GObject      *object,
       self->role = g_value_get_int (value);
       if (self->role == GTK_BUTTON_ROLE_CHECK)
         g_object_set (self, "draw-indicator", TRUE, NULL);
+      else
+        {
+          g_object_set (self, "draw-indicator", FALSE, NULL);
+          if (self->role == -1)
+            dzl_menu_button_item_hierarchy_changed (GTK_WIDGET (self), NULL);
+        }
       break;
 
     case PROP_SHOW_ACCEL:
