@@ -82,7 +82,9 @@ typedef struct
   const GVariantType *state_type;
   const gchar        *property_name;
   GType               property_type;
-  DzlPropertiesFlags  flags;
+  DzlPropertiesFlags  flags : 8;
+  guint               can_read : 1;
+  guint               can_write : 1;
 } Mapping;
 
 enum {
@@ -101,6 +103,9 @@ get_action_state (GObject       *object,
 
   g_assert (G_IS_OBJECT (object));
   g_assert (mapping != NULL);
+
+  if (!mapping->can_read)
+    return NULL;
 
   g_value_init (&value, mapping->property_type);
   g_object_get_property (object, mapping->property_name, &value);
@@ -340,6 +345,12 @@ dzl_properties_group_change_action_state (GActionGroup *group,
       if (g_strcmp0 (name, mapping->action_name) == 0)
         {
           g_auto(GValue) value = G_VALUE_INIT;
+
+          if (!mapping->can_write)
+            {
+              g_warning ("property is not writable, ignoring request to change state");
+              break;
+            }
 
           switch (mapping->property_type)
             {
@@ -792,6 +803,8 @@ dzl_properties_group_add_property_full (DzlPropertiesGroup *self,
   mapping.property_name = pspec->name;
   mapping.property_type = pspec->value_type;
   mapping.flags = flags;
+  mapping.can_read = !!(pspec->flags & G_PARAM_READABLE);
+  mapping.can_write = !!(pspec->flags & G_PARAM_WRITABLE);
 
   /* we already warned, ignore this */
   if (mapping.state_type == NULL)
