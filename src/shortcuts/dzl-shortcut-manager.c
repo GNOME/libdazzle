@@ -702,7 +702,7 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
       DzlShortcutController *controller;
       gboolean use_binding_sets = TRUE;
 
-      if (NULL != (controller = dzl_shortcut_controller_find (widget)))
+      if (NULL != (controller = dzl_shortcut_controller_try_find (widget)))
         {
           DzlShortcutContext *context = dzl_shortcut_controller_get_context (controller);
 
