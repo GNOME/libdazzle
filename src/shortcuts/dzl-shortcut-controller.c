@@ -201,6 +201,7 @@ dzl_shortcut_controller_remove (DzlShortcutController *self,
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (descendant));
 
   g_queue_unlink (&priv->descendants, &dpriv->descendants_link);
+  g_object_unref (descendant);
 }
 
 static void
