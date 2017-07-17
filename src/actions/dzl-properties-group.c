@@ -543,6 +543,8 @@ dzl_properties_group_weak_notify (gpointer  data,
 
   g_assert (DZL_IS_PROPERTIES_GROUP (self));
 
+  g_weak_ref_set (&self->object_ref, NULL);
+
   dzl_properties_group_notify_all_disabled (self);
 }
 
