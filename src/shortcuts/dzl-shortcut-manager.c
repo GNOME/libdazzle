@@ -671,6 +671,10 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
   if (self == NULL)
     self = dzl_shortcut_manager_get_default ();
 
+  /* We don't support anything but key-press */
+  if (event->type != GDK_KEY_PRESS)
+    DZL_RETURN (GDK_EVENT_PROPAGATE);
+
   if (toplevel == NULL)
     {
       gpointer user_data;
@@ -681,9 +685,6 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
       toplevel = gtk_widget_get_toplevel (user_data);
       g_return_val_if_fail (GTK_IS_WINDOW (toplevel), FALSE);
     }
-
-  if (event->type != GDK_KEY_PRESS)
-    DZL_RETURN (GDK_EVENT_PROPAGATE);
 
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (GTK_IS_WINDOW (toplevel));
