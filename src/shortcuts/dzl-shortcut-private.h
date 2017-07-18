@@ -128,6 +128,8 @@ gboolean               _dzl_shortcut_chord_table_iter_next      (DzlShortcutChor
                                                                  const DzlShortcutChord    **chord,
                                                                  gpointer                   *value);
 void                   _dzl_shortcut_chord_table_iter_steal     (DzlShortcutChordTableIter  *iter);
+DzlShortcutContext    *_dzl_shortcut_theme_try_find_context_by_name (DzlShortcutTheme           *self,
+                                                                     const gchar                *name);
 
 G_END_DECLS
 

@@ -264,6 +264,32 @@ dzl_shortcut_theme_find_context_by_name (DzlShortcutTheme *self,
   return ret;
 }
 
+/**
+ * _dzl_shortcut_theme_try_find_context_by_name:
+ * @self: a #DzlShortcutTheme
+ *
+ * This function is like dzl_shortcut_theme_find_context_by_name() but will
+ * not create the context if it does not exist.
+ *
+ * Returns: (transfer none) (nullable): A #DzlShortcutContext or %NULL.
+ */
+DzlShortcutContext *
+_dzl_shortcut_theme_try_find_context_by_name (DzlShortcutTheme *self,
+                                              const gchar      *name)
+{
+  DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+  GQuark qname;
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (self), NULL);
+  g_return_val_if_fail (name != NULL, NULL);
+
+  /* Names are interned (which are quarks) */
+  if (0 != (qname = g_quark_try_string (name)))
+    return g_hash_table_lookup (priv->contexts, g_quark_to_string (qname));
+
+  return NULL;
+}
+
 static DzlShortcutContext *
 dzl_shortcut_theme_find_default_context_by_type (DzlShortcutTheme *self,
                                                  GType             type)
