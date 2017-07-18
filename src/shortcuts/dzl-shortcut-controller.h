@@ -23,26 +23,9 @@
 
 #include "shortcuts/dzl-shortcut-context.h"
 #include "shortcuts/dzl-shortcut-manager.h"
+#include "shortcuts/dzl-shortcut-phase.h"
 
 G_BEGIN_DECLS
-
-/**
- * DzlShortcutPhase:
- * @DZL_SHORTCUT_PHASE_CAPTURE: Indicates the capture phase of the shortcut
- *   activation. This allows parent widgets to intercept the keybinding before
- *   it is dispatched to the target #GdkWindow.
- * @DZL_SHORTCUT_DISPATCH: Indicates the typical dispatch phase of the shortcut
- *   to the widget of the target #GdkWindow.
- * @DZL_SHORTCUT_BUBBLE: The final phase of event delivery. The event is
- *   delivered to each widget as it progresses from the target window widget
- *   up to the toplevel.
- */
-typedef enum
-{
-  DZL_SHORTCUT_PHASE_CAPTURE,
-  DZL_SHORTCUT_PHASE_DISPATCH,
-  DZL_SHORTCUT_PHASE_BUBBLE,
-} DzlShortcutPhase;
 
 #define DZL_TYPE_SHORTCUT_CONTROLLER (dzl_shortcut_controller_get_type())
 
