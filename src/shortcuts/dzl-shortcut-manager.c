@@ -639,6 +639,160 @@ dzl_shortcut_manager_set_theme (DzlShortcutManager *self,
     }
 }
 
+/*
+ * dzl_shortcut_manager_run_phase:
+ * @self: a #DzlShortcutManager
+ * @event: the event in question
+ * @chord: the current chord for the toplevel
+ * @phase: the phase (capture, bubble)
+ * @widget: the widget the event was destined for
+ * @focus: the current focus widget
+ * @toplevel: the toplevel of the event window
+ *
+ * Runs a particular phase of the event dispatch.
+ *
+ * A phase can be either capture or bubble. Capture tries to deliver the
+ * event starting from the root down to the given widget. Bubble tries to
+ * deliver the event starting from the widget up to the toplevel.
+ *
+ * These two phases allow stealing before or after, depending on the needs
+ * of the keybindings.
+ *
+ * Returns: A #DzlShortcutMatch
+ */
+static DzlShortcutMatch
+dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
+                                const GdkEventKey      *event,
+                                const DzlShortcutChord *chord,
+                                int                     phase,
+                                GtkWidget              *widget,
+                                GtkWidget              *focus)
+{
+  GtkWidget *ancestor = widget;
+  GQueue queue = G_QUEUE_INIT;
+  GdkModifierType modifier;
+  DzlShortcutMatch ret = DZL_SHORTCUT_MATCH_NONE;
+
+  g_assert (DZL_IS_SHORTCUT_MANAGER (self));
+  g_assert (event != NULL);
+  g_assert (chord != NULL);
+  g_assert (phase <= DZL_SHORTCUT_PHASE_BUBBLE);
+  g_assert (GTK_IS_WIDGET (widget));
+  g_assert (GTK_IS_WIDGET (focus));
+
+  modifier = event->state & gtk_accelerator_get_default_mod_mask ();
+
+  /*
+   * Collect all the widgets that might be needed for this phase and
+   * order them so that we can process from first-to-last. Capture
+   * phase is toplevel-to-widget, and bubble is widget-to-toplevel.
+   * Dispatch only has the the widget itself.
+   */
+  do
+    {
+      if (phase == DZL_SHORTCUT_PHASE_CAPTURE)
+        g_queue_push_head (&queue, g_object_ref (ancestor));
+      else
+        g_queue_push_tail (&queue, g_object_ref (ancestor));
+      ancestor = gtk_widget_get_parent (ancestor);
+    }
+  while (phase != DZL_SHORTCUT_PHASE_DISPATCH && ancestor != NULL);
+
+  for (const GList *iter = queue.head; iter; iter = iter->next)
+    {
+      GtkWidget *current = iter->data;
+      DzlShortcutController *controller;
+      gboolean use_binding_sets = TRUE;
+
+      controller = dzl_shortcut_controller_try_find (current);
+
+      if (controller != NULL)
+        {
+          if (phase == DZL_SHORTCUT_PHASE_DISPATCH)
+            {
+              DzlShortcutContext *context;
+
+              /*
+               * Get the default context for the controller. We do not take
+               * the controller for this particular phase because we only are
+               * using the context to determine if we should dispatch the
+               * default binding sets later on.
+               */
+              context = dzl_shortcut_controller_get_context (controller);
+              if (context != NULL)
+                g_object_get (context,
+                              "use-binding-sets", &use_binding_sets,
+                              NULL);
+            }
+
+          /*
+           * Now try to activate the event using the controller. If we get
+           * any result other than DZL_SHORTCUT_MATCH_NONE, we need to stop
+           * processing and swallow the event.
+           *
+           * Multiple controllers can have a partial match, but if any hits
+           * a partial match, it's undefined behavior to also have a shortcut
+           * which would activate.
+           */
+          ret = _dzl_shortcut_controller_handle (controller, event, chord, phase);
+          if (ret)
+            DZL_GOTO (cleanup);
+        }
+
+      /*
+       * If the current context at activation indicates that we can
+       * dispatch using the default binding sets for the widget, go
+       * ahead and try to do that.
+       */
+      if (use_binding_sets && phase == DZL_SHORTCUT_PHASE_DISPATCH)
+        {
+          GtkStyleContext *style_context;
+          g_autoptr(GPtrArray) sets = NULL;
+
+          style_context = gtk_widget_get_style_context (current);
+          gtk_style_context_get (style_context,
+                                 gtk_style_context_get_state (style_context),
+                                 "-gtk-key-bindings", &sets,
+                                 NULL);
+
+          if (sets != NULL)
+            {
+              for (guint i = 0; i < sets->len; i++)
+                {
+                  GtkBindingSet *set = g_ptr_array_index (sets, i);
+
+                  if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (current)))
+                    {
+                      ret = DZL_SHORTCUT_MATCH_EQUAL;
+                      DZL_GOTO (cleanup);
+                    }
+                }
+            }
+
+          /*
+           * Only if this widget is also our focus, try to activate the default
+           * keybindings for the widget.
+           */
+          if (current == focus)
+            {
+              GtkBindingSet *set = gtk_binding_set_by_class (G_OBJECT_GET_CLASS (current));
+
+              if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (current)))
+                {
+                  ret = DZL_SHORTCUT_MATCH_EQUAL;
+                  DZL_GOTO (cleanup);
+                }
+            }
+        }
+    }
+
+cleanup:
+  g_queue_foreach (&queue, (GFunc)g_object_unref, NULL);
+  g_queue_clear (&queue);
+
+  DZL_RETURN (ret);
+}
+
 /**
  * dzl_shortcut_manager_handle_event:
  * @self: (nullable): An #DzlShortcutManager
@@ -658,9 +812,12 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
                                    const GdkEventKey  *event,
                                    GtkWidget          *toplevel)
 {
+  g_autoptr(DzlShortcutChord) chord = NULL;
+  DzlShortcutController *root;
+  DzlShortcutMatch match;
   GtkWidget *widget;
   GtkWidget *focus;
-  GdkModifierType modifier;
+  gboolean ret = GDK_EVENT_PROPAGATE;
 
   DZL_ENTRY;
 
@@ -675,6 +832,7 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
   if (event->type != GDK_KEY_PRESS)
     DZL_RETURN (GDK_EVENT_PROPAGATE);
 
+  /* We might need to discover our toplevel from the event */
   if (toplevel == NULL)
     {
       gpointer user_data;
@@ -686,86 +844,49 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
       g_return_val_if_fail (GTK_IS_WINDOW (toplevel), FALSE);
     }
 
+  /* Sanitiy checks */
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (GTK_IS_WINDOW (toplevel));
   g_assert (event != NULL);
 
-  modifier = event->state & gtk_accelerator_get_default_mod_mask ();
+  /* Synthesize focus as the toplevel if there is none */
   widget = focus = gtk_window_get_focus (GTK_WINDOW (toplevel));
-
   if (widget == NULL)
     widget = focus = toplevel;
 
-  while (widget != NULL)
-    {
-      G_GNUC_UNUSED g_autoptr(GtkWidget) widget_hold = g_object_ref (widget);
-      DzlShortcutController *controller;
-      gboolean use_binding_sets = TRUE;
+  /*
+   * We want to push this event into the toplevel controller. If it
+   * gives us back a chord, then we can try to dispatch that up/down
+   * the controller tree.
+   */
+  root = dzl_shortcut_controller_find (toplevel);
+  chord = _dzl_shortcut_controller_push (root, event);
+  if (chord == NULL)
+    DZL_RETURN (GDK_EVENT_PROPAGATE);
 
-      if (NULL != (controller = dzl_shortcut_controller_try_find (widget)))
-        {
-          DzlShortcutContext *context = dzl_shortcut_controller_get_context (controller);
+#ifdef DZL_ENABLE_TRACE
+  {
+    g_autofree gchar *str = dzl_shortcut_chord_to_string (chord);
+    DZL_TRACE_MSG ("current chord: %s", str);
+  }
+#endif
 
-          /*
-           * Fetch this property first as the controller context could change
-           * during activation of the handle_event().
-           */
-          if (context != NULL)
-            g_object_get (context,
-                          "use-binding-sets", &use_binding_sets,
-                          NULL);
+  /*
+   * Now we have our chord/event to dispatch to the individual controllers
+   * on widgets. We can run through the phases to capture/dispatch/bubble.
+   */
+  if ((match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_CAPTURE, widget, focus)) ||
+      (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_DISPATCH, widget, focus)) ||
+      (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, widget, focus)))
+    ret = GDK_EVENT_STOP;
 
-          /*
-           * Now try to activate the event using the controller.
-           */
-          if (dzl_shortcut_controller_handle_event (controller, event))
-            DZL_RETURN (GDK_EVENT_STOP);
-        }
+  DZL_TRACE_MSG ("match = %d", match);
 
-      /*
-       * If the current context at activation indicates that we can
-       * dispatch using the default binding sets for the widget, go
-       * ahead and try to do that.
-       */
-      if (use_binding_sets)
-        {
-          GtkStyleContext *style_context;
-          g_autoptr(GPtrArray) sets = NULL;
+  /* No match, clear our current chord */
+  if (match != DZL_SHORTCUT_MATCH_PARTIAL)
+    _dzl_shortcut_controller_clear (root);
 
-          style_context = gtk_widget_get_style_context (widget);
-          gtk_style_context_get (style_context,
-                                 gtk_style_context_get_state (style_context),
-                                 "-gtk-key-bindings", &sets,
-                                 NULL);
-
-          if (sets != NULL)
-            {
-              for (guint i = 0; i < sets->len; i++)
-                {
-                  GtkBindingSet *set = g_ptr_array_index (sets, i);
-
-                  if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (widget)))
-                    DZL_RETURN (GDK_EVENT_STOP);
-                }
-            }
-
-          /*
-           * Only if this widget is also our focus, try to activate the default
-           * keybindings for the widget.
-           */
-          if (widget == focus)
-            {
-              GtkBindingSet *set = gtk_binding_set_by_class (G_OBJECT_GET_CLASS (widget));
-
-              if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (widget)))
-                DZL_RETURN (GDK_EVENT_STOP);
-            }
-        }
-
-      widget = gtk_widget_get_parent (widget);
-    }
-
-  DZL_RETURN (GDK_EVENT_PROPAGATE);
+  DZL_RETURN (ret);
 }
 
 const gchar *

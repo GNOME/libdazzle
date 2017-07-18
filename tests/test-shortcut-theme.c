@@ -1,5 +1,7 @@
 #include <dazzle.h>
 
+#include "shortcuts/dzl-shortcut-private.h"
+
 static void
 test_shortcut_theme_basic (void)
 {
@@ -87,7 +89,7 @@ test_shortcut_theme_manager (void)
   dzl_shortcut_controller_add_command_callback (controller, "useless.command.here", "<Control>a", key_callback, &did_cb, NULL);
   event = dzl_gdk_synthesize_event_keyval (gtk_widget_get_window (label), GDK_KEY_a);
   event->state |= GDK_CONTROL_MASK;
-  r = dzl_shortcut_controller_handle_event (controller, event);
+  r = dzl_shortcut_manager_handle_event (NULL, event, window);
   g_assert_cmpint (did_cb, ==, TRUE);
   g_assert_cmpint (r, ==, GDK_EVENT_STOP);
 }

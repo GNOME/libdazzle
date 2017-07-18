@@ -40,11 +40,11 @@ typedef struct
   GtkWidget *widget;
 
   /*
-   * This is the current context for the controller. These are collections of
-   * shortcuts to signals, actions, etc. The context can be changed in reaction
-   * to different events.
+   * This is the name of the current context. Contexts are resolved at runtime
+   * by locating them within the theme (or inherited theme). They are interned
+   * strings to avoid lots of allocations between widgets.
    */
-  DzlShortcutContext *context;
+  const gchar *context_name;
 
   /*
    * If we are building a chord, it will be tracked here. Each incoming
@@ -65,6 +65,12 @@ typedef struct
    * intern'd string containing the command id (for direct comparisons).
    */
   GHashTable *commands;
+
+  /*
+   * The command table is used to provide a mapping from accelerator/chord
+   * to the key for @commands. The data for each chord is an interned string
+   * which can be used as a direct pointer for lookups in @commands.
+   */
   DzlShortcutChordTable *commands_table;
 
   /*
@@ -79,7 +85,12 @@ typedef struct
    * link nodes.
    */
   GQueue descendants;
-  GList  descendants_link;
+
+  /*
+   * To avoid allocating GList nodes for controllers, we just inline a link
+   * here and attach it to @descendants when necessary.
+   */
+  GList descendants_link;
 
   /*
    * Signal handlers to react to various changes in the system.
@@ -114,6 +125,15 @@ static GQuark      controller_quark;
 
 static void dzl_shortcut_controller_connect    (DzlShortcutController *self);
 static void dzl_shortcut_controller_disconnect (DzlShortcutController *self);
+
+static void
+dzl_shortcut_controller_emit_reset (DzlShortcutController *self)
+{
+  g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
+
+  g_signal_emit (self, signals[RESET], 0);
+}
+
 
 /**
  * dzl_shortcut_controller_get_manager:
@@ -213,8 +233,9 @@ dzl_shortcut_controller_on_manager_changed (DzlShortcutController *self,
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
   g_assert (DZL_IS_SHORTCUT_MANAGER (manager));
 
-  g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
-  g_clear_object (&priv->context);
+  priv->context_name = NULL;
+  _dzl_shortcut_controller_clear (self);
+  dzl_shortcut_controller_emit_reset (self);
 }
 
 static void
@@ -302,7 +323,7 @@ dzl_shortcut_controller_connect (DzlShortcutController *self)
   manager = dzl_shortcut_controller_get_manager (self);
 
   g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
-  g_clear_object (&priv->context);
+  priv->context_name = NULL;
 
   priv->widget_destroy_handler =
     g_signal_connect_swapped (priv->widget,
@@ -354,26 +375,32 @@ dzl_shortcut_controller_set_widget (DzlShortcutController *self,
     }
 }
 
-static void
-dzl_shortcut_controller_emit_reset (DzlShortcutController *self)
-{
-  g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
-
-  g_signal_emit (self, signals[RESET], 0);
-}
-
+/**
+ * dzl_shortcut_controller_set_context_by_name:
+ * @self: a #DzlShortcutController
+ * @name: (nullable): The name of the context
+ *
+ * Changes the context for the controller to the context matching @name.
+ *
+ * Contexts are resolved at runtime through the current theme (and possibly
+ * a parent theme if it inherits from one).
+ *
+ * Since: 3.26
+ */
 void
-dzl_shortcut_controller_set_context (DzlShortcutController *self,
-                                     DzlShortcutContext    *context)
+dzl_shortcut_controller_set_context_by_name (DzlShortcutController *self,
+                                             const gchar           *name)
 {
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
 
   g_return_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self));
-  g_return_if_fail (!context || DZL_IS_SHORTCUT_CONTEXT (context));
 
-  if (g_set_object (&priv->context, context))
+  name = g_intern_string (name);
+
+  if (name != priv->context_name)
     {
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONTEXT]);
+      priv->context_name = name;
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CONTEXT]);
       dzl_shortcut_controller_emit_reset (self);
     }
 }
@@ -382,18 +409,9 @@ static void
 dzl_shortcut_controller_real_set_context_named (DzlShortcutController *self,
                                                 const gchar           *name)
 {
-  g_autoptr(DzlShortcutContext) context = NULL;
-  DzlShortcutManager *manager;
-  DzlShortcutTheme *theme;
-
   g_return_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self));
-  g_return_if_fail (name != NULL);
 
-  manager = dzl_shortcut_controller_get_manager (self);
-  theme = dzl_shortcut_manager_get_theme (manager);
-  context = dzl_shortcut_theme_find_context_by_name (theme, name);
-
-  dzl_shortcut_controller_set_context (self, context);
+  dzl_shortcut_controller_set_context_by_name (self, name);
 }
 
 static void
@@ -409,12 +427,13 @@ dzl_shortcut_controller_finalize (GObject *object)
     }
 
   g_clear_pointer (&priv->commands, g_hash_table_unref);
-
-  g_clear_object (&priv->context);
+  g_clear_pointer (&priv->commands_table, dzl_shortcut_chord_table_free);
   g_clear_object (&priv->root);
 
   while (priv->descendants.length > 0)
     g_queue_unlink (&priv->descendants, priv->descendants.head);
+
+  priv->context_name = NULL;
 
   G_OBJECT_CLASS (dzl_shortcut_controller_parent_class)->finalize (object);
 }
@@ -431,7 +450,7 @@ dzl_shortcut_controller_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_CONTEXT:
-      g_value_set_object (value, priv->context);
+      g_value_set_object (value, dzl_shortcut_controller_get_context (self));
       break;
 
     case PROP_CURRENT_CHORD:
@@ -461,10 +480,6 @@ dzl_shortcut_controller_set_property (GObject      *object,
 
   switch (prop_id)
     {
-    case PROP_CONTEXT:
-      dzl_shortcut_controller_set_context (self, g_value_get_object (value));
-      break;
-
     case PROP_MANAGER:
       dzl_shortcut_controller_set_manager (self, g_value_get_object (value));
       break;
@@ -497,9 +512,9 @@ dzl_shortcut_controller_class_init (DzlShortcutControllerClass *klass)
   properties [PROP_CONTEXT] =
     g_param_spec_object ("context",
                          "Context",
-                         "The current context of the controller",
+                         "The current context of the controller, for dispatch phase",
                          DZL_TYPE_SHORTCUT_CONTEXT,
-                         (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_MANAGER] =
     g_param_spec_object ("manager",
@@ -630,6 +645,70 @@ dzl_shortcut_controller_find (GtkWidget *widget)
   return controller;
 }
 
+static DzlShortcutContext *
+_dzl_shortcut_controller_get_context_for_phase (DzlShortcutController *self,
+                                                DzlShortcutTheme      *theme,
+                                                DzlShortcutPhase       phase)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+  g_autofree gchar *phased_name = NULL;
+  DzlShortcutContext *ret;
+  const gchar *name;
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), NULL);
+  g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (theme), NULL);
+
+  if (priv->widget == NULL)
+    return NULL;
+
+  name = priv->context_name ? priv->context_name : G_OBJECT_TYPE_NAME (priv->widget);
+
+  g_return_val_if_fail (name != NULL, NULL);
+
+  /* If we are in dispatch phase, we use our direct context */
+  if (phase == DZL_SHORTCUT_PHASE_BUBBLE)
+    name = phased_name = g_strdup_printf ("%s:bubble", name);
+  else if (phase == DZL_SHORTCUT_PHASE_CAPTURE)
+    name = phased_name = g_strdup_printf ("%s:capture", name);
+
+  ret = _dzl_shortcut_theme_try_find_context_by_name (theme, name);
+
+  g_return_val_if_fail (!ret || DZL_IS_SHORTCUT_CONTEXT (ret), NULL);
+
+  return ret;
+}
+
+/**
+ * dzl_shortcut_controller_get_context_for_phase:
+ * @self: a #DzlShortcutController
+ * @phase: the phase for the shorcut delivery
+ *
+ * Controllers can have a different context for a particular phase, which allows
+ * them to activate different keybindings depending if the event in capture,
+ * bubble, or dispatch.
+ *
+ * Returns: (transfer none) (nullable): A #DzlShortcutContext or %NULL.
+ *
+ * Since: 3.26
+ */
+DzlShortcutContext *
+dzl_shortcut_controller_get_context_for_phase (DzlShortcutController *self,
+                                               DzlShortcutPhase       phase)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+  DzlShortcutManager *manager;
+  DzlShortcutTheme *theme;
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), NULL);
+
+  if (NULL == priv->widget ||
+      NULL == (manager = dzl_shortcut_controller_get_manager (self)) ||
+      NULL == (theme = dzl_shortcut_manager_get_theme (manager)))
+    return NULL;
+
+  return _dzl_shortcut_controller_get_context_for_phase (self, theme, phase);
+}
+
 /**
  * dzl_shortcut_controller_get_context:
  * @self: An #DzlShortcutController
@@ -639,77 +718,49 @@ dzl_shortcut_controller_find (GtkWidget *widget)
  * is a group of keybindings that may be activated in response to a
  * single or series of #GdkEventKey.
  *
- * Returns: (transfer none) (nullable): An #DzlShortcutContext or %NULL.
+ * Returns: (transfer none) (nullable): A #DzlShortcutContext or %NULL.
+ *
+ * Since: 3.26
  */
 DzlShortcutContext *
 dzl_shortcut_controller_get_context (DzlShortcutController *self)
 {
-  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
-
   g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), NULL);
 
-  if (priv->widget == NULL)
-    return NULL;
-
-  if (priv->context == NULL)
-    {
-      DzlShortcutManager *manager;
-      DzlShortcutTheme *theme;
-
-      manager = dzl_shortcut_controller_get_manager (self);
-      theme = dzl_shortcut_manager_get_theme (manager);
-
-      /*
-       * If we have not set an explicit context, then we want to just return
-       * our borrowed context so if the theme changes we adapt.
-       */
-
-      return dzl_shortcut_theme_find_default_context (theme, priv->widget);
-    }
-
-  return priv->context;
+  return dzl_shortcut_controller_get_context_for_phase (self, DZL_SHORTCUT_PHASE_DISPATCH);
 }
 
 static DzlShortcutContext *
-dzl_shortcut_controller_get_parent_context (DzlShortcutController *self)
+dzl_shortcut_controller_get_inherited_context (DzlShortcutController *self,
+                                               DzlShortcutPhase       phase)
 {
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
   DzlShortcutManager *manager;
+  DzlShortcutContext *ret;
   DzlShortcutTheme *theme;
   DzlShortcutTheme *parent;
-  const gchar *name = NULL;
   const gchar *parent_name = NULL;
 
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
 
-  manager = dzl_shortcut_controller_get_manager (self);
-
-  theme = dzl_shortcut_manager_get_theme (manager);
-  if (theme == NULL)
+  if (NULL == priv->widget ||
+      NULL == (manager = dzl_shortcut_controller_get_manager (self)) ||
+      NULL == (theme = dzl_shortcut_manager_get_theme (manager)) ||
+      NULL == (parent_name = dzl_shortcut_theme_get_parent_name (theme)) ||
+      NULL == (parent = dzl_shortcut_manager_get_theme_by_name (manager, parent_name)))
     return NULL;
 
-  parent_name = dzl_shortcut_theme_get_parent_name (theme);
-  if (parent_name == NULL)
-    return NULL;
+  ret = _dzl_shortcut_controller_get_context_for_phase (self, parent, phase);
 
-  parent = dzl_shortcut_manager_get_theme_by_name (manager, parent_name);
-  if (parent == NULL)
-    return NULL;
+  g_return_val_if_fail (!ret || DZL_IS_SHORTCUT_CONTEXT (ret), NULL);
 
-  if (priv->context != NULL)
-    {
-      name = dzl_shortcut_context_get_name (priv->context);
-
-      if (name != NULL)
-        return dzl_shortcut_theme_find_context_by_name (theme, name);
-    }
-
-  return dzl_shortcut_theme_find_default_context (theme, priv->widget);
+  return ret;
 }
 
 static DzlShortcutMatch
 dzl_shortcut_controller_process (DzlShortcutController  *self,
-                                 const DzlShortcutChord *chord)
+                                 const DzlShortcutChord *chord,
+                                 DzlShortcutPhase        phase)
 {
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
   DzlShortcutContext *context;
@@ -718,55 +769,47 @@ dzl_shortcut_controller_process (DzlShortcutController  *self,
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
   g_assert (chord != NULL);
 
-  /* Short-circuit if we can't make forward progress */
-  if (priv->widget == NULL ||
-      !gtk_widget_get_visible (priv->widget) ||
-      !gtk_widget_is_sensitive (priv->widget))
-    return DZL_SHORTCUT_MATCH_NONE;
-
   /* Try to activate our current context */
   if (match == DZL_SHORTCUT_MATCH_NONE &&
-      NULL != (context = dzl_shortcut_controller_get_context (self)))
+      NULL != (context = dzl_shortcut_controller_get_context_for_phase (self, phase)))
     match = dzl_shortcut_context_activate (context, priv->widget, chord);
 
   /* If we didn't get a match, locate the context within the parent theme */
   if (match == DZL_SHORTCUT_MATCH_NONE &&
-      NULL != (context = dzl_shortcut_controller_get_parent_context (self)))
+      NULL != (context = dzl_shortcut_controller_get_inherited_context (self, phase)))
     match = dzl_shortcut_context_activate (context, priv->widget, chord);
-
-  /* Try to activate one of our descendant controllers */
-  for (GList *iter = priv->descendants.head;
-       match != DZL_SHORTCUT_MATCH_EQUAL && iter != NULL;
-       iter = iter->next)
-    {
-      DzlShortcutController *descendant = iter->data;
-      DzlShortcutMatch child_match;
-
-      child_match = dzl_shortcut_controller_process (descendant, chord);
-
-      if (child_match != DZL_SHORTCUT_MATCH_NONE)
-        match = child_match;
-    }
 
   return match;
 }
 
 /**
- * dzl_shortcut_controller_handle_event:
+ * _dzl_shortcut_controller_handle:
  * @self: An #DzlShortcutController
  * @event: A #GdkEventKey
+ * @chord: the current chord for the toplevel
+ * @phase: the dispatch phase
  *
  * This function uses @event to determine if the current context has a shortcut
  * registered matching the event. If so, the shortcut will be dispatched and
- * %TRUE is returned.
+ * %TRUE is returned. Otherwise, %FALSE is returned.
  *
- * Otherwise, %FALSE is returned.
+ * @chord is used to track the current chord from the toplevel. Chord tracking
+ * is done in a single place to avoid inconsistencies between controllers.
  *
- * Returns: %TRUE if @event has been handled, otherwise %FALSE.
+ * @phase should indicate the phase of the event dispatch. Capture is used
+ * to capture events before the destination #GdkWindow can process them, and
+ * bubble is to allow the destination window to handle it before processing
+ * the result afterwards if not yet handled.
+ *
+ * Returns: A #DzlShortcutMatch based on if the event was dispatched.
+ *
+ * Since: 3.26
  */
-gboolean
-dzl_shortcut_controller_handle_event (DzlShortcutController *self,
-                                      const GdkEventKey     *event)
+DzlShortcutMatch
+_dzl_shortcut_controller_handle (DzlShortcutController  *self,
+                                 const GdkEventKey      *event,
+                                 const DzlShortcutChord *chord,
+                                 DzlShortcutPhase        phase)
 {
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
   DzlShortcutMatch match;
@@ -775,70 +818,58 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), FALSE);
   g_return_val_if_fail (event != NULL, FALSE);
+  g_return_val_if_fail (chord != NULL, FALSE);
+  g_return_val_if_fail (phase <= DZL_SHORTCUT_PHASE_BUBBLE, FALSE);
+
+  /* Nothing to do if the widget isn't visible/mapped/etc */
+  if (priv->widget == NULL ||
+      !gtk_widget_get_visible (priv->widget) ||
+      !gtk_widget_get_child_visible (priv->widget) ||
+      !gtk_widget_is_sensitive (priv->widget))
+    DZL_RETURN (DZL_SHORTCUT_MATCH_NONE);
 
   /*
-   * This handles the activation of the event starting from this context,
-   * and working our way down into the children controllers.
+   * This function processes a particular phase for the event. If our phase
+   * is DZL_SHORTCUT_PHASE_CAPTURE, that means we are in the process of working
+   * our way from the toplevel down to the widget containing the event window.
    *
-   * We process things in the order of:
+   * If our phase is DZL_SHORTCUT_PHASE_BUBBLE, then we are working our way
+   * up from the widget containing the event window to the toplevel. This is
+   * the phase where most activations should occur.
    *
-   *   1) Our current shortcut context
-   *   2) Our current shortcut context for "commands"
-   *   3) Each of our registered controllers.
+   * During the capture phase, we look for a context matching the current
+   * context, but with a suffix on the context name like ":capture". So for
+   * the default GtkEntry, the capture context name would be something like
+   * "GtkEntry:capture". The bubble phase does not have a suffix.
    *
-   * This gets a bit complicated once we start talking about chords. A chord is
-   * a sequence of GdkEventKey which can activate a shortcut. That might be
-   * something like Ctrl+X|Ctrl+O. Ctrl+X does not activate something on its
-   * own, but if the following event is a CTRL+O, it will activate that
-   * shortcut.
+   *   Toplevel Capture
+   *     - Child 1 Capture
+   *       - Grandchild 1 Capture
+   *       - Grandchild 1 Bubble
+   *     - Child 1 Bubble
+   *   Toplevel Bubble
    *
-   * This means we need to stash the chord sequence while we have partial
-   * matches up until we get a match. If no match is found (nor a partial),
-   * then we can ignore the event and return GDK_EVENT_PROPAGATE.
-   *
-   * If we swallow the event, because we are building a chord, then we will
-   * return GDK_EVENT_STOP and stash the chord for future use.
-   *
-   * While unfortunate, we do not try to handle a situation where we have a
-   * collision between an exact match and a partial match. The first item we
-   * come across wins. This is considered undefined behavior.
+   * If we come across a keybinding that is a partial match, we assume that
+   * is the closest match in the dispatch chain and stop processing further.
+   * Overlapping and conflicting keybindings are considered undefined behavior
+   * and this falls under such a situation.
    */
 
-  if (priv->current_chord == NULL)
-    {
-      priv->current_chord = dzl_shortcut_chord_new_from_event (event);
-      if (priv->current_chord == NULL)
-        DZL_RETURN (GDK_EVENT_PROPAGATE);
-    }
-  else
-    {
-      if (!dzl_shortcut_chord_append_event (priv->current_chord, event))
-        {
-          g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
-          g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
-          DZL_RETURN (GDK_EVENT_PROPAGATE);
-        }
-    }
-
-  g_assert (priv->current_chord != NULL);
-
-  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
-
-#if 0
-  {
-    g_autofree gchar *str = dzl_shortcut_chord_to_string (priv->current_chord);
-    g_debug ("Chord = %s", str);
-  }
-#endif
-
-  match = dzl_shortcut_controller_process (self, priv->current_chord);
+  match = dzl_shortcut_controller_process (self, chord, phase);
 
   /*
    * If we still haven't located a match, we need to ask the theme if there
    * is a keybinding registered for this chord to a command or action. If
    * so, we will try to dispatch it now.
+   *
+   * This is only performed by the root controller as it is for global actions.
+   * The theme may have specified a phase, so we must propagate that to the
+   * controller as well. Dispatch does not make sense, so we only perform this
+   * on capture/bubble.
    */
-  if (match != DZL_SHORTCUT_MATCH_EQUAL && priv->current_chord != NULL)
+  if (match == DZL_SHORTCUT_MATCH_NONE &&
+      phase != DZL_SHORTCUT_PHASE_DISPATCH &&
+      priv->root == NULL)
     {
       DzlShortcutClosureChain *chain = NULL;
       DzlShortcutManager *manager;
@@ -847,7 +878,7 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
 
       manager = dzl_shortcut_controller_get_manager (self);
       theme = dzl_shortcut_manager_get_theme (manager);
-      theme_match = _dzl_shortcut_theme_match (theme, priv->current_chord, &chain);
+      theme_match = _dzl_shortcut_theme_match (theme, phase, chord, &chain);
 
       if (theme_match == DZL_SHORTCUT_MATCH_EQUAL)
         dzl_shortcut_closure_chain_execute (chain, priv->widget);
@@ -856,24 +887,11 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
         match = theme_match;
     }
 
-#if 0
-  g_message ("match = %d", match);
-#endif
-
-  if (match != DZL_SHORTCUT_MATCH_PARTIAL)
-    {
-      g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
-      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
-    }
-
   DZL_TRACE_MSG ("match = %s",
-		 match == DZL_SHORTCUT_MATCH_NONE ? "none" :
-		 match == DZL_SHORTCUT_MATCH_PARTIAL ? "partial" : "equal");
+                 match == DZL_SHORTCUT_MATCH_NONE ? "none" :
+                 match == DZL_SHORTCUT_MATCH_PARTIAL ? "partial" : "equal");
 
-  if (match != DZL_SHORTCUT_MATCH_NONE)
-    DZL_RETURN (GDK_EVENT_STOP);
-
-  DZL_RETURN (GDK_EVENT_PROPAGATE);
+  DZL_RETURN (match);
 }
 
 /**
@@ -881,8 +899,11 @@ dzl_shortcut_controller_handle_event (DzlShortcutController *self,
  * @self: a #DzlShortcutController
  *
  * This method gets the #DzlShortcutController:current-chord property.
- *
  * This is useful if you want to monitor in-progress chord building.
+ *
+ * Note that this value will only be valid on the controller for the
+ * toplevel widget (a #GtkWindow). Chords are not tracked at the
+ * individual widget controller level.
  *
  * Returns: (transfer none) (nullable): A #DzlShortcutChord or %NULL.
  */
@@ -1037,4 +1058,55 @@ dzl_shortcut_controller_add_command_signal (DzlShortcutController *self,
   va_end (args);
 
   dzl_shortcut_controller_add_command (self, command_id, default_accel, chain);
+}
+
+DzlShortcutChord *
+_dzl_shortcut_controller_push (DzlShortcutController *self,
+                               const GdkEventKey     *event)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), NULL);
+  g_return_val_if_fail (event != NULL, NULL);
+
+  /*
+   * Only the toplevel controller handling the event needs to determine
+   * the current "chord" as that state lives in the root controller only.
+   *
+   * So our first step is to determine the current chord, or if this input
+   * breaks further chord processing.
+   *
+   * We will use these chords during capture/dispatch/bubble later on.
+   */
+  if (priv->current_chord == NULL)
+    {
+      /* Try to create a new chord starting with this key.
+       * current_chord may still be NULL after this.
+       */
+      priv->current_chord = dzl_shortcut_chord_new_from_event (event);
+    }
+  else
+    {
+      if (!dzl_shortcut_chord_append_event (priv->current_chord, event))
+        {
+          /* Failed to add the key to the chord, cancel */
+          _dzl_shortcut_controller_clear (self);
+          return NULL;
+        }
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
+
+  return dzl_shortcut_chord_copy (priv->current_chord);
+}
+
+void
+_dzl_shortcut_controller_clear (DzlShortcutController *self)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self));
+
+  g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
 }

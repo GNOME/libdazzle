@@ -21,45 +21,63 @@
 
 #include <gtk/gtk.h>
 
-#include "dzl-shortcut-context.h"
-#include "dzl-shortcut-manager.h"
+#include "shortcuts/dzl-shortcut-context.h"
+#include "shortcuts/dzl-shortcut-manager.h"
 
 G_BEGIN_DECLS
+
+/**
+ * DzlShortcutPhase:
+ * @DZL_SHORTCUT_PHASE_CAPTURE: Indicates the capture phase of the shortcut
+ *   activation. This allows parent widgets to intercept the keybinding before
+ *   it is dispatched to the target #GdkWindow.
+ * @DZL_SHORTCUT_DISPATCH: Indicates the typical dispatch phase of the shortcut
+ *   to the widget of the target #GdkWindow.
+ * @DZL_SHORTCUT_BUBBLE: The final phase of event delivery. The event is
+ *   delivered to each widget as it progresses from the target window widget
+ *   up to the toplevel.
+ */
+typedef enum
+{
+  DZL_SHORTCUT_PHASE_CAPTURE,
+  DZL_SHORTCUT_PHASE_DISPATCH,
+  DZL_SHORTCUT_PHASE_BUBBLE,
+} DzlShortcutPhase;
 
 #define DZL_TYPE_SHORTCUT_CONTROLLER (dzl_shortcut_controller_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlShortcutController, dzl_shortcut_controller, DZL, SHORTCUT_CONTROLLER, GObject)
 
-DzlShortcutController  *dzl_shortcut_controller_new                  (GtkWidget             *widget);
-DzlShortcutManager     *dzl_shortcut_controller_get_manager          (DzlShortcutController *self);
-void                    dzl_shortcut_controller_set_manager          (DzlShortcutController *self,
-                                                                      DzlShortcutManager    *manager);
-gboolean                dzl_shortcut_controller_handle_event         (DzlShortcutController *self,
-                                                                      const GdkEventKey     *event);
-DzlShortcutController  *dzl_shortcut_controller_find                 (GtkWidget             *widget);
-DzlShortcutController  *dzl_shortcut_controller_try_find             (GtkWidget             *widget);
-DzlShortcutContext     *dzl_shortcut_controller_get_context          (DzlShortcutController *self);
-void                    dzl_shortcut_controller_set_context          (DzlShortcutController *self,
-                                                                      DzlShortcutContext    *context);
-gboolean                dzl_shortcut_controller_execute_command      (DzlShortcutController *self,
-                                                                      const gchar           *command);
-const DzlShortcutChord *dzl_shortcut_controller_get_current_chord    (DzlShortcutController *self);
-void                    dzl_shortcut_controller_add_command_action   (DzlShortcutController *self,
-                                                                      const gchar           *command_id,
-                                                                      const gchar           *default_accel,
-                                                                      const gchar           *action);
-void                    dzl_shortcut_controller_add_command_callback (DzlShortcutController *self,
-                                                                      const gchar           *command_id,
-                                                                      const gchar           *default_accel,
-                                                                      GtkCallback            callback,
-                                                                      gpointer               callback_data,
-                                                                      GDestroyNotify         callback_data_destroy);
-void                    dzl_shortcut_controller_add_command_signal   (DzlShortcutController *self,
-                                                                      const gchar           *command_id,
-                                                                      const gchar           *default_accel,
-                                                                      const gchar           *signal_name,
-                                                                      guint                  n_args,
-                                                                      ...);
+DzlShortcutController  *dzl_shortcut_controller_new                   (GtkWidget             *widget);
+DzlShortcutManager     *dzl_shortcut_controller_get_manager           (DzlShortcutController *self);
+void                    dzl_shortcut_controller_set_manager           (DzlShortcutController *self,
+                                                                       DzlShortcutManager    *manager);
+DzlShortcutController  *dzl_shortcut_controller_find                  (GtkWidget             *widget);
+DzlShortcutController  *dzl_shortcut_controller_try_find              (GtkWidget             *widget);
+DzlShortcutContext     *dzl_shortcut_controller_get_context           (DzlShortcutController *self);
+void                    dzl_shortcut_controller_set_context_by_name   (DzlShortcutController *self,
+                                                                       const gchar           *name);
+DzlShortcutContext     *dzl_shortcut_controller_get_context_for_phase (DzlShortcutController *self,
+                                                                       DzlShortcutPhase       phase);
+gboolean                dzl_shortcut_controller_execute_command       (DzlShortcutController *self,
+                                                                       const gchar           *command);
+const DzlShortcutChord *dzl_shortcut_controller_get_current_chord     (DzlShortcutController *self);
+void                    dzl_shortcut_controller_add_command_action    (DzlShortcutController *self,
+                                                                       const gchar           *command_id,
+                                                                       const gchar           *default_accel,
+                                                                       const gchar           *action);
+void                    dzl_shortcut_controller_add_command_callback  (DzlShortcutController *self,
+                                                                       const gchar           *command_id,
+                                                                       const gchar           *default_accel,
+                                                                       GtkCallback            callback,
+                                                                       gpointer               callback_data,
+                                                                       GDestroyNotify         callback_data_destroy);
+void                    dzl_shortcut_controller_add_command_signal    (DzlShortcutController *self,
+                                                                       const gchar           *command_id,
+                                                                       const gchar           *default_accel,
+                                                                       const gchar           *signal_name,
+                                                                       guint                  n_args,
+                                                                       ...);
 
 G_END_DECLS
 

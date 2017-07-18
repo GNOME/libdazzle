@@ -616,6 +616,7 @@ dzl_shortcut_theme_get_parent (DzlShortcutTheme *self)
 
 DzlShortcutMatch
 _dzl_shortcut_theme_match (DzlShortcutTheme         *self,
+                           DzlShortcutPhase          phase,
                            const DzlShortcutChord   *chord,
                            DzlShortcutClosureChain **chain)
 {
@@ -630,6 +631,9 @@ _dzl_shortcut_theme_match (DzlShortcutTheme         *self,
   g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (self), FALSE);
   g_return_val_if_fail (chord != NULL, FALSE);
   g_return_val_if_fail (chain != NULL, FALSE);
+
+  if (phase != DZL_SHORTCUT_PHASE_BUBBLE)
+    return DZL_SHORTCUT_MATCH_NONE;
 
   /* TODO: We probably need the ability to have a "block" or "unbind" type
    *       disabling when we implement chaining up to the parent theme.
@@ -659,7 +663,7 @@ _dzl_shortcut_theme_match (DzlShortcutTheme         *self,
 
   if (parent != NULL)
     {
-      match3 = _dzl_shortcut_theme_match (parent, chord, chain);
+      match3 = _dzl_shortcut_theme_match (parent, phase, chord, chain);
 
       if (match3 == DZL_SHORTCUT_MATCH_EQUAL)
         return match3;

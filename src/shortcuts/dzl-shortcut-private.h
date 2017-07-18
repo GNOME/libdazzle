@@ -21,6 +21,7 @@
 
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-closure-chain.h"
+#include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-simple-label.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "shortcuts/dzl-shortcut-theme.h"
@@ -98,38 +99,42 @@ struct _DzlShortcutClosureChain
   };
 };
 
-gboolean               _dzl_gtk_widget_activate_action          (GtkWidget                  *widget,
-                                                                 const gchar                *prefix,
-                                                                 const gchar                *action_name,
-                                                                 GVariant                   *parameter);
-GNode                 *_dzl_shortcut_manager_get_root           (DzlShortcutManager         *self);
-DzlShortcutTheme      *_dzl_shortcut_manager_get_internal_theme (DzlShortcutManager         *self);
-void                   _dzl_shortcut_simple_label_set_size_group(DzlShortcutSimpleLabel     *self,
-                                                                 GtkSizeGroup               *size_group);
-void                   _dzl_shortcut_theme_attach               (DzlShortcutTheme           *self);
-void                   _dzl_shortcut_theme_detach               (DzlShortcutTheme           *self);
-GtkTreeModel          *_dzl_shortcut_theme_create_model         (DzlShortcutTheme           *self);
-GHashTable            *_dzl_shortcut_theme_get_contexts         (DzlShortcutTheme           *self);
-void                   _dzl_shortcut_theme_set_manager          (DzlShortcutTheme           *self,
-                                                                 DzlShortcutManager         *manager);
-void                   _dzl_shortcut_theme_set_name             (DzlShortcutTheme           *self,
-                                                                 const gchar                *name);
-void                   _dzl_shortcut_theme_merge                (DzlShortcutTheme           *self,
-                                                                 DzlShortcutTheme           *layer);
-DzlShortcutMatch       _dzl_shortcut_theme_match                (DzlShortcutTheme           *self,
-                                                                 const DzlShortcutChord     *chord,
-                                                                 DzlShortcutClosureChain   **chain);
-DzlShortcutChordTable *_dzl_shortcut_context_get_table          (DzlShortcutContext         *self);
-void                   _dzl_shortcut_context_merge              (DzlShortcutContext         *self,
-                                                                 DzlShortcutContext         *layer);
-void                   _dzl_shortcut_chord_table_iter_init      (DzlShortcutChordTableIter  *iter,
-                                                                 DzlShortcutChordTable      *table);
-gboolean               _dzl_shortcut_chord_table_iter_next      (DzlShortcutChordTableIter  *iter,
-                                                                 const DzlShortcutChord    **chord,
-                                                                 gpointer                   *value);
-void                   _dzl_shortcut_chord_table_iter_steal     (DzlShortcutChordTableIter  *iter);
+DzlShortcutMatch       _dzl_shortcut_controller_handle              (DzlShortcutController      *self,
+                                                                     const GdkEventKey          *event,
+                                                                     const DzlShortcutChord     *chord,
+                                                                     DzlShortcutPhase            phase);
+DzlShortcutChord      *_dzl_shortcut_controller_push                (DzlShortcutController      *self,
+                                                                     const GdkEventKey          *event);
+void                   _dzl_shortcut_controller_clear               (DzlShortcutController      *self);
+GNode                 *_dzl_shortcut_manager_get_root               (DzlShortcutManager         *self);
+DzlShortcutTheme      *_dzl_shortcut_manager_get_internal_theme     (DzlShortcutManager         *self);
+void                   _dzl_shortcut_simple_label_set_size_group    (DzlShortcutSimpleLabel     *self,
+                                                                     GtkSizeGroup               *size_group);
+void                   _dzl_shortcut_theme_attach                   (DzlShortcutTheme           *self);
+void                   _dzl_shortcut_theme_detach                   (DzlShortcutTheme           *self);
+GtkTreeModel          *_dzl_shortcut_theme_create_model             (DzlShortcutTheme           *self);
+GHashTable            *_dzl_shortcut_theme_get_contexts             (DzlShortcutTheme           *self);
 DzlShortcutContext    *_dzl_shortcut_theme_try_find_context_by_name (DzlShortcutTheme           *self,
                                                                      const gchar                *name);
+void                   _dzl_shortcut_theme_set_manager              (DzlShortcutTheme           *self,
+                                                                     DzlShortcutManager         *manager);
+void                   _dzl_shortcut_theme_set_name                 (DzlShortcutTheme           *self,
+                                                                     const gchar                *name);
+void                   _dzl_shortcut_theme_merge                    (DzlShortcutTheme           *self,
+                                                                     DzlShortcutTheme           *layer);
+DzlShortcutMatch       _dzl_shortcut_theme_match                    (DzlShortcutTheme           *self,
+                                                                     DzlShortcutPhase            phase,
+                                                                     const DzlShortcutChord     *chord,
+                                                                     DzlShortcutClosureChain   **chain);
+DzlShortcutChordTable *_dzl_shortcut_context_get_table              (DzlShortcutContext         *self);
+void                   _dzl_shortcut_context_merge                  (DzlShortcutContext         *self,
+                                                                     DzlShortcutContext         *layer);
+void                   _dzl_shortcut_chord_table_iter_init          (DzlShortcutChordTableIter  *iter,
+                                                                     DzlShortcutChordTable      *table);
+gboolean               _dzl_shortcut_chord_table_iter_next          (DzlShortcutChordTableIter  *iter,
+                                                                     const DzlShortcutChord    **chord,
+                                                                     gpointer                   *value);
+void                   _dzl_shortcut_chord_table_iter_steal         (DzlShortcutChordTableIter  *iter);
 
 G_END_DECLS
 
