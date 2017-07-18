@@ -76,6 +76,7 @@ struct _DzlShortcutClosureChain
 
   DzlShortcutClosureType type : 3;
   guint executing : 1;
+  DzlShortcutPhase phase : 2;
 
   union {
     struct {

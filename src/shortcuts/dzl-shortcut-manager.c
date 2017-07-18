@@ -1399,7 +1399,8 @@ dzl_shortcut_manager_add_shortcut_entries (DzlShortcutManager     *self,
 
       if (entry->default_accel != NULL)
         dzl_shortcut_theme_set_accel_for_command (priv->internal_theme,
-                                                  entry->command, entry->default_accel);
+                                                  entry->command,
+                                                  entry->default_accel);
 
       dzl_shortcut_manager_add_command (self,
                                         entry->command,

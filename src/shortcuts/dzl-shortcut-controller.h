@@ -48,16 +48,19 @@ const DzlShortcutChord *dzl_shortcut_controller_get_current_chord     (DzlShortc
 void                    dzl_shortcut_controller_add_command_action    (DzlShortcutController *self,
                                                                        const gchar           *command_id,
                                                                        const gchar           *default_accel,
+                                                                       DzlShortcutPhase       phase,
                                                                        const gchar           *action);
 void                    dzl_shortcut_controller_add_command_callback  (DzlShortcutController *self,
                                                                        const gchar           *command_id,
                                                                        const gchar           *default_accel,
+                                                                       DzlShortcutPhase       phase,
                                                                        GtkCallback            callback,
                                                                        gpointer               callback_data,
                                                                        GDestroyNotify         callback_data_destroy);
 void                    dzl_shortcut_controller_add_command_signal    (DzlShortcutController *self,
                                                                        const gchar           *command_id,
                                                                        const gchar           *default_accel,
+                                                                       DzlShortcutPhase       phase,
                                                                        const gchar           *signal_name,
                                                                        guint                  n_args,
                                                                        ...);

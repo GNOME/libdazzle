@@ -175,9 +175,9 @@ example_window_init (ExampleWindow *self)
 
   controller = dzl_shortcut_controller_find (GTK_WIDGET (self));
 
-  dzl_shortcut_controller_add_command_action (controller, "com.example.window.NewDoc", NULL, "win.new-document");
-  dzl_shortcut_controller_add_command_action (controller, "com.example.window.CloseDoc", NULL, "win.close-document");
-  dzl_shortcut_controller_add_command_action (controller, "com.example.window.Fullscreen", NULL, "win.fullscreen");
+  dzl_shortcut_controller_add_command_action (controller, "com.example.window.NewDoc", NULL, 0, "win.new-document");
+  dzl_shortcut_controller_add_command_action (controller, "com.example.window.CloseDoc", NULL, 0, "win.close-document");
+  dzl_shortcut_controller_add_command_action (controller, "com.example.window.Fullscreen", NULL, 0, "win.fullscreen");
 
   g_signal_connect_swapped (self,
                             "key-press-event",

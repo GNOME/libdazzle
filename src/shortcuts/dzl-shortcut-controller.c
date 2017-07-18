@@ -880,6 +880,13 @@ _dzl_shortcut_controller_handle (DzlShortcutController  *self,
       theme = dzl_shortcut_manager_get_theme (manager);
       theme_match = _dzl_shortcut_theme_match (theme, phase, chord, &chain);
 
+      /* If this chain doesn't match our phase, ignore it */
+      if (chain != NULL && chain->phase != phase)
+        {
+          theme_match = DZL_SHORTCUT_MATCH_NONE;
+          chain = NULL;
+        }
+
       if (theme_match == DZL_SHORTCUT_MATCH_EQUAL)
         dzl_shortcut_closure_chain_execute (chain, priv->widget);
 
@@ -962,6 +969,7 @@ static void
 dzl_shortcut_controller_add_command (DzlShortcutController   *self,
                                      const gchar             *command_id,
                                      const gchar             *default_accel,
+                                     DzlShortcutPhase         phase,
                                      DzlShortcutClosureChain *chain)
 {
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
@@ -972,33 +980,43 @@ dzl_shortcut_controller_add_command (DzlShortcutController   *self,
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
   g_assert (command_id != NULL);
   g_assert (chain != NULL);
+  g_assert (phase <= DZL_SHORTCUT_PHASE_BUBBLE);
 
+  /* Always use interned strings for command ids */
   command_id = g_intern_string (command_id);
 
+  /*
+   * Set the phase on the closure chain so we know what phase we are allowed
+   * to execute the chain within during capture/dispatch/bubble.
+   */
+  chain->phase = phase;
+
+  /* Add the closure chain to our set of commands. */
   if (priv->commands == NULL)
     priv->commands = g_hash_table_new_full (NULL, NULL, NULL,
                                             (GDestroyNotify)dzl_shortcut_closure_chain_free);
-
   g_hash_table_insert (priv->commands, (gpointer)command_id, chain);
 
-  if (priv->commands_table == NULL)
-    priv->commands_table = dzl_shortcut_chord_table_new ();
-
+  /* If an accel was provided, we need to register it in various places */
   if (default_accel != NULL)
     {
+      /* Make sure this is a valid accelerator */
       chord = dzl_shortcut_chord_new_from_string (default_accel);
 
       if (chord != NULL)
         {
+          /* Add the chord to our chord table for lookups */
+          if (priv->commands_table == NULL)
+            priv->commands_table = dzl_shortcut_chord_table_new ();
           dzl_shortcut_chord_table_add (priv->commands_table, chord, (gpointer)command_id);
+
+          /* Set the value in the theme so it can have overrides by users */
           manager = dzl_shortcut_controller_get_manager (self);
           theme = _dzl_shortcut_manager_get_internal_theme (manager);
           dzl_shortcut_theme_set_chord_for_command (theme, command_id, chord);
-
-#if 0
-          g_print ("Added %s for command %s\n", default_accel, command_id);
-#endif
         }
+      else
+        g_warning ("\"%s\" is not a valid accelerator chord", default_accel);
     }
 }
 
@@ -1006,6 +1024,7 @@ void
 dzl_shortcut_controller_add_command_action (DzlShortcutController *self,
                                             const gchar           *command_id,
                                             const gchar           *default_accel,
+                                            DzlShortcutPhase       phase,
                                             const gchar           *action)
 {
   DzlShortcutClosureChain *chain;
@@ -1014,14 +1033,14 @@ dzl_shortcut_controller_add_command_action (DzlShortcutController *self,
   g_return_if_fail (command_id != NULL);
 
   chain = dzl_shortcut_closure_chain_append_action_string (NULL, action);
-
-  dzl_shortcut_controller_add_command (self, command_id, default_accel, chain);
+  dzl_shortcut_controller_add_command (self, command_id, default_accel, phase, chain);
 }
 
 void
 dzl_shortcut_controller_add_command_callback (DzlShortcutController *self,
                                               const gchar           *command_id,
                                               const gchar           *default_accel,
+                                              DzlShortcutPhase       phase,
                                               GtkCallback            callback,
                                               gpointer               callback_data,
                                               GDestroyNotify         callback_data_destroy)
@@ -1036,13 +1055,14 @@ dzl_shortcut_controller_add_command_callback (DzlShortcutController *self,
                                                       callback_data,
                                                       callback_data_destroy);
 
-  dzl_shortcut_controller_add_command (self, command_id, default_accel, chain);
+  dzl_shortcut_controller_add_command (self, command_id, default_accel, phase, chain);
 }
 
 void
 dzl_shortcut_controller_add_command_signal (DzlShortcutController *self,
                                             const gchar           *command_id,
                                             const gchar           *default_accel,
+                                            DzlShortcutPhase       phase,
                                             const gchar           *signal_name,
                                             guint                  n_args,
                                             ...)
@@ -1057,7 +1077,7 @@ dzl_shortcut_controller_add_command_signal (DzlShortcutController *self,
   chain = dzl_shortcut_closure_chain_append_signal (NULL, signal_name, n_args, args);
   va_end (args);
 
-  dzl_shortcut_controller_add_command (self, command_id, default_accel, chain);
+  dzl_shortcut_controller_add_command (self, command_id, default_accel, phase, chain);
 }
 
 DzlShortcutChord *

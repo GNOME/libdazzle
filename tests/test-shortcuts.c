@@ -15,8 +15,8 @@ typedef struct
 } App;
 
 static const DzlShortcutEntry entries[] = {
-  { "a.b.c.a", "<Control>l", "Editor", "Navigation", "Move to next error" },
-  { "a.b.c.b", "<Control>k", "Editor", "Navigation", "Move to previous error" },
+  { "a.b.c.a", 0, "<Control>l", "Editor", "Navigation", "Move to next error" },
+  { "a.b.c.b", 0, "<Control>k", "Editor", "Navigation", "Move to previous error" },
 };
 
 static void
@@ -103,7 +103,7 @@ main (gint argc,
                              "title", "Shortcuts Test",
                              NULL);
   app.root_controller = dzl_shortcut_controller_new (GTK_WIDGET (app.window));
-  dzl_shortcut_controller_add_command_callback (app.root_controller, "a.b.c.a", NULL, a_b_c_a, NULL, NULL);
+  dzl_shortcut_controller_add_command_callback (app.root_controller, "a.b.c.a", NULL, 0, a_b_c_a, NULL, NULL);
 
   g_signal_connect (app.root_controller,
                     "notify::current-chord",
@@ -138,11 +138,13 @@ main (gint argc,
   dzl_shortcut_controller_add_command_signal (app.search_controller,
                                               "com.example.foo.search",
                                               "<ctrl>y|<ctrl>y",
+                                              DZL_SHORTCUT_PHASE_CAPTURE,
                                               "grab-focus",
                                               0);
   dzl_shortcut_controller_add_command_callback (app.search_controller,
                                                 "com.example.foo.test",
                                                 "<ctrl>x|<ctrl>r",
+                                                DZL_SHORTCUT_PHASE_CAPTURE,
                                                 test_callback, NULL, NULL);
 
   app.shortcuts = g_object_new (GTK_TYPE_BUTTON,
