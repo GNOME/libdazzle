@@ -92,12 +92,13 @@ typedef struct
    */
   GList descendants_link;
 
-  /*
-   * Signal handlers to react to various changes in the system.
-   */
+  /* Signal handlers to react to various changes in the system. */
   gulong hierarchy_changed_handler;
   gulong widget_destroy_handler;
   gulong manager_changed_handler;
+
+  /* If we have any global shortcuts registered */
+  guint have_global : 1;
 } DzlShortcutControllerPrivate;
 
 enum {
@@ -134,6 +135,13 @@ dzl_shortcut_controller_emit_reset (DzlShortcutController *self)
   g_signal_emit (self, signals[RESET], 0);
 }
 
+static inline gboolean
+dzl_shortcut_controller_is_root (DzlShortcutController *self)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+
+  return priv->root == NULL;
+}
 
 /**
  * dzl_shortcut_controller_get_manager:
@@ -260,16 +268,13 @@ dzl_shortcut_controller_widget_hierarchy_changed (DzlShortcutController *self,
   g_assert (!previous_toplevel || GTK_IS_WIDGET (previous_toplevel));
   g_assert (GTK_IS_WIDGET (widget));
 
-  g_object_ref (self);
-
   /*
-   * Here we register our controller with the toplevel controller. If that
-   * widget doesn't yet have a placeholder toplevel controller, then we
-   * create that and attach to it.
-   *
-   * The toplevel controller is used to dispatch events from the window
-   * to any controller that could be activating for the window.
+   * We attach our controller to the root controller if we have shortcuts in
+   * the global activation phase. That allows the bubble/capture phase to
+   * potentially dispatch to our controller.
    */
+
+  g_object_ref (self);
 
   if (priv->root != NULL)
     {
@@ -277,14 +282,17 @@ dzl_shortcut_controller_widget_hierarchy_changed (DzlShortcutController *self,
       g_clear_object (&priv->root);
     }
 
-  toplevel = gtk_widget_get_toplevel (widget);
-
-  if (toplevel != widget)
+  if (priv->have_global)
     {
-      priv->root = g_object_get_qdata (G_OBJECT (toplevel), root_quark);
-      if (priv->root == NULL)
-        priv->root = dzl_shortcut_controller_new (toplevel);
-      dzl_shortcut_controller_add (priv->root, self);
+      toplevel = gtk_widget_get_toplevel (widget);
+
+      if (toplevel != widget)
+        {
+          priv->root = g_object_get_qdata (G_OBJECT (toplevel), root_quark);
+          if (priv->root == NULL)
+            priv->root = dzl_shortcut_controller_new (toplevel);
+          dzl_shortcut_controller_add (priv->root, self);
+        }
     }
 
   g_object_unref (self);
@@ -782,12 +790,88 @@ dzl_shortcut_controller_process (DzlShortcutController  *self,
   return match;
 }
 
+static void
+dzl_shortcut_controller_do_global_chain (DzlShortcutController   *self,
+                                         DzlShortcutClosureChain *chain,
+                                         GtkWidget               *widget,
+                                         GList                   *next)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+
+  g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
+  g_assert (chain != NULL);
+  g_assert (GTK_IS_WIDGET (widget));
+
+  /*
+   * If this is an action chain, the best we're going to be able to do is
+   * activate the action from the current widget. For commands, we can try to
+   * resolve them by locating commands within our registered controllers.
+   */
+
+  if (chain->type != DZL_SHORTCUT_CLOSURE_COMMAND)
+    {
+      dzl_shortcut_closure_chain_execute (chain, widget);
+      return;
+    }
+
+  if (priv->commands != NULL &&
+      g_hash_table_contains (priv->commands, chain->command.name))
+    {
+      dzl_shortcut_closure_chain_execute (chain, priv->widget);
+      return;
+    }
+
+  if (next == NULL)
+    {
+      dzl_shortcut_closure_chain_execute (chain, widget);
+      return;
+    }
+
+  dzl_shortcut_controller_do_global_chain (next->data, chain, widget, next->next);
+}
+
+static DzlShortcutMatch
+dzl_shortcut_controller_do_global (DzlShortcutController  *self,
+                                   const DzlShortcutChord *chord,
+                                   DzlShortcutPhase        phase,
+                                   GtkWidget              *widget)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+  DzlShortcutClosureChain *chain = NULL;
+  DzlShortcutManager *manager;
+  DzlShortcutTheme *theme;
+  DzlShortcutMatch match;
+
+  g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
+  g_assert (chord != NULL);
+  g_assert ((phase & DZL_SHORTCUT_PHASE_GLOBAL) != 0);
+  g_assert (GTK_IS_WIDGET (widget));
+
+  manager = dzl_shortcut_controller_get_manager (self);
+  g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
+
+  theme = dzl_shortcut_manager_get_theme (manager);
+  g_assert (DZL_IS_SHORTCUT_THEME (theme));
+
+  /* See if we have a chain for this chord */
+  match = _dzl_shortcut_theme_match (theme, phase, chord, &chain);
+
+  /* If we matched, execute the chain, trying to locate the proper widget for
+   * the event delivery.
+   */
+  if (match == DZL_SHORTCUT_MATCH_EQUAL && chain->phase == phase)
+    dzl_shortcut_controller_do_global_chain (self, chain, widget, priv->descendants.head);
+
+  return match;
+}
+
 /**
  * _dzl_shortcut_controller_handle:
  * @self: An #DzlShortcutController
  * @event: A #GdkEventKey
  * @chord: the current chord for the toplevel
  * @phase: the dispatch phase
+ * @widget: the widget receiving @event
  *
  * This function uses @event to determine if the current context has a shortcut
  * registered matching the event. If so, the shortcut will be dispatched and
@@ -809,17 +893,18 @@ DzlShortcutMatch
 _dzl_shortcut_controller_handle (DzlShortcutController  *self,
                                  const GdkEventKey      *event,
                                  const DzlShortcutChord *chord,
-                                 DzlShortcutPhase        phase)
+                                 DzlShortcutPhase        phase,
+                                 GtkWidget              *widget)
 {
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
-  DzlShortcutMatch match;
+  DzlShortcutMatch match = DZL_SHORTCUT_MATCH_NONE;
 
   DZL_ENTRY;
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), FALSE);
   g_return_val_if_fail (event != NULL, FALSE);
   g_return_val_if_fail (chord != NULL, FALSE);
-  g_return_val_if_fail (phase <= DZL_SHORTCUT_PHASE_BUBBLE, FALSE);
+  g_return_val_if_fail (GTK_IS_WIDGET (widget), FALSE);
 
   /* Nothing to do if the widget isn't visible/mapped/etc */
   if (priv->widget == NULL ||
@@ -827,6 +912,11 @@ _dzl_shortcut_controller_handle (DzlShortcutController  *self,
       !gtk_widget_get_child_visible (priv->widget) ||
       !gtk_widget_is_sensitive (priv->widget))
     DZL_RETURN (DZL_SHORTCUT_MATCH_NONE);
+
+  /* Try to dispatch our capture global shortcuts first */
+  if (phase == (DZL_SHORTCUT_PHASE_CAPTURE | DZL_SHORTCUT_PHASE_GLOBAL) &&
+      dzl_shortcut_controller_is_root (self))
+    match = dzl_shortcut_controller_do_global (self, chord, phase, widget);
 
   /*
    * This function processes a particular phase for the event. If our phase
@@ -842,57 +932,32 @@ _dzl_shortcut_controller_handle (DzlShortcutController  *self,
    * the default GtkEntry, the capture context name would be something like
    * "GtkEntry:capture". The bubble phase does not have a suffix.
    *
+   *   Toplevel Global Capture Accels
    *   Toplevel Capture
    *     - Child 1 Capture
    *       - Grandchild 1 Capture
    *       - Grandchild 1 Bubble
    *     - Child 1 Bubble
    *   Toplevel Bubble
+   *   Toplevel Global Bubble Accels
    *
    * If we come across a keybinding that is a partial match, we assume that
    * is the closest match in the dispatch chain and stop processing further.
    * Overlapping and conflicting keybindings are considered undefined behavior
    * and this falls under such a situation.
-   */
-
-  match = dzl_shortcut_controller_process (self, chord, phase);
-
-  /*
-   * If we still haven't located a match, we need to ask the theme if there
-   * is a keybinding registered for this chord to a command or action. If
-   * so, we will try to dispatch it now.
    *
-   * This is only performed by the root controller as it is for global actions.
-   * The theme may have specified a phase, so we must propagate that to the
-   * controller as well. Dispatch does not make sense, so we only perform this
-   * on capture/bubble.
+   * Note that we do not perform the bubble/capture phase here, that is handled
+   * by our caller in DzlShortcutManager.
    */
+
+  if (match == DZL_SHORTCUT_MATCH_NONE)
+    match = dzl_shortcut_controller_process (self, chord, phase);
+
+  /* Try to dispatch our capture global shortcuts first */
   if (match == DZL_SHORTCUT_MATCH_NONE &&
-      phase != DZL_SHORTCUT_PHASE_DISPATCH &&
-      priv->root == NULL)
-    {
-      DzlShortcutClosureChain *chain = NULL;
-      DzlShortcutManager *manager;
-      DzlShortcutTheme *theme;
-      DzlShortcutMatch theme_match;
-
-      manager = dzl_shortcut_controller_get_manager (self);
-      theme = dzl_shortcut_manager_get_theme (manager);
-      theme_match = _dzl_shortcut_theme_match (theme, phase, chord, &chain);
-
-      /* If this chain doesn't match our phase, ignore it */
-      if (chain != NULL && chain->phase != phase)
-        {
-          theme_match = DZL_SHORTCUT_MATCH_NONE;
-          chain = NULL;
-        }
-
-      if (theme_match == DZL_SHORTCUT_MATCH_EQUAL)
-        dzl_shortcut_closure_chain_execute (chain, priv->widget);
-
-      if (theme_match != DZL_SHORTCUT_MATCH_NONE)
-        match = theme_match;
-    }
+      dzl_shortcut_controller_is_root (self) &&
+      phase == (DZL_SHORTCUT_PHASE_BUBBLE | DZL_SHORTCUT_PHASE_GLOBAL))
+    match = dzl_shortcut_controller_do_global (self, chord, phase, widget);
 
   DZL_TRACE_MSG ("match = %s",
                  match == DZL_SHORTCUT_MATCH_NONE ? "none" :
@@ -980,15 +1045,17 @@ dzl_shortcut_controller_add_command (DzlShortcutController   *self,
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
   g_assert (command_id != NULL);
   g_assert (chain != NULL);
-  g_assert (phase <= DZL_SHORTCUT_PHASE_BUBBLE);
 
   /* Always use interned strings for command ids */
   command_id = g_intern_string (command_id);
 
   /*
    * Set the phase on the closure chain so we know what phase we are allowed
-   * to execute the chain within during capture/dispatch/bubble.
+   * to execute the chain within during capture/dispatch/bubble. There is no
+   * "global + dispatch" phase, so if global is set, default to bubble.
    */
+  if (phase == DZL_SHORTCUT_PHASE_GLOBAL)
+    phase |= DZL_SHORTCUT_PHASE_BUBBLE;
   chain->phase = phase;
 
   /* Add the closure chain to our set of commands. */
@@ -996,6 +1063,21 @@ dzl_shortcut_controller_add_command (DzlShortcutController   *self,
     priv->commands = g_hash_table_new_full (NULL, NULL, NULL,
                                             (GDestroyNotify)dzl_shortcut_closure_chain_free);
   g_hash_table_insert (priv->commands, (gpointer)command_id, chain);
+
+  /*
+   * If this command can be executed in the global phase, we need to be
+   * sure that the root controller knows that we must be checked during
+   * global activation checks.
+   */
+  if ((phase & DZL_SHORTCUT_PHASE_GLOBAL) != 0)
+    {
+      if (priv->have_global != TRUE)
+        {
+          priv->have_global = TRUE;
+          if (priv->widget != NULL)
+            dzl_shortcut_controller_widget_hierarchy_changed (self, NULL, priv->widget);
+        }
+    }
 
   /* If an accel was provided, we need to register it in various places */
   if (default_accel != NULL)
@@ -1013,7 +1095,7 @@ dzl_shortcut_controller_add_command (DzlShortcutController   *self,
           /* Set the value in the theme so it can have overrides by users */
           manager = dzl_shortcut_controller_get_manager (self);
           theme = _dzl_shortcut_manager_get_internal_theme (manager);
-          dzl_shortcut_theme_set_chord_for_command (theme, command_id, chord);
+          dzl_shortcut_theme_set_chord_for_command (theme, command_id, chord, phase);
         }
       else
         g_warning ("\"%s\" is not a valid accelerator chord", default_accel);

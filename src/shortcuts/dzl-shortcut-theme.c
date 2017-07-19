@@ -429,19 +429,20 @@ dzl_shortcut_theme_set_parent_name (DzlShortcutTheme *self,
 void
 dzl_shortcut_theme_set_chord_for_action (DzlShortcutTheme       *self,
                                          const gchar            *detailed_action_name,
-                                         const DzlShortcutChord *chord)
+                                         const DzlShortcutChord *chord,
+                                         DzlShortcutPhase        phase)
 {
   DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
 
   g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
-
-  detailed_action_name = g_intern_string (detailed_action_name);
 
   if (detailed_action_name == NULL)
     {
       dzl_shortcut_chord_table_remove (priv->actions_table, chord);
       return;
     }
+
+  detailed_action_name = g_intern_string (detailed_action_name);
 
   dzl_shortcut_chord_table_remove_data (priv->actions_table,
                                         (gpointer)detailed_action_name);
@@ -450,10 +451,17 @@ dzl_shortcut_theme_set_chord_for_action (DzlShortcutTheme       *self,
     dzl_shortcut_chord_table_add (priv->actions_table, chord,
                                   (gpointer)detailed_action_name);
 
+  if (phase == DZL_SHORTCUT_PHASE_DISPATCH)
+    phase = DZL_SHORTCUT_PHASE_BUBBLE | DZL_SHORTCUT_PHASE_GLOBAL;
+
   if (!g_hash_table_contains (priv->chains, detailed_action_name))
-    g_hash_table_insert (priv->chains,
-                         (gchar *)detailed_action_name,
-                         dzl_shortcut_closure_chain_append_action_string (NULL, detailed_action_name));
+  {
+    DzlShortcutClosureChain *chain;
+
+    chain = dzl_shortcut_closure_chain_append_action_string (NULL, detailed_action_name);
+    chain->phase = phase;
+    g_hash_table_insert (priv->chains, (gchar *)detailed_action_name, chain);
+  }
 }
 
 const DzlShortcutChord *
@@ -485,7 +493,8 @@ dzl_shortcut_theme_get_chord_for_action (DzlShortcutTheme *self,
 void
 dzl_shortcut_theme_set_accel_for_action (DzlShortcutTheme *self,
                                          const gchar      *detailed_action_name,
-                                         const gchar      *accel)
+                                         const gchar      *accel,
+                                         DzlShortcutPhase  phase)
 {
   g_autoptr(DzlShortcutChord) chord = NULL;
 
@@ -494,7 +503,7 @@ dzl_shortcut_theme_set_accel_for_action (DzlShortcutTheme *self,
   if (accel != NULL)
     chord = dzl_shortcut_chord_new_from_string (accel);
 
-  dzl_shortcut_theme_set_chord_for_action (self, detailed_action_name, chord);
+  dzl_shortcut_theme_set_chord_for_action (self, detailed_action_name, chord, phase);
 }
 
 /**
@@ -502,6 +511,7 @@ dzl_shortcut_theme_set_accel_for_action (DzlShortcutTheme *self,
  * @self: a #DzlShortcutTheme
  * @chord: (nullable): the chord for the command
  * @command: (nullable): the command to be executed
+ * @phase: the phase to activate within, or 0 for the default
  *
  * This will set the command to execute when @chord is pressed.  If command is
  * %NULL, the accelerator will be cleared.  If @chord is %NULL, all
@@ -510,13 +520,12 @@ dzl_shortcut_theme_set_accel_for_action (DzlShortcutTheme *self,
 void
 dzl_shortcut_theme_set_chord_for_command (DzlShortcutTheme       *self,
                                           const gchar            *command,
-                                          const DzlShortcutChord *chord)
+                                          const DzlShortcutChord *chord,
+                                          DzlShortcutPhase        phase)
 {
   DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
 
   g_return_if_fail (DZL_IS_SHORTCUT_THEME (self));
-
-  command = g_intern_string (command);
 
   if (command == NULL)
     {
@@ -524,15 +533,23 @@ dzl_shortcut_theme_set_chord_for_command (DzlShortcutTheme       *self,
       return;
     }
 
+  command = g_intern_string (command);
   dzl_shortcut_chord_table_remove_data (priv->commands_table, (gpointer)command);
 
   if (chord != NULL)
     dzl_shortcut_chord_table_add (priv->commands_table, chord, (gpointer)command);
 
+  if (phase == DZL_SHORTCUT_PHASE_DISPATCH)
+    phase = DZL_SHORTCUT_PHASE_BUBBLE | DZL_SHORTCUT_PHASE_GLOBAL;
+
   if (!g_hash_table_contains (priv->chains, command))
-    g_hash_table_insert (priv->chains,
-                         (gchar *)command,
-                         dzl_shortcut_closure_chain_append_command (NULL, command));
+    {
+      DzlShortcutClosureChain *chain;
+
+      chain = dzl_shortcut_closure_chain_append_command (NULL, command);
+      chain->phase = phase;
+      g_hash_table_insert (priv->chains, (gchar *)command, chain);
+    }
 }
 
 const DzlShortcutChord *
@@ -566,6 +583,7 @@ dzl_shortcut_theme_get_chord_for_command (DzlShortcutTheme *self,
  * @self: a #DzlShortcutTheme
  * @command: (nullable): the command to be executed
  * @accel: (nullable): the shortcut accelerator
+ * @phase: the phase to activate within, or 0 for the default
  *
  * This will set the command to execute when @accel is pressed.  If command is
  * %NULL, the accelerator will be cleared.  If accelerator is %NULL, all
@@ -574,7 +592,8 @@ dzl_shortcut_theme_get_chord_for_command (DzlShortcutTheme *self,
 void
 dzl_shortcut_theme_set_accel_for_command (DzlShortcutTheme *self,
                                           const gchar      *command,
-                                          const gchar      *accel)
+                                          const gchar      *accel,
+                                          DzlShortcutPhase  phase)
 {
   g_autoptr(DzlShortcutChord) chord = NULL;
 
@@ -583,7 +602,7 @@ dzl_shortcut_theme_set_accel_for_command (DzlShortcutTheme *self,
   if (accel != NULL)
     chord = dzl_shortcut_chord_new_from_string (accel);
 
-  dzl_shortcut_theme_set_chord_for_command (self, command, chord);
+  dzl_shortcut_theme_set_chord_for_command (self, command, chord, phase);
 }
 
 /**
@@ -632,19 +651,14 @@ _dzl_shortcut_theme_match (DzlShortcutTheme         *self,
   g_return_val_if_fail (chord != NULL, FALSE);
   g_return_val_if_fail (chain != NULL, FALSE);
 
-  if (phase != DZL_SHORTCUT_PHASE_BUBBLE)
-    return DZL_SHORTCUT_MATCH_NONE;
-
-  /* TODO: We probably need the ability to have a "block" or "unbind" type
-   *       disabling when we implement chaining up to the parent theme.
-   */
-
   match1 = dzl_shortcut_chord_table_lookup (priv->actions_table, chord, (gpointer *)&action_id);
 
   if (match1 == DZL_SHORTCUT_MATCH_EQUAL)
     {
       *chain = g_hash_table_lookup (priv->chains, action_id);
-      return match1;
+      if ((*chain)->phase == phase)
+        return match1;
+      match1 = DZL_SHORTCUT_MATCH_NONE;
     }
 
   match2 = dzl_shortcut_chord_table_lookup (priv->commands_table, chord, (gpointer *)&command_id);
@@ -652,7 +666,9 @@ _dzl_shortcut_theme_match (DzlShortcutTheme         *self,
   if (match2 == DZL_SHORTCUT_MATCH_EQUAL)
     {
       *chain = g_hash_table_lookup (priv->chains, command_id);
-      return match2;
+      if ((*chain)->phase == phase)
+        return match2;
+      match2 = DZL_SHORTCUT_MATCH_NONE;
     }
 
   /*

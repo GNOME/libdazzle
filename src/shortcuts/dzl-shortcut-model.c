@@ -302,9 +302,9 @@ dzl_shortcut_model_apply (DzlShortcutModel *self,
                       -1);
 
   if (type == DZL_SHORTCUT_NODE_ACTION)
-    dzl_shortcut_theme_set_chord_for_action (self->theme, id, chord);
+    dzl_shortcut_theme_set_chord_for_action (self->theme, id, chord, 0);
   else if (type == DZL_SHORTCUT_NODE_COMMAND)
-    dzl_shortcut_theme_set_chord_for_command (self->theme, id, chord);
+    dzl_shortcut_theme_set_chord_for_command (self->theme, id, chord, 0);
   else
     g_warning ("Unknown type: %d", type);
 }

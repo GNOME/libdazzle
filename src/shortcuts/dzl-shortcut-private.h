@@ -75,8 +75,8 @@ struct _DzlShortcutClosureChain
   GSList node;
 
   DzlShortcutClosureType type : 3;
+  DzlShortcutPhase phase : 3;
   guint executing : 1;
-  DzlShortcutPhase phase : 2;
 
   union {
     struct {
@@ -103,7 +103,8 @@ struct _DzlShortcutClosureChain
 DzlShortcutMatch       _dzl_shortcut_controller_handle              (DzlShortcutController      *self,
                                                                      const GdkEventKey          *event,
                                                                      const DzlShortcutChord     *chord,
-                                                                     DzlShortcutPhase            phase);
+                                                                     DzlShortcutPhase            phase,
+                                                                     GtkWidget                  *widget);
 DzlShortcutChord      *_dzl_shortcut_controller_push                (DzlShortcutController      *self,
                                                                      const GdkEventKey          *event);
 void                   _dzl_shortcut_controller_clear               (DzlShortcutController      *self);

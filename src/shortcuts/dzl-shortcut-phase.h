@@ -35,12 +35,15 @@ G_BEGIN_DECLS
  * @DZL_SHORTCUT_BUBBLE: The final phase of event delivery. The event is
  *   delivered to each widget as it progresses from the target window widget
  *   up to the toplevel.
+ * @DZL_SHORTCUT_GLOBAL: The shortcut can be activated from anywhere in the
+ *   widget hierarchy, even outside the direct chain of focus.
  */
 typedef enum
 {
   DZL_SHORTCUT_PHASE_DISPATCH = 0,
-  DZL_SHORTCUT_PHASE_CAPTURE  = 1,
-  DZL_SHORTCUT_PHASE_BUBBLE   = 2,
+  DZL_SHORTCUT_PHASE_CAPTURE  = 1 << 0,
+  DZL_SHORTCUT_PHASE_BUBBLE   = 1 << 1,
+  DZL_SHORTCUT_PHASE_GLOBAL   = 1 << 2,
 } DzlShortcutPhase;
 
 GType dzl_shortcut_phase_get_type (void);

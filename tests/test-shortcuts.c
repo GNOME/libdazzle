@@ -138,13 +138,13 @@ main (gint argc,
   dzl_shortcut_controller_add_command_signal (app.search_controller,
                                               "com.example.foo.search",
                                               "<ctrl>y|<ctrl>y",
-                                              DZL_SHORTCUT_PHASE_CAPTURE,
+                                              DZL_SHORTCUT_PHASE_GLOBAL,
                                               "grab-focus",
                                               0);
   dzl_shortcut_controller_add_command_callback (app.search_controller,
                                                 "com.example.foo.test",
                                                 "<ctrl>x|<ctrl>r",
-                                                DZL_SHORTCUT_PHASE_CAPTURE,
+                                                DZL_SHORTCUT_PHASE_GLOBAL,
                                                 test_callback, NULL, NULL);
 
   app.shortcuts = g_object_new (GTK_TYPE_BUTTON,
@@ -222,22 +222,22 @@ main (gint argc,
   dzl_shortcut_manager_add_command (manager, "org.gnome.builder.paste", "Editor", "Editing", "Paste Selection", NULL);
   dzl_shortcut_manager_add_command (manager, "org.gnome.builder.delete", "Editor", "Editing", "Delete Selection", NULL);
 
-  dzl_shortcut_theme_set_accel_for_action (theme, "build-manager.build", "F7");
-  dzl_shortcut_theme_set_accel_for_action (theme, "build-manager.rebuild", "<Control>F7");
-  dzl_shortcut_theme_set_accel_for_action (theme, "build-manager.clean", "F8");
+  dzl_shortcut_theme_set_accel_for_action (theme, "build-manager.build", "F7", 0);
+  dzl_shortcut_theme_set_accel_for_action (theme, "build-manager.rebuild", "<Control>F7", 0);
+  dzl_shortcut_theme_set_accel_for_action (theme, "build-manager.clean", "F8", 0);
 
-  dzl_shortcut_theme_set_accel_for_action (theme, "win.new-terminal", "<primary><shift>t");
-  dzl_shortcut_theme_set_accel_for_action (theme, "win.new-terminal-in-runtime", "<primary><shift><alt>t");
+  dzl_shortcut_theme_set_accel_for_action (theme, "win.new-terminal", "<primary><shift>t", 0);
+  dzl_shortcut_theme_set_accel_for_action (theme, "win.new-terminal-in-runtime", "<primary><shift><alt>t", 0);
 
-  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.cut", "<Primary>x");
-  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.copy", "<Primary>c");
-  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.paste", "<Primary>v");
-  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.delete", "Delete");
+  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.cut", "<Primary>x", 0);
+  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.copy", "<Primary>c", 0);
+  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.paste", "<Primary>v", 0);
+  dzl_shortcut_theme_set_accel_for_command (theme, "org.gnome.builder.delete", "Delete", 0);
 
-  dzl_shortcut_theme_set_accel_for_command (theme, "com.example.foo.test", "<Control>r|<Control>r");
+  dzl_shortcut_theme_set_accel_for_command (theme, "com.example.foo.test", "<Control>r|<Control>r", 0);
 
-  dzl_shortcut_theme_set_accel_for_action (theme, "run-manager.run", "F3");
-  dzl_shortcut_theme_set_accel_for_action (theme, "run-manager.run-with-handler::'debugger'", "<Shift>F3");
+  dzl_shortcut_theme_set_accel_for_action (theme, "run-manager.run", "F3", 0);
+  dzl_shortcut_theme_set_accel_for_action (theme, "run-manager.run-with-handler::'debugger'", "<Shift>F3", 0);
 
   dzl_shortcut_manager_add_shortcut_entries (manager, entries, G_N_ELEMENTS (entries), NULL);
 

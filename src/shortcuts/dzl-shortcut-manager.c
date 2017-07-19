@@ -676,17 +676,17 @@ dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (event != NULL);
   g_assert (chord != NULL);
-  g_assert (phase <= DZL_SHORTCUT_PHASE_BUBBLE);
+  g_assert ((phase & DZL_SHORTCUT_PHASE_GLOBAL) == 0);
   g_assert (GTK_IS_WIDGET (widget));
   g_assert (GTK_IS_WIDGET (focus));
 
   modifier = event->state & gtk_accelerator_get_default_mod_mask ();
 
   /*
-   * Collect all the widgets that might be needed for this phase and
-   * order them so that we can process from first-to-last. Capture
-   * phase is toplevel-to-widget, and bubble is widget-to-toplevel.
-   * Dispatch only has the the widget itself.
+   * Collect all the widgets that might be needed for this phase and order them
+   * so that we can process from first-to-last. Capture phase is
+   * toplevel-to-widget, and bubble is widget-to-toplevel.  Dispatch only has
+   * the the widget itself.
    */
   do
     {
@@ -698,6 +698,9 @@ dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
     }
   while (phase != DZL_SHORTCUT_PHASE_DISPATCH && ancestor != NULL);
 
+  /*
+   * Now look through our widget chain to find a match to activate.
+   */
   for (const GList *iter = queue.head; iter; iter = iter->next)
     {
       GtkWidget *current = iter->data;
@@ -734,7 +737,7 @@ dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
            * a partial match, it's undefined behavior to also have a shortcut
            * which would activate.
            */
-          ret = _dzl_shortcut_controller_handle (controller, event, chord, phase);
+          ret = _dzl_shortcut_controller_handle (controller, event, chord, phase, focus);
           if (ret)
             DZL_GOTO (cleanup);
         }
@@ -791,6 +794,33 @@ cleanup:
   g_queue_clear (&queue);
 
   DZL_RETURN (ret);
+}
+
+static DzlShortcutMatch
+dzl_shortcut_manager_run_global (DzlShortcutManager     *self,
+                                 const GdkEventKey      *event,
+                                 const DzlShortcutChord *chord,
+                                 DzlShortcutPhase        phase,
+                                 DzlShortcutController  *root,
+                                 GtkWidget              *widget)
+{
+  g_assert (DZL_IS_SHORTCUT_MANAGER (self));
+  g_assert (event != NULL);
+  g_assert (chord != NULL);
+  g_assert (phase == DZL_SHORTCUT_PHASE_CAPTURE ||
+            phase == DZL_SHORTCUT_PHASE_BUBBLE);
+  g_assert (DZL_IS_SHORTCUT_CONTROLLER (root));
+  g_assert (GTK_WIDGET (widget));
+
+  /*
+   * The goal of this function is to locate a shortcut within any
+   * controller registered with the root controller (or the root
+   * controller itself) that is registered as a "global shortcut".
+   */
+
+  phase |= DZL_SHORTCUT_PHASE_GLOBAL;
+
+  return _dzl_shortcut_controller_handle (root, event, chord, phase, widget);
 }
 
 /**
@@ -875,9 +905,11 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
    * Now we have our chord/event to dispatch to the individual controllers
    * on widgets. We can run through the phases to capture/dispatch/bubble.
    */
-  if ((match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_CAPTURE, widget, focus)) ||
+  if ((match = dzl_shortcut_manager_run_global (self, event, chord, DZL_SHORTCUT_PHASE_CAPTURE, root, widget)) ||
+      (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_CAPTURE, widget, focus)) ||
       (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_DISPATCH, widget, focus)) ||
-      (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, widget, focus)))
+      (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, widget, focus)) ||
+      (match = dzl_shortcut_manager_run_global (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, root, widget)))
     ret = GDK_EVENT_STOP;
 
   DZL_TRACE_MSG ("match = %d", match);
@@ -1400,7 +1432,8 @@ dzl_shortcut_manager_add_shortcut_entries (DzlShortcutManager     *self,
       if (entry->default_accel != NULL)
         dzl_shortcut_theme_set_accel_for_command (priv->internal_theme,
                                                   entry->command,
-                                                  entry->default_accel);
+                                                  entry->default_accel,
+                                                  entry->phase);
 
       dzl_shortcut_manager_add_command (self,
                                         entry->command,

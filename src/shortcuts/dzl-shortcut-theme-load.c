@@ -161,7 +161,7 @@ load_state_add_action (LoadState   *state,
       if (context != NULL)
         dzl_shortcut_context_add_action (context, accel, action);
       else if (theme != NULL)
-        dzl_shortcut_theme_set_accel_for_action (theme, action, accel);
+        dzl_shortcut_theme_set_accel_for_action (theme, action, accel, 0);
     }
 }
 
@@ -196,7 +196,7 @@ load_state_add_command (LoadState   *state,
       if (context != NULL)
         dzl_shortcut_context_add_command (context, accel, command);
       else if (theme != NULL)
-        dzl_shortcut_theme_set_accel_for_command (theme, command, accel);
+        dzl_shortcut_theme_set_accel_for_command (theme, command, accel, 0);
     }
 }
 

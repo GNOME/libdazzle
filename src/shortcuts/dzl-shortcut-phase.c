@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-shortcut-phase"
+
 #include "shortcuts/dzl-shortcut-phase.h"
 
 GType
@@ -25,13 +27,14 @@ dzl_shortcut_phase_get_type (void)
 
   if (g_once_init_enter (&type_id))
     {
-      static const GEnumValue values[] = {
+      static const GFlagsValue values[] = {
         { DZL_SHORTCUT_PHASE_DISPATCH, "DZL_SHORTCUT_PHASE_DISPATCH", "dispatch" },
         { DZL_SHORTCUT_PHASE_CAPTURE, "DZL_SHORTCUT_PHASE_CAPTURE", "capture" },
         { DZL_SHORTCUT_PHASE_BUBBLE, "DZL_SHORTCUT_PHASE_BUBBLE", "bubble" },
+        { DZL_SHORTCUT_PHASE_GLOBAL, "DZL_SHORTCUT_PHASE_GLOBAL", "global" },
         { 0 }
       };
-      GType _type_id = g_enum_register_static ("DzlShortcutPhase", values);
+      GType _type_id = g_flags_register_static ("DzlShortcutPhase", values);
       g_once_init_leave (&type_id, _type_id);
     }
 

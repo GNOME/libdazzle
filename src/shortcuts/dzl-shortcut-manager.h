@@ -21,6 +21,7 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-shortcut-phase.h"
 #include "dzl-shortcut-theme.h"
 #include "dzl-shortcuts-window.h"
 
@@ -33,6 +34,7 @@ G_DECLARE_DERIVABLE_TYPE (DzlShortcutManager, dzl_shortcut_manager, DZL, SHORTCU
 /**
  * DzlShortcutEntry:
  * @command: the command identifier
+ * @phase: the phase for activation, or 0 for the default
  * @default_accel: the default accelerator for the command, if any
  * @section: the section for the shortcuts window
  * @group: the group for the shortcuts window
@@ -45,12 +47,13 @@ G_DECLARE_DERIVABLE_TYPE (DzlShortcutManager, dzl_shortcut_manager, DZL, SHORTCU
  */
 typedef struct
 {
-  const gchar *command;
-  const gchar *default_accel;
-  const gchar *section;
-  const gchar *group;
-  const gchar *title;
-  const gchar *subtitle;
+  const gchar      *command;
+  DzlShortcutPhase  phase;
+  const gchar      *default_accel;
+  const gchar      *section;
+  const gchar      *group;
+  const gchar      *title;
+  const gchar      *subtitle;
 } DzlShortcutEntry;
 
 struct _DzlShortcutManagerClass

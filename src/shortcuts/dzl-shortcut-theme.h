@@ -21,8 +21,9 @@
 
 #include <gtk/gtk.h>
 
-#include "dzl-shortcut-chord.h"
-#include "dzl-shortcut-context.h"
+#include "shortcuts/dzl-shortcut-chord.h"
+#include "shortcuts/dzl-shortcut-context.h"
+#include "shortcuts/dzl-shortcut-phase.h"
 
 G_BEGIN_DECLS
 
@@ -63,20 +64,24 @@ void                    dzl_shortcut_theme_add_context           (DzlShortcutThe
                                                                   DzlShortcutContext      *context);
 void                    dzl_shortcut_theme_set_chord_for_action  (DzlShortcutTheme        *self,
                                                                   const gchar             *detailed_action_name,
-                                                                  const DzlShortcutChord  *chord);
+                                                                  const DzlShortcutChord  *chord,
+                                                                  DzlShortcutPhase         phase);
 const DzlShortcutChord *dzl_shortcut_theme_get_chord_for_action  (DzlShortcutTheme        *self,
                                                                   const gchar             *detailed_action_name);
 void                    dzl_shortcut_theme_set_accel_for_action  (DzlShortcutTheme        *self,
                                                                   const gchar             *detailed_action_name,
-                                                                  const gchar             *accel);
+                                                                  const gchar             *accel,
+                                                                  DzlShortcutPhase         phase);
 void                    dzl_shortcut_theme_set_chord_for_command (DzlShortcutTheme        *self,
                                                                   const gchar             *command,
-                                                                  const DzlShortcutChord  *chord);
+                                                                  const DzlShortcutChord  *chord,
+                                                                  DzlShortcutPhase         phase);
 const DzlShortcutChord *dzl_shortcut_theme_get_chord_for_command (DzlShortcutTheme        *self,
                                                                   const gchar             *command);
 void                    dzl_shortcut_theme_set_accel_for_command (DzlShortcutTheme        *self,
                                                                   const gchar             *command,
-                                                                  const gchar             *accel);
+                                                                  const gchar             *accel,
+                                                                  DzlShortcutPhase         phase);
 gboolean                dzl_shortcut_theme_load_from_data        (DzlShortcutTheme        *self,
                                                                   const gchar             *data,
                                                                   gssize                   len,

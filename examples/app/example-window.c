@@ -17,9 +17,9 @@ struct _ExampleWindow
 G_DEFINE_TYPE (ExampleWindow, example_window, DZL_TYPE_APPLICATION_WINDOW)
 
 static const DzlShortcutEntry shortcuts[] = {
-  { "com.example.window.NewDoc", NULL, N_("Editing"), N_("Documents"), N_("New Document"), N_("Create a new document") },
-  { "com.example.window.CloseDoc", NULL, N_("Editing"), N_("Documents"), N_("Close Document"), N_("Close the current document") },
-  { "com.example.window.Fullscreen", "F11", N_("Editing"), N_("General"), N_("Fullscreen"), N_("Toggle window fullscreen") },
+  { "com.example.window.NewDoc", 0, NULL, N_("Editing"), N_("Documents"), N_("New Document"), N_("Create a new document") },
+  { "com.example.window.CloseDoc", 0, NULL, N_("Editing"), N_("Documents"), N_("Close Document"), N_("Close the current document") },
+  { "com.example.window.Fullscreen", 0, "F11", N_("Editing"), N_("General"), N_("Fullscreen"), N_("Toggle window fullscreen") },
 };
 
 ExampleDocumentView *
