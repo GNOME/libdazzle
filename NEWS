@@ -1,4 +1,48 @@
 ==============
+Version 3.25.4
+==============
+
+We are mid-development cycle for GNOME 3.26 and so as you can imagine, we are
+busy adding the features we need to libdazzle. Given how early the project is,
+the pace of development has been quite rapid.
+
+ • Updated build system to make things easier to maintain.
+ • Soname and libtool-like versioning has been added. Like GObject and Gtk,
+   we don't intend on bumping this when we break ABI during development
+   snapshots. Only in the stable series.
+ • Consistent LGPL-2.1+ usage.
+ • DzlJoinedMenu is a new GMenuModel implementation that allows you to
+   concatenate multiple GMenuModel implementations. This can be useful
+   in various plugin scenarios.
+ • DzlMultiPaned has gone through more improvements. We know of a few more
+   that need to be shaken out before 3.26, but things are stabilizing.
+ • Utilities to proxy action groups between GtkWidgets.
+ • WIN64 build fixes for DzlTrie.
+ • Examples have been added for DzlApplication and the CPU graph.
+ • Many theming improvements.
+ • DzlDockBin now tries to unpin a panel when animating out. This can give
+   the effect of smoother transitions where the cost of resizing the main
+   window content is high (such as with textviews).
+ • Utilities for insertion with GtkListStore have been added.
+ • DzlPropertiesGroup is a new GActionGroup that can help simplify exposing
+   groups of properties on a single object as a GActionGroup.
+ • The DzlMenuMerger can now perform multi-phase sorting to increase the
+   chances of ideal placement with before/after among multiple menu items.
+ • A new DzlMenuButton has been added that has a consistent style for a few
+   forms of MenuButton type scenarios. It can have icons, accelerators and
+   we expect in the future to keep the accelerator in sync with the active
+   shortcut theme. Some extended attributes with menus.ui are used.
+ • DzlSuggestionEntry now supports a position function which can specify being
+   relative to the window or to the entry widget. Various position functions
+   are provided as a convenience.
+ • The shortcut engine has gained support for CAPTURE/BUBBLE semantics.
+ • The shortcut engine has gained support for specifying global shortcuts
+   which can be activated outside the chain of focus.
+
+We hope you enjoy using libdazzle!
+
+
+==============
 Version 3.25.3
 ==============
 
