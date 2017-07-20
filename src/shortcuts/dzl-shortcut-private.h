@@ -118,6 +118,10 @@ GtkTreeModel          *_dzl_shortcut_theme_create_model             (DzlShortcut
 GHashTable            *_dzl_shortcut_theme_get_contexts             (DzlShortcutTheme           *self);
 DzlShortcutContext    *_dzl_shortcut_theme_try_find_context_by_name (DzlShortcutTheme           *self,
                                                                      const gchar                *name);
+DzlShortcutContext     *_dzl_shortcut_theme_find_default_context_with_phase
+                                                                    (DzlShortcutTheme           *self,
+                                                                     GtkWidget                  *widget,
+                                                                     DzlShortcutPhase            phase);
 void                   _dzl_shortcut_theme_set_manager              (DzlShortcutTheme           *self,
                                                                      DzlShortcutManager         *manager);
 void                   _dzl_shortcut_theme_set_name                 (DzlShortcutTheme           *self,

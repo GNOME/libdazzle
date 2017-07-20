@@ -317,6 +317,27 @@ dzl_shortcut_theme_find_default_context (DzlShortcutTheme *self,
   return dzl_shortcut_theme_find_default_context_by_type (self, G_OBJECT_TYPE (widget));
 }
 
+DzlShortcutContext *
+_dzl_shortcut_theme_find_default_context_with_phase (DzlShortcutTheme *self,
+                                                     GtkWidget        *widget,
+                                                     DzlShortcutPhase  phase)
+{
+  g_autofree gchar *free_me = NULL;
+  const gchar *name;
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (self), NULL);
+  g_return_val_if_fail (GTK_IS_WIDGET (widget), NULL);
+
+  name = G_OBJECT_TYPE_NAME (widget);
+
+  if ((phase & DZL_SHORTCUT_PHASE_BUBBLE) != 0)
+    name = free_me = g_strdup_printf ("%s:bubble", name);
+  else if ((phase & DZL_SHORTCUT_PHASE_CAPTURE) != 0)
+    name = free_me = g_strdup_printf ("%s:capture", name);
+
+  return dzl_shortcut_theme_find_context_by_name (self, name);
+}
+
 void
 dzl_shortcut_theme_add_context (DzlShortcutTheme   *self,
                                 DzlShortcutContext *context)

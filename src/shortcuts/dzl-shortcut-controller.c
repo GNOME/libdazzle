@@ -1087,6 +1087,8 @@ dzl_shortcut_controller_add_command (DzlShortcutController   *self,
 
       if (chord != NULL)
         {
+          DzlShortcutContext *context;
+
           /* Add the chord to our chord table for lookups */
           if (priv->commands_table == NULL)
             priv->commands_table = dzl_shortcut_chord_table_new ();
@@ -1096,6 +1098,10 @@ dzl_shortcut_controller_add_command (DzlShortcutController   *self,
           manager = dzl_shortcut_controller_get_manager (self);
           theme = _dzl_shortcut_manager_get_internal_theme (manager);
           dzl_shortcut_theme_set_chord_for_command (theme, command_id, chord, phase);
+
+          /* Hook things up into the default context */
+          context = _dzl_shortcut_theme_find_default_context_with_phase (theme, priv->widget, phase);
+          dzl_shortcut_context_add_command (context, default_accel, command_id);
         }
       else
         g_warning ("\"%s\" is not a valid accelerator chord", default_accel);
