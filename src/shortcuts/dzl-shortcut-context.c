@@ -231,7 +231,7 @@ dzl_shortcut_context_activate (DzlShortcutContext     *self,
         match = DZL_SHORTCUT_MATCH_NONE;
     }
 
-  DZL_TRACE_MSG ("match = %d", match);
+  DZL_TRACE_MSG ("%s: match = %d", priv->name, match);
 
   DZL_RETURN (match);
 }
