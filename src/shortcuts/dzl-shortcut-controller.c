@@ -913,6 +913,8 @@ _dzl_shortcut_controller_handle (DzlShortcutController  *self,
       !gtk_widget_is_sensitive (priv->widget))
     DZL_RETURN (DZL_SHORTCUT_MATCH_NONE);
 
+  DZL_TRACE_MSG ("widget = %s, phase = %d", G_OBJECT_TYPE_NAME (priv->widget), phase);
+
   /* Try to dispatch our capture global shortcuts first */
   if (phase == (DZL_SHORTCUT_PHASE_CAPTURE | DZL_SHORTCUT_PHASE_GLOBAL) &&
       dzl_shortcut_controller_is_root (self))
