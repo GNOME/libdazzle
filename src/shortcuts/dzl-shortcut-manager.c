@@ -670,7 +670,6 @@ dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
 {
   GtkWidget *ancestor = widget;
   GQueue queue = G_QUEUE_INIT;
-  GdkModifierType modifier;
   DzlShortcutMatch ret = DZL_SHORTCUT_MATCH_NONE;
 
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
@@ -679,8 +678,6 @@ dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
   g_assert ((phase & DZL_SHORTCUT_PHASE_GLOBAL) == 0);
   g_assert (GTK_IS_WIDGET (widget));
   g_assert (GTK_IS_WIDGET (focus));
-
-  modifier = event->state & gtk_accelerator_get_default_mod_mask ();
 
   /*
    * Collect all the widgets that might be needed for this phase and order them
@@ -705,29 +702,11 @@ dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
     {
       GtkWidget *current = iter->data;
       DzlShortcutController *controller;
-      gboolean use_binding_sets = TRUE;
 
       controller = dzl_shortcut_controller_try_find (current);
 
       if (controller != NULL)
         {
-          if (phase == DZL_SHORTCUT_PHASE_DISPATCH)
-            {
-              DzlShortcutContext *context;
-
-              /*
-               * Get the default context for the controller. We do not take
-               * the controller for this particular phase because we only are
-               * using the context to determine if we should dispatch the
-               * default binding sets later on.
-               */
-              context = dzl_shortcut_controller_get_context (controller);
-              if (context != NULL)
-                g_object_get (context,
-                              "use-binding-sets", &use_binding_sets,
-                              NULL);
-            }
-
           /*
            * Now try to activate the event using the controller. If we get
            * any result other than DZL_SHORTCUT_MATCH_NONE, we need to stop
@@ -743,48 +722,16 @@ dzl_shortcut_manager_run_phase (DzlShortcutManager     *self,
         }
 
       /*
-       * If the current context at activation indicates that we can
-       * dispatch using the default binding sets for the widget, go
-       * ahead and try to do that.
+       * If we are in the dispatch phase, we will only see our target widget for
+       * the event delivery. Try to dispatch the event and if so we consider
+       * the event handled.
        */
-      if (use_binding_sets && phase == DZL_SHORTCUT_PHASE_DISPATCH)
+      if (phase == DZL_SHORTCUT_PHASE_DISPATCH)
         {
-          GtkStyleContext *style_context;
-          g_autoptr(GPtrArray) sets = NULL;
-
-          style_context = gtk_widget_get_style_context (current);
-          gtk_style_context_get (style_context,
-                                 gtk_style_context_get_state (style_context),
-                                 "-gtk-key-bindings", &sets,
-                                 NULL);
-
-          if (sets != NULL)
+          if (gtk_widget_event (current, (GdkEvent *)event))
             {
-              for (guint i = 0; i < sets->len; i++)
-                {
-                  GtkBindingSet *set = g_ptr_array_index (sets, i);
-
-                  if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (current)))
-                    {
-                      ret = DZL_SHORTCUT_MATCH_EQUAL;
-                      DZL_GOTO (cleanup);
-                    }
-                }
-            }
-
-          /*
-           * Only if this widget is also our focus, try to activate the default
-           * keybindings for the widget.
-           */
-          if (current == focus)
-            {
-              GtkBindingSet *set = gtk_binding_set_by_class (G_OBJECT_GET_CLASS (current));
-
-              if (gtk_binding_set_activate (set, event->keyval, modifier, G_OBJECT (current)))
-                {
-                  ret = DZL_SHORTCUT_MATCH_EQUAL;
-                  DZL_GOTO (cleanup);
-                }
+              ret = DZL_SHORTCUT_MATCH_EQUAL;
+              DZL_GOTO (cleanup);
             }
         }
     }
