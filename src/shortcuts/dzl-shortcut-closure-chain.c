@@ -26,6 +26,7 @@
 #include "shortcuts/dzl-shortcut-closure-chain.h"
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-private.h"
+#include "util/dzl-gtk.h"
 
 static DzlShortcutClosureChain *
 dzl_shortcut_closure_chain_new (DzlShortcutClosureType type)
@@ -263,61 +264,6 @@ dzl_shortcut_closure_chain_append_signal (DzlShortcutClosureChain *chain,
   return dzl_shortcut_closure_chain_append_signalv (chain, signal_name, params);
 }
 
-gboolean
-_dzl_gtk_widget_activate_action (GtkWidget   *widget,
-                                 const gchar *prefix,
-                                 const gchar *action_name,
-                                 GVariant    *parameter)
-{
-  GtkWidget *toplevel;
-  GApplication *app;
-  GActionGroup *group = NULL;
-
-  g_assert (GTK_IS_WIDGET (widget));
-  g_assert (prefix != NULL);
-  g_assert (action_name != NULL);
-
-  app = g_application_get_default ();
-  toplevel = gtk_widget_get_toplevel (widget);
-
-  while ((group == NULL) && (widget != NULL))
-    {
-      group = gtk_widget_get_action_group (widget, prefix);
-
-      if G_UNLIKELY (GTK_IS_POPOVER (widget))
-        {
-          GtkWidget *relative_to;
-
-          relative_to = gtk_popover_get_relative_to (GTK_POPOVER (widget));
-
-          if (relative_to != NULL)
-            widget = relative_to;
-          else
-            widget = gtk_widget_get_parent (widget);
-        }
-      else
-        {
-          widget = gtk_widget_get_parent (widget);
-        }
-    }
-
-  if (!group && g_str_equal (prefix, "win") && G_IS_ACTION_GROUP (toplevel))
-    group = G_ACTION_GROUP (toplevel);
-
-  if (!group && g_str_equal (prefix, "app") && G_IS_ACTION_GROUP (app))
-    group = G_ACTION_GROUP (app);
-
-  if (group && g_action_group_has_action (group, action_name))
-    {
-      g_action_group_activate_action (group, action_name, parameter);
-      return TRUE;
-    }
-
-  g_warning ("Failed to locate action %s.%s", prefix, action_name);
-
-  return FALSE;
-}
-
 static gboolean
 find_instance_and_signal (GtkWidget          *widget,
                           const gchar        *signal_name,
@@ -482,10 +428,10 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
     case DZL_SHORTCUT_CLOSURE_ACTION:
       DZL_TRACE_MSG ("executing closure action %s.%s",
                      chain->action.group, chain->action.name);
-      ret |= _dzl_gtk_widget_activate_action (widget,
-                                              chain->action.group,
-                                              chain->action.name,
-                                              chain->action.params);
+      ret |= dzl_gtk_widget_action (widget,
+                                    chain->action.group,
+                                    chain->action.name,
+                                    chain->action.params);
       break;
 
     case DZL_SHORTCUT_CLOSURE_CALLBACK:
