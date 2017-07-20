@@ -406,6 +406,8 @@ command_activate (DzlShortcutClosureChain *chain,
         }
     }
 
+  g_warning ("Failed to locate controller command: %s", chain->command.name);
+
   return FALSE;
 }
 
@@ -415,11 +417,16 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
 {
   gboolean ret = FALSE;
 
+  DZL_ENTRY;
+
   g_return_val_if_fail (chain != NULL, FALSE);
   g_return_val_if_fail (GTK_IS_WIDGET (widget), FALSE);
 
   if (chain->executing)
-    return FALSE;
+    {
+      g_warning ("Attempt for re-entrancy in closure chain activation blocked");
+      DZL_RETURN (FALSE);
+    }
 
   chain->executing = TRUE;
 
@@ -461,5 +468,7 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
 
   chain->executing = FALSE;
 
-  return ret;
+  DZL_TRACE_MSG ("ret = %d", ret);
+
+  DZL_RETURN (ret);
 }

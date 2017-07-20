@@ -21,6 +21,8 @@
 #include <gobject/gvaluecollector.h>
 #include <string.h>
 
+#include "dzl-debug.h"
+
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-closure-chain.h"
 #include "shortcuts/dzl-shortcut-context.h"
@@ -182,9 +184,14 @@ dzl_shortcut_context_activate (DzlShortcutContext     *self,
   DzlShortcutMatch match = DZL_SHORTCUT_MATCH_NONE;
   DzlShortcutClosureChain *chain = NULL;
 
+  DZL_ENTRY;
+
   g_return_val_if_fail (DZL_IS_SHORTCUT_CONTEXT (self), DZL_SHORTCUT_MATCH_NONE);
   g_return_val_if_fail (GTK_IS_WIDGET (widget), DZL_SHORTCUT_MATCH_NONE);
   g_return_val_if_fail (chord != NULL, DZL_SHORTCUT_MATCH_NONE);
+
+  if (priv->table == NULL)
+    DZL_RETURN (DZL_SHORTCUT_MATCH_NONE);
 
 #if 0
   g_print ("Looking up %s in table %p (of size %u)\n",
@@ -195,21 +202,24 @@ dzl_shortcut_context_activate (DzlShortcutContext     *self,
   dzl_shortcut_chord_table_printf (priv->table);
 #endif
 
-  if (priv->table != NULL)
-    match = dzl_shortcut_chord_table_lookup (priv->table, chord, (gpointer *)&chain);
+  match = dzl_shortcut_chord_table_lookup (priv->table, chord, (gpointer *)&chain);
 
   if (match == DZL_SHORTCUT_MATCH_EQUAL)
     {
+      g_assert (chain != NULL);
+
       /*
        * If we got a full match, but it failed to activate, we could potentially
        * have another partial match. However, that lands squarely in the land of
        * undefined behavior. So instead we just assume there was no match.
        */
       if (!dzl_shortcut_closure_chain_execute (chain, widget))
-        return DZL_SHORTCUT_MATCH_NONE;
+        match = DZL_SHORTCUT_MATCH_NONE;
     }
 
-  return match;
+  DZL_TRACE_MSG ("match = %d", match);
+
+  DZL_RETURN (match);
 }
 
 static void
