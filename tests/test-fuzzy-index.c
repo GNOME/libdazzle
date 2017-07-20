@@ -123,7 +123,13 @@ test_index_builder_basic (void)
   g_assert (r);
 
   g_object_unref (file);
+
+#if 0
+  /* It would be nice if we could rely on testing this for NULL,
+   * but the async operations could still hold a reference.
+   */
   g_assert (file == NULL);
+#endif
 }
 
 static void
