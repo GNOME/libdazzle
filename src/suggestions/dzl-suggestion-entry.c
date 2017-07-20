@@ -786,8 +786,11 @@ _dzl_suggestion_entry_reposition (DzlSuggestionEntry   *self,
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
   GtkWidget *toplevel;
+  GdkWindow *window;
   GtkAllocation alloc;
   gboolean is_absolute = FALSE;
+  gint x;
+  gint y;
 
   g_return_if_fail (DZL_IS_SUGGESTION_ENTRY (self));
   g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (popover));
@@ -797,6 +800,7 @@ _dzl_suggestion_entry_reposition (DzlSuggestionEntry   *self,
     return;
 
   toplevel = gtk_widget_get_toplevel (GTK_WIDGET (self));
+  window = gtk_widget_get_window (toplevel);
 
   gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
 
@@ -809,13 +813,14 @@ _dzl_suggestion_entry_reposition (DzlSuggestionEntry   *self,
 
   if (!is_absolute)
     {
-      gint x;
-      gint y;
-
       gtk_widget_translate_coordinates (GTK_WIDGET (self), toplevel, 0, 0, &x, &y);
       alloc.x += x;
       alloc.y += y;
     }
+
+  gdk_window_get_position (window, &x, &y);
+  alloc.x += x;
+  alloc.y += y;
 
   _dzl_suggestion_popover_adjust_margin (popover, &alloc);
 
