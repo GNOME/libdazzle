@@ -175,6 +175,20 @@ dzl_shortcut_context_get_name (DzlShortcutContext *self)
   return priv->name;
 }
 
+gboolean
+_dzl_shortcut_context_contains (DzlShortcutContext     *self,
+                                const DzlShortcutChord *chord)
+{
+  DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
+  gpointer data;
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CONTEXT (self), FALSE);
+  g_return_val_if_fail (chord != NULL, FALSE);
+
+  return priv->table != NULL &&
+         dzl_shortcut_chord_table_lookup (priv->table, chord, &data) == DZL_SHORTCUT_MATCH_EQUAL;
+}
+
 DzlShortcutMatch
 dzl_shortcut_context_activate (DzlShortcutContext     *self,
                                GtkWidget              *widget,

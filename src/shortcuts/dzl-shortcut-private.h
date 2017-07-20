@@ -132,6 +132,8 @@ DzlShortcutMatch       _dzl_shortcut_theme_match                    (DzlShortcut
                                                                      DzlShortcutPhase            phase,
                                                                      const DzlShortcutChord     *chord,
                                                                      DzlShortcutClosureChain   **chain);
+gboolean               _dzl_shortcut_context_contains               (DzlShortcutContext         *self,
+                                                                     const DzlShortcutChord     *chord);
 DzlShortcutChordTable *_dzl_shortcut_context_get_table              (DzlShortcutContext         *self);
 void                   _dzl_shortcut_context_merge                  (DzlShortcutContext         *self,
                                                                      DzlShortcutContext         *layer);
