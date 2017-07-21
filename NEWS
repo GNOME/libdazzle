@@ -1,4 +1,20 @@
 ==============
+Version 3.25.5
+==============
+
+We are quickly releasing a followup to 3.25.4 to fix a number of bugs with
+the shortcut engine that were found as Builder transitioned to it.
+
+ • DzlShortcutManager is not in control of event delivery. This allows the
+   capture/bubble phase to act as expected and still integrate with
+   GtkBindingSet.
+ • DzlSuggestionEntry now properly places the popover window when using the
+   X11 backend.
+ • Various license blurbs have been updated to reflect reality.
+
+Thanks to everyone who was quick to report bugs.
+
+==============
 Version 3.25.4
 ==============
 
