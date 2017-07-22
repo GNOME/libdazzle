@@ -22,6 +22,7 @@
 #ifndef __GI_SCANNER__
 
 #include <glib.h>
+#include <stdlib.h>
 
 G_BEGIN_DECLS
 
