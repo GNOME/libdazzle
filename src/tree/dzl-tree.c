@@ -364,14 +364,34 @@ pixbuf_func (GtkCellLayout   *cell_layout,
 {
   g_autoptr(DzlTreeNode) node = NULL;
   g_autoptr(GIcon) old_icon = NULL;
+  DzlTree *self = data;
+  GtkTreePath *tree_path;
+  gboolean expanded;
   GIcon *icon;
 
   g_assert (GTK_IS_CELL_LAYOUT (cell_layout));
   g_assert (GTK_IS_CELL_RENDERER_PIXBUF (cell));
   g_assert (GTK_IS_TREE_MODEL (tree_model));
+  g_assert (DZL_IS_TREE (self));
   g_assert (iter != NULL);
 
   gtk_tree_model_get (tree_model, iter, 0, &node, -1);
+
+  tree_path = gtk_tree_model_get_path (tree_model, iter);
+  expanded = gtk_tree_view_row_expanded (GTK_TREE_VIEW (self), tree_path);
+  gtk_tree_path_free (tree_path);
+
+  if (expanded)
+    {
+      const gchar *icon_name = _dzl_tree_node_get_expanded_icon (node);
+
+      if (icon_name != NULL)
+        {
+          g_object_set (cell, "icon-name", icon_name, NULL);
+          return;
+        }
+    }
+
   icon = dzl_tree_node_get_gicon (node);
   g_object_get (cell, "gicon", &old_icon, NULL);
   if (icon != old_icon)
@@ -972,7 +992,7 @@ dzl_tree_init (DzlTree *self)
   priv->cell_pixbuf = cell;
   g_object_bind_property (self, "show-icons", cell, "visible", 0);
   gtk_cell_layout_pack_start (column, cell, FALSE);
-  gtk_cell_layout_set_cell_data_func (column, cell, pixbuf_func, NULL, NULL);
+  gtk_cell_layout_set_cell_data_func (column, cell, pixbuf_func, self, NULL);
 
   cell = g_object_new (GTK_TYPE_CELL_RENDERER_TEXT,
                        "ellipsize", PANGO_ELLIPSIZE_NONE,

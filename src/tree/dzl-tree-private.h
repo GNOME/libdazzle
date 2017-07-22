@@ -51,6 +51,7 @@ void         _dzl_tree_node_set_tree           (DzlTreeNode    *node,
                                                 DzlTree        *tree);
 void         _dzl_tree_node_set_parent         (DzlTreeNode    *node,
                                                 DzlTreeNode    *parent);
+const gchar *_dzl_tree_node_get_expanded_icon  (DzlTreeNode    *node);
 gboolean     _dzl_tree_node_get_needs_build    (DzlTreeNode    *node);
 void         _dzl_tree_node_set_needs_build    (DzlTreeNode    *node,
                                                 gboolean        needs_build);

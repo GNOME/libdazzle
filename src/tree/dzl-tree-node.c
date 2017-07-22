@@ -33,6 +33,7 @@ struct _DzlTreeNode
   gchar             *text;
   DzlTree           *tree;
   GQuark             icon_name;
+  GQuark             expanded_icon_name;
   GIcon             *gicon;
   GList             *emblems;
   guint              use_markup : 1;
@@ -53,6 +54,7 @@ G_DEFINE_TYPE (DzlTreeNode, dzl_tree_node, G_TYPE_INITIALLY_UNOWNED)
 enum {
   PROP_0,
   PROP_CHILDREN_POSSIBLE,
+  PROP_EXPANDED_ICON_NAME,
   PROP_ICON_NAME,
   PROP_GICON,
   PROP_ITEM,
@@ -710,6 +712,10 @@ dzl_tree_node_get_property (GObject    *object,
       g_value_set_boolean (value, dzl_tree_node_get_children_possible (node));
       break;
 
+    case PROP_EXPANDED_ICON_NAME:
+      g_value_set_string (value, _dzl_tree_node_get_expanded_icon (node));
+      break;
+
     case PROP_ICON_NAME:
       g_value_set_string (value, g_quark_to_string (node->icon_name));
       break;
@@ -759,6 +765,10 @@ dzl_tree_node_set_property (GObject      *object,
     {
     case PROP_CHILDREN_POSSIBLE:
       dzl_tree_node_set_children_possible (node, g_value_get_boolean (value));
+      break;
+
+    case PROP_EXPANDED_ICON_NAME:
+      node->expanded_icon_name = g_quark_from_string (g_value_get_string (value));
       break;
 
     case PROP_ICON_NAME:
@@ -815,7 +825,12 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                           FALSE,
                           (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
-
+  properties [PROP_EXPANDED_ICON_NAME] =
+    g_param_spec_string ("expanded-icon-name",
+                         "Expanded Icon Name",
+                         "The icon-name to use when the row is expanded",
+                         NULL,
+                         (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   /**
    * DzlTreeNode:icon-name:
@@ -1156,4 +1171,12 @@ dzl_tree_node_is_root (DzlTreeNode *node)
   g_return_val_if_fail (DZL_IS_TREE_NODE (node), FALSE);
 
   return node->parent == NULL;
+}
+
+const gchar *
+_dzl_tree_node_get_expanded_icon (DzlTreeNode *node)
+{
+  g_return_val_if_fail (DZL_IS_TREE_NODE (node), NULL);
+
+  return g_quark_to_string (node->expanded_icon_name);
 }
