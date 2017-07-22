@@ -365,8 +365,7 @@ pixbuf_func (GtkCellLayout   *cell_layout,
   g_autoptr(DzlTreeNode) node = NULL;
   g_autoptr(GIcon) old_icon = NULL;
   DzlTree *self = data;
-  GtkTreePath *tree_path;
-  gboolean expanded;
+  const gchar *expanded_icon_name;
   GIcon *icon;
 
   g_assert (GTK_IS_CELL_LAYOUT (cell_layout));
@@ -377,17 +376,20 @@ pixbuf_func (GtkCellLayout   *cell_layout,
 
   gtk_tree_model_get (tree_model, iter, 0, &node, -1);
 
-  tree_path = gtk_tree_model_get_path (tree_model, iter);
-  expanded = gtk_tree_view_row_expanded (GTK_TREE_VIEW (self), tree_path);
-  gtk_tree_path_free (tree_path);
+  expanded_icon_name = _dzl_tree_node_get_expanded_icon (node);
 
-  if (expanded)
+  if (expanded_icon_name != NULL)
     {
-      const gchar *icon_name = _dzl_tree_node_get_expanded_icon (node);
+      GtkTreePath *tree_path;
+      gboolean expanded;
 
-      if (icon_name != NULL)
+      tree_path = gtk_tree_model_get_path (tree_model, iter);
+      expanded = gtk_tree_view_row_expanded (GTK_TREE_VIEW (self), tree_path);
+      gtk_tree_path_free (tree_path);
+
+      if (expanded)
         {
-          g_object_set (cell, "icon-name", icon_name, NULL);
+          g_object_set (cell, "icon-name", expanded_icon_name, NULL);
           return;
         }
     }
