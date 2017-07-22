@@ -66,16 +66,6 @@ dzl_bin_draw (GtkWidget *widget,
   return FALSE;
 }
 
-static inline void
-add_border (GtkBorder       *lsv,
-            const GtkBorder *rsv)
-{
-  lsv->left += rsv->left;
-  lsv->right += rsv->right;
-  lsv->top += rsv->top;
-  lsv->bottom += rsv->bottom;
-}
-
 static void
 dzl_bin_size_allocate (GtkWidget     *widget,
                        GtkAllocation *alloc)
