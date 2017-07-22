@@ -300,7 +300,6 @@ dzl_shortcut_context_add_command (DzlShortcutContext *self,
                                   const gchar        *accel,
                                   const gchar        *command)
 {
-  g_autoptr(GError) error = NULL;
   g_autoptr(DzlShortcutChord) chord = NULL;
   DzlShortcutClosureChain *chain;
 
