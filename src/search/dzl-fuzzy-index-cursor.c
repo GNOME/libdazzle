@@ -395,7 +395,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
   lookup.index = self->index;
   lookup.matches = matches;
   lookup.tables = (const DzlFuzzyIndexItem * const *)tables->pdata;
-  lookup.tables_n_elements = (const gsize *)tables_n_elements->data;
+  lookup.tables_n_elements = (const gsize *)(gpointer)tables_n_elements->data;
   lookup.tables_state = tables_state;
   lookup.n_tables = tables->len;
   lookup.needle = query;
