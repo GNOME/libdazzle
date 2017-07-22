@@ -1886,10 +1886,6 @@ dzl_dock_bin_init (DzlDockBin *self)
   static GtkTargetEntry drag_entries[] = {
     { (gchar *)"DZL_DOCK_BIN_WIDGET", GTK_TARGET_SAME_APP, 0 },
   };
-  g_autoptr(GPropertyAction) left = NULL;
-  g_autoptr(GPropertyAction) right = NULL;
-  g_autoptr(GPropertyAction) bottom = NULL;
-  g_autoptr(GPropertyAction) top = NULL;
 
   gtk_widget_set_has_window (GTK_WIDGET (self), TRUE);
 
