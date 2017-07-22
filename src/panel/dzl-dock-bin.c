@@ -827,7 +827,7 @@ dzl_dock_bin_child_size_allocate (DzlDockBin      *self,
       GtkRequisition neighbor_min = { 0 };
       GtkRequisition neighbor_nat = { 0 };
       GtkStyleContext *style_context = gtk_widget_get_style_context (child->widget);
-      GtkStateType state = gtk_style_context_get_state (style_context);
+      GtkStateFlags state = gtk_style_context_get_state (style_context);
       GtkBorder margin;
 
       gtk_style_context_get_margin (style_context, state, &margin);
