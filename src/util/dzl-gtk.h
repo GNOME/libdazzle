@@ -43,6 +43,8 @@ void          dzl_gtk_widget_hide_with_fade          (GtkWidget               *w
 void          dzl_gtk_widget_show_with_fade          (GtkWidget               *widget);
 void          dzl_gtk_widget_add_style_class         (GtkWidget               *widget,
                                                       const gchar             *class_name);
+void          dzl_gtk_widget_remove_style_class      (GtkWidget               *widget,
+                                                      const gchar             *class_name);
 gpointer      dzl_gtk_widget_find_child_typed        (GtkWidget               *widget,
                                                       GType                    type);
 void          dzl_gtk_text_buffer_remove_tag         (GtkTextBuffer           *buffer,
