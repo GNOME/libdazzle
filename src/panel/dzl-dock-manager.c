@@ -16,8 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dzl-dock-manager.h"
-#include "dzl-dock-transient-grab.h"
+#define G_LOG_DOMAIN "dzl-dock-manager"
+
+#include "panel/dzl-dock-manager.h"
+#include "panel/dzl-dock-transient-grab.h"
 
 typedef struct
 {
