@@ -28,6 +28,7 @@ typedef struct
   DzlDockTransientGrab *grab;
   GHashTable           *queued_focus_by_toplevel;
   guint                 queued_handler;
+  gint                  pause_count;
 } DzlDockManagerPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlDockManager, dzl_dock_manager, G_TYPE_OBJECT)
@@ -46,12 +47,15 @@ dzl_dock_manager_do_set_focus (DzlDockManager *self,
                                GtkWidget      *toplevel)
 {
   DzlDockManagerPrivate *priv = dzl_dock_manager_get_instance_private (self);
-  DzlDockTransientGrab *grab = NULL;
+  g_autoptr(DzlDockTransientGrab) grab = NULL;
   GtkWidget *parent;
 
   g_assert (DZL_IS_DOCK_MANAGER (self));
   g_assert (GTK_IS_WIDGET (focus));
   g_assert (GTK_IS_WIDGET (toplevel));
+
+  if (priv->pause_count > 0)
+    return;
 
   if (priv->grab != NULL)
     {
@@ -105,7 +109,7 @@ dzl_dock_manager_do_set_focus (DzlDockManager *self,
   /* Start the grab process */
   if (grab != NULL)
     {
-      priv->grab = grab;
+      priv->grab = g_steal_pointer (&grab);
       dzl_dock_transient_grab_acquire (priv->grab);
     }
 }
@@ -342,4 +346,53 @@ dzl_dock_manager_unregister_dock (DzlDockManager *self,
   g_return_if_fail (DZL_IS_DOCK (dock));
 
   g_signal_emit (self, signals [UNREGISTER_DOCK], 0, dock);
+}
+
+/**
+ * dzl_dock_manager_pause_grabs:
+ * @self: a #DzlDockManager
+ *
+ * Requests that the transient grab monitoring stop until
+ * dzl_dock_manager_unpause_grabs() is called.
+ *
+ * This might be useful while setting up UI so that you don't focus
+ * something unexpectedly.
+ *
+ * This function may be called multiple times and after an equivalent
+ * number of calls to dzl_dock_manager_unpause_grabs(), transient
+ * grab monitoring will continue.
+ *
+ * Since: 3.26
+ */
+void
+dzl_dock_manager_pause_grabs (DzlDockManager *self)
+{
+  DzlDockManagerPrivate *priv = dzl_dock_manager_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_DOCK_MANAGER (self));
+  g_return_if_fail (priv->pause_count >= 0);
+
+  priv->pause_count++;
+}
+
+/**
+ * dzl_dock_manager_unpause_grabs:
+ * @self: a #DzlDockManager
+ *
+ * Unpauses a previous call to dzl_dock_manager_pause_grabs().
+ *
+ * Once the pause count returns to zero, transient grab monitoring
+ * will be restored.
+ *
+ * Since: 3.26
+ */
+void
+dzl_dock_manager_unpause_grabs (DzlDockManager *self)
+{
+  DzlDockManagerPrivate *priv = dzl_dock_manager_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_DOCK_MANAGER (self));
+  g_return_if_fail (priv->pause_count > 0);
+
+  priv->pause_count--;
 }

@@ -51,6 +51,8 @@ void            dzl_dock_manager_register_dock   (DzlDockManager *self,
                                                   DzlDock        *dock);
 void            dzl_dock_manager_unregister_dock (DzlDockManager *self,
                                                   DzlDock        *dock);
+void            dzl_dock_manager_pause_grabs     (DzlDockManager *self);
+void            dzl_dock_manager_unpause_grabs   (DzlDockManager *self);
 
 G_END_DECLS
 
