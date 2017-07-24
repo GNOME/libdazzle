@@ -71,8 +71,16 @@ dzl_dock_manager_do_set_focus (DzlDockManager *self,
     {
       if (DZL_IS_DOCK_ITEM (parent))
         {
+          /* If we reach a DockItem that doesn't have a manager set,
+           * then we are probably adding the widgetry to the window
+           * and grabing focus right now would be intrusive.
+           */
+          if (dzl_dock_item_get_manager (DZL_DOCK_ITEM (parent)) == NULL)
+            return;
+
           if (grab == NULL)
             grab = dzl_dock_transient_grab_new ();
+
           dzl_dock_transient_grab_add_item (grab, DZL_DOCK_ITEM (parent));
         }
 
