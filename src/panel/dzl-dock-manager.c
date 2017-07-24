@@ -20,6 +20,7 @@
 
 #include "panel/dzl-dock-manager.h"
 #include "panel/dzl-dock-transient-grab.h"
+#include "util/dzl-util-private.h"
 
 typedef struct
 {
@@ -152,9 +153,8 @@ dzl_dock_manager_set_focus (DzlDockManager *self,
    * to the hierarchy, as they may implicitly grab focus.
    */
   g_hash_table_insert (priv->queued_focus_by_toplevel, toplevel, focus);
-  if (priv->queued_handler != 0)
-    g_source_remove (priv->queued_handler);
-  priv->queued_handler = g_timeout_add (0, do_delayed_focus_update, self);
+  dzl_clear_source (&priv->queued_handler);
+  priv->queued_handler = gdk_threads_add_idle (do_delayed_focus_update, self);
 }
 
 static void

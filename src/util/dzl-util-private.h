@@ -42,6 +42,15 @@ dzl_str_equal0 (const gchar *str1,
   return g_strcmp0 (str1, str2) == 0;
 }
 
+static inline void
+dzl_clear_source (guint *source_ptr)
+{
+  guint source = *source_ptr;
+  *source_ptr = 0;
+  if (source != 0)
+    g_source_remove (source);
+}
+
 void          dzl_gtk_widget_class_add_css_resource (GtkWidgetClass   *widget_class,
                                                      const gchar      *resource);
 void          dzl_gtk_widget_add_class              (GtkWidget        *widget,
