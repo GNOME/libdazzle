@@ -81,15 +81,12 @@ dzl_dock_manager_do_set_focus (DzlDockManager *self,
 
   /*
    * Steal common hierarchy so that we don't hide it when breaking grabs.
-   */
-  if (priv->grab != NULL && grab != NULL)
-    dzl_dock_transient_grab_steal_common_ancestors (grab, priv->grab);
-
-  /*
-   * Release the previous grab.
+   * Then release our previous grab.
    */
   if (priv->grab != NULL)
     {
+      if (grab != NULL)
+        dzl_dock_transient_grab_steal_common_ancestors (grab, priv->grab);
       dzl_dock_transient_grab_release (priv->grab);
       g_clear_object (&priv->grab);
     }
