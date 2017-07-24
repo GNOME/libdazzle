@@ -207,7 +207,7 @@ dzl_dock_stack_init (DzlDockStack *self)
    */
 
   priv->stack = g_object_new (GTK_TYPE_STACK,
-                              "homogeneous", TRUE,
+                              "homogeneous", FALSE,
                               "visible", TRUE,
                               NULL);
 
