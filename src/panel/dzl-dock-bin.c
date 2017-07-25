@@ -271,6 +271,17 @@ set_visible (DzlDockBin          *self,
 
       if (visible != dzl_dock_revealer_get_reveal_child (DZL_DOCK_REVEALER (widget)))
         {
+
+          /* If the widget isn't currently visible, first make it visible but keep
+           * the reveal-child set as FALSE. That allows us to animate in from a
+           * hiddent initial state.
+           */
+          if (visible && !gtk_widget_get_visible (widget))
+            {
+              dzl_dock_revealer_set_reveal_child (DZL_DOCK_REVEALER (widget), FALSE);
+              gtk_widget_show (child->widget);
+            }
+
           /* Only stash state if there is not an animation in progress.
            * Otherwise we stomp on our previous state.
            */
