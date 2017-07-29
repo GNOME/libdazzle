@@ -37,6 +37,7 @@ typedef struct
   GMenuModel         *context_menu;
   GdkRGBA             dim_foreground;
   guint               show_icons : 1;
+  guint               always_expand : 1;
 } DzlTreePrivate;
 
 typedef struct
@@ -62,6 +63,7 @@ G_DEFINE_TYPE_WITH_CODE (DzlTree, dzl_tree, GTK_TYPE_TREE_VIEW,
 
 enum {
   PROP_0,
+  PROP_ALWAYS_EXPAND,
   PROP_CONTEXT_MENU,
   PROP_ROOT,
   PROP_SELECTION,
@@ -475,8 +477,15 @@ dzl_tree_add (DzlTree     *self,
   if (dzl_tree_node_get_children_possible (child))
     _dzl_tree_node_add_dummy_child (child);
 
-  if (node == priv->root)
-    _dzl_tree_build_node (self, child);
+  if (priv->always_expand)
+    {
+      _dzl_tree_build_node (self, child);
+      dzl_tree_node_expand (child, TRUE);
+    }
+  else if (node == priv->root)
+    {
+      _dzl_tree_build_node (self, child);
+    }
 
   g_object_unref (child);
 }
@@ -830,6 +839,10 @@ dzl_tree_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ALWAYS_EXPAND:
+      g_value_set_boolean (value, priv->always_expand);
+      break;
+
     case PROP_CONTEXT_MENU:
       g_value_set_object (value, priv->context_menu);
       break;
@@ -858,9 +871,14 @@ dzl_tree_set_property (GObject      *object,
                        GParamSpec   *pspec)
 {
   DzlTree *self = DZL_TREE (object);
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
 
   switch (prop_id)
     {
+    case PROP_ALWAYS_EXPAND:
+      priv->always_expand = g_value_get_boolean (value);
+      break;
+
     case PROP_CONTEXT_MENU:
       dzl_tree_set_context_menu (self, g_value_get_object (value));
       break;
@@ -909,6 +927,15 @@ dzl_tree_class_init (DzlTreeClass *klass)
   tree_view_class->row_expanded = dzl_tree_row_expanded;
 
   klass->action = dzl_tree_real_action;
+
+  properties [PROP_ALWAYS_EXPAND] =
+    g_param_spec_boolean ("always-expand",
+                          "Always expand",
+                          "Always expand",
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_CONSTRUCT_ONLY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CONTEXT_MENU] =
     g_param_spec_object ("context-menu",
