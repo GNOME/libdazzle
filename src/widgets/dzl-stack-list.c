@@ -26,8 +26,8 @@
 #include "widgets/dzl-stack-list.h"
 #include "util/dzl-gtk.h"
 
-#define FADE_DURATION  250
-#define SLIDE_DURATION 350
+#define FADE_DURATION      250
+#define SLIDE_DURATION_MAX 300
 
 typedef struct
 {
@@ -240,6 +240,7 @@ dzl_stack_list_end_anim (DzlStackList *self)
 
   dzl_stack_list_scroll_to_top (self);
 
+  gtk_stack_set_transition_type (GTK_STACK (priv->flip_stack), GTK_STACK_TRANSITION_TYPE_SLIDE_DOWN);
   gtk_stack_set_visible_child (GTK_STACK (priv->flip_stack), GTK_WIDGET (priv->scroller));
 
   dzl_stack_list_update_activatables (self);
@@ -324,20 +325,20 @@ dzl_stack_list_begin_anim (DzlStackList       *self,
       monitor = gdk_display_get_monitor_at_window (display, window);
 
       duration = dzl_animation_calculate_duration (monitor, 0, distance);
-      duration = MIN (duration, 500);
+      duration = MIN (duration, SLIDE_DURATION_MAX);
     }
 
   priv->animation = dzl_object_animate_full (priv->animating_rect,
-                                              DZL_ANIMATION_EASE_OUT_CUBIC,
-                                              duration,
-                                              frame_clock,
-                                              animation_finished,
-                                              closure,
-                                              "x", end_area->x,
-                                              "y", end_area->y,
-                                              "width", end_area->width,
-                                              "height", end_area->height,
-                                              NULL);
+                                             DZL_ANIMATION_EASE_IN_OUT_CUBIC,
+                                             duration,
+                                             frame_clock,
+                                             animation_finished,
+                                             closure,
+                                             "x", end_area->x,
+                                             "y", end_area->y,
+                                             "width", end_area->width,
+                                             "height", end_area->height,
+                                             NULL);
 
   g_object_ref (priv->animation);
 
@@ -347,6 +348,7 @@ dzl_stack_list_begin_anim (DzlStackList       *self,
                            priv->animating,
                            G_CONNECT_SWAPPED);
 
+  gtk_stack_set_transition_type (GTK_STACK (priv->flip_stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
   gtk_stack_set_visible_child (GTK_STACK (priv->flip_stack), GTK_WIDGET (priv->fake_list));
 }
 
@@ -479,7 +481,7 @@ dzl_stack_list_init (DzlStackList *self)
 
   priv->flip_stack = g_object_new (GTK_TYPE_STACK,
                                    "transition-duration", FADE_DURATION,
-                                   "transition-type", GTK_STACK_TRANSITION_TYPE_CROSSFADE,
+                                   "transition-type", GTK_STACK_TRANSITION_TYPE_NONE,
                                    "visible", TRUE,
                                    "vexpand", TRUE,
                                    NULL);
