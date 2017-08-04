@@ -49,11 +49,11 @@ typedef struct
 
 typedef struct
 {
-  GListModel                    *model;
-  GtkWidget                     *header;
+  GListModel                   *model;
+  GtkWidget                    *header;
   DzlStackListCreateWidgetFunc  create_widget_func;
-  gpointer                       user_data;
-  GDestroyNotify                 user_data_free_func;
+  gpointer                      user_data;
+  GDestroyNotify                user_data_free_func;
 } ModelInfo;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlStackList, dzl_stack_list, GTK_TYPE_BIN)
@@ -447,11 +447,10 @@ dzl_stack_list_init (DzlStackList *self)
   priv->overlay = g_object_new (GTK_TYPE_OVERLAY,
                                 "visible", TRUE,
                                 NULL);
-  g_signal_connect_object (priv->overlay,
-                           "get-child-position",
-                           G_CALLBACK (dzl_stack_list__overlay__get_child_position),
-                           self,
-                           G_CONNECT_SWAPPED);
+  g_signal_connect_swapped (priv->overlay,
+                            "get-child-position",
+                            G_CALLBACK (dzl_stack_list__overlay__get_child_position),
+                            self);
   gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->overlay));
 
   priv->box = g_object_new (GTK_TYPE_BOX,
@@ -465,11 +464,10 @@ dzl_stack_list_init (DzlStackList *self)
                                 "selection-mode", GTK_SELECTION_NONE,
                                 "visible", TRUE,
                                 NULL);
-  g_signal_connect_object (priv->headers,
-                           "row-activated",
-                           G_CALLBACK (dzl_stack_list_header_row_activated),
-                           self,
-                           G_CONNECT_SWAPPED);
+  g_signal_connect_swapped (priv->headers,
+                            "row-activated",
+                            G_CALLBACK (dzl_stack_list_header_row_activated),
+                            self);
   gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (priv->headers)),
                                "stack-header");
   gtk_container_add (GTK_CONTAINER (priv->box), GTK_WIDGET (priv->headers));
@@ -525,7 +523,6 @@ dzl_stack_list_push (DzlStackList                 *self,
   ModelInfo *info;
   GdkRectangle current_area;
   GdkRectangle target_area;
-  gint nat_height;
 
   g_return_if_fail (DZL_IS_STACK_LIST (self));
   g_return_if_fail (GTK_IS_WIDGET (header));
@@ -573,20 +570,17 @@ dzl_stack_list_push (DzlStackList                 *self,
   gtk_widget_get_allocation (GTK_WIDGET (priv->activated), &current_area);
   gtk_widget_translate_coordinates (GTK_WIDGET (priv->activated),
                                     GTK_WIDGET (priv->overlay),
-                                    current_area.x, current_area.y,
+                                    0, 0,
                                     &current_area.x, &current_area.y);
 
   /*
    * Get the location to end the animation.
    */
   gtk_widget_get_allocation (GTK_WIDGET (priv->headers), &target_area);
-  gtk_widget_get_preferred_height (GTK_WIDGET (header), NULL, &nat_height);
-  target_area.y += target_area.height;
-  target_area.height = nat_height;
-  gtk_widget_translate_coordinates (GTK_WIDGET (header),
-                                    GTK_WIDGET (priv->overlay),
-                                    target_area.x, target_area.y,
-                                    &target_area.x, &target_area.y);
+  target_area.x = current_area.x;
+  target_area.y = target_area.height;
+  target_area.width = current_area.width;
+  target_area.height = current_area.height;
 
   dzl_stack_list_begin_anim (self, GTK_LIST_BOX_ROW (header), &current_area, &target_area);
 }
