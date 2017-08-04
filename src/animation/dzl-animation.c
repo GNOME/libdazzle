@@ -143,10 +143,12 @@ dzl_animation_alpha_ease_out_cubic (gdouble offset)
 static gdouble
 dzl_animation_alpha_ease_in_out_cubic (gdouble offset)
 {
-  if (offset < .5)
-    return dzl_animation_alpha_ease_in_cubic (offset * 2.0) / 2.0;
-  else
-    return .5 + dzl_animation_alpha_ease_out_cubic ((offset - .5) * 2.0) / 2.0;
+  gdouble p = offset * 2.0;
+
+  if (p < 1.0)
+    return 0.5 * p * p * p;
+  p -= 2.0;
+  return 0.5 * (p * p * p + 2.0);
 }
 
 
