@@ -24,6 +24,7 @@
 #include "util/dzl-util-private.h"
 #include "widgets/dzl-rect-helper.h"
 #include "widgets/dzl-stack-list.h"
+#include "util/dzl-gtk.h"
 
 #define FADE_DURATION  250
 #define SLIDE_DURATION 350
@@ -212,6 +213,8 @@ dzl_stack_list_end_anim (DzlStackList *self)
   info = g_ptr_array_index (priv->models, priv->models->len - 1);
   header = g_object_ref (priv->animating);
 
+  dzl_gtk_widget_remove_style_class (GTK_WIDGET (header), "animating");
+
   priv->animating = NULL;
 
   if (priv->animation != NULL)
@@ -289,6 +292,8 @@ dzl_stack_list_begin_anim (DzlStackList       *self,
   g_assert (end_area != NULL);
 
   priv->animating = row;
+
+  dzl_gtk_widget_add_style_class (GTK_WIDGET (row), "animating");
 
   g_object_set (priv->animating_rect,
                 "x", begin_area->x,

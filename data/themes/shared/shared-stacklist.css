@@ -25,6 +25,9 @@ dzlstacklist list.stack-header:backdrop {
 dzlstacklist list.stack-header row:not(:last-child) {
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+dzlstacklist list.stack-header row:last-child {
+  border-bottom: 1px solid transparent;
+}
 dzlstacklist list:not(.stack-header) row:active,
 dzlstacklist list:not(.stack-header) row:selected,
 dzlstacklist list.stack-header row:not(:last-child):active,
@@ -32,6 +35,7 @@ dzlstacklist list.stack-header row:not(:last-child):selected {
   color: @theme_selected_fg_color;
   background-color: @theme_selected_bg_color;
 }
+dzlstacklist row.animating label:not(.dim-label),
 dzlstacklist list.stack-header row:last-child label:not(.dim-label) {
   font-weight: bold;
 }
