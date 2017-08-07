@@ -851,7 +851,7 @@ dzl_dock_bin_child_size_allocate (DzlDockBin      *self,
                                                  &child->min_req.width,
                                                  &child->nat_req.width);
 
-      if (child->pinned)
+      if (child->pinned && n_children > 1)
         {
           dzl_dock_bin_get_children_preferred_height (self,
                                                       &children [1],
