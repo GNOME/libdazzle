@@ -312,4 +312,11 @@ test_box = executable('test-box', 'test-box.c',
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_directory_reaper = executable('test-directory-reaper', 'test-directory-reaper.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-directory-reaper', test_directory_reaper, env: test_env)
+
 endif
