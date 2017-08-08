@@ -1,3 +1,20 @@
+===============
+Version 3.25.90
+===============
+
+Changes in this release:
+
+ • DzlSignalGroup and DzlBIndingGroup were made LGPLv2.1+ so they can be
+   copied into projects that cannot link against libdazzle.
+ • DzlDockBin got a number of bug fixes.
+ • Various compilation fixes for less used compilers.
+ • DzlTree gained support for "expanded icon names".
+ • DzlTree has a new "always-expand" property to ensure it stays expanded.
+ • DzlDockStack no longer requires homogeneous sized children.
+ • DzlStackList transition animations have been tweaked to more closely
+   reflect physical locality.
+ • Calculated animation duration was sped up 1.5x.
+
 ==============
 Version 3.25.5
 ==============
