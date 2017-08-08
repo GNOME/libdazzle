@@ -157,8 +157,8 @@ has_expired (guint64 mtime,
 {
   guint64 now = g_get_real_time () / G_USEC_PER_SEC;
 
-  if (now > min_age)
-    return (now - min_age) > mtime;
+  if (now >= min_age)
+    return (now - min_age) >= mtime;
 
   return FALSE;
 }
@@ -169,6 +169,7 @@ remove_directory_with_children (GFile         *file,
                                 GError       **error)
 {
   g_autoptr(GFileEnumerator) enumerator = NULL;
+  g_autoptr(GError) enum_error = NULL;
   g_autofree gchar *uri = NULL;
   gpointer infoptr;
 
@@ -176,7 +177,7 @@ remove_directory_with_children (GFile         *file,
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
   uri = g_file_get_uri (file);
-  g_debug ("Removing directory recursively \"%s\"", uri);
+  g_debug ("Removing uri recursively \"%s\"", uri);
 
   enumerator = g_file_enumerate_children (file,
                                           G_FILE_ATTRIBUTE_STANDARD_NAME","
@@ -184,12 +185,20 @@ remove_directory_with_children (GFile         *file,
                                           G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                           G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                           cancellable,
-                                          error);
+                                          &enum_error);
+
 
   if (enumerator == NULL)
-    return FALSE;
+    {
+      /* If the directory does not exist, nothing to do */
+      if (g_error_matches (enum_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+        return TRUE;
+      return FALSE;
+    }
 
-  while (NULL != (infoptr = g_file_enumerator_next_file (enumerator, cancellable, NULL)))
+  g_assert (enum_error == NULL);
+
+  while (NULL != (infoptr = g_file_enumerator_next_file (enumerator, cancellable, &enum_error)))
     {
       g_autoptr(GFileInfo) info = infoptr;
       const gchar *name = g_file_info_get_name (info);
@@ -199,12 +208,20 @@ remove_directory_with_children (GFile         *file,
         {
           if (!remove_directory_with_children (child, cancellable, error))
             return FALSE;
-          continue;
         }
 
       if (!g_file_delete (child, cancellable, error))
         return FALSE;
     }
+
+  if (enum_error != NULL)
+    {
+      g_propagate_error (error, g_steal_pointer (&enum_error));
+      return FALSE;
+    }
+
+  if (!g_file_enumerator_close (enumerator, cancellable, error))
+    return FALSE;
 
   return TRUE;
 }
@@ -295,7 +312,8 @@ dzl_directory_reaper_execute_worker (GTask        *task,
 
                   if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, cancellable) == G_FILE_TYPE_DIRECTORY)
                     {
-                      if (!remove_directory_with_children (file, cancellable, &error))
+                      if (!remove_directory_with_children (file, cancellable, &error) ||
+                          !g_file_delete (file, cancellable, &error))
                         {
                           g_warning ("%s", error->message);
                           g_clear_error (&error);
