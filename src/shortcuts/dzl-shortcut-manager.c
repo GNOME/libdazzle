@@ -408,12 +408,40 @@ dzl_shortcut_manager_class_init (DzlShortcutManagerClass *klass)
                   0, NULL, NULL, NULL, G_TYPE_NONE, 0);
 }
 
+static guint
+shortcut_entry_hash (gconstpointer key)
+{
+  DzlShortcutEntry *entry = (DzlShortcutEntry *)key;
+  guint command_hash = 0;
+  guint section_hash = 0;
+  guint group_hash = 0;
+  guint title_hash = 0;
+  guint subtitle_hash = 0;
+
+  if (entry->command != NULL)
+    command_hash = g_str_hash (entry->command);
+
+  if (entry->section != NULL)
+    section_hash = g_str_hash (entry->section);
+
+  if (entry->group != NULL)
+    group_hash = g_str_hash (entry->group);
+
+  if (entry->title != NULL)
+    title_hash = g_str_hash (entry->title);
+
+  if (entry->subtitle != NULL)
+    subtitle_hash = g_str_hash (entry->subtitle);
+
+  return (command_hash ^ section_hash ^ group_hash ^ title_hash ^ subtitle_hash);
+}
+
 static void
 dzl_shortcut_manager_init (DzlShortcutManager *self)
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
-  priv->seen_entries = g_hash_table_new (NULL, NULL);
+  priv->seen_entries = g_hash_table_new (shortcut_entry_hash, NULL);
   priv->themes = g_ptr_array_new_with_free_func (destroy_theme);
   priv->root = g_node_new (NULL);
   priv->internal_theme = g_object_new (DZL_TYPE_SHORTCUT_THEME,
