@@ -1525,7 +1525,7 @@ dzl_shortcut_manager_merge (DzlShortcutManager *self,
    * Okay, now we need to go through all the custom contexts, and global
    * shortcuts in the theme and merge them into the base_layer. However, we
    * will defer that work to the DzlShortcutTheme module so it has access to
-   * the intenral structures.
+   * the internal structures.
    */
   _dzl_shortcut_theme_merge (base_layer, theme);
 
