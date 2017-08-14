@@ -675,7 +675,6 @@ dzl_shortcut_manager_set_theme (DzlShortcutManager *self,
  * @phase: the phase (capture, bubble)
  * @widget: the widget the event was destined for
  * @focus: the current focus widget
- * @toplevel: the toplevel of the event window
  *
  * Runs a particular phase of the event dispatch.
  *
