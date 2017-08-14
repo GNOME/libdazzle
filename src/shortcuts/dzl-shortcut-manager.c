@@ -1326,15 +1326,12 @@ dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager *self,
             {
               DzlShortcutNodeData *data = iter->data;
               const DzlShortcutChord *chord = NULL;
-              g_autofree gchar *accel = NULL;
               DzlShortcutsShortcut *shortcut;
 
               if (data->type == DZL_SHORTCUT_NODE_ACTION)
                 chord = dzl_shortcut_theme_get_chord_for_action (theme, data->name);
               else if (data->type == DZL_SHORTCUT_NODE_COMMAND)
                 chord = dzl_shortcut_theme_get_chord_for_command (theme, data->name);
-
-              accel = dzl_shortcut_chord_to_string (chord);
 
               shortcut = create_shortcut (chord, data->title, data->subtitle);
               gtk_container_add (GTK_CONTAINER (group), GTK_WIDGET (shortcut));
