@@ -3,12 +3,14 @@ tree_headers = [
   'dzl-tree-node.h',
   'dzl-tree-types.h',
   'dzl-tree.h',
+  'dzl-list-store-adapter.h',
 ]
 
 tree_sources = [
   'dzl-tree-builder.c',
   'dzl-tree.c',
   'dzl-tree-node.c',
+  'dzl-list-store-adapter.c',
 ]
 
 libdazzle_public_headers += files(tree_headers)

@@ -119,6 +119,7 @@ G_BEGIN_DECLS
 #include "suggestions/dzl-suggestion.h"
 #include "theming/dzl-css-provider.h"
 #include "theming/dzl-theme-manager.h"
+#include "tree/dzl-list-store-adapter.h"
 #include "tree/dzl-tree.h"
 #include "tree/dzl-tree-builder.h"
 #include "tree/dzl-tree-node.h"
