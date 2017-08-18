@@ -409,4 +409,5 @@ dzl_list_store_adapter_set_model (DzlListStoreAdapter *self,
   g_return_if_fail (!model || G_IS_LIST_MODEL (model));
 
   dzl_signal_group_set_target (priv->signals, model);
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_MODEL]);
 }
