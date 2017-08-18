@@ -55,6 +55,19 @@ dzl_list_store_adapter_get_n_columns (GtkTreeModel *model)
   return 1;
 }
 
+static GType
+dzl_list_store_adapter_get_column_type (GtkTreeModel *model,
+                                        gint          column)
+{
+  DzlListStoreAdapter *self = DZL_LIST_STORE_ADAPTER (model);
+  DzlListStoreAdapterPrivate *priv = dzl_list_store_adapter_get_instance_private (self);
+
+  if (column == 0)
+    return priv->type;
+
+  return G_TYPE_INVALID;
+}
+
 static gboolean
 dzl_list_store_adapter_get_iter (GtkTreeModel *model,
                                  GtkTreeIter  *iter,
@@ -191,6 +204,7 @@ tree_model_iface_init (GtkTreeModelIface *iface)
 {
   iface->get_flags = dzl_list_store_adapter_get_flags;
   iface->get_n_columns = dzl_list_store_adapter_get_n_columns;
+  iface->get_column_type = dzl_list_store_adapter_get_column_type;
   iface->get_iter = dzl_list_store_adapter_get_iter;
   iface->get_path = dzl_list_store_adapter_get_path;
   iface->get_value = dzl_list_store_adapter_get_value;
@@ -262,7 +276,7 @@ dzl_list_store_adapter_unbind (DzlListStoreAdapter *self,
 
   priv->model = NULL;
   priv->length = 0;
-  priv->type = G_TYPE_INVALID;
+  priv->type = G_TYPE_OBJECT;
 }
 
 static void
@@ -338,6 +352,7 @@ dzl_list_store_adapter_init (DzlListStoreAdapter *self)
 {
   DzlListStoreAdapterPrivate *priv = dzl_list_store_adapter_get_instance_private (self);
 
+  priv->type = G_TYPE_OBJECT;
   priv->signals = dzl_signal_group_new (G_TYPE_LIST_MODEL);
 
   dzl_signal_group_connect_swapped (priv->signals,
