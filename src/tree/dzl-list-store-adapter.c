@@ -98,7 +98,7 @@ static GtkTreePath *
 dzl_list_store_adapter_get_path (GtkTreeModel *model,
                                  GtkTreeIter  *iter)
 {
-  return gtk_tree_path_new_from_indices (GPOINTER_TO_INT (iter), -1);
+  return gtk_tree_path_new_from_indices (GPOINTER_TO_INT (iter->user_data), -1);
 }
 
 static void
