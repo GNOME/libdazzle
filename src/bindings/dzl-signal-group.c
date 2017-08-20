@@ -249,19 +249,22 @@ dzl_signal_group_unbind (DzlSignalGroup *self)
   for (i = 0; i < self->handlers->len; i++)
     {
       SignalHandler *handler;
-      gulong handler_id;
 
       handler = g_ptr_array_index (self->handlers, i);
 
       g_assert (handler != NULL);
       g_assert (handler->signal_id != 0);
       g_assert (handler->closure != NULL);
-      g_assert (handler->handler_id != 0);
 
-      handler_id = handler->handler_id;
-      handler->handler_id = 0;
+      if (handler->handler_id != 0)
+        {
+          gulong handler_id;
 
-      g_signal_handler_disconnect (target, handler_id);
+          handler_id = handler->handler_id;
+          handler->handler_id = 0;
+
+          g_signal_handler_disconnect (target, handler_id);
+        }
     }
 
   g_signal_emit (self, signals [UNBIND], 0);
