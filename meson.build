@@ -2,7 +2,7 @@ project('libdazzle', 'c',
           version: '3.25.90',
           license: 'GPLv3+',
     meson_version: '>= 0.40.1',
-  default_options: [ 'warning_level=1', 'buildtype=debugoptimized' ],
+  default_options: [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=c99' ],
 )
 
 version_arr = meson.project_version().split('.')
