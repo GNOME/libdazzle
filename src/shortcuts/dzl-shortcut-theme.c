@@ -476,13 +476,17 @@ dzl_shortcut_theme_set_chord_for_action (DzlShortcutTheme       *self,
     phase = DZL_SHORTCUT_PHASE_BUBBLE | DZL_SHORTCUT_PHASE_GLOBAL;
 
   if (!g_hash_table_contains (priv->chains, detailed_action_name))
-  {
-    DzlShortcutClosureChain *chain;
+    {
+      DzlShortcutClosureChain *chain;
 
-    chain = dzl_shortcut_closure_chain_append_action_string (NULL, detailed_action_name);
-    chain->phase = phase;
-    g_hash_table_insert (priv->chains, (gchar *)detailed_action_name, chain);
-  }
+      chain = dzl_shortcut_closure_chain_append_action_string (NULL, detailed_action_name);
+
+      if (chain != NULL)
+        {
+          chain->phase = phase;
+          g_hash_table_insert (priv->chains, (gchar *)detailed_action_name, chain);
+        }
+    }
 }
 
 const DzlShortcutChord *
