@@ -1,4 +1,18 @@
 ===============
+Version 3.25.91
+===============
+
+Changes in this release:
+
+ • DzlDirectoryReaper now properly removes recursive directories
+ • DzlListStoreAdapter is a new GListModel->GtkTreeModel adapter
+ • DzlSignalGroup had an overzealous assertion which was removed
+   and corner case handled.
+ • DzlShortcutTheme properly handles closure chain parse failure case
+ • DzlShortcutManager can handle DzlShortcutEntry that are not static
+   allocations.
+
+===============
 Version 3.25.90
 ===============
 
