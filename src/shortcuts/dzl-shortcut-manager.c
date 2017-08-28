@@ -30,6 +30,7 @@
 #include "shortcuts/dzl-shortcuts-group.h"
 #include "shortcuts/dzl-shortcuts-section.h"
 #include "shortcuts/dzl-shortcuts-shortcut.h"
+#include "util/dzl-gtk.h"
 #include "util/dzl-util-private.h"
 
 typedef struct
@@ -797,6 +798,51 @@ dzl_shortcut_manager_run_global (DzlShortcutManager     *self,
   return _dzl_shortcut_controller_handle (root, event, chord, phase, widget);
 }
 
+static gboolean
+dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
+                                    GtkWidget              *widget,
+                                    const DzlShortcutChord *chord)
+{
+  g_assert (DZL_IS_SHORTCUT_MANAGER (self));
+  g_assert (GTK_IS_WIDGET (widget));
+  g_assert (chord != NULL);
+
+  if (dzl_shortcut_chord_get_length (chord) == 1)
+    {
+      GApplication *app = g_application_get_default ();
+
+      if (GTK_IS_APPLICATION (app))
+        {
+          g_autofree gchar *accel = dzl_shortcut_chord_to_string (chord);
+          g_auto(GStrv) actions = NULL;
+
+          actions = gtk_application_get_actions_for_accel (GTK_APPLICATION (app), accel);
+
+          if (actions != NULL)
+            {
+              for (guint i = 0; actions[i] != NULL; i++)
+                {
+                  const gchar *action = actions[i];
+                  g_autofree gchar *prefix = NULL;
+                  g_autofree gchar *name = NULL;
+                  g_autoptr(GVariant) param = NULL;
+
+                  if (!dzl_g_action_name_parse_full (action, &prefix, &name, &param))
+                    {
+                      g_warning ("Failed to parse: %s", action);
+                      continue;
+                    }
+
+                  if (dzl_gtk_widget_action (widget, prefix, name, param))
+                    return TRUE;
+                }
+            }
+        }
+    }
+
+  return FALSE;
+}
+
 /**
  * dzl_shortcut_manager_handle_event:
  * @self: (nullable): An #DzlShortcutManager
@@ -883,7 +929,8 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
       (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_CAPTURE, widget, focus)) ||
       (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_DISPATCH, widget, focus)) ||
       (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, widget, focus)) ||
-      (match = dzl_shortcut_manager_run_global (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, root, widget)))
+      (match = dzl_shortcut_manager_run_global (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, root, widget)) ||
+      (match = dzl_shortcut_manager_run_fallbacks (self, widget, chord)))
     ret = GDK_EVENT_STOP;
 
   DZL_TRACE_MSG ("match = %d", match);
