@@ -27,6 +27,7 @@
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-private.h"
 #include "util/dzl-gtk.h"
+#include "util/dzl-util-private.h"
 
 static DzlShortcutClosureChain *
 dzl_shortcut_closure_chain_new (DzlShortcutClosureType type)
@@ -145,39 +146,20 @@ dzl_shortcut_closure_chain_append_action_string (DzlShortcutClosureChain *chain,
                                                  const gchar             *detailed_action_name)
 {
   DzlShortcutClosureChain *tail;
-  g_autoptr(GError) error = NULL;
   g_autoptr(GVariant) target_value = NULL;
-  g_autofree gchar *full_name = NULL;
-  g_autofree gchar *group = NULL;
-  const gchar *name = NULL;
-  const gchar *dot;
+  g_autofree gchar *prefix = NULL;
+  g_autofree gchar *name = NULL;
 
   g_return_val_if_fail (detailed_action_name != NULL, NULL);
 
-  if (!g_action_parse_detailed_name (detailed_action_name, &full_name, &target_value, &error))
+  if (!dzl_g_action_name_parse_full (detailed_action_name, &prefix, &name, &target_value))
     {
-      g_warning ("%s", error->message);
-      return chain;
-    }
-
-  if (target_value != NULL)
-    g_variant_take_ref (target_value);
-
-  dot = strchr (full_name, '.');
-
-  if (dot != NULL)
-    {
-      group = g_strndup (full_name, dot - full_name);
-      name = dot + 1;
-    }
-  else
-    {
-      group = NULL;
-      name = full_name;
+      g_warning ("Failed to parse action: %s", detailed_action_name);
+      return NULL;
     }
 
   tail = dzl_shortcut_closure_chain_new (DZL_SHORTCUT_CLOSURE_ACTION);
-  tail->action.group = g_intern_string (group);
+  tail->action.group = g_intern_string (prefix);
   tail->action.name = g_intern_string (name);
   tail->action.params = g_steal_pointer (&target_value);
 

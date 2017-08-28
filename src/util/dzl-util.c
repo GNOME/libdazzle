@@ -265,6 +265,47 @@ dzl_g_action_name_parse (const gchar  *action_name,
   split_action_name (action_name, prefix, name);
 }
 
+gboolean
+dzl_g_action_name_parse_full (const gchar  *detailed_action_name,
+                              gchar       **prefix,
+                              gchar       **name,
+                              GVariant    **target)
+{
+  g_autofree gchar *full_name = NULL;
+  g_autoptr(GVariant) target_value = NULL;
+  const gchar *dot;
+
+  if (detailed_action_name == NULL)
+    return FALSE;
+
+  if (!g_action_parse_detailed_name (detailed_action_name, &full_name, &target_value, NULL))
+    return FALSE;
+
+  if (target_value != NULL)
+    g_variant_take_ref (target_value);
+
+  dot = strchr (full_name, '.');
+
+  if (dot != NULL)
+    {
+      if (prefix != NULL)
+        *prefix = g_strndup (full_name, dot - full_name);
+
+      if (name != NULL)
+        *name = g_strdup (dot + 1);
+    }
+  else
+    {
+      *prefix = NULL;
+      *name = g_steal_pointer (&full_name);
+    }
+
+  if (target != NULL)
+    *target = g_steal_pointer (&target_value);
+
+  return TRUE;
+}
+
 void
 dzl_gtk_allocation_subtract_border (GtkAllocation *alloc,
                                     GtkBorder     *border)

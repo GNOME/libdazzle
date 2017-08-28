@@ -65,6 +65,10 @@ GActionGroup *dzl_gtk_widget_find_group_for_action  (GtkWidget        *widget,
 void          dzl_g_action_name_parse               (const gchar      *action_name,
                                                      gchar           **prefix,
                                                      gchar           **name);
+gboolean      dzl_g_action_name_parse_full          (const gchar      *detailed_action_name,
+                                                     gchar           **prefix,
+                                                     gchar           **name,
+                                                     GVariant        **target);
 void          dzl_gtk_style_context_get_borders     (GtkStyleContext  *style_context,
                                                      GtkBorder        *borders);
 void          dzl_gtk_allocation_subtract_border    (GtkAllocation    *alloc,

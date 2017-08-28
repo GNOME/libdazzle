@@ -326,4 +326,11 @@ test_list_store_adapter = executable('test-list-store-adapter', 'test-list-store
 )
 test('test-list-store-adapter', test_list_store_adapter, env: test_env)
 
+test_util = executable('test-util', 'test-util.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-util', test_util, env: test_env)
+
 endif
