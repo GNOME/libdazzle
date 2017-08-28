@@ -19,10 +19,27 @@
 #define G_LOG_DOMAIN "dzl-application-window"
 
 #include "app/dzl-application-window.h"
+#include "shortcuts/dzl-shortcut-manager.h"
 #include "util/dzl-gtk.h"
 
 #define DEFAULT_DISMISSAL_SECONDS   3
 #define SHOW_HEADER_WITHIN_DISTANCE 5
+
+/**
+ * SECTION:dzl-application-window
+ * @title: DzlApplicationWindow
+ * @short_description: An base application window for applications
+ *
+ * The #DzlApplicationWindow class provides a #GtkApplicationWindow subclass
+ * that integrates well with #DzlApplication. It provides features such as:
+ *
+ *  - Integration with the #DzlShortcutManager for capture/bubble keyboard
+ *    input events.
+ *  - Native support for fullscreen state by re-parenting the #GtkHeaderBar as
+ *    necessary. #DzlApplicationWindow does expect you to use GtkHeaderBar.
+ *
+ * Since: 3.26
+ */
 
 typedef struct
 {
@@ -36,6 +53,7 @@ typedef struct
   guint        fullscreen_source;
   guint        fullscreen_reveal_source;
   guint        fullscreen : 1;
+  guint        in_key_press : 1;
 } DzlApplicationWindowPrivate;
 
 enum {
@@ -324,6 +342,28 @@ dzl_application_window_add (GtkContainer *container,
   gtk_container_add (GTK_CONTAINER (priv->event_box), widget);
 }
 
+static gboolean
+dzl_application_window_key_press_event (GtkWidget   *widget,
+                                        GdkEventKey *event)
+{
+  DzlApplicationWindow *self = (DzlApplicationWindow *)widget;
+  DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
+  gboolean ret;
+
+  g_assert (DZL_IS_APPLICATION_WINDOW (self));
+  g_assert (event != NULL);
+
+  /* Be re-entrant safe from the shortcut manager */
+  if (priv->in_key_press)
+    return GTK_WIDGET_CLASS (dzl_application_window_parent_class)->key_press_event (widget, event);
+
+  priv->in_key_press = TRUE;
+  ret = dzl_shortcut_manager_handle_event (NULL, event, widget);
+  priv->in_key_press = FALSE;
+
+  return ret;
+}
+
 static void
 dzl_application_window_destroy (GtkWidget *widget)
 {
@@ -408,6 +448,7 @@ dzl_application_window_class_init (DzlApplicationWindowClass *klass)
   object_class->set_property = dzl_application_window_set_property;
 
   widget_class->destroy = dzl_application_window_destroy;
+  widget_class->key_press_event = dzl_application_window_key_press_event;
 
   container_class->add = dzl_application_window_add;
 
