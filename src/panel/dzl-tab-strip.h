@@ -49,9 +49,6 @@ void             dzl_tab_strip_set_stack       (DzlTabStrip     *self,
 GtkPositionType  dzl_tab_strip_get_edge        (DzlTabStrip     *self);
 void             dzl_tab_strip_set_edge        (DzlTabStrip     *self,
                                                 GtkPositionType  edge);
-gboolean         dzl_tab_strip_get_show_labels (DzlTabStrip     *self);
-void             dzl_tab_strip_set_show_labels (DzlTabStrip     *self,
-                                                gboolean         show_labels);
 DzlTabStyle      dzl_tab_strip_get_style       (DzlTabStrip     *self);
 void             dzl_tab_strip_set_style       (DzlTabStrip     *self,
                                                 DzlTabStyle      style);

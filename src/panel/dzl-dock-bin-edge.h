@@ -33,14 +33,14 @@ struct _DzlDockBinEdgeClass
 
   void (*move_to_bin_child) (DzlDockBinEdge *self);
 
-  void (*padding1) (void);
-  void (*padding2) (void);
-  void (*padding3) (void);
-  void (*padding4) (void);
-  void (*padding5) (void);
-  void (*padding6) (void);
-  void (*padding7) (void);
-  void (*padding8) (void);
+  gpointer _reserved1;
+  gpointer _reserved2;
+  gpointer _reserved3;
+  gpointer _reserved4;
+  gpointer _reserved5;
+  gpointer _reserved6;
+  gpointer _reserved7;
+  gpointer _reserved8;
 };
 
 GtkPositionType dzl_dock_bin_edge_get_edge (DzlDockBinEdge  *self);

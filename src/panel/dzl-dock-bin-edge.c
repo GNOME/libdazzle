@@ -177,9 +177,9 @@ dzl_dock_bin_edge_constructed (GObject *object)
 
 static void
 dzl_dock_bin_edge_get_property (GObject    *object,
-                            guint       prop_id,
-                            GValue     *value,
-                            GParamSpec *pspec)
+                                guint       prop_id,
+                                GValue     *value,
+                                GParamSpec *pspec)
 {
   DzlDockBinEdge *self = DZL_DOCK_BIN_EDGE (object);
 
@@ -196,9 +196,9 @@ dzl_dock_bin_edge_get_property (GObject    *object,
 
 static void
 dzl_dock_bin_edge_set_property (GObject      *object,
-                            guint         prop_id,
-                            const GValue *value,
-                            GParamSpec   *pspec)
+                                guint         prop_id,
+                                const GValue *value,
+                                GParamSpec   *pspec)
 {
   DzlDockBinEdge *self = DZL_DOCK_BIN_EDGE (object);
 
