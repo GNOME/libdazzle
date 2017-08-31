@@ -50,10 +50,8 @@ test_index_builder_basic (void)
   main_loop = g_main_loop_new (NULL, FALSE);
 
   file = g_file_new_for_path ("index.gvariant");
-  g_object_add_weak_pointer (G_OBJECT (file), (gpointer *)&file);
 
   builder = dzl_fuzzy_index_builder_new ();
-  g_object_add_weak_pointer (G_OBJECT (builder), (gpointer *)&builder);
 
   dzl_fuzzy_index_builder_insert (builder, "foo", g_variant_new_int32 (1), 7);
   dzl_fuzzy_index_builder_insert (builder, "FOO", g_variant_new_int32 (2), 7);
@@ -113,23 +111,12 @@ test_index_builder_basic (void)
   g_variant_dict_clear (&dict);
 
   g_object_unref (builder);
-#if 0
-  /* There may still be task queues racing to hold the object */
-  g_assert (builder == NULL);
-#endif
 
   r = g_file_delete (file, NULL, &error);
   g_assert_no_error (error);
   g_assert (r);
 
   g_object_unref (file);
-
-#if 0
-  /* It would be nice if we could rely on testing this for NULL,
-   * but the async operations could still hold a reference.
-   */
-  g_assert (file == NULL);
-#endif
 }
 
 static void
@@ -170,10 +157,6 @@ test_index_basic_query_cb (GObject      *object,
           g_autofree gchar *format = g_variant_print (doc, TRUE);
           g_print ("%f %s %s\n", score, key, format);
         }
-
-      g_object_add_weak_pointer (G_OBJECT (match), (gpointer *)&match);
-      g_object_unref (match);
-      g_assert (match == NULL);
     }
 
   g_main_loop_quit (main_loop);
@@ -231,12 +214,8 @@ test_index_basic (void)
   gboolean r;
 
   main_loop = g_main_loop_new (NULL, FALSE);
-
   file = g_file_new_for_path ("index.gvariant");
-  g_object_add_weak_pointer (G_OBJECT (file), (gpointer *)&file);
-
   builder = dzl_fuzzy_index_builder_new ();
-  g_object_add_weak_pointer (G_OBJECT (builder), (gpointer *)&builder);
 
   /*
    * We want to ensure we only get the highest scoring item for a
@@ -261,14 +240,12 @@ test_index_basic (void)
   g_assert_no_error (error);
 
   g_object_unref (builder);
-  g_assert (builder == NULL);
 
   r = g_file_delete (file, NULL, &error);
   g_assert_no_error (error);
   g_assert (r);
 
   g_object_unref (file);
-  g_assert (file == NULL);
 }
 
 gint
