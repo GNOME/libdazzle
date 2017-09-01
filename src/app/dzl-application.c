@@ -119,7 +119,8 @@ dzl_application_real_add_resources (DzlApplication *self,
   else
     merge_id = dzl_menu_manager_add_filename (priv->menu_manager, menu_path, &error);
 
-  g_hash_table_insert (priv->menu_merge_ids, (gchar *)resource_path, GUINT_TO_POINTER (merge_id));
+  if (merge_id != 0)
+    g_hash_table_insert (priv->menu_merge_ids, (gchar *)resource_path, GUINT_TO_POINTER (merge_id));
 
   if (error != NULL &&
       !(g_error_matches (error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND) ||
@@ -155,7 +156,10 @@ dzl_application_real_remove_resources (DzlApplication *self,
   /* Remove any merged menus from the @resource_path/gtk/menus.ui */
   merge_id = GPOINTER_TO_UINT (g_hash_table_lookup (priv->menu_merge_ids, resource_path));
   if (merge_id != 0)
-    dzl_menu_manager_remove (priv->menu_manager, merge_id);
+    {
+      dzl_menu_manager_remove (priv->menu_manager, merge_id);
+      g_hash_table_remove (priv->menu_merge_ids, resource_path);
+    }
 
   /* Remove keythemes path from the shortcuts manager */
   keythemes_path = g_strjoin (NULL, "resource://", resource_path, "/shortcuts", NULL);
