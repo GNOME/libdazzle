@@ -562,6 +562,17 @@ dzl_menu_manager_merge (DzlMenuManager *self,
   return merge_id;
 }
 
+/**
+ * dzl_menu_manager_remove:
+ * @self: a #DzlMenuManager
+ * @merge_id: A previously registered merge id
+ *
+ * This removes items from menus that were added as part of a previous
+ * menu merge. Use the value returned from dzl_menu_manager_merge() as
+ * the @merge_id.
+ *
+ * Since: 3.26
+ */
 void
 dzl_menu_manager_remove (DzlMenuManager *self,
                          guint           merge_id)
