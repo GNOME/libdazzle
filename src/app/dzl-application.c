@@ -157,8 +157,9 @@ dzl_application_real_remove_resources (DzlApplication *self,
   merge_id = GPOINTER_TO_UINT (g_hash_table_lookup (priv->menu_merge_ids, resource_path));
   if (merge_id != 0)
     {
+      if (g_hash_table_contains (priv->menu_merge_ids, resource_path))
+        g_hash_table_remove (priv->menu_merge_ids, resource_path);
       dzl_menu_manager_remove (priv->menu_manager, merge_id);
-      g_hash_table_remove (priv->menu_merge_ids, resource_path);
     }
 
   /* Remove keythemes path from the shortcuts manager */
