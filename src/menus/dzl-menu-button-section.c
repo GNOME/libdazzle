@@ -106,11 +106,12 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
 
   for (guint i = 0; i < removed; i++)
     {
-      GtkWidget *child = dzl_box_get_nth_child (self->items_box, i);
+      GtkWidget *child = dzl_box_get_nth_child (self->items_box, position);
+
       gtk_widget_destroy (child);
     }
 
-  for (guint i = position; i < position + added; i++)
+  for (guint i = position; i < (position + added); i++)
     {
       DzlMenuButtonItem *item;
       g_autoptr(GVariant) target = NULL;

@@ -128,7 +128,7 @@ dzl_menu_button_items_changed (DzlMenuButton *self,
       gtk_widget_destroy (child);
     }
 
-  for (guint i = position; i < position + added; i++)
+  for (guint i = position; i < (position + added); i++)
     {
       g_autofree gchar *label = NULL;
       g_autoptr(GMenuModel) linked_model = NULL;
