@@ -592,8 +592,10 @@ dzl_menu_manager_remove (DzlMenuManager *self,
                                                i,
                                                DZL_MENU_ATTRIBUTE_MERGE_ID,
                                                "u", &item_merge_id))
-            if (item_merge_id == merge_id)
-              g_menu_remove (menu, i);
+            {
+              if (item_merge_id == merge_id)
+                g_menu_remove (menu, i);
+            }
         }
     }
 }
