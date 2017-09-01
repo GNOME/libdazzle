@@ -586,7 +586,7 @@ dzl_menu_manager_remove (DzlMenuManager *self,
       /* Iterate backward so we have a stable loop variable. */
       for (i = n_items - 1; i >= 0; i--)
         {
-          guint item_merge_id;
+          guint item_merge_id = 0;
 
           if (g_menu_model_get_item_attribute (G_MENU_MODEL (menu),
                                                i,
