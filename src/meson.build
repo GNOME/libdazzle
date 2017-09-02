@@ -85,6 +85,11 @@ endif
 
 libdazzle_map = join_paths(meson.current_source_dir(), 'dazzle.map')
 
+libdazzle_link_args = []
+if host_machine.system() == 'linux'
+libdazzle_link_args += [ '-Wl,--version-script,' + libdazzle_map ]
+endif
+
 libdazzle = shared_library(
   'dazzle-' + apiversion,
   libdazzle_sources,
@@ -92,7 +97,7 @@ libdazzle = shared_library(
             soversion: 0,
          link_depends: libdazzle_map,
                c_args: libdazzle_args,
-            link_args: [ '-Wl,--version-script,' + libdazzle_map ],
+            link_args: libdazzle_link_args,
          dependencies: libdazzle_deps,
   include_directories: [ root_inc, src_inc ],
               install: true,
