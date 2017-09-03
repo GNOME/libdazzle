@@ -86,7 +86,7 @@ endif
 libdazzle_map = join_paths(meson.current_source_dir(), 'dazzle.map')
 
 libdazzle_link_args = []
-if host_machine.system() == 'linux'
+if ld_supports_version_script
 libdazzle_link_args += [ '-Wl,--version-script,' + libdazzle_map ]
 endif
 
