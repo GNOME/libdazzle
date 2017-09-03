@@ -26,7 +26,6 @@
 
 #include <glib/gprintf.h>
 #include <gmodule.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -34,6 +33,10 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifdef G_OS_UNIX
+# include <sys/mman.h>
+#endif
 
 #include "dzl-counter.h"
 
@@ -156,13 +159,15 @@ _dzl_counter_arena_atexit (void)
 static void
 _dzl_counter_arena_init_local (DzlCounterArena *arena)
 {
-  ShmHeader *header;
-  gpointer mem;
-  unsigned pid;
   gsize size;
   gint page_size;
+  ShmHeader *header;
+#ifndef G_OS_WIN32
+  gpointer mem;
+  unsigned pid;
   gint fd;
   gchar name [32];
+#endif
 
   page_size = sysconf (_SC_PAGE_SIZE);
 
@@ -173,6 +178,8 @@ _dzl_counter_arena_init_local (DzlCounterArena *arena)
       size = page_size * 4;
       goto use_malloc;
     }
+
+#ifndef G_OS_WIN32
 
   /*
    * FIXME: https://bugzilla.gnome.org/show_bug.cgi?id=749280
@@ -233,26 +240,39 @@ _dzl_counter_arena_init_local (DzlCounterArena *arena)
 failure:
   shm_unlink (name);
   close (fd);
+#endif
 
 use_malloc:
   g_warning ("Failed to allocate shared memory for counters. "
              "Counters will not be available to external processes.");
 
+  /*
+   * Ask for double memory than required so that we can be certain
+   * that the memalign will keep us within valid memory ranges.
+   */
+  if (size < page_size)
+    size = page_size;
   arena->data_is_mmapped = FALSE;
-  arena->cells = g_malloc0 (size << 1);
   arena->n_cells = (size / DATA_CELL_SIZE);
   arena->data_length = size;
+#ifdef G_OS_WIN32
+  arena->cells = _aligned_malloc (size, page_size);
+#else
+  arena->cells = g_malloc0 (size << 1);
+#endif
 
+#ifndef G_OS_WIN32
   /*
    * Make sure that we have a properly aligned allocation back from
    * malloc. Since we are at least a page size, we should pretty much
    * be guaranteed this, but better to check with posix_memalign().
    */
-  if (posix_memalign ((void *)&arena->cells, page_size, size << 1) != 0)
+  if (posix_memalign ((gpointer)&arena->cells, page_size, size << 1) != 0)
     {
       perror ("posix_memalign()");
       abort ();
     }
+#endif
 
   header = (void *)arena->cells;
   header->magic = MAGIC;
@@ -392,7 +412,12 @@ _dzl_counter_arena_destroy (DzlCounterArena *arena)
   if (arena->data_is_mmapped)
     munmap (arena->cells, arena->data_length);
   else
+#ifdef G_OS_WIN32
+    /* Allocated with _aligned_malloc() */
+    _aligned_free (arena->cells);
+#else
     g_free (arena->cells);
+#endif
 
   g_clear_pointer (&arena->counters, g_list_free);
 
