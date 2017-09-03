@@ -87,7 +87,7 @@ add_project_arguments(
 # Check if we can use version scripts for ABI exports
 ld_supports_version_script = cc.links('''
   int main (void) { return 0; }
-''', args: '-Wl,--version-script,' + join_paths(meson.source_root(), 'libide/ide.map'))
+''', args: '-Wl,--version-script,' + join_paths(meson.source_root(), 'src/dazzle.map'))
 message('Linker supports --version-script: @0@'.format(ld_supports_version_script))
 
 # Setup various paths that subdirectory meson.build files need
