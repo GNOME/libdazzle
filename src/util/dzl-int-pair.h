@@ -26,7 +26,11 @@
 
 G_BEGIN_DECLS
 
-#if __WORDSIZE >= 64
+#if defined(__LP64__) || defined(_WIN64)
+# define DZL_INT_PAIR_64
+#endif
+
+#ifdef DZL_INT_PAIR_64
 
 typedef union
 {
@@ -82,7 +86,7 @@ dzl_int_pair_new (gint first, gint second)
   pair.first = first;
   pair.second = second;
 
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   return pair.ptr;
 #else
   return g_slice_copy (sizeof (DzlIntPair), &pair);
@@ -105,7 +109,7 @@ dzl_uint_pair_new (guint first, guint second)
   pair.first = first;
   pair.second = second;
 
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   return pair.ptr;
 #else
   return g_slice_copy (sizeof (DzlUIntPair), &pair);
@@ -119,7 +123,7 @@ static inline gint
 dzl_int_pair_first (DzlIntPair *pair)
 {
   DzlIntPair p;
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   p.ptr = pair;
 #else
   p = *pair;
@@ -134,7 +138,7 @@ static inline gint
 dzl_int_pair_second (DzlIntPair *pair)
 {
   DzlIntPair p;
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   p.ptr = pair;
 #else
   p = *pair;
@@ -149,7 +153,7 @@ static inline guint
 dzl_uint_pair_first (DzlUIntPair *pair)
 {
   DzlUIntPair p;
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   p.ptr = pair;
 #else
   p = *pair;
@@ -164,7 +168,7 @@ static inline guint
 dzl_uint_pair_second (DzlUIntPair *pair)
 {
   DzlUIntPair p;
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   p.ptr = pair;
 #else
   p = *pair;
@@ -178,7 +182,7 @@ dzl_uint_pair_second (DzlUIntPair *pair)
 static inline void
 dzl_int_pair_free (DzlIntPair *pair)
 {
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   /* Do Nothing */
 #else
   g_slice_free (DzlIntPair, pair);
@@ -191,7 +195,7 @@ dzl_int_pair_free (DzlIntPair *pair)
 static inline void
 dzl_uint_pair_free (DzlUIntPair *pair)
 {
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   /* Do Nothing */
 #else
   g_slice_free (DzlUIntPair, pair);
