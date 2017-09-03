@@ -336,4 +336,11 @@ test_util = executable('test-util', 'test-util.c',
 )
 test('test-util', test_util, env: test_env)
 
+test_pattern_spec = executable('test-pattern-spec', 'test-pattern-spec.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-pattern-spec', test_pattern_spec, env: test_env)
+
 endif
