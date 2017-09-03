@@ -287,11 +287,14 @@ test_ring = executable('test-ring', 'test-ring.c',
 )
 test('test-ring', test_ring, env: test_env)
 
+# Counters only run on UNIX-like systems currently
+if host_machine.system() != 'windows'
 test_counters_window = executable('test-counters-window', 'test-counters-window.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+endif
 
 test_list_store = executable('test-list-store', 'test-list-store.c',
         c_args: test_cflags,
