@@ -47,6 +47,37 @@ struct _DzlPatternSpec
   guint           case_sensitive : 1;
 };
 
+#ifdef G_OS_WIN32
+/* A fallback for missing strcasestr() on Windows. This is not in any way
+ * optimized, but at least it supports something resembling UTF-8.
+ */
+static char *
+strcasestr (const gchar *haystack,
+            const gchar *needle)
+{
+  g_autofree gchar *haystack_folded = g_utf8_casefold (haystack, -1);
+  g_autofree gchar *needle_folded = g_utf8_casefold (needle, -1);
+  const gchar *pos;
+  gsize n_chars = 0;
+
+  pos = strstr (haystack_folded, needle_folded);
+
+  if (pos == NULL)
+    return NULL;
+
+  for (const gchar *iter = haystack_folded;
+       *iter != '\0';
+       iter = g_utf8_next_char (iter))
+    {
+      if (iter >= pos)
+        break;
+      n_chars++;
+    }
+
+  return g_utf8_offset_to_pointer (haystack, n_chars);
+}
+#endif
+
 DzlPatternSpec *
 dzl_pattern_spec_new (const gchar *needle)
 {
