@@ -24,8 +24,10 @@ typedef struct
 {
   gchar *title;
   gchar *subtitle;
-  gchar *icon_name;
   gchar *id;
+
+  /* interned string */
+  const gchar *icon_name;
 } DzlSuggestionPrivate;
 
 enum {
@@ -56,7 +58,6 @@ dzl_suggestion_finalize (GObject *object)
 
   g_clear_pointer (&priv->title, g_free);
   g_clear_pointer (&priv->subtitle, g_free);
-  g_clear_pointer (&priv->icon_name, g_free);
   g_clear_pointer (&priv->id, g_free);
 
   G_OBJECT_CLASS (dzl_suggestion_parent_class)->finalize (object);
@@ -77,7 +78,7 @@ dzl_suggestion_get_property (GObject    *object,
       break;
 
     case PROP_ICON_NAME:
-      g_value_set_string (value, dzl_suggestion_get_icon_name (self));
+      g_value_set_static_string (value, dzl_suggestion_get_icon_name (self));
       break;
 
     case PROP_TITLE:
@@ -233,10 +234,11 @@ dzl_suggestion_set_icon_name (DzlSuggestion *self,
 
   g_return_if_fail (DZL_IS_SUGGESTION (self));
 
-  if (g_strcmp0 (priv->icon_name, icon_name) != 0)
+  icon_name = g_intern_string (icon_name);
+
+  if (priv->icon_name != icon_name)
     {
-      g_free (priv->icon_name);
-      priv->icon_name = g_strdup (icon_name);
+      priv->icon_name = icon_name;
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ICON_NAME]);
     }
 }
