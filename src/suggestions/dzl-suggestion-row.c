@@ -66,10 +66,8 @@ dzl_suggestion_row_connect (DzlSuggestionRow *self)
   g_return_if_fail (priv->suggestion != NULL);
 
   icon_name = dzl_suggestion_get_icon_name (priv->suggestion);
-  if (icon_name == NULL)
-    icon_name = "web-browser-symbolic";
-
   g_object_set (priv->image, "icon-name", icon_name, NULL);
+
   gtk_label_set_label (priv->title, dzl_suggestion_get_title (priv->suggestion));
 
   subtitle = dzl_suggestion_get_subtitle (priv->suggestion);
