@@ -56,6 +56,8 @@ dzl_suggestion_finalize (GObject *object)
   DzlSuggestion *self = (DzlSuggestion *)object;
   DzlSuggestionPrivate *priv = dzl_suggestion_get_instance_private (self);
 
+  priv->icon_name = NULL;
+
   g_clear_pointer (&priv->title, g_free);
   g_clear_pointer (&priv->subtitle, g_free);
   g_clear_pointer (&priv->id, g_free);
