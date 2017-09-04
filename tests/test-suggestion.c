@@ -35,17 +35,17 @@ typedef struct
 
 static DzlFuzzyMutableIndex *search_index;
 static const DemoData demo_data[] = {
-  { NULL, "https://twitter.com", "Twitter", "twitter.com" },
-  { NULL, "https://facebook.com", "Facebook", "facebook.com" },
-  { NULL, "https://google.com", "Google", "google.com" },
-  { NULL, "https://images.google.com", "Google Images", "images.google.com" },
-  { NULL, "https://news.ycombinator.com", "Hacker News", "news.ycombinator.com" },
-  { NULL, "https://reddit.com/r/gnome", "GNOME Desktop Environment", "reddit.com/r/gnome" },
-  { NULL, "https://reddit.com/r/linux", "Linux, GNU/Linux, free software", "reddit.com/r/linux" },
-  { NULL, "https://wiki.gnome.org", "GNOME Wiki", "wiki.gnome.org" },
-  { NULL, "https://gnome.org", "GNOME", "gnome.org" },
-  { NULL, "https://planet.gnome.org", "Planet GNOME", "planet.gnome.org" },
-  { NULL, "https://wiki.gnome.org/Apps/Builder", "GNOME Builder", "wiki.gnome.org/Apps/Builder" },
+  { "web-browser-symbolic", "https://twitter.com", "Twitter", "twitter.com" },
+  { "web-browser-symbolic", "https://facebook.com", "Facebook", "facebook.com" },
+  { "web-browser-symbolic", "https://google.com", "Google", "google.com" },
+  { "web-browser-symbolic", "https://images.google.com", "Google Images", "images.google.com" },
+  { "web-browser-symbolic", "https://news.ycombinator.com", "Hacker News", "news.ycombinator.com" },
+  { "web-browser-symbolic", "https://reddit.com/r/gnome", "GNOME Desktop Environment", "reddit.com/r/gnome" },
+  { "web-browser-symbolic", "https://reddit.com/r/linux", "Linux, GNU/Linux, free software", "reddit.com/r/linux" },
+  { "web-browser-symbolic", "https://wiki.gnome.org", "GNOME Wiki", "wiki.gnome.org" },
+  { "web-browser-symbolic", "https://gnome.org", "GNOME", "gnome.org" },
+  { "web-browser-symbolic", "https://planet.gnome.org", "Planet GNOME", "planet.gnome.org" },
+  { "web-browser-symbolic", "https://wiki.gnome.org/Apps/Builder", "GNOME Builder", "wiki.gnome.org/Apps/Builder" },
 };
 
 static void
