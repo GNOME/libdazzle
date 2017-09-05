@@ -1,4 +1,32 @@
 ===============
+Version 3.25.92
+===============
+
+Changes in this release:
+
+ • Enforce GNU11 C standard when configuring project.
+ • DzlApplicationWindow automatically queries the shortcut manager.
+ • The shortcut manager now checks GtkApplication registered accelerators
+   providing an improved migration strategy for applications.
+ • Lifecycle tests were removed from the test-fuzzy-index as they were
+   racy via delayed disposal of threaded workers. This should fix unit
+   tests for various distributions on less common hardware.
+ • Menu buttons now remove the proper section item when handling GMenuModel
+   changes.
+ • Our meson-based build system now checks if version-script is supported
+   and only applies the ABI map in that case. We may consider switching to
+   export macros in the future.
+ • Counters are now disabled on Windows.
+ • Various compiler pre-processor checks have been improved.
+ • A fallback for strcasecmp() is included for Windows.
+ • DzlSuggestion will now use intern'd strings for icon-names to help
+   reduce the number of duplicate strings in memory.
+ • Various CSS styling refinements.
+ • DzlListBox fixed a lingering pointer to the cached row during disposal.
+   This fixes a crash that would occur if GObjectClass.dispose() was called
+   multiple times.
+
+===============
 Version 3.25.91
 ===============
 
