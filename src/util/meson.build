@@ -1,6 +1,5 @@
 util_headers = [
   'dzl-cairo.h',
-  'dzl-counter.h',
   'dzl-date-time.h',
   'dzl-dnd.h',
   'dzl-file-manager.h',
@@ -16,7 +15,6 @@ util_headers = [
 
 util_sources = [
   'dzl-cairo.c',
-  'dzl-counter.c',
   'dzl-date-time.c',
   'dzl-dnd.c',
   'dzl-file-manager.c',
@@ -29,6 +27,14 @@ util_sources = [
   'dzl-util.c',
   'dzl-variant.c',
 ]
+
+# No counters if building on win32 for now.
+# They need explicit porting to that platform and should
+# probably just wrap the eventtrace API or something.
+if host_machine.system() != 'windows'
+  util_headers += ['dzl-counter.h']
+  util_sources += ['dzl-counter.c']
+endif
 
 libdazzle_public_headers += files(util_headers)
 libdazzle_public_sources += files(util_sources)

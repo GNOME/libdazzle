@@ -4,7 +4,6 @@ widgets_headers = [
   'dzl-box.h',
   'dzl-centering-bin.h',
   'dzl-column-layout.h',
-  'dzl-counters-window.h',
   'dzl-elastic-bin.h',
   'dzl-empty-state.h',
   'dzl-entry-box.h',
@@ -33,7 +32,6 @@ widgets_sources = [
   'dzl-box.c',
   'dzl-centering-bin.c',
   'dzl-column-layout.c',
-  'dzl-counters-window.c',
   'dzl-elastic-bin.c',
   'dzl-empty-state.c',
   'dzl-entry-box.c',
@@ -55,6 +53,11 @@ widgets_sources = [
   'dzl-stack-list.c',
   'dzl-three-grid.c',
 ]
+
+if host_machine.system() != 'windows'
+  widgets_headers += ['dzl-counters-window.h']
+  widgets_sources += ['dzl-counters-window.c']
+endif
 
 libdazzle_public_headers += files(widgets_headers)
 libdazzle_public_sources += files(widgets_sources)
