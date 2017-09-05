@@ -25,6 +25,10 @@
 #include "search/dzl-fuzzy-index-private.h"
 #include "util/dzl-int-pair.h"
 
+#if defined(__LP64__) || defined(_WIN64)
+# define DZL_FUZZY_64 1
+#endif
+
 struct _DzlFuzzyIndexCursor
 {
   GObject          object;
@@ -87,7 +91,7 @@ pointer_to_float (gpointer ptr)
 {
   union {
     gpointer ptr;
-#if __WORDSIZE == 64
+#ifdef DZL_FUZZY_64
     gdouble fval;
 #else
     gfloat fval;
@@ -102,7 +106,7 @@ float_to_pointer (gfloat fval)
 {
   union {
     gpointer ptr;
-#if __WORDSIZE == 64
+#ifdef DZL_FUZZY_64
     gdouble fval;
 #else
     gfloat fval;

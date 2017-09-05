@@ -6,7 +6,7 @@ test_intpair_basic (void)
   DzlIntPair *p;
 
   p = dzl_int_pair_new (0, 0);
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   /* Technically not ANSI as NULL is allowed to be non-zero, but all the
    * platforms we support, this is the case.
    */
@@ -40,7 +40,7 @@ test_uintpair_basic (void)
   DzlUIntPair *p;
 
   p = dzl_uint_pair_new (0, 0);
-#if __WORDSIZE >= 64
+#ifdef DZL_INT_PAIR_64
   /* Technically not ANSI as NULL is allowed to be non-zero, but all the
    * platforms we support, this is the case.
    */
