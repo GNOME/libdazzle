@@ -166,6 +166,8 @@ dzl_list_box_destroy (GtkWidget *widget)
   priv->recycle_max = 0;
 
   rows = priv->trashed_rows.head;
+
+  priv->trashed_rows.head = NULL;
   priv->trashed_rows.tail = NULL;
   priv->trashed_rows.length = 0;
 
