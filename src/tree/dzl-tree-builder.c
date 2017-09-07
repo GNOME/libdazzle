@@ -229,20 +229,28 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (DzlTreeBuilderClass, added),
-                  NULL, NULL, NULL,
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
                   G_TYPE_NONE,
                   1,
                   DZL_TYPE_TREE);
+  g_signal_set_va_marshaller (signals [ADDED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 
   signals [BUILD_NODE] =
     g_signal_new ("build-node",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (DzlTreeBuilderClass, build_node),
-                  NULL, NULL, NULL,
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
                   G_TYPE_NONE,
                   1,
                   DZL_TYPE_TREE_NODE);
+  g_signal_set_va_marshaller (signals [BUILD_NODE],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 
   signals [NODE_ACTIVATED] =
     g_signal_new ("node-activated",
@@ -270,30 +278,42 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (DzlTreeBuilderClass, node_selected),
-                  NULL, NULL, NULL,
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
                   G_TYPE_NONE,
                   1,
                   DZL_TYPE_TREE_NODE);
+  g_signal_set_va_marshaller (signals [NODE_SELECTED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 
   signals [NODE_UNSELECTED] =
     g_signal_new ("node-unselected",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (DzlTreeBuilderClass, node_unselected),
-                  NULL, NULL, NULL,
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
                   G_TYPE_NONE,
                   1,
                   DZL_TYPE_TREE_NODE);
+  g_signal_set_va_marshaller (signals [NODE_UNSELECTED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 
   signals [REMOVED] =
     g_signal_new ("removed",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (DzlTreeBuilderClass, removed),
-                  NULL, NULL, NULL,
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
                   G_TYPE_NONE,
                   1,
                   DZL_TYPE_TREE);
+  g_signal_set_va_marshaller (signals [REMOVED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 }
 
 static void
