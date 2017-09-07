@@ -801,15 +801,25 @@ dzl_shortcut_manager_run_global (DzlShortcutManager     *self,
 static gboolean
 dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
                                     GtkWidget              *widget,
+                                    GtkWidget              *toplevel,
                                     const DzlShortcutChord *chord)
 {
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (GTK_IS_WIDGET (widget));
+  g_assert (GTK_IS_WIDGET (toplevel));
   g_assert (chord != NULL);
 
   if (dzl_shortcut_chord_get_length (chord) == 1)
     {
       GApplication *app = g_application_get_default ();
+      GdkModifierType state;
+      guint keyval;
+
+      dzl_shortcut_chord_get_nth_key (chord, 0, &keyval, &state);
+
+      /* See if the toplevel activates this, like Tab, etc */
+      if (gtk_bindings_activate (G_OBJECT (toplevel), keyval, state))
+        return TRUE;
 
       if (GTK_IS_APPLICATION (app))
         {
@@ -930,7 +940,7 @@ dzl_shortcut_manager_handle_event (DzlShortcutManager *self,
       (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_DISPATCH, widget, focus)) ||
       (match = dzl_shortcut_manager_run_phase (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, widget, focus)) ||
       (match = dzl_shortcut_manager_run_global (self, event, chord, DZL_SHORTCUT_PHASE_BUBBLE, root, widget)) ||
-      (match = dzl_shortcut_manager_run_fallbacks (self, widget, chord)))
+      (match = dzl_shortcut_manager_run_fallbacks (self, widget, toplevel, chord)))
     ret = GDK_EVENT_STOP;
 
   DZL_TRACE_MSG ("match = %d", match);
