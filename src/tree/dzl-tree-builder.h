@@ -31,9 +31,9 @@ struct _DzlTreeBuilderClass
   GInitiallyUnownedClass parent_class;
 
   void     (*added)           (DzlTreeBuilder *builder,
-                               GtkWidget     *tree);
+                               GtkWidget      *tree);
   void     (*removed)         (DzlTreeBuilder *builder,
-                               GtkWidget     *tree);
+                               GtkWidget      *tree);
   void     (*build_node)      (DzlTreeBuilder *builder,
                                DzlTreeNode    *node);
   gboolean (*node_activated)  (DzlTreeBuilder *builder,
@@ -44,7 +44,7 @@ struct _DzlTreeBuilderClass
                                DzlTreeNode    *node);
   void     (*node_popup)      (DzlTreeBuilder *builder,
                                DzlTreeNode    *node,
-                               GMenu         *menu);
+                               GMenu          *menu);
 };
 
 DzlTree *dzl_tree_builder_get_tree (DzlTreeBuilder *builder);
