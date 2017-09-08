@@ -22,8 +22,8 @@
 
 #include "dzl-trie.h"
 
-#if defined(__LP64__) || __WORDSIZE == 64 || defined(_WIN64)
-#define TRIE_64 1
+#if defined(__LP64__) || defined(_WIN64)
+# define TRIE_64 1
 #endif
 
 #define STATIC_ASSERT(a)                              \
