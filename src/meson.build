@@ -23,7 +23,7 @@ dzl_version_h = configure_file(
   configuration: version_data)
 
 debug_data = configuration_data()
-debug_data.set10('ENABLE_TRACING', get_option('enable_tracing'))
+debug_data.set10('ENABLE_TRACING', get_option('tracing'))
 
 dzl_debug_h = configure_file(
           input: 'dzl-debug.h.in',
@@ -79,7 +79,7 @@ libdazzle_deps = [
 ]
 
 libdazzle_args = []
-if get_option('enable_rdtscp')
+if get_option('rdtscp')
   libdazzle_args += '-DDZL_HAVE_RDTSCP'
 endif
 
@@ -110,7 +110,7 @@ libdazzle_dep = declare_dependency(
   include_directories: include_directories('.'),
 )
 
-if get_option('with_introspection')
+if get_option('introspection')
 
   libdazzle_gir = gnome.generate_gir(libdazzle,
                 sources: libdazzle_generated_headers + libdazzle_public_headers + libdazzle_public_sources,
@@ -126,7 +126,7 @@ if get_option('with_introspection')
              extra_args: [ '--c-include=dazzle.h', '--quiet' ],
   )
 
-  if get_option('with_vapi')
+  if get_option('vapi')
 
     libdazzle_vapi = gnome.generate_vapi('libdazzle-' + apiversion,
             sources: libdazzle_gir[0],

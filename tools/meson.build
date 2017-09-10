@@ -1,4 +1,4 @@
-if get_option('enable_tools')
+if get_option('tools')
 
 # Counters are UNIX-systems only currently
 if host_machine.system() != 'windows'

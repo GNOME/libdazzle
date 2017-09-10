@@ -16,7 +16,7 @@ Not everything we have in the code base has tests, and ideally that will improve
 
 ## Troubleshooting
 
-If you configure the meson project with `-Denable_tracing=true` then libdazzle with be built with tracing.
+If you configure the meson project with `-Dtracing=true` then libdazzle with be built with tracing.
 This allows various parts of the code to use `DZL_ENTRY`, `DZL_EXIT` and other tracing macros to log function calls.
 You might find this useful in tracking down difficult re-entrancy or simply learn "how does this work".
 

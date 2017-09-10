@@ -70,7 +70,7 @@ test_c_args = [
 if get_option('buildtype') != 'plain'
   test_c_args += '-fstack-protector-strong'
 endif
-if get_option('enable_profiling')
+if get_option('profiling')
   test_c_args += '-pg'
 endif
 
@@ -108,6 +108,6 @@ subdir('tools')
 subdir('tests')
 subdir('examples/app')
 
-if get_option('enable_gtk_doc')
+if get_option('gtk-doc')
   subdir('doc')
 endif

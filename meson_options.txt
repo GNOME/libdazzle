@@ -1,27 +1,27 @@
 
 # Performance and debugging related options
-option('enable_tracing', type: 'boolean', value: false)
-option('enable_profiling', type: 'boolean', value: false)
-option('enable_rdtscp', type: 'boolean', value: false,
+option('tracing', type: 'boolean', value: false)
+option('profiling', type: 'boolean', value: false)
+option('rdtscp', type: 'boolean', value: false,
   description: 'Use intel rdtscp haswell instruction for performance counters'
 )
 
-option('enable_tools', type: 'boolean', value: true,
+option('tools', type: 'boolean', value: true,
        description: 'Whether helper tools should be installed')
 
 # Support for multiple languages
-option('with_introspection', type: 'boolean', value: true)
-option('with_vapi', type: 'boolean', value: true)
+option('introspection', type: 'boolean', value: true)
+option('vapi', type: 'boolean', value: true)
 
 # Subproject
 option('package_subdir', type: 'string',
   description: 'Subdirectory to append to all installed files, for use as subproject'
 )
 
-option('enable_gtk_doc',
+option('gtk-doc',
        type: 'boolean', value: false,
        description: 'Whether to generate the API reference for Dazzle')
 
-option('enable_tests',
+option('tests',
        type: 'boolean', value: true,
        description: 'Whether to compile unit tests')
