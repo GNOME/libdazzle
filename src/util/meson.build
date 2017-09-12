@@ -7,6 +7,7 @@ util_headers = [
   'dzl-gtk.h',
   'dzl-heap.h',
   'dzl-int-pair.h',
+  'dzl-macros.h',
   'dzl-pango.h',
   'dzl-rgba.h',
   'dzl-ring.h',
