@@ -27,11 +27,6 @@
 # define TRIE_64 1
 #endif
 
-#define STATIC_ASSERT(a)                              \
-   G_STMT_START {                                     \
-      G_GNUC_UNUSED gchar static_assert[(a)? 0 : -1]; \
-   } G_STMT_END
-
 /**
  * SECTION:trie
  * @title: DzlTrie
@@ -116,6 +111,20 @@ struct _DzlTrie
    GDestroyNotify  value_destroy;
    DzlTrieNode    *root;
 };
+
+#ifdef TRIE_64
+  G_STATIC_ASSERT (sizeof(gpointer) == 8);
+  G_STATIC_ASSERT ((FIRST_CHUNK_KEYS-1) == 3);
+  G_STATIC_ASSERT (((FIRST_CHUNK_KEYS-1) * sizeof(gpointer)) == 24);
+  G_STATIC_ASSERT(sizeof(DzlTrieNode) == 32);
+  G_STATIC_ASSERT(sizeof(DzlTrieNodeChunk) == 16);
+#else
+  G_STATIC_ASSERT (sizeof(gpointer) == 4);
+  G_STATIC_ASSERT ((FIRST_CHUNK_KEYS-1) == 2);
+  G_STATIC_ASSERT (((FIRST_CHUNK_KEYS-1) * sizeof(gpointer)) == 8);
+  G_STATIC_ASSERT(sizeof(DzlTrieNode) == 20);
+  G_STATIC_ASSERT(sizeof(DzlTrieNodeChunk) == 12);
+#endif
 
 /**
  * dzl_trie_malloc0:
@@ -265,16 +274,6 @@ dzl_trie_node_move_to_front (DzlTrieNode      *node,
    offset = ((first == chunk) ? first->count : FIRST_CHUNK_KEYS) - 1;
    chunk->keys[idx] = first->keys[offset];
    chunk->children[idx] = first->children[offset];
-
-#ifdef TRIE_64
-   STATIC_ASSERT(sizeof(gpointer) == 8);
-   STATIC_ASSERT((FIRST_CHUNK_KEYS-1) == 3);
-   STATIC_ASSERT(((FIRST_CHUNK_KEYS-1) * sizeof(gpointer)) == 24);
-#else
-   STATIC_ASSERT(sizeof(gpointer) == 4);
-   STATIC_ASSERT((FIRST_CHUNK_KEYS-1) == 2);
-   STATIC_ASSERT(((FIRST_CHUNK_KEYS-1) * sizeof(gpointer)) == 8);
-#endif
 
    memmove(&first->keys[1], &first->keys[0], (FIRST_CHUNK_KEYS-1));
    memmove(&first->children[1], &first->children[0], (FIRST_CHUNK_KEYS-1) * sizeof(DzlTrieNode *));
@@ -487,14 +486,6 @@ DzlTrie *
 dzl_trie_new (GDestroyNotify value_destroy)
 {
    DzlTrie *trie;
-
-#ifdef TRIE_64
-   STATIC_ASSERT(sizeof(DzlTrieNode) == 32);
-   STATIC_ASSERT(sizeof(DzlTrieNodeChunk) == 16);
-#else
-   STATIC_ASSERT(sizeof(DzlTrieNode) == 20);
-   STATIC_ASSERT(sizeof(DzlTrieNodeChunk) == 12);
-#endif
 
    trie = g_new0(DzlTrie, 1);
    trie->ref_count = 1;
