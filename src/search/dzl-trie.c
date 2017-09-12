@@ -20,7 +20,8 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-trie.h"
+#include "search/dzl-trie.h"
+#include "util/dzl-macros.h"
 
 #if defined(__LP64__) || defined(_WIN64)
 # define TRIE_64 1
@@ -77,7 +78,7 @@ G_DEFINE_BOXED_TYPE (DzlTrie, dzl_trie, dzl_trie_ref, dzl_trie_unref)
  * @children: The children #DzlTrieNodeChunk or %NULL. If the chunk is
  *   inline the DzlTrieNode, then there will be fewer items.
  */
-#pragma pack(push, 1)
+DZL_ALIGNED_BEGIN(1)
 struct _DzlTrieNodeChunk
 {
    DzlTrieNodeChunk *next;
@@ -86,8 +87,7 @@ struct _DzlTrieNodeChunk
    guint             count : 8;
    guint8            keys[6];
    DzlTrieNode      *children[0];
-};
-#pragma pack(pop)
+} DZL_ALIGNED_END(1);
 
 /**
  * DzlTrieNode:
@@ -97,14 +97,13 @@ struct _DzlTrieNodeChunk
  * @chunk: The first chunk in the chain. Inline chunks have fewer children
  *    elements than extra allocated chunks so that they are cache aligned.
  */
-#pragma pack(push, 1)
+DZL_ALIGNED_BEGIN(1)
 struct _DzlTrieNode
 {
    DzlTrieNode      *parent;
    gpointer          value;
    DzlTrieNodeChunk  chunk;
-};
-#pragma pack(pop)
+} DZL_ALIGNED_END(1);
 
 /**
  * DzlTrie:
