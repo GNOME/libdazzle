@@ -39,6 +39,7 @@ traverse_cb (DzlTrie        *trie,
 static void
 test_dzl_trie_gauntlet (void)
 {
+   g_autofree gchar *path = NULL;
    gboolean ret;
    GTimer *timer;
    GError *error = NULL;
@@ -50,7 +51,8 @@ test_dzl_trie_gauntlet (void)
    guint j;
    DzlTrie *trie;
 
-   ret = g_file_get_contents("/usr/share/dict/words", &content, NULL, &error);
+   path = g_build_filename (TEST_DATA_DIR, "words.txt", NULL);
+   ret = g_file_get_contents(path, &content, NULL, &error);
    g_assert_no_error(error);
    if (!ret) {
       g_assert(ret);
