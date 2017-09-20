@@ -30,6 +30,7 @@ typedef struct
   GtkFileChooserDialog *dialog;
   GtkFileFilter *filter;
   GFile *file;
+  gchar *title;
 
   GtkFileChooserAction action;
 
@@ -81,6 +82,7 @@ dzl_file_chooser_entry_sync_to_dialog (DzlFileChooserEntry *self)
                 "local-only", priv->local_only,
                 "show-hidden", priv->show_hidden,
                 "filter", priv->filter,
+                "title", priv->title,
                 NULL);
 
   if (priv->file != NULL)
@@ -117,45 +119,56 @@ dzl_file_chooser_entry_sync_to_dialog (DzlFileChooserEntry *self)
     }
 }
 
-static gboolean
-dzl_file_chooser_entry_dialog_delete_event (DzlFileChooserEntry  *self,
-                                            GdkEvent             *event,
-                                            GtkFileChooserDialog *dialog)
-{
-  g_assert (DZL_IS_FILE_CHOOSER_ENTRY (self));
-  g_assert (event != NULL);
-  g_assert (GTK_IS_FILE_CHOOSER_DIALOG (dialog));
-
-  if (gtk_widget_in_destruction (GTK_WIDGET (self)))
-    return GDK_EVENT_PROPAGATE;
-
-  gtk_widget_hide (GTK_WIDGET (dialog));
-
-  return GDK_EVENT_STOP;
-}
-
 static void
 dzl_file_chooser_entry_dialog_response (DzlFileChooserEntry  *self,
                                         gint                  response_id,
                                         GtkFileChooserDialog *dialog)
 {
-  g_autoptr(GFile) file = NULL;
-
   g_assert (DZL_IS_FILE_CHOOSER_ENTRY (self));
   g_assert (GTK_IS_FILE_CHOOSER_DIALOG (dialog));
 
-  if (response_id == GTK_RESPONSE_CANCEL)
+  if (response_id == GTK_RESPONSE_OK)
     {
-      gtk_widget_hide (GTK_WIDGET (dialog));
-      return;
+      g_autoptr(GFile) file = NULL;
+
+      file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+      if (file != NULL)
+        dzl_file_chooser_entry_set_file (self, file);
     }
 
-  file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+  gtk_widget_destroy (GTK_WIDGET (dialog));
+}
 
-  if (file != NULL)
-    dzl_file_chooser_entry_set_file (self, file);
+static void
+dzl_file_chooser_entry_ensure_dialog (DzlFileChooserEntry *self)
+{
+  DzlFileChooserEntryPrivate *priv = dzl_file_chooser_entry_get_instance_private (self);
 
-  gtk_widget_hide (GTK_WIDGET (dialog));
+  g_assert (DZL_IS_FILE_CHOOSER_ENTRY (self));
+
+  if (priv->dialog == NULL)
+    {
+      priv->dialog = g_object_new (GTK_TYPE_FILE_CHOOSER_DIALOG,
+                                   "local-only", TRUE,
+                                   "modal", TRUE,
+                                   NULL);
+      g_signal_connect_object (priv->dialog,
+                               "response",
+                               G_CALLBACK (dzl_file_chooser_entry_dialog_response),
+                               self,
+                               G_CONNECT_SWAPPED);
+      g_signal_connect (priv->dialog,
+                        "destroy",
+                        G_CALLBACK (gtk_widget_destroyed),
+                        &priv->dialog);
+      gtk_dialog_add_buttons (GTK_DIALOG (priv->dialog),
+                              _("Cancel"), GTK_RESPONSE_CANCEL,
+                              _("Open"), GTK_RESPONSE_OK,
+                              NULL);
+      gtk_dialog_set_default_response (GTK_DIALOG (priv->dialog), GTK_RESPONSE_OK);
+    }
+
+  dzl_file_chooser_entry_sync_to_dialog (self);
 }
 
 static void
@@ -167,10 +180,8 @@ dzl_file_chooser_entry_button_clicked (DzlFileChooserEntry *self,
   g_assert (DZL_IS_FILE_CHOOSER_ENTRY (self));
   g_assert (GTK_IS_BUTTON (button));
 
-  dzl_file_chooser_entry_sync_to_dialog (self);
-
-  if (priv->dialog != NULL)
-    gtk_window_present (GTK_WINDOW (priv->dialog));
+  dzl_file_chooser_entry_ensure_dialog (self);
+  gtk_window_present (GTK_WINDOW (priv->dialog));
 }
 
 static GFile *
@@ -230,6 +241,7 @@ dzl_file_chooser_entry_finalize (GObject *object)
 
   g_clear_object (&priv->file);
   g_clear_object (&priv->filter);
+  g_clear_pointer (&priv->title, g_free);
 
   G_OBJECT_CLASS (dzl_file_chooser_entry_parent_class)->finalize (object);
 }
@@ -278,7 +290,7 @@ dzl_file_chooser_entry_get_property (GObject    *object,
       break;
 
     case PROP_TITLE:
-      g_value_set_string (value, gtk_window_get_title (GTK_WINDOW (priv->dialog)));
+      g_value_set_string (value, priv->title);
       break;
 
     default:
@@ -331,7 +343,8 @@ dzl_file_chooser_entry_set_property (GObject      *object,
       break;
 
     case PROP_TITLE:
-      gtk_window_set_title (GTK_WINDOW (priv->dialog), g_value_get_string (value));
+      g_free (priv->title);
+      priv->title = g_value_dup_string (value);
       break;
 
     default:
@@ -465,30 +478,6 @@ dzl_file_chooser_entry_init (DzlFileChooserEntry *self)
                     G_CALLBACK (gtk_widget_destroyed),
                     &priv->button);
   gtk_container_add (GTK_CONTAINER (hbox), GTK_WIDGET (priv->button));
-
-  priv->dialog = g_object_new (GTK_TYPE_FILE_CHOOSER_DIALOG,
-                               "local-only", TRUE,
-                               "modal", TRUE,
-                               NULL);
-  g_signal_connect_object (priv->dialog,
-                           "delete-event",
-                           G_CALLBACK (dzl_file_chooser_entry_dialog_delete_event),
-                           self,
-                           G_CONNECT_SWAPPED);
-  g_signal_connect_object (priv->dialog,
-                           "response",
-                           G_CALLBACK (dzl_file_chooser_entry_dialog_response),
-                           self,
-                           G_CONNECT_SWAPPED);
-  g_signal_connect (priv->dialog,
-                    "destroy",
-                    G_CALLBACK (gtk_widget_destroyed),
-                    &priv->dialog);
-  gtk_dialog_add_buttons (GTK_DIALOG (priv->dialog),
-                          _("Cancel"), GTK_RESPONSE_CANCEL,
-                          _("Open"), GTK_RESPONSE_OK,
-                          NULL);
-  gtk_dialog_set_default_response (GTK_DIALOG (priv->dialog), GTK_RESPONSE_OK);
 }
 
 static gchar *
