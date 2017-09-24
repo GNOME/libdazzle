@@ -123,9 +123,25 @@ dzl_theme_manager_add_resources (DzlThemeManager *self,
   icons_dir = g_build_filename (real_path, "icons", NULL);
   g_debug ("Loading icon resources from %s", icons_dir);
   if (!g_str_equal (real_path, resource_path))
-    gtk_icon_theme_add_resource_path (theme, icons_dir);
+    {
+      g_auto(GStrv) children = NULL;
+
+      /* Okay, tihs is a resource-based path. Make sure the
+       * path contains children so we don't slow down the
+       * theme loading code with tons of useless directories.
+       */
+      children = g_resources_enumerate_children (icons_dir, 0, NULL);
+      if (children != NULL && children[0] != NULL)
+        gtk_icon_theme_add_resource_path (theme, icons_dir);
+    }
   else
-    gtk_icon_theme_append_search_path (theme, icons_dir);
+    {
+      /* Make sure the directory exists so that we don't needlessly
+       * slow down the icon loading paths.
+       */
+      if (g_file_test (icons_dir, G_FILE_TEST_IS_DIR))
+        gtk_icon_theme_append_search_path (theme, icons_dir);
+    }
 }
 
 /**
