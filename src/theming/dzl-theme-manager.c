@@ -126,7 +126,7 @@ dzl_theme_manager_add_resources (DzlThemeManager *self,
     {
       g_auto(GStrv) children = NULL;
 
-      /* Okay, tihs is a resource-based path. Make sure the
+      /* Okay, this is a resource-based path. Make sure the
        * path contains children so we don't slow down the
        * theme loading code with tons of useless directories.
        */
