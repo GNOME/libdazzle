@@ -44,11 +44,51 @@ typedef struct
   guint                  last_widget_id;
 } DzlPreferencesViewPrivate;
 
+typedef struct
+{
+  GtkWidget *widget;
+  gulong     handler;
+  guint      id;
+} TrackedWidget;
+
 static void dzl_preferences_iface_init (DzlPreferencesInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (DzlPreferencesView, dzl_preferences_view, GTK_TYPE_BIN,
                          G_ADD_PRIVATE (DzlPreferencesView)
                          G_IMPLEMENT_INTERFACE (DZL_TYPE_PREFERENCES, dzl_preferences_iface_init))
+
+static void
+tracked_widget_free (gpointer data)
+{
+  TrackedWidget *tracked = data;
+
+  if (tracked->widget != NULL)
+    g_signal_handler_disconnect (tracked->widget, tracked->handler);
+  g_slice_free (TrackedWidget, tracked);
+}
+
+static void
+dzl_preferences_view_track (DzlPreferencesView *self,
+                            guint               id,
+                            GtkWidget          *widget)
+{
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+  TrackedWidget *tracked;
+
+  g_assert (DZL_IS_PREFERENCES_VIEW (self));
+  g_assert (id > 0);
+  g_assert (GTK_IS_WIDGET (widget));
+
+  tracked = g_slice_new0 (TrackedWidget);
+  tracked->widget = widget;
+  tracked->id = id;
+  tracked->handler = g_signal_connect (widget,
+                                       "destroy",
+                                       G_CALLBACK (gtk_widget_destroyed),
+                                       &tracked->widget);
+
+  g_hash_table_insert (priv->widgets, GUINT_TO_POINTER (id), tracked);
+}
 
 static void
 dzl_preferences_view_refilter_cb (GtkWidget *widget,
@@ -269,7 +309,8 @@ dzl_preferences_view_init (DzlPreferencesView *self)
                            G_CONNECT_SWAPPED);
 
   priv->pages = g_sequence_new (NULL);
-  priv->widgets = g_hash_table_new (g_direct_hash, g_direct_equal);
+  priv->widgets = g_hash_table_new_full (g_direct_hash, g_direct_equal,
+                                         NULL, tracked_widget_free);
 
   priv->actions = G_ACTION_GROUP (g_simple_action_group_new ());
   g_action_map_add_action_entries (G_ACTION_MAP (priv->actions),
@@ -476,7 +517,7 @@ dzl_preferences_view_add_radio (DzlPreferences *preferences,
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
   widget_id = ++priv->last_widget_id;
-  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
+  dzl_preferences_view_track (self, widget_id, GTK_WIDGET (widget));
 
   return widget_id;
 }
@@ -553,7 +594,7 @@ dzl_preferences_view_add_switch (DzlPreferences *preferences,
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
   widget_id = ++priv->last_widget_id;
-  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
+  dzl_preferences_view_track (self, widget_id, GTK_WIDGET (widget));
 
   return widget_id;
 }
@@ -616,7 +657,7 @@ dzl_preferences_view_add_spin_button (DzlPreferences *preferences,
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
   widget_id = ++priv->last_widget_id;
-  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
+  dzl_preferences_view_track (self, widget_id, GTK_WIDGET (widget));
 
   return widget_id;
 }
@@ -674,7 +715,7 @@ dzl_preferences_view_add_font_button (DzlPreferences *preferences,
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
   widget_id = ++priv->last_widget_id;
-  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
+  dzl_preferences_view_track (self, widget_id, GTK_WIDGET (widget));
 
   return widget_id;
 }
@@ -738,7 +779,7 @@ dzl_preferences_view_add_file_chooser (DzlPreferences       *preferences,
   dzl_preferences_group_add (group, GTK_WIDGET (widget));
 
   widget_id = ++priv->last_widget_id;
-  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
+  dzl_preferences_view_track (self, widget_id, GTK_WIDGET (widget));
 
   return widget_id;
 }
@@ -797,7 +838,7 @@ dzl_preferences_view_add_custom (DzlPreferences *preferences,
 
   dzl_preferences_group_add (group, GTK_WIDGET (container));
 
-  g_hash_table_insert (priv->widgets, GINT_TO_POINTER (widget_id), widget);
+  dzl_preferences_view_track (self, widget_id, GTK_WIDGET (widget));
 
   return widget_id;
 }
@@ -808,20 +849,25 @@ dzl_preferences_view_remove_id (DzlPreferences *preferences,
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
   DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
-  GtkWidget *widget;
+  TrackedWidget *tracked;
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
   g_assert (widget_id);
 
-  widget = g_hash_table_lookup (priv->widgets, GINT_TO_POINTER (widget_id));
-  if (widget != NULL)
+  tracked = g_hash_table_lookup (priv->widgets, GUINT_TO_POINTER (widget_id));
+
+  if (tracked != NULL)
     {
-      if (g_hash_table_remove (priv->widgets, GINT_TO_POINTER (widget_id)))
+      GtkWidget *widget = tracked->widget;
+
+      g_hash_table_remove (priv->widgets, GUINT_TO_POINTER (widget_id));
+
+      if (widget != NULL && !gtk_widget_in_destruction (widget))
         {
           GtkWidget *parent = gtk_widget_get_ancestor (widget, GTK_TYPE_LIST_BOX_ROW);
 
           /* in case we added our own row ancestor, destroy it */
-          if (parent != NULL)
+          if (parent != NULL && !gtk_widget_in_destruction (parent))
             gtk_widget_destroy (parent);
           else
             gtk_widget_destroy (widget);
@@ -829,8 +875,6 @@ dzl_preferences_view_remove_id (DzlPreferences *preferences,
           return TRUE;
         }
     }
-
-  g_warning ("No Preferences widget with number %i could be found and thus removed.", widget_id);
 
   return FALSE;
 }
@@ -874,10 +918,13 @@ dzl_preferences_view_get_widget (DzlPreferences *preferences,
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
   DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+  TrackedWidget *tracked;
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
 
-  return g_hash_table_lookup (priv->widgets, GINT_TO_POINTER (widget_id));
+  tracked = g_hash_table_lookup (priv->widgets, GINT_TO_POINTER (widget_id));
+
+  return tracked ? tracked->widget : NULL;
 }
 
 static void
