@@ -1,4 +1,17 @@
 ==============
+Version 3.26.1
+==============
+
+Changes in this release:
+
+ • icons: avoid thrashing the GtkIconTheme on startup
+ • prefs: track destruction state of pref widgets
+ • macros: add a few internally used macros to public API
+ • trie: various alignment fixes for Win32 and Win64
+ • tests: crib some test data for portable tests
+ • file-chooser-entry: be lazy with dialog construction
+
+==============
 Version 3.26.0
 ==============
 
