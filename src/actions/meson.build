@@ -1,4 +1,5 @@
 action_headers = [
+  'dzl-action-group.h',
   'dzl-child-property-action.h',
   'dzl-properties-group.h',
   'dzl-settings-flag-action.h',
