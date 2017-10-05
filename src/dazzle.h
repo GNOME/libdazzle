@@ -33,6 +33,7 @@ G_BEGIN_DECLS
 
 #define DAZZLE_INSIDE
 #include "dzl-version.h"
+#include "actions/dzl-action-group.h"
 #include "actions/dzl-child-property-action.h"
 #include "actions/dzl-properties-group.h"
 #include "actions/dzl-settings-flag-action.h"
