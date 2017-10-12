@@ -87,7 +87,7 @@ _##prefix##_get_action_info (GActionGroup *group,                               
   return info;                                                                    \
 }                                                                                 \
                                                                                   \
-static void                                                                       \
+static inline void                                                                \
 prefix##_set_action_state (Type *self,                                            \
                            const gchar *name,                                     \
                            GVariant *state)                                       \
@@ -102,7 +102,7 @@ prefix##_set_action_state (Type *self,                                          
     }                                                                             \
 }                                                                                 \
                                                                                   \
-static void                                                                       \
+static inline void                                                                \
 prefix##_set_action_enabled (Type *self,                                          \
                              const gchar *name,                                   \
                              gboolean enabled)                                    \
