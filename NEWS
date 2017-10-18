@@ -1,4 +1,10 @@
 ==============
+Version 3.27.1
+==============
+
+ • actions: add DZL_DEFINE_ACTION_GROUP() for creating action groups
+
+==============
 Version 3.26.1
 ==============
 
