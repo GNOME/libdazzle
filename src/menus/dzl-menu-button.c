@@ -189,6 +189,12 @@ dzl_menu_button_set_menu_id (DzlMenuButton *self,
 
   g_return_if_fail (DZL_IS_MENU_BUTTON (self));
 
+  if (menu_id == NULL)
+    {
+      dzl_menu_button_set_model (self, NULL);
+      return;
+    }
+
   app = g_application_get_default ();
 
   if (DZL_IS_APPLICATION (app))
