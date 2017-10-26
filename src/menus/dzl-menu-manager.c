@@ -38,8 +38,7 @@ G_DEFINE_TYPE (DzlMenuManager, dzl_menu_manager, G_TYPE_OBJECT)
 #define DZL_MENU_ATTRIBUTE_MERGE_ID "dazzle-merge-id"
 
 /**
- * SECTION:dzlmenumanager
- * @short_description: UI merging for menus
+ * DzlMenuManager:
  *
  * The goal of #DzlMenuManager is to simplify the process of merging multiple
  * GtkBuilder .ui files containing menus into a single representation of the
@@ -59,6 +58,8 @@ G_DEFINE_TYPE (DzlMenuManager, dzl_menu_manager, G_TYPE_OBJECT)
  * dzl_menu_manager_get_menu_by_id() will always return a #GMenu, however
  * that menu may contain no children until something has extended it later
  * on during the application process.
+ *
+ * Since: 3.26
  */
 
 static const gchar *
