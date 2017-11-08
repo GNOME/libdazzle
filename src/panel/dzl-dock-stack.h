@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_STACK_H
 #define DZL_DOCK_STACK_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
@@ -37,14 +39,21 @@ struct _DzlDockStackClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget       *dzl_dock_stack_new                    (void);
+DZL_AVAILABLE_IN_ALL
 GtkPositionType  dzl_dock_stack_get_edge               (DzlDockStack    *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_dock_stack_set_edge               (DzlDockStack    *self,
                                                         GtkPositionType  edge);
+DZL_AVAILABLE_IN_ALL
 DzlTabStyle      dzl_dock_stack_get_style              (DzlDockStack    *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_dock_stack_set_style              (DzlDockStack    *self,
                                                         DzlTabStyle      style);
+DZL_AVAILABLE_IN_ALL
 gboolean         dzl_dock_stack_get_show_pinned_button (DzlDockStack    *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_dock_stack_set_show_pinned_button (DzlDockStack    *self,
                                                         gboolean         show_pinned_button);
 

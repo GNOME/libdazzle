@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PRIORITY_BOX (dzl_priority_box_get_type())
@@ -37,6 +39,7 @@ struct _DzlPriorityBoxClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_priority_box_new (void);
 
 G_END_DECLS

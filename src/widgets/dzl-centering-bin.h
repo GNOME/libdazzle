@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_CENTERING_BIN (dzl_centering_bin_get_type())
@@ -32,6 +34,7 @@ struct _DzlCenteringBinClass
   GtkBinClass parent;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_centering_bin_new (void);
 
 G_END_DECLS

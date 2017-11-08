@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "util/dzl-counter.h"
 
 G_BEGIN_DECLS
@@ -39,8 +41,11 @@ struct _DzlCountersWindowClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget       *dzl_counters_window_new       (void);
+DZL_AVAILABLE_IN_ALL
 DzlCounterArena *dzl_counters_window_get_arena (DzlCountersWindow *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_counters_window_set_arena (DzlCountersWindow *self,
                                                 DzlCounterArena   *arena);
 

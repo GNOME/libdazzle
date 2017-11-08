@@ -21,9 +21,13 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 cairo_region_t *dzl_cairo_region_create_from_clip_extents (cairo_t            *cr);
+DZL_AVAILABLE_IN_ALL
 void            dzl_cairo_rounded_rectangle               (cairo_t            *cr,
                                                            const GdkRectangle *rect,
                                                            gint                x_radius,

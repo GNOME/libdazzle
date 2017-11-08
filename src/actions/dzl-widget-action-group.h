@@ -21,15 +21,20 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_WIDGET_ACTION_GROUP (dzl_widget_action_group_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlWidgetActionGroup, dzl_widget_action_group, DZL, WIDGET_ACTION_GROUP, GObject)
 
+DZL_AVAILABLE_IN_ALL
 GActionGroup *dzl_widget_action_group_new                (GtkWidget            *widget);
+DZL_AVAILABLE_IN_ALL
 void          dzl_widget_action_group_attach             (gpointer              widget,
                                                           const gchar          *group_name);
+DZL_AVAILABLE_IN_ALL
 void          dzl_widget_action_group_set_action_enabled (DzlWidgetActionGroup *self,
                                                           const gchar          *action_name,
                                                           gboolean              enabled);

@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_MANAGER_H
 #define DZL_DOCK_MANAGER_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
@@ -46,12 +48,17 @@ struct _DzlDockManagerClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlDockManager *dzl_dock_manager_new             (void);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_manager_register_dock   (DzlDockManager *self,
                                                   DzlDock        *dock);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_manager_unregister_dock (DzlDockManager *self,
                                                   DzlDock        *dock);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_manager_pause_grabs     (DzlDockManager *self);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_manager_unpause_grabs   (DzlDockManager *self);
 
 G_END_DECLS

@@ -23,14 +23,20 @@
 #ifndef DZL_DOCK_OVERLAY_EDGE_H
 #define DZL_DOCK_OVERLAY_EDGE_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 GtkPositionType dzl_dock_overlay_edge_get_edge     (DzlDockOverlayEdge *self);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_overlay_edge_set_edge     (DzlDockOverlayEdge *self,
                                                     GtkPositionType     edge);
+DZL_AVAILABLE_IN_ALL
 gint            dzl_dock_overlay_edge_get_position (DzlDockOverlayEdge *self);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_overlay_edge_set_position (DzlDockOverlayEdge *self,
                                                     gint                position);
 

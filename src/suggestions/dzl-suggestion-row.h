@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "suggestions/dzl-suggestion.h"
 #include "widgets/dzl-list-box-row.h"
 
@@ -40,8 +42,11 @@ struct _DzlSuggestionRowClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget     *dzl_suggestion_row_new            (void);
+DZL_AVAILABLE_IN_ALL
 DzlSuggestion *dzl_suggestion_row_get_suggestion (DzlSuggestionRow *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_row_set_suggestion (DzlSuggestionRow *self,
                                                   DzlSuggestion    *suggestion);
 

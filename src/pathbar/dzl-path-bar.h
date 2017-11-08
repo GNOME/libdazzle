@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "pathbar/dzl-path.h"
 
 G_BEGIN_DECLS
@@ -29,10 +31,14 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlPathBar, dzl_path_bar, DZL, PATH_BAR, GtkBox)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_path_bar_new                (void);
+DZL_AVAILABLE_IN_ALL
 DzlPath   *dzl_path_bar_get_path           (DzlPathBar *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_path_bar_set_path           (DzlPathBar *self,
                                             DzlPath   *path);
+DZL_AVAILABLE_IN_ALL
 void       dzl_path_bar_set_selected_index (DzlPathBar *self,
                                             guint       index);
 

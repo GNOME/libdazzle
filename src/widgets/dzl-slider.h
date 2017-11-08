@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SLIDER          (dzl_slider_get_type())
@@ -42,12 +44,17 @@ struct _DzlSliderClass
   GtkContainerClass parent_instance;
 };
 
+DZL_AVAILABLE_IN_ALL
 GType              dzl_slider_position_get_type (void);
+DZL_AVAILABLE_IN_ALL
 GtkWidget         *dzl_slider_new               (void);
+DZL_AVAILABLE_IN_ALL
 void               dzl_slider_add_slider        (DzlSlider         *self,
                                                  GtkWidget         *widget,
                                                  DzlSliderPosition  position);
+DZL_AVAILABLE_IN_ALL
 DzlSliderPosition  dzl_slider_get_position      (DzlSlider         *self);
+DZL_AVAILABLE_IN_ALL
 void               dzl_slider_set_position      (DzlSlider         *self,
                                                  DzlSliderPosition  position);
 

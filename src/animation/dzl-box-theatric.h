@@ -25,8 +25,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_BOX_THEATRIC (dzl_box_theatric_get_type())
 
-G_DECLARE_FINAL_TYPE (DzlBoxTheatric, dzl_box_theatric,
-                      DZL, BOX_THEATRIC, GObject)
+G_DECLARE_FINAL_TYPE (DzlBoxTheatric, dzl_box_theatric, DZL, BOX_THEATRIC, GObject)
 
 G_END_DECLS
 

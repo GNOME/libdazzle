@@ -21,24 +21,32 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_MENU_MANAGER (dzl_menu_manager_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlMenuManager, dzl_menu_manager, DZL, MENU_MANAGER, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlMenuManager *dzl_menu_manager_new            (void);
+DZL_AVAILABLE_IN_ALL
 guint           dzl_menu_manager_add_filename   (DzlMenuManager  *self,
                                                  const gchar     *filename,
                                                  GError         **error);
+DZL_AVAILABLE_IN_ALL
 guint           dzl_menu_manager_add_resource   (DzlMenuManager  *self,
                                                  const gchar     *resource,
                                                  GError         **error);
+DZL_AVAILABLE_IN_ALL
 guint           dzl_menu_manager_merge          (DzlMenuManager  *self,
                                                  const gchar     *menu_id,
                                                  GMenuModel      *model);
+DZL_AVAILABLE_IN_ALL
 void            dzl_menu_manager_remove         (DzlMenuManager  *self,
                                                  guint            merge_id);
+DZL_AVAILABLE_IN_ALL
 GMenu          *dzl_menu_manager_get_menu_by_id (DzlMenuManager  *self,
                                                  const gchar     *menu_id);
 

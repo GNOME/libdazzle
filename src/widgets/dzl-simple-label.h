@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 /*
@@ -34,14 +36,21 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlSimpleLabel, dzl_simple_label, DZL, SIMPLE_LABEL, GtkWidget)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget   *dzl_simple_label_new             (const gchar    *label);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_simple_label_get_label       (DzlSimpleLabel *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_label_set_label       (DzlSimpleLabel *self,
                                                const gchar    *label);
+DZL_AVAILABLE_IN_ALL
 gint         dzl_simple_label_get_width_chars (DzlSimpleLabel *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_label_set_width_chars (DzlSimpleLabel *self,
                                                gint            width_chars);
+DZL_AVAILABLE_IN_ALL
 gfloat       dzl_simple_label_get_xalign      (DzlSimpleLabel *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_label_set_xalign      (DzlSimpleLabel *self,
                                                gfloat          xalign);
 

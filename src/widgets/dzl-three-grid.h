@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_THREE_GRID        (dzl_three_grid_get_type())
@@ -49,7 +51,9 @@ typedef enum
   DZL_THREE_GRID_COLUMN_RIGHT
 } DzlThreeGridColumn;
 
+DZL_AVAILABLE_IN_ALL
 GType      dzl_three_grid_column_get_type (void);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_three_grid_new             (void);
 
 G_END_DECLS

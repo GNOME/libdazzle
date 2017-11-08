@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_BIN_H
 #define DZL_DOCK_BIN_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
@@ -46,11 +48,17 @@ struct _DzlDockBinClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_bin_new               (void);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_bin_get_center_widget (DzlDockBin   *self);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_bin_get_top_edge      (DzlDockBin   *self);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_bin_get_left_edge     (DzlDockBin   *self);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_bin_get_bottom_edge   (DzlDockBin   *self);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_bin_get_right_edge    (DzlDockBin   *self);
 
 G_END_DECLS

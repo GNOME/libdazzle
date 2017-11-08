@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_APPLICATION_WINDOW (dzl_application_window_get_type())
@@ -45,10 +47,14 @@ struct _DzlApplicationWindowClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_application_window_get_fullscreen (DzlApplicationWindow *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_application_window_set_fullscreen (DzlApplicationWindow *self,
                                                   gboolean              fullscreen);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_application_window_get_titlebar   (DzlApplicationWindow *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_application_window_set_titlebar   (DzlApplicationWindow *self,
                                                   GtkWidget            *titlebar);
 

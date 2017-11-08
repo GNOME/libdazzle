@@ -21,15 +21,20 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_THEME_MANAGER (dzl_theme_manager_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlThemeManager, dzl_theme_manager, DZL, THEME_MANAGER, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlThemeManager *dzl_theme_manager_new              (void);
+DZL_AVAILABLE_IN_ALL
 void             dzl_theme_manager_add_resources    (DzlThemeManager *self,
                                                      const gchar     *resource_path);
+DZL_AVAILABLE_IN_ALL
 void             dzl_theme_manager_remove_resources (DzlThemeManager *self,
                                                      const gchar     *resource_path);
 

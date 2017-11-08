@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-shortcut-theme.h"
 
 G_BEGIN_DECLS
@@ -43,8 +45,11 @@ struct _DzlShortcutThemeEditorClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget        *dzl_shortcut_theme_editor_new       (void);
+DZL_AVAILABLE_IN_ALL
 DzlShortcutTheme *dzl_shortcut_theme_editor_get_theme (DzlShortcutThemeEditor *self);
+DZL_AVAILABLE_IN_ALL
 void              dzl_shortcut_theme_editor_set_theme (DzlShortcutThemeEditor *self,
                                                        DzlShortcutTheme       *theme);
 

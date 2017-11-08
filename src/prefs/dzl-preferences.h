@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES (dzl_preferences_get_type())
@@ -112,21 +114,25 @@ struct _DzlPreferencesInterface
                                              guint                 widget_id);
 };
 
+DZL_AVAILABLE_IN_ALL
 void       dzl_preferences_add_page         (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *title,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 void       dzl_preferences_add_group        (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
                                              const gchar          *title,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 void       dzl_preferences_add_list_group   (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
                                              const gchar          *title,
                                              GtkSelectionMode      mode,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_preferences_add_radio        (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
@@ -138,6 +144,7 @@ guint      dzl_preferences_add_radio        (DzlPreferences       *self,
                                              const gchar          *subtitle,
                                              const gchar          *keywords,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_preferences_add_switch       (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
@@ -149,6 +156,7 @@ guint      dzl_preferences_add_switch       (DzlPreferences       *self,
                                              const gchar          *subtitle,
                                              const gchar          *keywords,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_preferences_add_spin_button  (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
@@ -159,12 +167,14 @@ guint      dzl_preferences_add_spin_button  (DzlPreferences       *self,
                                              const gchar          *subtitle,
                                              const gchar          *keywords,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_preferences_add_custom       (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
                                              GtkWidget            *widget,
                                              const gchar          *keywords,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_preferences_add_font_button  (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
@@ -173,6 +183,7 @@ guint      dzl_preferences_add_font_button  (DzlPreferences       *self,
                                              const gchar          *title,
                                              const gchar          *keywords,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_preferences_add_file_chooser (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              const gchar          *group_name,
@@ -184,11 +195,14 @@ guint      dzl_preferences_add_file_chooser (DzlPreferences       *self,
                                              GtkFileChooserAction  action,
                                              const gchar          *keywords,
                                              gint                  priority);
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_preferences_remove_id        (DzlPreferences       *self,
                                              guint                 widget_id);
+DZL_AVAILABLE_IN_ALL
 void       dzl_preferences_set_page         (DzlPreferences       *self,
                                              const gchar          *page_name,
                                              GHashTable           *map);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_preferences_get_widget       (DzlPreferences       *self,
                                              guint                 widget_id);
 

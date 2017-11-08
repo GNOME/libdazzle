@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-graph-model.h"
 #include "dzl-graph-renderer.h"
 
@@ -44,10 +46,14 @@ struct _DzlGraphViewClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget     *dzl_graph_view_new          (void);
+DZL_AVAILABLE_IN_ALL
 void           dzl_graph_view_set_model    (DzlGraphView     *self,
                                             DzlGraphModel    *model);
+DZL_AVAILABLE_IN_ALL
 DzlGraphModel *dzl_graph_view_get_model    (DzlGraphView     *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_graph_view_add_renderer (DzlGraphView     *self,
                                             DzlGraphRenderer *renderer);
 

@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_FUZZY_MUTABLE_INDEX (dzl_fuzzy_mutable_index_get_type())
@@ -35,26 +37,39 @@ typedef struct
    guint        id;
 } DzlFuzzyMutableIndexMatch;
 
+DZL_AVAILABLE_IN_ALL
 GType                     dzl_fuzzy_mutable_index_get_type           (void);
+DZL_AVAILABLE_IN_ALL
 DzlFuzzyMutableIndex     *dzl_fuzzy_mutable_index_new                (gboolean              case_sensitive);
+DZL_AVAILABLE_IN_ALL
 DzlFuzzyMutableIndex     *dzl_fuzzy_mutable_index_new_with_free_func (gboolean              case_sensitive,
                                                                       GDestroyNotify        free_func);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_fuzzy_mutable_index_set_free_func      (DzlFuzzyMutableIndex *fuzzy,
                                                                       GDestroyNotify        free_func);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_fuzzy_mutable_index_begin_bulk_insert  (DzlFuzzyMutableIndex *fuzzy);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_fuzzy_mutable_index_end_bulk_insert    (DzlFuzzyMutableIndex *fuzzy);
+DZL_AVAILABLE_IN_ALL
 gboolean                  dzl_fuzzy_mutable_index_contains           (DzlFuzzyMutableIndex *fuzzy,
                                                                       const gchar          *key);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_fuzzy_mutable_index_insert             (DzlFuzzyMutableIndex *fuzzy,
                                                                       const gchar          *key,
                                                                       gpointer              value);
+DZL_AVAILABLE_IN_ALL
 GArray                   *dzl_fuzzy_mutable_index_match              (DzlFuzzyMutableIndex *fuzzy,
                                                                       const gchar          *needle,
                                                                       gsize                 max_matches);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_fuzzy_mutable_index_remove             (DzlFuzzyMutableIndex *fuzzy,
                                                                       const gchar          *key);
+DZL_AVAILABLE_IN_ALL
 DzlFuzzyMutableIndex     *dzl_fuzzy_mutable_index_ref                (DzlFuzzyMutableIndex *fuzzy);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_fuzzy_mutable_index_unref              (DzlFuzzyMutableIndex *fuzzy);
+DZL_AVAILABLE_IN_ALL
 gchar                    *dzl_fuzzy_highlight                        (const gchar          *str,
                                                                       const gchar          *query,
                                                                       gboolean              case_sensitive);

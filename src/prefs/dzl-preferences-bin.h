@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "search/dzl-pattern-spec.h"
 
 G_BEGIN_DECLS

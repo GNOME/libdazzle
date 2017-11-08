@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "prefs/dzl-preferences-bin.h"
 
 G_BEGIN_DECLS
@@ -34,7 +36,9 @@ struct _DzlPreferencesEntryClass
   DzlPreferencesBinClass parent_class;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_preferences_entry_get_entry_widget (DzlPreferencesEntry *self);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_preferences_entry_get_title_widget (DzlPreferencesEntry *self);
 
 G_END_DECLS

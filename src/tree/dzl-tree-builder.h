@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 #include "tree/dzl-tree-node.h"
 #include "tree/dzl-tree-types.h"
 
@@ -47,6 +49,7 @@ struct _DzlTreeBuilderClass
                                GMenu          *menu);
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlTree *dzl_tree_builder_get_tree (DzlTreeBuilder *builder);
 
 G_END_DECLS

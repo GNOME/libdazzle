@@ -19,6 +19,8 @@
 #ifndef DZL_CPU_MODEL_H
 #define DZL_CPU_MODEL_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-graph-model.h"
 
 G_BEGIN_DECLS
@@ -27,6 +29,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlCpuModel, dzl_cpu_model, DZL, CPU_MODEL, DzlGraphModel)
 
+DZL_AVAILABLE_IN_ALL
 DzlGraphModel *dzl_cpu_model_new (void);
 
 G_END_DECLS

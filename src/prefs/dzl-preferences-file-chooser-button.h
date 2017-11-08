@@ -19,6 +19,8 @@
 #ifndef DZL_PREFERENCES_FILE_CHOOSER_BUTTON_H
 #define DZL_PREFERENCES_FILE_CHOOSER_BUTTON_H
 
+#include "dzl-version-macros.h"
+
 #include "prefs/dzl-preferences-bin.h"
 
 G_BEGIN_DECLS

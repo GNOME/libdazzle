@@ -21,8 +21,11 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 void dzl_rgba_shade (const GdkRGBA *rgba,
                      GdkRGBA       *dst,
                      gdouble        k);

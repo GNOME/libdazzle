@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-graph-model.h"
 
 G_BEGIN_DECLS
@@ -43,6 +45,7 @@ struct _DzlGraphRendererInterface
                   const cairo_rectangle_int_t *area);
 };
 
+DZL_AVAILABLE_IN_ALL
 void dzl_graph_view_renderer_render (DzlGraphRenderer                  *self,
                          DzlGraphModel                     *table,
                          gint64                       x_begin,

@@ -21,40 +21,52 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_FUZZY_INDEX (dzl_fuzzy_index_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlFuzzyIndex, dzl_fuzzy_index, DZL, FUZZY_INDEX, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlFuzzyIndex  *dzl_fuzzy_index_new                 (void);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_fuzzy_index_load_file           (DzlFuzzyIndex        *self,
                                                      GFile                *file,
                                                      GCancellable         *cancellable,
                                                      GError              **error);
+DZL_AVAILABLE_IN_ALL
 void            dzl_fuzzy_index_load_file_async     (DzlFuzzyIndex        *self,
                                                      GFile                *file,
                                                      GCancellable         *cancellable,
                                                      GAsyncReadyCallback   callback,
                                                      gpointer              user_data);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_fuzzy_index_load_file_finish    (DzlFuzzyIndex        *self,
                                                      GAsyncResult         *result,
                                                      GError              **error);
+DZL_AVAILABLE_IN_ALL
 void            dzl_fuzzy_index_query_async         (DzlFuzzyIndex        *self,
                                                      const gchar          *query,
                                                      guint                 max_matches,
                                                      GCancellable         *cancellable,
                                                      GAsyncReadyCallback   callback,
                                                      gpointer              user_data);
+DZL_AVAILABLE_IN_ALL
 GListModel     *dzl_fuzzy_index_query_finish        (DzlFuzzyIndex        *self,
                                                      GAsyncResult         *result,
                                                      GError              **error);
+DZL_AVAILABLE_IN_ALL
 GVariant       *dzl_fuzzy_index_get_metadata        (DzlFuzzyIndex        *self,
                                                      const gchar          *key);
+DZL_AVAILABLE_IN_ALL
 guint32         dzl_fuzzy_index_get_metadata_uint32 (DzlFuzzyIndex        *self,
                                                      const gchar          *key);
+DZL_AVAILABLE_IN_ALL
 guint64         dzl_fuzzy_index_get_metadata_uint64 (DzlFuzzyIndex        *self,
                                                      const gchar          *key);
+DZL_AVAILABLE_IN_ALL
 const gchar    *dzl_fuzzy_index_get_metadata_string (DzlFuzzyIndex        *self,
                                                      const gchar          *key);
 

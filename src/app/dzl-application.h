@@ -25,6 +25,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "menus/dzl-menu-manager.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "theming/dzl-theme-manager.h"
@@ -55,13 +57,19 @@ struct _DzlApplicationClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlMenuManager     *dzl_application_get_menu_manager     (DzlApplication *self);
+DZL_AVAILABLE_IN_ALL
 DzlShortcutManager *dzl_application_get_shortcut_manager (DzlApplication *self);
+DZL_AVAILABLE_IN_ALL
 DzlThemeManager    *dzl_application_get_theme_manager    (DzlApplication *self);
+DZL_AVAILABLE_IN_ALL
 GMenu              *dzl_application_get_menu_by_id       (DzlApplication *self,
                                                           const gchar    *menu_id);
+DZL_AVAILABLE_IN_ALL
 void                dzl_application_add_resources        (DzlApplication *self,
                                                           const gchar    *resource_path);
+DZL_AVAILABLE_IN_ALL
 void                dzl_application_remove_resources     (DzlApplication *self,
                                                           const gchar    *resource_path);
 

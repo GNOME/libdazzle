@@ -21,45 +21,60 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_widget_action_set              (GtkWidget               *widget,
                                                       const gchar             *group,
                                                       const gchar             *name,
                                                       const gchar             *first_property,
                                                       ...) G_GNUC_NULL_TERMINATED;
+DZL_AVAILABLE_IN_ALL
 gboolean      dzl_gtk_widget_action                  (GtkWidget               *widget,
                                                       const gchar             *group,
                                                       const gchar             *name,
                                                       GVariant                *param);
+DZL_AVAILABLE_IN_ALL
 gboolean      dzl_gtk_widget_action_with_string      (GtkWidget               *widget,
                                                       const gchar             *group,
                                                       const gchar             *name,
                                                       const gchar             *param);
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_widget_mux_action_groups       (GtkWidget               *widget,
                                                       GtkWidget               *from_widget,
                                                       const gchar             *mux_key);
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_widget_hide_with_fade          (GtkWidget               *widget);
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_widget_show_with_fade          (GtkWidget               *widget);
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_widget_add_style_class         (GtkWidget               *widget,
                                                       const gchar             *class_name);
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_widget_remove_style_class      (GtkWidget               *widget,
                                                       const gchar             *class_name);
+DZL_AVAILABLE_IN_ALL
 gpointer      dzl_gtk_widget_find_child_typed        (GtkWidget               *widget,
                                                       GType                    type);
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_text_buffer_remove_tag         (GtkTextBuffer           *buffer,
                                                       GtkTextTag              *tag,
                                                       const GtkTextIter       *start,
                                                       const GtkTextIter       *end,
                                                       gboolean                 minimal_damage);
+DZL_AVAILABLE_IN_ALL
 void          dzl_gtk_list_store_insert_sorted       (GtkListStore            *store,
                                                       GtkTreeIter             *iter,
                                                       gconstpointer            key,
                                                       guint                    compare_column,
                                                       GCompareDataFunc         compare_func,
                                                       gpointer                 compare_data);
+DZL_AVAILABLE_IN_ALL
 GtkWidget    *dzl_gtk_widget_get_relative            (GtkWidget               *widget,
                                                       GType                    relative_type);
+DZL_AVAILABLE_IN_ALL
 gboolean      dzl_gtk_widget_is_ancestor_or_relative (GtkWidget               *widget,
                                                       GtkWidget               *ancestor);
 

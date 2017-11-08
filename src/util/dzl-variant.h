@@ -21,8 +21,11 @@
 
 #include <glib.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 guint dzl_g_variant_hash (gconstpointer data);
 
 G_END_DECLS

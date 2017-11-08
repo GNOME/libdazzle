@@ -21,8 +21,11 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 void dzl_state_machine_buildable_iface_init (GtkBuildableIface *iface);
 
 G_END_DECLS

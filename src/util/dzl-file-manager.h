@@ -21,8 +21,11 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 gboolean dzl_file_manager_show (GFile   *file,
                                 GError **error);
 

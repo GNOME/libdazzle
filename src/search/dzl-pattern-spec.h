@@ -21,18 +21,26 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 typedef struct _DzlPatternSpec DzlPatternSpec;
 
 #define DZL_TYPE_PATTERN_SPEC (dzl_pattern_spec_get_type())
 
+DZL_AVAILABLE_IN_ALL
 GType           dzl_pattern_spec_get_type (void);
+DZL_AVAILABLE_IN_ALL
 DzlPatternSpec *dzl_pattern_spec_new      (const gchar    *keywords);
+DZL_AVAILABLE_IN_ALL
 DzlPatternSpec *dzl_pattern_spec_ref      (DzlPatternSpec *self);
+DZL_AVAILABLE_IN_ALL
 void            dzl_pattern_spec_unref    (DzlPatternSpec *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_pattern_spec_match    (DzlPatternSpec *self,
                                            const gchar     *haystack);
+DZL_AVAILABLE_IN_ALL
 const gchar    *dzl_pattern_spec_get_text (DzlPatternSpec *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (DzlPatternSpec, dzl_pattern_spec_unref)

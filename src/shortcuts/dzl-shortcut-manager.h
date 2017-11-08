@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-shortcut-phase.h"
 #include "dzl-shortcut-theme.h"
 #include "dzl-shortcuts-window.h"
@@ -70,46 +72,64 @@ struct _DzlShortcutManagerClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlShortcutManager *dzl_shortcut_manager_get_default             (void);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_queue_reload            (DzlShortcutManager     *self);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_reload                  (DzlShortcutManager     *self,
                                                                   GCancellable           *cancellable);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_append_search_path      (DzlShortcutManager     *self,
                                                                   const gchar            *directory);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_prepend_search_path     (DzlShortcutManager     *self,
                                                                   const gchar            *directory);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_remove_search_path      (DzlShortcutManager     *self,
                                                                   const gchar            *directory);
+DZL_AVAILABLE_IN_ALL
 DzlShortcutTheme   *dzl_shortcut_manager_get_theme               (DzlShortcutManager     *self);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_set_theme               (DzlShortcutManager     *self,
                                                                   DzlShortcutTheme       *theme);
+DZL_AVAILABLE_IN_ALL
 const gchar        *dzl_shortcut_manager_get_theme_name          (DzlShortcutManager     *self);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_set_theme_name          (DzlShortcutManager     *self,
                                                                   const gchar            *theme_name);
+DZL_AVAILABLE_IN_ALL
 DzlShortcutTheme   *dzl_shortcut_manager_get_theme_by_name       (DzlShortcutManager     *self,
                                                                   const gchar            *theme_name);
+DZL_AVAILABLE_IN_ALL
 gboolean            dzl_shortcut_manager_handle_event            (DzlShortcutManager     *self,
                                                                   const GdkEventKey      *event,
                                                                   GtkWidget              *toplevel);
+DZL_AVAILABLE_IN_ALL
 const gchar        *dzl_shortcut_manager_get_user_dir            (DzlShortcutManager     *self);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_set_user_dir            (DzlShortcutManager     *self,
                                                                   const gchar            *user_dir);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_add_action              (DzlShortcutManager     *self,
                                                                   const gchar            *detailed_action_name,
                                                                   const gchar            *section,
                                                                   const gchar            *group,
                                                                   const gchar            *title,
                                                                   const gchar            *subtitle);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_add_command             (DzlShortcutManager     *self,
                                                                   const gchar            *command,
                                                                   const gchar            *section,
                                                                   const gchar            *group,
                                                                   const gchar            *title,
                                                                   const gchar            *subtitle);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_add_shortcut_entries    (DzlShortcutManager     *self,
                                                                   const DzlShortcutEntry *shortcuts,
                                                                   guint                   n_shortcuts,
                                                                   const gchar            *translation_domain);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager     *self,
                                                                   DzlShortcutsWindow     *window);
 

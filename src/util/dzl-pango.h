@@ -21,8 +21,11 @@
 
 #include <pango/pango.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 gchar *dzl_pango_font_description_to_css (const PangoFontDescription *font_desc);
 
 G_END_DECLS

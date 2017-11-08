@@ -21,8 +21,11 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 gchar **dzl_dnd_get_uri_list (GtkSelectionData *selection_data);
 
 G_END_DECLS

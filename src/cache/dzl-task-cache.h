@@ -21,6 +21,8 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_TASK_CACHE (dzl_task_cache_get_type())
@@ -49,6 +51,7 @@ typedef void (*DzlTaskCacheCallback) (DzlTaskCache  *self,
                                       GTask         *task,
                                       gpointer       user_data);
 
+DZL_AVAILABLE_IN_ALL
 DzlTaskCache *dzl_task_cache_new        (GHashFunc              key_hash_func,
                                          GEqualFunc             key_equal_func,
                                          GBoxedCopyFunc         key_copy_func,
@@ -59,22 +62,29 @@ DzlTaskCache *dzl_task_cache_new        (GHashFunc              key_hash_func,
                                          DzlTaskCacheCallback   populate_callback,
                                          gpointer               populate_callback_data,
                                          GDestroyNotify         populate_callback_data_destroy);
+DZL_AVAILABLE_IN_ALL
 void          dzl_task_cache_set_name   (DzlTaskCache          *self,
                                          const gchar           *name);
+DZL_AVAILABLE_IN_ALL
 void          dzl_task_cache_get_async  (DzlTaskCache          *self,
                                          gconstpointer          key,
                                          gboolean               force_update,
                                          GCancellable          *cancellable,
                                          GAsyncReadyCallback    callback,
                                          gpointer               user_data);
+DZL_AVAILABLE_IN_ALL
 gpointer      dzl_task_cache_get_finish (DzlTaskCache          *self,
                                          GAsyncResult          *result,
                                          GError               **error);
+DZL_AVAILABLE_IN_ALL
 gboolean      dzl_task_cache_evict      (DzlTaskCache          *self,
                                          gconstpointer          key);
+DZL_AVAILABLE_IN_ALL
 void          dzl_task_cache_evict_all  (DzlTaskCache          *self);
+DZL_AVAILABLE_IN_ALL
 gpointer      dzl_task_cache_peek       (DzlTaskCache          *self,
                                          gconstpointer          key);
+DZL_AVAILABLE_IN_ALL
 GPtrArray    *dzl_task_cache_get_values (DzlTaskCache          *self);
 
 G_END_DECLS

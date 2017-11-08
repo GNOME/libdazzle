@@ -22,6 +22,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION (dzl_suggestion_get_type())
@@ -43,21 +45,32 @@ struct _DzlSuggestionClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlSuggestion *dzl_suggestion_new                (void);
+DZL_AVAILABLE_IN_ALL
 const gchar   *dzl_suggestion_get_id             (DzlSuggestion *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_set_id             (DzlSuggestion *self,
                                                   const gchar   *id);
+DZL_AVAILABLE_IN_ALL
 const gchar   *dzl_suggestion_get_icon_name      (DzlSuggestion *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_set_icon_name      (DzlSuggestion *self,
                                                   const gchar   *icon_name);
+DZL_AVAILABLE_IN_ALL
 const gchar   *dzl_suggestion_get_title          (DzlSuggestion *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_set_title          (DzlSuggestion *self,
                                                   const gchar   *title);
+DZL_AVAILABLE_IN_ALL
 const gchar   *dzl_suggestion_get_subtitle       (DzlSuggestion *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_set_subtitle       (DzlSuggestion *self,
                                                   const gchar   *subtitle);
+DZL_AVAILABLE_IN_ALL
 gchar         *dzl_suggestion_suggest_suffix     (DzlSuggestion *self,
                                                   const gchar   *typed_text);
+DZL_AVAILABLE_IN_ALL
 gchar         *dzl_suggestion_replace_typed_text (DzlSuggestion *self,
                                                   const gchar   *typed_text);
 

@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "tree/dzl-tree-builder.h"
 #include "tree/dzl-tree-node.h"
 #include "tree/dzl-tree-types.h"
@@ -63,37 +65,54 @@ struct _DzlTreeClass
                           GtkWidget   *widget);
 };
 
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_add_builder      (DzlTree           *self,
                                          DzlTreeBuilder    *builder);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_remove_builder   (DzlTree           *self,
                                          DzlTreeBuilder    *builder);
+DZL_AVAILABLE_IN_ALL
 DzlTreeNode   *dzl_tree_find_item       (DzlTree           *self,
                                          GObject           *item);
+DZL_AVAILABLE_IN_ALL
 DzlTreeNode   *dzl_tree_find_custom     (DzlTree           *self,
                                          GEqualFunc         equal_func,
                                          gpointer           key);
+DZL_AVAILABLE_IN_ALL
 DzlTreeNode   *dzl_tree_get_selected    (DzlTree           *self);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_unselect_all     (DzlTree           *self);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_rebuild          (DzlTree           *self);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_set_root         (DzlTree           *self,
                                          DzlTreeNode       *node);
+DZL_AVAILABLE_IN_ALL
 DzlTreeNode   *dzl_tree_get_root        (DzlTree           *self);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_set_show_icons   (DzlTree           *self,
                                          gboolean           show_icons);
+DZL_AVAILABLE_IN_ALL
 gboolean      dzl_tree_get_show_icons   (DzlTree           *self);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_scroll_to_node   (DzlTree           *self,
                                          DzlTreeNode       *node);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_expand_to_node   (DzlTree           *self,
                                          DzlTreeNode       *node);
+DZL_AVAILABLE_IN_ALL
 DzlTreeNode   *dzl_tree_find_child_node (DzlTree           *self,
                                          DzlTreeNode       *node,
                                          DzlTreeFindFunc    find_func,
                                          gpointer           user_data);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_set_filter       (DzlTree           *self,
                                          DzlTreeFilterFunc  filter_func,
                                          gpointer           filter_data,
                                          GDestroyNotify     filter_data_destroy);
+DZL_AVAILABLE_IN_ALL
 GMenuModel   *dzl_tree_get_context_menu (DzlTree           *self);
+DZL_AVAILABLE_IN_ALL
 void          dzl_tree_set_context_menu (DzlTree           *self,
                                          GMenuModel        *context_menu);
 

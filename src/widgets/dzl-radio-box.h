@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_RADIO_BOX (dzl_radio_box_get_type())
@@ -37,11 +39,15 @@ struct _DzlRadioBoxClass
   gpointer _padding4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget   *dzl_radio_box_new           (void);
+DZL_AVAILABLE_IN_ALL
 void         dzl_radio_box_add_item      (DzlRadioBox *self,
                                           const gchar *id,
                                           const gchar *text);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_radio_box_get_active_id (DzlRadioBox *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_radio_box_set_active_id (DzlRadioBox *self,
                                           const gchar *id);
 

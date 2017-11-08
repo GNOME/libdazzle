@@ -21,17 +21,23 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PATH_ELEMENT (dzl_path_element_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlPathElement, dzl_path_element, DZL, PATH_ELEMENT, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlPathElement *dzl_path_element_new           (const gchar    *id,
                                                 const gchar    *icon_name,
                                                 const gchar    *title);
+DZL_AVAILABLE_IN_ALL
 const gchar    *dzl_path_element_get_title     (DzlPathElement *self);
+DZL_AVAILABLE_IN_ALL
 const gchar    *dzl_path_element_get_id        (DzlPathElement *self);
+DZL_AVAILABLE_IN_ALL
 const gchar    *dzl_path_element_get_icon_name (DzlPathElement *self);
 
 G_END_DECLS

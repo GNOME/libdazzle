@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_HEAP            (dzl_heap_get_type())
@@ -36,16 +38,23 @@ struct _DzlHeap
   gsize  len;
 };
 
+DZL_AVAILABLE_IN_ALL
 GType      dzl_heap_get_type      (void);
+DZL_AVAILABLE_IN_ALL
 DzlHeap   *dzl_heap_new           (guint           element_size,
                                    GCompareFunc    compare_func);
+DZL_AVAILABLE_IN_ALL
 DzlHeap   *dzl_heap_ref           (DzlHeap        *heap);
+DZL_AVAILABLE_IN_ALL
 void       dzl_heap_unref         (DzlHeap        *heap);
+DZL_AVAILABLE_IN_ALL
 void       dzl_heap_insert_vals   (DzlHeap        *heap,
                                    gconstpointer   data,
                                    guint           len);
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_heap_extract       (DzlHeap        *heap,
                                    gpointer        result);
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_heap_extract_index (DzlHeap        *heap,
                                    gsize           index_,
                                    gpointer        result);

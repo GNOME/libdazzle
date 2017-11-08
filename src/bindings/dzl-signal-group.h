@@ -22,40 +22,52 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SIGNAL_GROUP (dzl_signal_group_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlSignalGroup, dzl_signal_group, DZL, SIGNAL_GROUP, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlSignalGroup *dzl_signal_group_new             (GType           target_type);
 
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_set_target      (DzlSignalGroup *self,
                                                   gpointer        target);
+DZL_AVAILABLE_IN_ALL
 gpointer        dzl_signal_group_get_target      (DzlSignalGroup *self);
 
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_block           (DzlSignalGroup *self);
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_unblock         (DzlSignalGroup *self);
 
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_connect_object  (DzlSignalGroup *self,
                                                   const gchar    *detailed_signal,
                                                   GCallback       c_handler,
                                                   gpointer        object,
                                                   GConnectFlags   flags);
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_connect_data    (DzlSignalGroup *self,
                                                   const gchar    *detailed_signal,
                                                   GCallback       c_handler,
                                                   gpointer        data,
                                                   GClosureNotify  notify,
                                                   GConnectFlags   flags);
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_connect         (DzlSignalGroup *self,
                                                   const gchar    *detailed_signal,
                                                   GCallback       c_handler,
                                                   gpointer        data);
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_connect_after   (DzlSignalGroup *self,
                                                   const gchar    *detailed_signal,
                                                   GCallback       c_handler,
                                                   gpointer        data);
+DZL_AVAILABLE_IN_ALL
 void            dzl_signal_group_connect_swapped (DzlSignalGroup *self,
                                                   const gchar    *detailed_signal,
                                                   GCallback       c_handler,

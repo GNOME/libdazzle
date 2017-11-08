@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUTS_SHORTCUT (dzl_shortcuts_shortcut_get_type())
@@ -71,6 +73,7 @@ typedef enum {
   DZL_SHORTCUT_GESTURE
 } DzlShortcutType;
 
+DZL_AVAILABLE_IN_ALL
 GType dzl_shortcuts_shortcut_get_type (void) G_GNUC_CONST;
 
 G_END_DECLS

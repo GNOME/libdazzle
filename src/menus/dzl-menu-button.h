@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_MENU_BUTTON (dzl_menu_button_get_type())
@@ -37,18 +39,27 @@ struct _DzlMenuButtonClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget     *dzl_menu_button_new_with_model  (const gchar   *icon_name,
                                                 GMenuModel    *model);
+DZL_AVAILABLE_IN_ALL
 GMenuModel    *dzl_menu_button_get_model       (DzlMenuButton *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_menu_button_set_model       (DzlMenuButton *self,
                                                 GMenuModel    *model);
+DZL_AVAILABLE_IN_ALL
 gboolean       dzl_menu_button_get_show_arrow  (DzlMenuButton *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_menu_button_set_show_arrow  (DzlMenuButton *self,
                                                 gboolean       show_arrow);
+DZL_AVAILABLE_IN_ALL
 gboolean       dzl_menu_button_get_show_icons  (DzlMenuButton *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_menu_button_set_show_icons  (DzlMenuButton *self,
                                                 gboolean       show_icons);
+DZL_AVAILABLE_IN_ALL
 gboolean       dzl_menu_button_get_show_accels (DzlMenuButton *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_menu_button_set_show_accels (DzlMenuButton *self,
                                                 gboolean       show_accels);
 

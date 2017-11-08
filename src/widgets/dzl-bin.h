@@ -25,6 +25,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_BIN (dzl_bin_get_type())
@@ -36,6 +38,7 @@ struct _DzlBinClass
   GtkBinClass parent_class;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_bin_new (void);
 
 G_END_DECLS

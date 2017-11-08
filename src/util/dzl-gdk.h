@@ -21,10 +21,14 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 GdkEventKey *dzl_gdk_synthesize_event_key    (GdkWindow *window,
                                               gunichar   ch);
+DZL_AVAILABLE_IN_ALL
 GdkEventKey *dzl_gdk_synthesize_event_keyval (GdkWindow *window,
                                               guint      keyval);
 

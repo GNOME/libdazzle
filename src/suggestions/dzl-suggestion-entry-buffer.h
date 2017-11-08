@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-suggestion.h"
 
 G_BEGIN_DECLS
@@ -39,12 +41,18 @@ struct _DzlSuggestionEntryBufferClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlSuggestionEntryBuffer *dzl_suggestion_entry_buffer_new              (void);
+DZL_AVAILABLE_IN_ALL
 DzlSuggestion            *dzl_suggestion_entry_buffer_get_suggestion   (DzlSuggestionEntryBuffer *self);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_suggestion_entry_buffer_set_suggestion   (DzlSuggestionEntryBuffer *self,
                                                                         DzlSuggestion            *suggestion);
+DZL_AVAILABLE_IN_ALL
 const gchar              *dzl_suggestion_entry_buffer_get_typed_text   (DzlSuggestionEntryBuffer *self);
+DZL_AVAILABLE_IN_ALL
 guint                     dzl_suggestion_entry_buffer_get_typed_length (DzlSuggestionEntryBuffer *self);
+DZL_AVAILABLE_IN_ALL
 void                      dzl_suggestion_entry_buffer_commit           (DzlSuggestionEntryBuffer *self);
 
 G_END_DECLS

@@ -22,21 +22,28 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_BINDING_GROUP (dzl_binding_group_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlBindingGroup, dzl_binding_group, DZL, BINDING_GROUP, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlBindingGroup *dzl_binding_group_new                (void);
+DZL_AVAILABLE_IN_ALL
 GObject         *dzl_binding_group_get_source         (DzlBindingGroup       *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_binding_group_set_source         (DzlBindingGroup       *self,
                                                        gpointer               source);
+DZL_AVAILABLE_IN_ALL
 void             dzl_binding_group_bind               (DzlBindingGroup       *self,
                                                        const gchar           *source_property,
                                                        gpointer               target,
                                                        const gchar           *target_property,
                                                        GBindingFlags          flags);
+DZL_AVAILABLE_IN_ALL
 void             dzl_binding_group_bind_full          (DzlBindingGroup       *self,
                                                        const gchar           *source_property,
                                                        gpointer               target,
@@ -46,6 +53,7 @@ void             dzl_binding_group_bind_full          (DzlBindingGroup       *se
                                                        GBindingTransformFunc  transform_from,
                                                        gpointer               user_data,
                                                        GDestroyNotify         user_data_destroy);
+DZL_AVAILABLE_IN_ALL
 void             dzl_binding_group_bind_with_closures (DzlBindingGroup       *self,
                                                        const gchar           *source_property,
                                                        gpointer               target,

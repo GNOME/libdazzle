@@ -24,29 +24,45 @@
 #ifndef DZL_TAB_H
 #define DZL_TAB_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 const gchar     *dzl_tab_get_icon_name  (DzlTab          *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_set_icon_name  (DzlTab          *self,
                                          const gchar     *icon_name);
+DZL_AVAILABLE_IN_ALL
 const gchar     *dzl_tab_get_title      (DzlTab          *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_set_title      (DzlTab          *self,
                                          const gchar     *title);
+DZL_AVAILABLE_IN_ALL
 GtkPositionType  dzl_tab_get_edge       (DzlTab          *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_set_edge       (DzlTab          *self,
                                          GtkPositionType  edge);
+DZL_AVAILABLE_IN_ALL
 GtkWidget       *dzl_tab_get_widget     (DzlTab          *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_set_widget     (DzlTab          *self,
                                          GtkWidget       *widget);
+DZL_AVAILABLE_IN_ALL
 gboolean         dzl_tab_get_active     (DzlTab          *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_set_active     (DzlTab          *self,
                                          gboolean         active);
+DZL_AVAILABLE_IN_ALL
 gboolean         dzl_tab_get_can_close  (DzlTab          *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_set_can_close  (DzlTab          *self,
                                          gboolean         can_close);
+DZL_AVAILABLE_IN_ALL
 DzlTabStyle      dzl_tab_get_style      (DzlTab          *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_set_style      (DzlTab          *self,
                                          DzlTabStyle      style);
 

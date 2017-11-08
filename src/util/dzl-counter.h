@@ -24,6 +24,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 /*
  * History
  * =======
@@ -270,18 +272,28 @@ struct _DzlCounterValue
   gint64          padding [7];
 } __attribute__ ((aligned(8)));
 
+DZL_AVAILABLE_IN_ALL
 GType            dzl_counter_arena_get_type     (void);
+DZL_AVAILABLE_IN_ALL
 guint            dzl_get_current_cpu_call       (void);
+DZL_AVAILABLE_IN_ALL
 DzlCounterArena *dzl_counter_arena_get_default  (void);
+DZL_AVAILABLE_IN_ALL
 DzlCounterArena *dzl_counter_arena_new_for_pid  (GPid                   pid);
+DZL_AVAILABLE_IN_ALL
 DzlCounterArena *dzl_counter_arena_ref          (DzlCounterArena       *arena);
+DZL_AVAILABLE_IN_ALL
 void             dzl_counter_arena_unref        (DzlCounterArena       *arena);
+DZL_AVAILABLE_IN_ALL
 void             dzl_counter_arena_register     (DzlCounterArena       *arena,
                                                  DzlCounter            *counter);
+DZL_AVAILABLE_IN_ALL
 void             dzl_counter_arena_foreach      (DzlCounterArena       *arena,
                                                  DzlCounterForeachFunc  func,
                                                  gpointer               user_data);
+DZL_AVAILABLE_IN_ALL
 void             dzl_counter_reset              (DzlCounter            *counter);
+DZL_AVAILABLE_IN_ALL
 gint64           dzl_counter_get                (DzlCounter            *counter);
 
 G_END_DECLS

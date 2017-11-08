@@ -25,6 +25,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "widgets/dzl-bin.h"
 #include "widgets/dzl-multi-paned.h"
 #include "panel/dzl-dock-revealer.h"
@@ -70,6 +72,7 @@ typedef enum
   DZL_TAB_BOTH  = (DZL_TAB_TEXT | DZL_TAB_ICONS),
 } DzlTabStyle;
 
+DZL_AVAILABLE_IN_ALL
 GType dzl_tab_style_get_type (void);
 
 G_END_DECLS

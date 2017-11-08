@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_ITEM_H
 #define DZL_DOCK_ITEM_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-manager.h"
 
 G_BEGIN_DECLS
@@ -57,30 +59,47 @@ struct _DzlDockItemInterface
                                          DzlDockItem     *child);
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlDockManager *dzl_dock_item_get_manager       (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_item_set_manager       (DzlDockItem     *self,
                                                  DzlDockManager  *manager);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_dock_item_adopt             (DzlDockItem     *self,
                                                  DzlDockItem     *child);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_item_present           (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_item_present_child     (DzlDockItem     *self,
                                                  DzlDockItem     *child);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_item_update_visibility (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_dock_item_has_widgets       (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_dock_item_get_child_visible (DzlDockItem     *self,
                                                  DzlDockItem     *child);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_item_set_child_visible (DzlDockItem     *self,
                                                  DzlDockItem     *child,
                                                  gboolean         child_visible);
+DZL_AVAILABLE_IN_ALL
 DzlDockItem    *dzl_dock_item_get_parent        (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gchar          *dzl_dock_item_get_title         (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gchar          *dzl_dock_item_get_icon_name     (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_dock_item_get_can_close     (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_dock_item_get_can_minimize  (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_dock_item_close             (DzlDockItem     *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_dock_item_minimize          (DzlDockItem     *self,
                                                  DzlDockItem     *child,
                                                  GtkPositionType *position);
+DZL_AVAILABLE_IN_ALL
 void            dzl_dock_item_release           (DzlDockItem     *self,
                                                  DzlDockItem     *child);
 void            _dzl_dock_item_printf           (DzlDockItem     *self);

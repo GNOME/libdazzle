@@ -21,8 +21,11 @@
 
 #include <glib.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 gint dzl_levenshtein (const gchar *needle,
                       const gchar *haystack);
 

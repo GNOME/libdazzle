@@ -21,12 +21,15 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_CSS_PROVIDER (dzl_css_provider_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlCssProvider, dzl_css_provider, DZL, CSS_PROVIDER, GtkCssProvider)
 
+DZL_AVAILABLE_IN_ALL
 GtkCssProvider *dzl_css_provider_new (const gchar *base_path);
 
 G_END_DECLS

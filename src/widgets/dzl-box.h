@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_BOX (dzl_box_get_type())
@@ -32,10 +34,14 @@ struct _DzlBoxClass
   GtkBoxClass parent_class;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_box_new                   (void);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_box_get_nth_child         (DzlBox    *self,
                                           guint      nth);
+DZL_AVAILABLE_IN_ALL
 gint       dzl_box_get_max_width_request (DzlBox    *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_box_set_max_width_request (DzlBox    *self,
                                           gint       max_width_request);
 

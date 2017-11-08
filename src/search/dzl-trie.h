@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_TRIE (dzl_trie_get_type())
@@ -32,18 +34,27 @@ typedef gboolean (*DzlTrieTraverseFunc) (DzlTrie     *dzl_trie,
                                          gpointer     value,
                                          gpointer     user_data);
 
+DZL_AVAILABLE_IN_ALL
 GType     dzl_trie_get_type (void);
+DZL_AVAILABLE_IN_ALL
 void      dzl_trie_destroy  (DzlTrie             *trie);
+DZL_AVAILABLE_IN_ALL
 void      dzl_trie_unref    (DzlTrie             *trie);
+DZL_AVAILABLE_IN_ALL
 DzlTrie  *dzl_trie_ref      (DzlTrie             *trie);
+DZL_AVAILABLE_IN_ALL
 void      dzl_trie_insert   (DzlTrie             *trie,
                              const gchar         *key,
                              gpointer             value);
+DZL_AVAILABLE_IN_ALL
 gpointer  dzl_trie_lookup   (DzlTrie             *trie,
                              const gchar         *key);
+DZL_AVAILABLE_IN_ALL
 DzlTrie  *dzl_trie_new      (GDestroyNotify       value_destroy);
+DZL_AVAILABLE_IN_ALL
 gboolean  dzl_trie_remove   (DzlTrie             *trie,
                              const gchar         *key);
+DZL_AVAILABLE_IN_ALL
 void      dzl_trie_traverse (DzlTrie             *trie,
                              const gchar         *key,
                              GTraverseType        order,

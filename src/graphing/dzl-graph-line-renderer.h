@@ -21,6 +21,8 @@
 
 #include <gdk/gdk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-graph-renderer.h"
 
 G_BEGIN_DECLS
@@ -29,11 +31,15 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlGraphLineRenderer, dzl_graph_view_line_renderer, DZL, GRAPH_LINE_RENDERER, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlGraphLineRenderer *dzl_graph_view_line_renderer_new (void);
+DZL_AVAILABLE_IN_ALL
 void            dzl_graph_view_line_renderer_set_stroke_color      (DzlGraphLineRenderer *self,
                                                         const gchar    *stroke_color);
+DZL_AVAILABLE_IN_ALL
 void            dzl_graph_view_line_renderer_set_stroke_color_rgba (DzlGraphLineRenderer *self,
                                                         const GdkRGBA  *stroke_color_rgba);
+DZL_AVAILABLE_IN_ALL
 const GdkRGBA  *dzl_graph_view_line_renderer_get_stroke_color_rgba (DzlGraphLineRenderer *self);
 
 G_END_DECLS

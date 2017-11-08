@@ -21,23 +21,34 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_SIMPLE_LABEL (dzl_shortcut_simple_label_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlShortcutSimpleLabel, dzl_shortcut_simple_label, DZL, SHORTCUT_SIMPLE_LABEL, GtkBox)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget   *dzl_shortcut_simple_label_new         (void);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_shortcut_simple_label_get_accel   (DzlShortcutSimpleLabel *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_shortcut_simple_label_set_accel   (DzlShortcutSimpleLabel *self,
                                                     const gchar            *accel);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_shortcut_simple_label_get_action  (DzlShortcutSimpleLabel *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_shortcut_simple_label_set_action  (DzlShortcutSimpleLabel *self,
                                                     const gchar            *action);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_shortcut_simple_label_get_command (DzlShortcutSimpleLabel *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_shortcut_simple_label_set_command (DzlShortcutSimpleLabel *self,
                                                     const gchar            *command);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_shortcut_simple_label_get_title   (DzlShortcutSimpleLabel *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_shortcut_simple_label_set_title   (DzlShortcutSimpleLabel *self,
                                                     const gchar            *title);
 

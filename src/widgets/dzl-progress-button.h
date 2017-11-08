@@ -23,6 +23,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PROGRESS_BUTTON (dzl_progress_button_get_type ())
@@ -39,11 +41,16 @@ struct _DzlProgressButtonClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget	*dzl_progress_button_new               (void);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_progress_button_get_progress      (DzlProgressButton *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_progress_button_set_progress	     (DzlProgressButton	*button,
                                                   guint              percentage);
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_progress_button_get_show_progress (DzlProgressButton *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_progress_button_set_show_progress (DzlProgressButton *button,
 					      																 	gboolean           show_progress);
 

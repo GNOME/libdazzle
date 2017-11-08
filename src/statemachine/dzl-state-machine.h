@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_STATE_MACHINE  (dzl_state_machine_get_type())
@@ -32,28 +34,36 @@ struct _DzlStateMachineClass
   GObjectClass parent;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlStateMachine *dzl_state_machine_new               (void);
+DZL_AVAILABLE_IN_ALL
 const gchar     *dzl_state_machine_get_state         (DzlStateMachine *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_set_state         (DzlStateMachine *self,
                                                       const gchar     *state);
+DZL_AVAILABLE_IN_ALL
 GAction         *dzl_state_machine_create_action     (DzlStateMachine *self,
                                                       const gchar     *name);
+DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_add_property      (DzlStateMachine *self,
                                                       const gchar     *state,
                                                       gpointer         object,
                                                       const gchar     *property,
                                                       ...);
+DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_add_property_valist
                                                      (DzlStateMachine *self,
                                                       const gchar     *state,
                                                       gpointer         object,
                                                       const gchar     *property,
                                                       va_list          var_args);
+DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_add_propertyv     (DzlStateMachine *self,
                                                       const gchar     *state,
                                                       gpointer         object,
                                                       const gchar     *property,
                                                       const GValue    *value);
+DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_add_binding       (DzlStateMachine *self,
                                                       const gchar     *state,
                                                       gpointer         source_object,
@@ -61,10 +71,12 @@ void             dzl_state_machine_add_binding       (DzlStateMachine *self,
                                                       gpointer         target_object,
                                                       const gchar     *target_property,
                                                       GBindingFlags    flags);
+DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_add_style         (DzlStateMachine *self,
                                                       const gchar     *state,
                                                       GtkWidget       *widget,
                                                       const gchar     *style);
+DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_connect_object    (DzlStateMachine *self,
                                                       const gchar     *state,
                                                       gpointer         source,

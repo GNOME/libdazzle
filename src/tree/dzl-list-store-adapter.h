@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_LIST_STORE_ADAPTER (dzl_list_store_adapter_get_type())
@@ -32,8 +34,11 @@ struct _DzlListStoreAdapterClass
   GObjectClass parent_class;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlListStoreAdapter *dzl_list_store_adapter_new       (GListModel          *model);
+DZL_AVAILABLE_IN_ALL
 GListModel          *dzl_list_store_adapter_get_model (DzlListStoreAdapter *self);
+DZL_AVAILABLE_IN_ALL
 void                 dzl_list_store_adapter_set_model (DzlListStoreAdapter *self,
                                                        GListModel          *model);
 

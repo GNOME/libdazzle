@@ -21,14 +21,18 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_BOLDING_LABEL (dzl_bolding_label_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlBoldingLabel, dzl_bolding_label, DZL, BOLDING_LABEL, GtkLabel)
 
+DZL_AVAILABLE_IN_ALL
 void dzl_bolding_label_set_weight (DzlBoldingLabel *self,
                                    PangoWeight      weight);
+DZL_AVAILABLE_IN_ALL
 void dzl_bolding_label_set_bold   (DzlBoldingLabel *self,
                                    gboolean         bold);
 

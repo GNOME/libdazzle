@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-shortcut-chord.h"
 
 G_BEGIN_DECLS
@@ -29,12 +31,17 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlShortcutLabel, dzl_shortcut_label, DZL, SHORTCUT_LABEL, GtkBox)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget              *dzl_shortcut_label_new             (void);
+DZL_AVAILABLE_IN_ALL
 gchar                  *dzl_shortcut_label_get_accelerator (DzlShortcutLabel       *self);
+DZL_AVAILABLE_IN_ALL
 void                    dzl_shortcut_label_set_accelerator (DzlShortcutLabel       *self,
                                                             const gchar            *accelerator);
+DZL_AVAILABLE_IN_ALL
 void                    dzl_shortcut_label_set_chord       (DzlShortcutLabel       *self,
                                                             const DzlShortcutChord *chord);
+DZL_AVAILABLE_IN_ALL
 const DzlShortcutChord *dzl_shortcut_label_get_chord       (DzlShortcutLabel       *self);
 
 G_END_DECLS

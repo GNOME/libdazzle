@@ -19,6 +19,8 @@
 #ifndef DZL_CPU_GRAPH_H
 #define DZL_CPU_GRAPH_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-graph-view.h"
 
 G_BEGIN_DECLS
@@ -27,6 +29,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlCpuGraph, dzl_cpu_graph, DZL, CPU_GRAPH, DzlGraphView)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_cpu_graph_new (void);
 
 G_END_DECLS

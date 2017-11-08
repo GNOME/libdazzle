@@ -21,30 +21,39 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_DIRECTORY_REAPER (dzl_directory_reaper_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlDirectoryReaper, dzl_directory_reaper, DZL, DIRECTORY_REAPER, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlDirectoryReaper *dzl_directory_reaper_new               (void);
+DZL_AVAILABLE_IN_ALL
 void                dzl_directory_reaper_add_directory     (DzlDirectoryReaper   *self,
                                                             GFile                *directory,
                                                             GTimeSpan             min_age);
+DZL_AVAILABLE_IN_ALL
 void                dzl_directory_reaper_add_file          (DzlDirectoryReaper   *self,
                                                             GFile                *file,
                                                             GTimeSpan             min_age);
+DZL_AVAILABLE_IN_ALL
 void                dzl_directory_reaper_add_glob          (DzlDirectoryReaper   *self,
                                                             GFile                *directory,
                                                             const gchar          *glob,
                                                             GTimeSpan             min_age);
+DZL_AVAILABLE_IN_ALL
 gboolean            dzl_directory_reaper_execute           (DzlDirectoryReaper   *self,
                                                             GCancellable         *cancellable,
                                                             GError              **error);
+DZL_AVAILABLE_IN_ALL
 void                dzl_directory_reaper_execute_async     (DzlDirectoryReaper   *self,
                                                             GCancellable         *cancellable,
                                                             GAsyncReadyCallback   callback,
                                                             gpointer              user_data);
+DZL_AVAILABLE_IN_ALL
 gboolean            dzl_directory_reaper_execute_finish    (DzlDirectoryReaper   *self,
                                                             GAsyncResult         *result,
                                                             GError              **error);

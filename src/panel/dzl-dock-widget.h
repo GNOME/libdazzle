@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_WIDGET_H
 #define DZL_DOCK_WIDGET_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
@@ -41,9 +43,12 @@ struct _DzlDockWidgetClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_widget_new           (void);
+DZL_AVAILABLE_IN_ALL
 void       dzl_dock_widget_set_title     (DzlDockWidget *self,
                                           const gchar   *title);
+DZL_AVAILABLE_IN_ALL
 void       dzl_dock_widget_set_icon_name (DzlDockWidget *self,
                                           const gchar   *icon_name);
 

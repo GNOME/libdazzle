@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_EMPTY_STATE (dzl_empty_state_get_type())
@@ -32,16 +34,24 @@ struct _DzlEmptyStateClass
   GtkBinClass parent_class;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget   *dzl_empty_state_new           (void);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_empty_state_get_icon_name (DzlEmptyState *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_empty_state_set_icon_name (DzlEmptyState *self,
                                             const gchar   *icon_name);
+DZL_AVAILABLE_IN_ALL
 void         dzl_empty_state_set_resource  (DzlEmptyState *self,
                                             const gchar   *resource);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_empty_state_get_title     (DzlEmptyState *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_empty_state_set_title     (DzlEmptyState *self,
                                             const gchar   *title);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_empty_state_get_subtitle  (DzlEmptyState *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_empty_state_set_subtitle  (DzlEmptyState *self,
                                             const gchar   *title);
 

@@ -21,6 +21,8 @@
 
 #include <gdk/gdk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_ANIMATION      (dzl_animation_get_type())
@@ -43,24 +45,31 @@ enum _DzlAnimationMode
   DZL_ANIMATION_LAST
 };
 
+DZL_AVAILABLE_IN_ALL
 GType         dzl_animation_mode_get_type      (void);
+DZL_AVAILABLE_IN_ALL
 void          dzl_animation_start              (DzlAnimation     *animation);
+DZL_AVAILABLE_IN_ALL
 void          dzl_animation_stop               (DzlAnimation     *animation);
+DZL_AVAILABLE_IN_ALL
 void          dzl_animation_add_property       (DzlAnimation     *animation,
                                                 GParamSpec       *pspec,
                                                 const GValue     *value);
+DZL_AVAILABLE_IN_ALL
 DzlAnimation *dzl_object_animatev              (gpointer          object,
                                                 DzlAnimationMode  mode,
                                                 guint             duration_msec,
                                                 GdkFrameClock    *frame_clock,
                                                 const gchar      *first_property,
                                                 va_list           args);
+DZL_AVAILABLE_IN_ALL
 DzlAnimation* dzl_object_animate               (gpointer          object,
                                                 DzlAnimationMode  mode,
                                                 guint             duration_msec,
                                                 GdkFrameClock    *frame_clock,
                                                 const gchar      *first_property,
                                                 ...) G_GNUC_NULL_TERMINATED;
+DZL_AVAILABLE_IN_ALL
 DzlAnimation* dzl_object_animate_full          (gpointer          object,
                                                 DzlAnimationMode  mode,
                                                 guint             duration_msec,
@@ -69,6 +78,7 @@ DzlAnimation* dzl_object_animate_full          (gpointer          object,
                                                 gpointer          notify_data,
                                                 const gchar      *first_property,
                                                 ...) G_GNUC_NULL_TERMINATED;
+DZL_AVAILABLE_IN_ALL
 guint         dzl_animation_calculate_duration (GdkMonitor       *monitor,
                                                 gdouble           from_value,
                                                 gdouble           to_value);

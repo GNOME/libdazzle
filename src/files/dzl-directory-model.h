@@ -21,6 +21,8 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_DIRECTORY_MODEL (dzl_directory_model_get_type())
@@ -32,10 +34,14 @@ typedef gboolean (*DzlDirectoryModelVisibleFunc) (DzlDirectoryModel *self,
                                                   GFileInfo         *file_info,
                                                   gpointer           user_data);
 
+DZL_AVAILABLE_IN_ALL
 GListModel *dzl_directory_model_new              (GFile                        *directory);
+DZL_AVAILABLE_IN_ALL
 GFile      *dzl_directory_model_get_directory    (DzlDirectoryModel            *self);
+DZL_AVAILABLE_IN_ALL
 void        dzl_directory_model_set_directory    (DzlDirectoryModel            *self,
                                                   GFile                        *directory);
+DZL_AVAILABLE_IN_ALL
 void        dzl_directory_model_set_visible_func (DzlDirectoryModel            *self,
                                                   DzlDirectoryModelVisibleFunc  visible_func,
                                                   gpointer                      user_data,

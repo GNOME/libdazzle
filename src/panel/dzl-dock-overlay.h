@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_OVERLAY_H
 #define DZL_DOCK_OVERLAY_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock.h"
 #include "dzl-dock-overlay-edge.h"
 
@@ -44,12 +46,16 @@ struct _DzlDockOverlayClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget              *dzl_dock_overlay_new                   (void);
+DZL_AVAILABLE_IN_ALL
 void                    dzl_overlay_add_child                  (DzlDockOverlay  *self,
                                                                 GtkWidget       *child,
                                                                 const gchar     *type);
+DZL_AVAILABLE_IN_ALL
 DzlDockOverlayEdge     *dzl_dock_overlay_get_edge              (DzlDockOverlay  *self,
                                                                 GtkPositionType  position);
+DZL_AVAILABLE_IN_ALL
 GtkAdjustment          *dzl_dock_overlay_get_edge_adjustment   (DzlDockOverlay  *self,
                                                                 GtkPositionType  position);
 G_END_DECLS

@@ -26,6 +26,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_MULTI_PANED (dzl_multi_paned_get_type())
@@ -51,8 +53,11 @@ struct _DzlMultiPanedClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_multi_paned_new            (void);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_multi_paned_get_n_children (DzlMultiPaned *self);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_multi_paned_get_nth_child  (DzlMultiPaned *self,
                                            guint          nth);
 

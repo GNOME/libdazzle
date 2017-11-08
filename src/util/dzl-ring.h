@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 /**
@@ -80,17 +82,23 @@ typedef struct
   /*< private >*/
 } DzlRing;
 
+DZL_AVAILABLE_IN_ALL
 GType    dzl_ring_get_type    (void);
+DZL_AVAILABLE_IN_ALL
 DzlRing *dzl_ring_sized_new   (guint           element_size,
                                guint           reserved_size,
                                GDestroyNotify  element_destroy);
+DZL_AVAILABLE_IN_ALL
 guint    dzl_ring_append_vals (DzlRing         *ring,
                                gconstpointer   data,
                                guint           len);
+DZL_AVAILABLE_IN_ALL
 void     dzl_ring_foreach     (DzlRing         *ring,
                                GFunc           func,
                                gpointer        user_data);
+DZL_AVAILABLE_IN_ALL
 DzlRing *dzl_ring_ref         (DzlRing         *ring);
+DZL_AVAILABLE_IN_ALL
 void     dzl_ring_unref       (DzlRing         *ring);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (DzlRing, dzl_ring_unref)

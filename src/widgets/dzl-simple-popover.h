@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SIMPLE_POPOVER (dzl_simple_popover_get_type())
@@ -68,20 +70,31 @@ struct _DzlSimplePopoverClass
   void (*changed) (DzlSimplePopover *self);
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget   *dzl_simple_popover_new             (void);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_simple_popover_get_text        (DzlSimplePopover *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_popover_set_text        (DzlSimplePopover *self,
                                                  const gchar     *text);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_simple_popover_get_message     (DzlSimplePopover *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_popover_set_message     (DzlSimplePopover *self,
                                                  const gchar     *message);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_simple_popover_get_title       (DzlSimplePopover *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_popover_set_title       (DzlSimplePopover *self,
                                                  const gchar     *title);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_simple_popover_get_button_text (DzlSimplePopover *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_popover_set_button_text (DzlSimplePopover *self,
                                                  const gchar     *button_text);
+DZL_AVAILABLE_IN_ALL
 gboolean     dzl_simple_popover_get_ready       (DzlSimplePopover *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_simple_popover_set_ready       (DzlSimplePopover *self,
                                                  gboolean         ready);
 

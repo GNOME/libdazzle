@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_PHASE (dzl_shortcut_phase_get_type())
@@ -46,6 +48,7 @@ typedef enum
   DZL_SHORTCUT_PHASE_GLOBAL   = 1 << 2,
 } DzlShortcutPhase;
 
+DZL_AVAILABLE_IN_ALL
 GType dzl_shortcut_phase_get_type (void);
 
 G_END_DECLS

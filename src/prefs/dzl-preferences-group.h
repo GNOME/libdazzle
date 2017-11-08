@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "search/dzl-pattern-spec.h"
 
 G_BEGIN_DECLS
@@ -29,12 +31,17 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlPreferencesGroup, dzl_preferences_group, DZL, PREFERENCES_GROUP, GtkBin)
 
+DZL_AVAILABLE_IN_ALL
 void         dzl_preferences_group_add          (DzlPreferencesGroup *self,
                                                  GtkWidget           *widget);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_preferences_group_get_title    (DzlPreferencesGroup *self);
+DZL_AVAILABLE_IN_ALL
 gint         dzl_preferences_group_get_priority (DzlPreferencesGroup *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_preferences_group_set_map      (DzlPreferencesGroup *self,
                                                  GHashTable          *map);
+DZL_AVAILABLE_IN_ALL
 guint        dzl_preferences_group_refilter     (DzlPreferencesGroup *self,
                                                  DzlPatternSpec      *spec);
 

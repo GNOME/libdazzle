@@ -21,14 +21,19 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PROGRESS_ICON (dzl_progress_icon_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlProgressIcon, dzl_progress_icon, DZL, PROGRESS_ICON, GtkDrawingArea)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_progress_icon_new          (void);
+DZL_AVAILABLE_IN_ALL
 gdouble    dzl_progress_icon_get_progress (DzlProgressIcon *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_progress_icon_set_progress (DzlProgressIcon *self,
                                            gdouble          progress);
 

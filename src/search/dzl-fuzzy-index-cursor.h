@@ -21,6 +21,8 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-fuzzy-index.h"
 
 G_BEGIN_DECLS
@@ -29,6 +31,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlFuzzyIndexCursor, dzl_fuzzy_index_cursor, DZL, FUZZY_INDEX_CURSOR, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlFuzzyIndex *dzl_fuzzy_index_cursor_get_index (DzlFuzzyIndexCursor *self);
 
 G_END_DECLS

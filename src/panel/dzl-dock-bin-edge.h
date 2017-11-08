@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_BIN_EDGE_H
 #define DZL_DOCK_BIN_EDGE_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
@@ -43,6 +45,7 @@ struct _DzlDockBinEdgeClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkPositionType dzl_dock_bin_edge_get_edge (DzlDockBinEdge  *self);
 
 G_END_DECLS

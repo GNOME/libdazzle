@@ -24,6 +24,8 @@
 #ifndef DZL_TAB_STRIP_H
 #define DZL_TAB_STRIP_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
@@ -42,16 +44,24 @@ struct _DzlTabStripClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget       *dzl_tab_strip_new             (void);
+DZL_AVAILABLE_IN_ALL
 GtkStack        *dzl_tab_strip_get_stack       (DzlTabStrip     *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_strip_set_stack       (DzlTabStrip     *self,
                                                 GtkStack        *stack);
+DZL_AVAILABLE_IN_ALL
 GtkPositionType  dzl_tab_strip_get_edge        (DzlTabStrip     *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_strip_set_edge        (DzlTabStrip     *self,
                                                 GtkPositionType  edge);
+DZL_AVAILABLE_IN_ALL
 DzlTabStyle      dzl_tab_strip_get_style       (DzlTabStrip     *self);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_strip_set_style       (DzlTabStrip     *self,
                                                 DzlTabStyle      style);
+DZL_AVAILABLE_IN_ALL
 void             dzl_tab_strip_add_control     (DzlTabStrip     *self,
                                                 GtkWidget       *widget);
 

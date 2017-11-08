@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_TRANSIENT_GRAB_H
 #define DZL_DOCK_TRANSIENT_GRAB_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-item.h"
 
 G_BEGIN_DECLS
@@ -31,20 +33,30 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlDockTransientGrab, dzl_dock_transient_grab, DZL, DOCK_TRANSIENT_GRAB, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlDockTransientGrab *dzl_dock_transient_grab_new                    (void);
+DZL_AVAILABLE_IN_ALL
 void                  dzl_dock_transient_grab_add_item               (DzlDockTransientGrab *self,
                                                                       DzlDockItem          *item);
+DZL_AVAILABLE_IN_ALL
 void                  dzl_dock_transient_grab_remove_item            (DzlDockTransientGrab *self,
                                                                       DzlDockItem          *item);
+DZL_AVAILABLE_IN_ALL
 void                  dzl_dock_transient_grab_acquire                (DzlDockTransientGrab *self);
+DZL_AVAILABLE_IN_ALL
 void                  dzl_dock_transient_grab_release                (DzlDockTransientGrab *self);
+DZL_AVAILABLE_IN_ALL
 guint                 dzl_dock_transient_grab_get_timeout            (DzlDockTransientGrab *self);
+DZL_AVAILABLE_IN_ALL
 void                  dzl_dock_transient_grab_set_timeout            (DzlDockTransientGrab *self,
                                                                       guint                 timeout);
+DZL_AVAILABLE_IN_ALL
 gboolean              dzl_dock_transient_grab_contains               (DzlDockTransientGrab *self,
                                                                       DzlDockItem          *item);
+DZL_AVAILABLE_IN_ALL
 gboolean              dzl_dock_transient_grab_is_descendant          (DzlDockTransientGrab *self,
                                                                       GtkWidget            *widget);
+DZL_AVAILABLE_IN_ALL
 void                  dzl_dock_transient_grab_steal_common_ancestors (DzlDockTransientGrab *self,
                                                                       DzlDockTransientGrab *other);
 

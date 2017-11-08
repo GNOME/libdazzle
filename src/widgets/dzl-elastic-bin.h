@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_ELASTIC_BIN (dzl_elastic_bin_get_type())
@@ -37,6 +39,7 @@ struct _DzlElasticBinClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_elastic_bin_new (void);
 
 G_END_DECLS

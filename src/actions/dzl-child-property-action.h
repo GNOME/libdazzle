@@ -25,12 +25,15 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_CHILD_PROPERTY_ACTION  (dzl_child_property_action_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlChildPropertyAction, dzl_child_property_action,  DZL, CHILD_PROPERTY_ACTION, GObject)
 
+DZL_AVAILABLE_IN_ALL
 GAction *dzl_child_property_action_new (const gchar  *name,
                                         GtkContainer *container,
                                         GtkWidget    *child,

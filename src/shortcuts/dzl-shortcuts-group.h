@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUTS_GROUP            (dzl_shortcuts_group_get_type ())
@@ -34,6 +36,7 @@ G_BEGIN_DECLS
 typedef struct _DzlShortcutsGroup         DzlShortcutsGroup;
 typedef struct _DzlShortcutsGroupClass    DzlShortcutsGroupClass;
 
+DZL_AVAILABLE_IN_ALL
 GType dzl_shortcuts_group_get_type (void) G_GNUC_CONST;
 
 G_END_DECLS

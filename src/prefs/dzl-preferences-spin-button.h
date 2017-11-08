@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "prefs/dzl-preferences-bin.h"
 
 G_BEGIN_DECLS
@@ -29,6 +31,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlPreferencesSpinButton, dzl_preferences_spin_button, DZL, PREFERENCES_SPIN_BUTTON, DzlPreferencesBin)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_preferences_spin_button_get_spin_button (DzlPreferencesSpinButton *self);
 
 G_END_DECLS

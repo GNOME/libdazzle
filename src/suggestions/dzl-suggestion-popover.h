@@ -22,26 +22,39 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION_POPOVER (dzl_suggestion_popover_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlSuggestionPopover, dzl_suggestion_popover, DZL, SUGGESTION_POPOVER, GtkWindow)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget     *dzl_suggestion_popover_new               (void);
+DZL_AVAILABLE_IN_ALL
 GtkWidget     *dzl_suggestion_popover_get_relative_to   (DzlSuggestionPopover *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_set_relative_to   (DzlSuggestionPopover *self,
                                                          GtkWidget            *widget);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_popup             (DzlSuggestionPopover *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_popdown           (DzlSuggestionPopover *self);
+DZL_AVAILABLE_IN_ALL
 GListModel    *dzl_suggestion_popover_get_model         (DzlSuggestionPopover *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_set_model         (DzlSuggestionPopover *self,
                                                          GListModel           *model);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_move_by           (DzlSuggestionPopover *self,
                                                          gint                  amount);
+DZL_AVAILABLE_IN_ALL
 DzlSuggestion *dzl_suggestion_popover_get_selected      (DzlSuggestionPopover *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_set_selected      (DzlSuggestionPopover *self,
                                                          DzlSuggestion        *suggestion);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_activate_selected (DzlSuggestionPopover *self);
 
 G_END_DECLS

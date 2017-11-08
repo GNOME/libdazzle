@@ -19,6 +19,8 @@
 #ifndef DZL_PREFERENCES_FLOW_BOX_H
 #define DZL_PREFERENCES_FLOW_BOX_H
 
+#include "dzl-version-macros.h"
+
 #include "widgets/dzl-column-layout.h"
 
 G_BEGIN_DECLS
@@ -27,6 +29,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlPreferencesFlowBox, dzl_preferences_flow_box, DZL, PREFERENCES_FLOW_BOX, DzlColumnLayout)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_preferences_flow_box_new (void);
 
 G_END_DECLS

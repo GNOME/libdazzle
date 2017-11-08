@@ -21,6 +21,8 @@
 
 #include <glib-object.h>
 
+#include "dzl-version-macros.h"
+
 #include "pathbar/dzl-path-element.h"
 
 G_BEGIN_DECLS
@@ -29,18 +31,27 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlPath, dzl_path, DZL, PATH, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlPath        *dzl_path_new          (void);
+DZL_AVAILABLE_IN_ALL
 void            dzl_path_prepend      (DzlPath        *self,
                                        DzlPathElement *element);
+DZL_AVAILABLE_IN_ALL
 void            dzl_path_append       (DzlPath        *self,
                                        DzlPathElement *element);
+DZL_AVAILABLE_IN_ALL
 GList          *dzl_path_get_elements (DzlPath        *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_path_has_prefix   (DzlPath        *self,
                                        DzlPath        *prefix);
+DZL_AVAILABLE_IN_ALL
 guint           dzl_path_get_length   (DzlPath        *self);
+DZL_AVAILABLE_IN_ALL
 DzlPathElement *dzl_path_get_element  (DzlPath        *self,
                                        guint           index);
+DZL_AVAILABLE_IN_ALL
 gchar          *dzl_path_printf       (DzlPath        *self);
+DZL_AVAILABLE_IN_ALL
 gboolean        dzl_path_is_empty     (DzlPath        *self);
 
 G_END_DECLS

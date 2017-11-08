@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_REVEALER_H
 #define DZL_DOCK_REVEALER_H
 
+#include "dzl-version-macros.h"
+
 #include "widgets/dzl-bin.h"
 
 G_BEGIN_DECLS
@@ -55,27 +57,42 @@ struct _DzlDockRevealerClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GType                          dzl_dock_revealer_transition_type_get_type (void);
+DZL_AVAILABLE_IN_ALL
 GtkWidget                     *dzl_dock_revealer_new                      (void);
+DZL_AVAILABLE_IN_ALL
 void                           dzl_dock_revealer_animate_to_position      (DzlDockRevealer               *self,
                                                                            gint                           position,
                                                                            guint                          transition_duration);
+DZL_AVAILABLE_IN_ALL
 DzlDockRevealerTransitionType  dzl_dock_revealer_get_transition_type      (DzlDockRevealer *self);
+DZL_AVAILABLE_IN_ALL
 void                           dzl_dock_revealer_set_transition_type      (DzlDockRevealer               *self,
                                                                            DzlDockRevealerTransitionType  transition_type);
+DZL_AVAILABLE_IN_ALL
 gboolean                       dzl_dock_revealer_get_child_revealed       (DzlDockRevealer               *self);
+DZL_AVAILABLE_IN_ALL
 void                           dzl_dock_revealer_set_reveal_child         (DzlDockRevealer               *self,
                                                                            gboolean                       reveal_child);
+DZL_AVAILABLE_IN_ALL
 gboolean                       dzl_dock_revealer_get_reveal_child         (DzlDockRevealer               *self);
+DZL_AVAILABLE_IN_ALL
 gint                           dzl_dock_revealer_get_position             (DzlDockRevealer               *self);
+DZL_AVAILABLE_IN_ALL
 void                           dzl_dock_revealer_set_position             (DzlDockRevealer               *self,
                                                                            gint                           position);
+DZL_AVAILABLE_IN_ALL
 gboolean                       dzl_dock_revealer_get_position_set         (DzlDockRevealer               *self);
+DZL_AVAILABLE_IN_ALL
 void                           dzl_dock_revealer_set_position_set         (DzlDockRevealer               *self,
                                                                            gboolean                       position_set);
+DZL_AVAILABLE_IN_ALL
 guint                          dzl_dock_revealer_get_transition_duration  (DzlDockRevealer               *self);
+DZL_AVAILABLE_IN_ALL
 void                           dzl_dock_revealer_set_transition_duration  (DzlDockRevealer               *self,
                                                                            guint                          transition_duration);
+DZL_AVAILABLE_IN_ALL
 gboolean                       dzl_dock_revealer_is_animating             (DzlDockRevealer               *self);
 
 G_END_DECLS

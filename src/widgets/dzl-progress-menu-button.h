@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PROGRESS_MENU_BUTTON (dzl_progress_menu_button_get_type())
@@ -37,13 +39,19 @@ struct _DzlProgressMenuButtonClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_progress_menu_button_new               (void);
+DZL_AVAILABLE_IN_ALL
 gdouble    dzl_progress_menu_button_get_progress      (DzlProgressMenuButton *button);
+DZL_AVAILABLE_IN_ALL
 void       dzl_progress_menu_button_set_progress      (DzlProgressMenuButton *button,
                                                        gdouble                progress);
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_progress_menu_button_get_show_theatric (DzlProgressMenuButton *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_progress_menu_button_set_show_theatric (DzlProgressMenuButton *self,
                                                        gboolean               show_theatic);
+DZL_AVAILABLE_IN_ALL
 void       dzl_progress_menu_button_reset_theatrics   (DzlProgressMenuButton *self);
 
 G_END_DECLS

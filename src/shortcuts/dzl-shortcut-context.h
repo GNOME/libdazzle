@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-shortcut-chord.h"
 
 G_BEGIN_DECLS
@@ -29,37 +31,48 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlShortcutContext, dzl_shortcut_context, DZL, SHORTCUT_CONTEXT, GObject)
 
+DZL_AVAILABLE_IN_ALL
 DzlShortcutContext *dzl_shortcut_context_new                (const gchar             *name);
+DZL_AVAILABLE_IN_ALL
 const gchar        *dzl_shortcut_context_get_name           (DzlShortcutContext      *self);
+DZL_AVAILABLE_IN_ALL
 DzlShortcutMatch    dzl_shortcut_context_activate           (DzlShortcutContext      *self,
                                                              GtkWidget               *widget,
                                                              const DzlShortcutChord  *chord);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_context_add_action         (DzlShortcutContext      *self,
                                                              const gchar             *accel,
                                                              const gchar             *detailed_action_name);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_context_add_command        (DzlShortcutContext      *self,
                                                              const gchar             *accel,
                                                              const gchar             *command);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_context_add_signal         (DzlShortcutContext      *self,
                                                              const gchar             *accel,
                                                              const gchar             *signal_name,
                                                              guint                    n_args,
                                                              ...);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_context_add_signal_va_list (DzlShortcutContext      *self,
                                                              const gchar             *accel,
                                                              const gchar             *signal_name,
                                                              guint                    n_args,
                                                              va_list                  args);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_context_add_signalv        (DzlShortcutContext      *self,
                                                              const gchar             *accel,
                                                              const gchar             *signal_name,
                                                              GArray                  *values);
+DZL_AVAILABLE_IN_ALL
 gboolean            dzl_shortcut_context_remove             (DzlShortcutContext      *self,
                                                              const gchar             *accel);
+DZL_AVAILABLE_IN_ALL
 gboolean            dzl_shortcut_context_load_from_data     (DzlShortcutContext      *self,
                                                              const gchar             *data,
                                                              gssize                   len,
                                                              GError                 **error);
+DZL_AVAILABLE_IN_ALL
 gboolean            dzl_shortcut_context_load_from_resource (DzlShortcutContext      *self,
                                                              const gchar             *resource_path,
                                                              GError                 **error);

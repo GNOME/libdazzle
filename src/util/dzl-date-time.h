@@ -21,10 +21,15 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_ALL
 gchar       *dzl_g_date_time_format_for_display  (GDateTime      *self);
+DZL_AVAILABLE_IN_ALL
 gchar       *dzl_g_time_span_to_label            (GTimeSpan       span);
+DZL_AVAILABLE_IN_ALL
 gboolean     dzl_g_time_span_to_label_mapping    (GBinding       *binding,
                                                   const GValue   *from_value,
                                                   GValue         *to_value,

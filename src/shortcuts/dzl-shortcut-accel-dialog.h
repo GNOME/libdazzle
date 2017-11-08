@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-shortcut-chord.h"
 
 G_BEGIN_DECLS
@@ -29,12 +31,18 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlShortcutAccelDialog, dzl_shortcut_accel_dialog, DZL, SHORTCUT_ACCEL_DIALOG, GtkDialog)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget              *dzl_shortcut_accel_dialog_new                (void);
+DZL_AVAILABLE_IN_ALL
 gchar                  *dzl_shortcut_accel_dialog_get_accelerator    (DzlShortcutAccelDialog *self);
+DZL_AVAILABLE_IN_ALL
 void                    dzl_shortcut_accel_dialog_set_accelerator    (DzlShortcutAccelDialog *self,
                                                                       const gchar            *accelerator);
+DZL_AVAILABLE_IN_ALL
 const DzlShortcutChord *dzl_shortcut_accel_dialog_get_chord          (DzlShortcutAccelDialog *self);
+DZL_AVAILABLE_IN_ALL
 const gchar            *dzl_shortcut_accel_dialog_get_shortcut_title (DzlShortcutAccelDialog *self);
+DZL_AVAILABLE_IN_ALL
 void                    dzl_shortcut_accel_dialog_set_shortcut_title (DzlShortcutAccelDialog *self,
                                                                       const gchar            *title);
 

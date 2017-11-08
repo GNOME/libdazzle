@@ -21,14 +21,19 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PILL_BOX (dzl_pill_box_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlPillBox, dzl_pill_box, DZL, PILL_BOX, GtkEventBox)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget   *dzl_pill_box_new       (const gchar *label);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_pill_box_get_label (DzlPillBox  *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_pill_box_set_label (DzlPillBox  *self,
                                      const gchar *label);
 

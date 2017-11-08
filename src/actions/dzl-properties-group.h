@@ -21,6 +21,8 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_PROPERTIES_GROUP (dzl_properties_group_get_type())
@@ -33,16 +35,22 @@ typedef enum
   DZL_PROPERTIES_FLAGS_STATEFUL_BOOLEANS = 1 << 0,
 } DzlPropertiesFlags;
 
+DZL_AVAILABLE_IN_ALL
 DzlPropertiesGroup *dzl_properties_group_new                (GObject            *object);
+DZL_AVAILABLE_IN_ALL
 DzlPropertiesGroup *dzl_properties_group_new_for_type       (GType               object_type);
+DZL_AVAILABLE_IN_ALL
 void                dzl_properties_group_add_property       (DzlPropertiesGroup *self,
                                                              const gchar        *name,
                                                              const gchar        *property_name);
+DZL_AVAILABLE_IN_ALL
 void                dzl_properties_group_add_property_full  (DzlPropertiesGroup *self,
                                                              const gchar        *name,
                                                              const gchar        *property_name,
                                                              DzlPropertiesFlags  flags);
+DZL_AVAILABLE_IN_ALL
 void                dzl_properties_group_add_all_properties (DzlPropertiesGroup *self);
+DZL_AVAILABLE_IN_ALL
 void                dzl_properties_group_remove             (DzlPropertiesGroup *self,
                                                              const gchar        *name);
 

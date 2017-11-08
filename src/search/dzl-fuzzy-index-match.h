@@ -21,15 +21,21 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_FUZZY_INDEX_MATCH (dzl_fuzzy_index_match_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlFuzzyIndexMatch, dzl_fuzzy_index_match, DZL, FUZZY_INDEX_MATCH, GObject)
 
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_fuzzy_index_match_get_key      (DzlFuzzyIndexMatch *self);
+DZL_AVAILABLE_IN_ALL
 GVariant    *dzl_fuzzy_index_match_get_document (DzlFuzzyIndexMatch *self);
+DZL_AVAILABLE_IN_ALL
 gfloat       dzl_fuzzy_index_match_get_score    (DzlFuzzyIndexMatch *self);
+DZL_AVAILABLE_IN_ALL
 guint        dzl_fuzzy_index_match_get_priority (DzlFuzzyIndexMatch *self);
 
 G_END_DECLS

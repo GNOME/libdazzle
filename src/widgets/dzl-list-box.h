@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_LIST_BOX (dzl_list_box_get_type())
@@ -37,11 +39,16 @@ struct _DzlListBoxClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_ALL
 DzlListBox  *dzl_list_box_new               (GType        row_type,
                                              const gchar *property_name);
+DZL_AVAILABLE_IN_ALL
 GType        dzl_list_box_get_row_type      (DzlListBox  *self);
+DZL_AVAILABLE_IN_ALL
 const gchar *dzl_list_box_get_property_name (DzlListBox  *self);
+DZL_AVAILABLE_IN_ALL
 GListModel  *dzl_list_box_get_model         (DzlListBox  *self);
+DZL_AVAILABLE_IN_ALL
 void         dzl_list_box_set_model         (DzlListBox  *self,
                                              GListModel  *model);
 

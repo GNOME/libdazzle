@@ -19,6 +19,8 @@
 #ifndef DZL_PREFERENCES_SWITCH_H
 #define DZL_PREFERENCES_SWITCH_H
 
+#include "dzl-version-macros.h"
+
 #include "prefs/dzl-preferences-bin.h"
 
 G_BEGIN_DECLS

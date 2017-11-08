@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUTS_WINDOW            (dzl_shortcuts_window_get_type ())
@@ -48,6 +50,7 @@ struct _DzlShortcutsWindowClass
   void (*search) (DzlShortcutsWindow *self);
 };
 
+DZL_AVAILABLE_IN_ALL
 GType dzl_shortcuts_window_get_type (void) G_GNUC_CONST;
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(DzlShortcutsWindow, g_object_unref)

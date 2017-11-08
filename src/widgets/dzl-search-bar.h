@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SEARCH_BAR (dzl_search_bar_get_type())
@@ -32,13 +34,19 @@ struct _DzlSearchBarClass
   GtkBinClass parent_class;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_search_bar_new                     (void);
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_search_bar_get_search_mode_enabled (DzlSearchBar *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_search_bar_set_search_mode_enabled (DzlSearchBar *self,
                                                    gboolean      search_mode_enabled);
+DZL_AVAILABLE_IN_ALL
 gboolean   dzl_search_bar_get_show_close_button   (DzlSearchBar *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_search_bar_set_show_close_button   (DzlSearchBar *self,
                                                    gboolean      show_close_button);
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_search_bar_get_entry               (DzlSearchBar *self);
 
 G_END_DECLS

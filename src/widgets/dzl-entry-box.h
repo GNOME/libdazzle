@@ -21,12 +21,15 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_ENTRY_BOX (dzl_entry_box_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlEntryBox, dzl_entry_box, DZL, ENTRY_BOX, GtkBox)
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_entry_box_new (void);
 
 G_END_DECLS

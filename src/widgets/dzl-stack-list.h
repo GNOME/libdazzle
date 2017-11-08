@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_STACK_LIST (dzl_stack_list_get_type())
@@ -49,16 +51,22 @@ struct _DzlStackListClass
 typedef GtkWidget *(*DzlStackListCreateWidgetFunc) (gpointer item,
                                                     gpointer user_data);
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_stack_list_new        (void);
+DZL_AVAILABLE_IN_ALL
 void       dzl_stack_list_push       (DzlStackList                  *self,
                                       GtkWidget                     *header,
                                       GListModel                    *model,
                                       DzlStackListCreateWidgetFunc   create_widget_func,
                                       gpointer                       user_data,
                                       GDestroyNotify                 user_data_free_func);
+DZL_AVAILABLE_IN_ALL
 void        dzl_stack_list_pop       (DzlStackList                  *self);
+DZL_AVAILABLE_IN_ALL
 GListModel *dzl_stack_list_get_model (DzlStackList                  *self);
+DZL_AVAILABLE_IN_ALL
 guint       dzl_stack_list_get_depth (DzlStackList                  *self);
+DZL_AVAILABLE_IN_ALL
 void        dzl_stack_list_clear     (DzlStackList                  *self);
 
 G_END_DECLS

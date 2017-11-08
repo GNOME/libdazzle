@@ -23,6 +23,8 @@
 #ifndef DZL_DOCK_PANED_H
 #define DZL_DOCK_PANED_H
 
+#include "dzl-version-macros.h"
+
 #include "dzl-dock-types.h"
 
 G_BEGIN_DECLS
@@ -41,6 +43,7 @@ struct _DzlDockPanedClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_dock_paned_new (void);
 
 G_END_DECLS

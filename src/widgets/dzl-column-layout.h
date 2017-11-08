@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_COLUMN_LAYOUT (dzl_column_layout_get_type())
@@ -32,17 +34,26 @@ struct _DzlColumnLayoutClass
   GtkContainerClass parent;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_column_layout_new                (void);
+DZL_AVAILABLE_IN_ALL
 guint      dzl_column_layout_get_max_columns    (DzlColumnLayout *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_column_layout_set_max_columns    (DzlColumnLayout *self,
                                                  guint            max_columns);
+DZL_AVAILABLE_IN_ALL
 gint       dzl_column_layout_get_column_width   (DzlColumnLayout *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_column_layout_set_column_width   (DzlColumnLayout *self,
                                                  gint             column_width);
+DZL_AVAILABLE_IN_ALL
 gint       dzl_column_layout_get_column_spacing (DzlColumnLayout *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_column_layout_set_column_spacing (DzlColumnLayout *self,
                                                  gint             column_spacing);
+DZL_AVAILABLE_IN_ALL
 gint       dzl_column_layout_get_row_spacing    (DzlColumnLayout *self);
+DZL_AVAILABLE_IN_ALL
 void       dzl_column_layout_set_row_spacing    (DzlColumnLayout *self,
                                                  gint             row_spacing);
 

@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-shortcut-chord.h"
 #include "dzl-shortcut-manager.h"
 #include "dzl-shortcut-theme.h"
@@ -31,16 +33,23 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlShortcutModel, dzl_shortcut_model, DZL, SHORTCUT_MODEL, GtkTreeStore)
 
+DZL_AVAILABLE_IN_ALL
 GtkTreeModel       *dzl_shortcut_model_new         (void);
+DZL_AVAILABLE_IN_ALL
 DzlShortcutManager *dzl_shortcut_model_get_manager (DzlShortcutModel       *self);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_model_set_manager (DzlShortcutModel       *self,
                                                     DzlShortcutManager     *manager);
+DZL_AVAILABLE_IN_ALL
 DzlShortcutTheme   *dzl_shortcut_model_get_theme   (DzlShortcutModel       *self);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_model_set_theme   (DzlShortcutModel       *self,
                                                     DzlShortcutTheme       *theme);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_model_set_chord   (DzlShortcutModel       *self,
                                                     GtkTreeIter            *iter,
                                                     const DzlShortcutChord *chord);
+DZL_AVAILABLE_IN_ALL
 void                dzl_shortcut_model_rebuild     (DzlShortcutModel       *self);
 
 G_END_DECLS

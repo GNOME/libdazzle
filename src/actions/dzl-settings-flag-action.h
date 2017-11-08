@@ -21,12 +21,15 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SETTINGS_FLAG_ACTION (dzl_settings_flag_action_get_type())
 
 G_DECLARE_FINAL_TYPE (DzlSettingsFlagAction, dzl_settings_flag_action, DZL, SETTINGS_FLAG_ACTION, GObject)
 
+DZL_AVAILABLE_IN_ALL
 GAction *dzl_settings_flag_action_new (const gchar *schema_id,
                                        const gchar *schema_key,
                                        const gchar *flag_nick);

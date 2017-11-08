@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 #include "dzl-suggestion.h"
 
 G_BEGIN_DECLS
@@ -69,23 +71,32 @@ struct _DzlSuggestionEntryClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget     *dzl_suggestion_entry_new               (void);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_entry_set_model         (DzlSuggestionEntry        *self,
                                                        GListModel                *model);
+DZL_AVAILABLE_IN_ALL
 GListModel    *dzl_suggestion_entry_get_model         (DzlSuggestionEntry        *self);
+DZL_AVAILABLE_IN_ALL
 const gchar   *dzl_suggestion_entry_get_typed_text    (DzlSuggestionEntry        *self);
+DZL_AVAILABLE_IN_ALL
 DzlSuggestion *dzl_suggestion_entry_get_suggestion    (DzlSuggestionEntry        *self);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_entry_set_suggestion    (DzlSuggestionEntry        *self,
                                                        DzlSuggestion             *suggestion);
+DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_entry_set_position_func (DzlSuggestionEntry        *self,
                                                        DzlSuggestionPositionFunc  func,
                                                        gpointer                   func_data,
                                                        GDestroyNotify             func_data_destroy);
 
+DZL_AVAILABLE_IN_ALL
 void dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,
                                                  GdkRectangle       *area,
                                                  gboolean           *is_absolute,
                                                  gpointer            user_data);
+DZL_AVAILABLE_IN_ALL
 void dzl_suggestion_entry_window_position_func  (DzlSuggestionEntry *self,
                                                  GdkRectangle       *area,
                                                  gboolean           *is_absolute,
