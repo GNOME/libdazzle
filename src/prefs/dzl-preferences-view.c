@@ -943,3 +943,9 @@ dzl_preferences_iface_init (DzlPreferencesInterface *iface)
   iface->remove_id = dzl_preferences_view_remove_id;
   iface->get_widget = dzl_preferences_view_get_widget;
 }
+
+GtkWidget *
+dzl_preferences_view_new (void)
+{
+  return g_object_new (DZL_TYPE_PREFERENCES_VIEW, NULL);
+}
