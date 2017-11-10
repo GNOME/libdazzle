@@ -45,7 +45,7 @@ struct _DzlPreferencesViewClass
   gpointer _reserved8;
 };
 
-DZL_AVAILABLE_IN_ALL
+DZL_AVAILABLE_IN_3_28
 GtkWidget *dzl_preferences_view_new            (void);
 DZL_AVAILABLE_IN_ALL
 void       dzl_preferences_view_reapply_filter (DzlPreferencesView *self);
