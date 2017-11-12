@@ -217,6 +217,16 @@ dzl_gtk_widget_find_child_typed_cb (GtkWidget *widget,
     }
 }
 
+/**
+ * dzl_gtk_widget_find_child_typed:
+ *
+ * Tries to locate a widget in a hierarchy given it's #GType.
+ *
+ * There is not an efficient implementation of this method, so use it
+ * only when the hierarchy of widgets is small.
+ *
+ * Returns: (transfer none) (type Gtk.Widget) (nullable): A widget or %NULL
+ */
 gpointer
 dzl_gtk_widget_find_child_typed (GtkWidget *widget,
                                  GType      child_type)
