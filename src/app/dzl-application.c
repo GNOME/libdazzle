@@ -185,7 +185,7 @@ dzl_application_startup (GApplication *app)
    */
 
   /* Register our resources that are part of libdazzle. */
-  DZL_APPLICATION_GET_CLASS (self)->add_resources (self, "resource:///org/gnome/dazzle");
+  DZL_APPLICATION_GET_CLASS (self)->add_resources (self, "resource:///org/gnome/dazzle/");
 
   /* Now register the application resources */
   if (NULL != (resource_base_path = g_application_get_resource_base_path (app)))
