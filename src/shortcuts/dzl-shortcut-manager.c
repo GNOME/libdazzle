@@ -517,7 +517,7 @@ dzl_shortcut_manager_load_resources (DzlShortcutManager *self,
     {
       for (guint i = 0; children[i] != NULL; i++)
         {
-          g_autofree gchar *path = g_build_filename (resource_dir, children[i], NULL);
+          g_autofree gchar *path = g_build_path ("/", resource_dir, children[i], NULL);
           g_autoptr(DzlShortcutTheme) theme = NULL;
           g_autoptr(GError) local_error = NULL;
           g_autoptr(GBytes) bytes = NULL;
