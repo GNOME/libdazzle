@@ -282,8 +282,18 @@ dzl_css_provider_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_BASE_PATH:
-      self->base_path = g_value_dup_string (value);
-      break;
+      {
+        const gchar *str = g_value_get_string (value);
+        gsize len = str ? strlen (str) : 0;
+
+        /* Ignore trailing slash to simplify building paths */
+        if (str && len && str[len-1] == '/')
+          self->base_path = g_strndup (str, len - 1);
+        else
+          self->base_path = g_strdup (str);
+
+        break;
+      }
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec);
