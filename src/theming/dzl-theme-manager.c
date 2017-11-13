@@ -108,7 +108,7 @@ dzl_theme_manager_add_resources (DzlThemeManager *self,
    * current application theme, using @resource_path/css as the base directory
    * to locate theming files.
    */
-  css_dir = g_build_filename (resource_path, "themes", NULL);
+  css_dir = g_build_path ("/", resource_path, "themes/", NULL);
   g_debug ("Including CSS overrides from %s", css_dir);
   provider = dzl_css_provider_new (css_dir);
   g_hash_table_insert (self->providers_by_path, g_strdup (resource_path), g_object_ref (provider));
@@ -120,7 +120,7 @@ dzl_theme_manager_add_resources (DzlThemeManager *self,
    * Add the icons sub-directory so that Gtk can locate the themed
    * icons (svg, png, etc).
    */
-  icons_dir = g_build_filename (real_path, "icons", NULL);
+  icons_dir = g_build_path ("/", real_path, "icons/", NULL);
   g_debug ("Loading icon resources from %s", icons_dir);
   if (!g_str_equal (real_path, resource_path))
     {
