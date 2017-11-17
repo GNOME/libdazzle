@@ -744,3 +744,25 @@ dzl_state_machine_connect_object (DzlStateMachine *self,
 
   dzl_signal_group_connect_object (signals, detailed_signal, callback, user_data, flags);
 }
+
+/**
+ * dzl_state_machine_is_state:
+ * @self: a #DzlStateMachine
+ * @state: (nullable): the name of the state to check
+ *
+ * Checks to see if the current state of the #DzlStateMachine matches @state.
+ *
+ * Returns: %TRUE if @self is currently set to @state.
+ *
+ * Since: 3.28
+ */
+gboolean
+dzl_state_machine_is_state (DzlStateMachine *self,
+                            const gchar     *state)
+{
+  DzlStateMachinePrivate *priv = dzl_state_machine_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_STATE_MACHINE (self), FALSE);
+
+  return g_strcmp0 (priv->state, state) == 0;
+}

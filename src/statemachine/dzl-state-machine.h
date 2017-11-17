@@ -41,6 +41,9 @@ const gchar     *dzl_state_machine_get_state         (DzlStateMachine *self);
 DZL_AVAILABLE_IN_ALL
 void             dzl_state_machine_set_state         (DzlStateMachine *self,
                                                       const gchar     *state);
+DZL_AVAILABLE_IN_3_28
+gboolean         dzl_state_machine_is_state          (DzlStateMachine *self,
+                                                      const gchar     *state);
 DZL_AVAILABLE_IN_ALL
 GAction         *dzl_state_machine_create_action     (DzlStateMachine *self,
                                                       const gchar     *name);
