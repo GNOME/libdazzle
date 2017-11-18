@@ -1,4 +1,19 @@
 ==============
+Version 3.27.2
+==============
+
+Changes in this release:
+
+ • A performance improvement to CSS and resource loading by ensuring
+   resource directory paths are suffixed with a /.
+ • Use export macros instead of linker script to simplify ABI conformance
+   on alternative platforms.
+ • add missing dzl_preferences_view_new() symbol.
+ • Various gobject introspection annotation fixes.
+ • Use g_build_path() when appropriate.
+ • Add dzl_state_machine_is_state() for checking the current state.
+
+==============
 Version 3.27.1
 ==============
 
