@@ -152,18 +152,6 @@ dzl_directory_reaper_new (void)
 }
 
 static gboolean
-has_expired (guint64 mtime,
-             guint64 min_age)
-{
-  guint64 now = g_get_real_time () / G_USEC_PER_SEC;
-
-  if (now >= min_age)
-    return (now - min_age) >= mtime;
-
-  return FALSE;
-}
-
-static gboolean
 remove_directory_with_children (GFile         *file,
                                 GCancellable  *cancellable,
                                 GError       **error)
@@ -233,6 +221,7 @@ dzl_directory_reaper_execute_worker (GTask        *task,
                                      GCancellable *cancellable)
 {
   GArray *patterns = task_data;
+  gint64 now = g_get_real_time ();
 
   g_assert (G_IS_TASK (task));
   g_assert (DZL_IS_DIRECTORY_REAPER (source_object));
@@ -267,7 +256,10 @@ dzl_directory_reaper_execute_worker (GTask        *task,
 
           v64 = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
 
-          if (has_expired (v64, p->min_age))
+          /* mtime is in seconds */
+          v64 *= G_USEC_PER_SEC;
+
+          if (v64 < now - p->min_age)
             {
               if (!g_file_delete (p->file.file, cancellable, &error))
                 g_warning ("%s", error->message);
@@ -306,7 +298,10 @@ dzl_directory_reaper_execute_worker (GTask        *task,
               name = g_file_info_get_name (info);
               v64 = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
 
-              if (has_expired (v64, p->min_age))
+              /* mtime is in seconds */
+              v64 *= G_USEC_PER_SEC;
+
+              if (v64 < now - p->min_age)
                 {
                   g_autoptr(GFile) file = g_file_get_child (p->glob.directory, name);
 
