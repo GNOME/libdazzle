@@ -333,6 +333,7 @@ dzl_fuzzy_index_query_async (DzlFuzzyIndex       *self,
   g_return_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable));
 
   task = g_task_new (self, cancellable, callback, user_data);
+  g_task_set_priority (task, G_PRIORITY_LOW);
   g_task_set_source_tag (task, dzl_fuzzy_index_query_async);
 
   cursor = g_object_new (DZL_TYPE_FUZZY_INDEX_CURSOR,
@@ -347,7 +348,7 @@ dzl_fuzzy_index_query_async (DzlFuzzyIndex       *self,
                                G_PRIORITY_LOW,
                                cancellable,
                                dzl_fuzzy_index_query_cb,
-                               g_object_ref (task));
+                               g_steal_pointer (&task));
 }
 
 /**
