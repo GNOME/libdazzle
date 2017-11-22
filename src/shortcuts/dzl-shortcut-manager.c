@@ -804,6 +804,8 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
                                     GtkWidget              *toplevel,
                                     const DzlShortcutChord *chord)
 {
+  DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (GTK_IS_WIDGET (widget));
   g_assert (GTK_IS_WIDGET (toplevel));
@@ -812,6 +814,7 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
   if (dzl_shortcut_chord_get_length (chord) == 1)
     {
       GApplication *app = g_application_get_default ();
+      const gchar *action;
       GdkModifierType state;
       guint keyval;
 
@@ -826,6 +829,28 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
           gtk_window_mnemonic_activate (GTK_WINDOW (toplevel), keyval, state))
         return TRUE;
 
+      /*
+       * See if we have something defined for this theme that
+       * can be activated directly.
+       */
+      action = _dzl_shortcut_theme_lookup_action (priv->internal_theme, chord);
+
+      if (action != NULL)
+        {
+          g_autofree gchar *prefix = NULL;
+          g_autofree gchar *name = NULL;
+          g_autoptr(GVariant) target = NULL;
+
+          dzl_g_action_name_parse_full (action, &prefix, &name, &target);
+
+          if (dzl_gtk_widget_action (toplevel, prefix, name, target))
+            return TRUE;
+        }
+
+      /*
+       * Now fallback to trying to activate the action within GtkApplication
+       * as the legacy Gtk bindings would do.
+       */
       if (GTK_IS_APPLICATION (app))
         {
           g_autofree gchar *accel = dzl_shortcut_chord_to_string (chord);
@@ -837,10 +862,11 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
             {
               for (guint i = 0; actions[i] != NULL; i++)
                 {
-                  const gchar *action = actions[i];
                   g_autofree gchar *prefix = NULL;
                   g_autofree gchar *name = NULL;
                   g_autoptr(GVariant) param = NULL;
+
+                  action = actions[i];
 
                   if (!dzl_g_action_name_parse_full (action, &prefix, &name, &param))
                     {
