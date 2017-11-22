@@ -447,6 +447,29 @@ dzl_shortcut_theme_set_parent_name (DzlShortcutTheme *self,
     }
 }
 
+const gchar *
+_dzl_shortcut_theme_lookup_action (DzlShortcutTheme       *self,
+                                   const DzlShortcutChord *chord)
+{
+  DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_THEME (self), NULL);
+  g_return_val_if_fail (chord != NULL, NULL);
+
+  if (priv->actions_table != NULL)
+    {
+      const gchar *action = NULL;
+      DzlShortcutMatch match;
+
+      match = dzl_shortcut_chord_table_lookup (priv->actions_table, chord, (gpointer *)&action);
+
+      if (match == DZL_SHORTCUT_MATCH_EQUAL)
+        return action;
+    }
+
+  return NULL;
+}
+
 void
 dzl_shortcut_theme_set_chord_for_action (DzlShortcutTheme       *self,
                                          const gchar            *detailed_action_name,

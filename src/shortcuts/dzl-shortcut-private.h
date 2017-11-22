@@ -126,6 +126,8 @@ void                   _dzl_shortcut_theme_set_manager              (DzlShortcut
                                                                      DzlShortcutManager         *manager);
 void                   _dzl_shortcut_theme_set_name                 (DzlShortcutTheme           *self,
                                                                      const gchar                *name);
+const gchar           *_dzl_shortcut_theme_lookup_action            (DzlShortcutTheme           *self,
+                                                                     const DzlShortcutChord     *chord);
 void                   _dzl_shortcut_theme_merge                    (DzlShortcutTheme           *self,
                                                                      DzlShortcutTheme           *layer);
 DzlShortcutMatch       _dzl_shortcut_theme_match                    (DzlShortcutTheme           *self,
