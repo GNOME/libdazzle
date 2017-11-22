@@ -634,7 +634,7 @@ dzl_state_machine_buildable_custom_tag_start (GtkBuildable  *buildable,
       StatesParserData *parser_data;
 
       parser_data = g_slice_new0 (StatesParserData);
-      parser_data->self = g_object_ref (buildable);
+      parser_data->self = g_object_ref (DZL_STATE_MACHINE (buildable));
       parser_data->builder = g_object_ref (builder);
       parser_data->stack = g_queue_new ();
 
