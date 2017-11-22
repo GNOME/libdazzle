@@ -23,10 +23,6 @@
 #include "search/dzl-trie.h"
 #include "util/dzl-macros.h"
 
-#if defined(__LP64__) || defined(_WIN64)
-# define TRIE_64 1
-#endif
-
 /**
  * SECTION:trie
  * @title: DzlTrie
@@ -52,16 +48,16 @@ G_DEFINE_BOXED_TYPE (DzlTrie, dzl_trie, dzl_trie_ref, dzl_trie_unref)
  * everwhere, such as x86_64 compiled with -m32. However, accomidating that
  * will require some changes to the layout of each chunk.
  */
-#ifdef TRIE_64
-#define FIRST_CHUNK_KEYS         4
-#define TRIE_NODE_SIZE          64
-#define TRIE_NODE_CHUNK_SIZE    64
-#define TRIE_NODE_CHUNK_KEYS(c) (((c)->is_inline) ? 4 : 6)
+#if GLIB_SIZEOF_VOID_P == 8
+# define FIRST_CHUNK_KEYS         4
+# define TRIE_NODE_SIZE          64
+# define TRIE_NODE_CHUNK_SIZE    64
+# define TRIE_NODE_CHUNK_KEYS(c) (((c)->is_inline) ? 4 : 6)
 #else
-#define FIRST_CHUNK_KEYS         3
-#define TRIE_NODE_SIZE          32
-#define TRIE_NODE_CHUNK_SIZE    32
-#define TRIE_NODE_CHUNK_KEYS(c) (((c)->is_inline) ? 3 : 5)
+# define FIRST_CHUNK_KEYS         3
+# define TRIE_NODE_SIZE          32
+# define TRIE_NODE_CHUNK_SIZE    32
+# define TRIE_NODE_CHUNK_KEYS(c) (((c)->is_inline) ? 3 : 5)
 #endif
 
 /**
@@ -112,7 +108,7 @@ struct _DzlTrie
    DzlTrieNode    *root;
 };
 
-#ifdef TRIE_64
+#if GLIB_SIZEOF_VOID_P == 8
   G_STATIC_ASSERT (sizeof(gpointer) == 8);
   G_STATIC_ASSERT ((FIRST_CHUNK_KEYS-1) == 3);
   G_STATIC_ASSERT (((FIRST_CHUNK_KEYS-1) * sizeof(gpointer)) == 24);

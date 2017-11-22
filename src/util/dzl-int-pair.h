@@ -26,7 +26,7 @@
 
 G_BEGIN_DECLS
 
-#if defined(__LP64__) || defined(_WIN64)
+#if GLIB_SIZEOF_VOID_P == 8
 # define DZL_INT_PAIR_64
 #endif
 
