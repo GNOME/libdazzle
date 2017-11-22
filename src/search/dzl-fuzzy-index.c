@@ -246,11 +246,11 @@ dzl_fuzzy_index_load_file_worker (GTask        *task,
 }
 
 void
-dzl_fuzzy_index_load_file_async (DzlFuzzyIndex          *self,
-                             GFile               *file,
-                             GCancellable        *cancellable,
-                             GAsyncReadyCallback  callback,
-                             gpointer             user_data)
+dzl_fuzzy_index_load_file_async (DzlFuzzyIndex       *self,
+                                 GFile               *file,
+                                 GCancellable        *cancellable,
+                                 GAsyncReadyCallback  callback,
+                                 gpointer             user_data)
 {
   g_autoptr(GTask) task = NULL;
 

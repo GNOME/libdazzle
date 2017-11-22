@@ -82,9 +82,9 @@ static void list_model_iface_init     (GListModelInterface *iface);
 
 static GParamSpec *properties [N_PROPS];
 
-G_DEFINE_TYPE_EXTENDED (DzlFuzzyIndexCursor, dzl_fuzzy_index_cursor, G_TYPE_OBJECT, 0,
-                        G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_INITABLE, async_initable_iface_init)
-                        G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
+G_DEFINE_TYPE_WITH_CODE (DzlFuzzyIndexCursor, dzl_fuzzy_index_cursor, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_INITABLE, async_initable_iface_init)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static inline gfloat
 pointer_to_float (gpointer ptr)
@@ -529,10 +529,10 @@ cleanup:
 
 static void
 dzl_fuzzy_index_cursor_init_async (GAsyncInitable      *initable,
-                               gint                 io_priority,
-                               GCancellable        *cancellable,
-                               GAsyncReadyCallback  callback,
-                               gpointer             user_data)
+                                   gint                 io_priority,
+                                   GCancellable        *cancellable,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data)
 {
   DzlFuzzyIndexCursor *self = (DzlFuzzyIndexCursor *)initable;
   g_autoptr(GTask) task = NULL;
@@ -549,8 +549,8 @@ dzl_fuzzy_index_cursor_init_async (GAsyncInitable      *initable,
 
 static gboolean
 dzl_fuzzy_index_cursor_init_finish (GAsyncInitable  *initiable,
-                                GAsyncResult    *result,
-                                GError         **error)
+                                    GAsyncResult    *result,
+                                    GError         **error)
 {
   g_assert (DZL_IS_FUZZY_INDEX_CURSOR (initiable));
   g_assert (G_IS_TASK (result));
