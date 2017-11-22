@@ -77,7 +77,7 @@ _dzl_list_box_cache (DzlListBox    *self,
 
   if (priv->trashed_rows.length < priv->recycle_max)
     {
-      g_autoptr(GtkWidget) held = g_object_ref (row);
+      g_autoptr(GtkWidget) held = g_object_ref (GTK_WIDGET (row));
 
       gtk_list_box_unselect_row (GTK_LIST_BOX (self), GTK_LIST_BOX_ROW (row));
       gtk_container_remove (GTK_CONTAINER (self), GTK_WIDGET (row));
