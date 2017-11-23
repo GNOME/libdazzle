@@ -116,10 +116,14 @@ static gboolean
 begin_theatrics_from_main (gpointer user_data)
 {
   DzlProgressMenuButton *self = user_data;
+  GtkAllocation rect;
 
   g_assert (DZL_IS_PROGRESS_MENU_BUTTON (self));
 
-  dzl_progress_menu_button_begin_theatrics (self);
+  /* Ignore if still ont allocated */
+  gtk_widget_get_allocation (GTK_WIDGET (self), &rect);
+  if (rect.x != -1 && rect.y != -1)
+    dzl_progress_menu_button_begin_theatrics (self);
 
   return G_SOURCE_REMOVE;
 }
