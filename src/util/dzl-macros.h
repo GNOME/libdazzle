@@ -20,6 +20,7 @@
 #define DZL_MACROS_H
 
 #include <glib.h>
+#include <string.h>
 
 G_BEGIN_DECLS
 
