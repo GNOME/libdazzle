@@ -37,6 +37,18 @@ G_BEGIN_DECLS
 #define dzl_set_weak_pointer(ptr,obj) \
   ((obj!=*(ptr))?(dzl_clear_weak_pointer(ptr),*(ptr)=obj,((obj)?g_object_add_weak_pointer((GObject*)obj,(gpointer*)ptr),NULL:NULL),1):0)
 
+static inline void
+dzl_clear_signal_handler (gpointer  object,
+                          gulong   *location_of_handler)
+{
+  if (*location_of_handler != 0)
+    {
+      gulong handler = *location_of_handler;
+      *location_of_handler = 0;
+      g_signal_handler_disconnect (object, handler);
+    }
+}
+
 static inline gboolean
 dzl_str_empty0 (const gchar *str)
 {
