@@ -37,6 +37,9 @@ G_BEGIN_DECLS
 #define dzl_set_weak_pointer(ptr,obj) \
   ((obj!=*(ptr))?(dzl_clear_weak_pointer(ptr),*(ptr)=obj,((obj)?g_object_add_weak_pointer((GObject*)obj,(gpointer*)ptr),NULL:NULL),1):0)
 
+/* strlen() gets hoisted out automatically at -O0 for everything but MSVC */
+#define DZL_LITERAL_LENGTH(s) (strlen(s))
+
 static inline void
 dzl_clear_signal_handler (gpointer  object,
                           gulong   *location_of_handler)
@@ -50,15 +53,19 @@ dzl_clear_signal_handler (gpointer  object,
 }
 
 static inline gboolean
-dzl_str_empty0 (const gchar *str)
+dzl_str_empty0 (gconstpointer str)
 {
-  return str == NULL || *str == '\0';
+  /* We use a gconstpointer to allow passing both
+   * signed and unsigned chars into this function */
+  return str == NULL || *(char*)str == '\0';
 }
 
 static inline gboolean
-dzl_str_equal0 (const gchar *str1,
-                const gchar *str2)
+dzl_str_equal0 (gconstpointer str1,
+                gconstpointer str2)
 {
+  /* We use gconstpointer so that we can allow
+   * both signed and unsigned chars here (such as xmlChar). */
   return g_strcmp0 (str1, str2) == 0;
 }
 
