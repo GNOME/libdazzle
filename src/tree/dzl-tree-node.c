@@ -141,9 +141,9 @@ _dzl_tree_node_set_tree (DzlTreeNode *node,
  */
 void
 dzl_tree_node_insert_sorted (DzlTreeNode            *node,
-                            DzlTreeNode            *child,
-                            DzlTreeNodeCompareFunc  compare_func,
-                            gpointer               user_data)
+                             DzlTreeNode            *child,
+                             DzlTreeNodeCompareFunc  compare_func,
+                             gpointer                user_data)
 {
   g_return_if_fail (DZL_IS_TREE_NODE (node));
   g_return_if_fail (DZL_IS_TREE_NODE (child));
@@ -240,8 +240,8 @@ dzl_tree_node_get_path (DzlTreeNode *node)
 }
 
 gboolean
-dzl_tree_node_get_iter (DzlTreeNode  *self,
-                       GtkTreeIter *iter)
+dzl_tree_node_get_iter (DzlTreeNode *self,
+                        GtkTreeIter *iter)
 {
   gboolean ret = FALSE;
 
@@ -583,7 +583,7 @@ dzl_tree_node_get_item (DzlTreeNode *node)
 
 gboolean
 dzl_tree_node_expand (DzlTreeNode *node,
-                     gboolean    expand_ancestors)
+                      gboolean     expand_ancestors)
 {
   DzlTree *tree;
   GtkTreePath *path;
