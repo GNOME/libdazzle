@@ -830,7 +830,7 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                          "Expanded Icon Name",
                          "The icon-name to use when the row is expanded",
                          NULL,
-                         (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
   /**
    * DzlTreeNode:icon-name:
@@ -842,7 +842,7 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                          "Icon Name",
                          "The icon name to display.",
                          NULL,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                         G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
   /**
    * DzlTreeNode:gicon:
    *
@@ -865,7 +865,7 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                          "Item",
                          "Optional object to associate with node.",
                          G_TYPE_OBJECT,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                         G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   /**
    * DzlTreeNode:parent:
@@ -901,7 +901,7 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                          "Text",
                          "The text of the node.",
                          NULL,
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                         G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   /**
    * DzlTreeNode:use-markup:
@@ -913,14 +913,14 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                           "Use Markup",
                           "If text should be translated as markup.",
                           FALSE,
-                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                          G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   properties [PROP_USE_DIM_LABEL] =
     g_param_spec_boolean ("use-dim-label",
                           "Use Dim Label",
                           "If text should be rendered with a dim label.",
                           FALSE,
-                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                          G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, LAST_PROP, properties);
 }
