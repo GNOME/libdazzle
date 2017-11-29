@@ -1110,7 +1110,7 @@ _dzl_tree_node_add_dummy_child (DzlTreeNode *self)
   gtk_tree_store_insert_with_values (model, &iter, &parent, -1,
                                      0, dummy,
                                      -1);
-  g_object_unref (dummy);
+  g_clear_object (&dummy);
 }
 
 void
@@ -1130,7 +1130,8 @@ _dzl_tree_node_remove_dummy_child (DzlTreeNode *self)
   if (dzl_tree_node_get_iter (self, &iter) &&
       gtk_tree_model_iter_children (GTK_TREE_MODEL (model), &children, &iter))
     {
-      while (gtk_tree_store_remove (model, &children)) { }
+      while (gtk_tree_store_remove (model, &children))
+        { /* Do nothing */ }
     }
 }
 
