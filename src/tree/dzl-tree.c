@@ -1516,13 +1516,13 @@ _dzl_tree_invalidate (DzlTree     *self,
 
   if (path != NULL)
     {
-      gtk_tree_model_get_iter (model, &iter, path);
 
-      if (gtk_tree_model_iter_children (model, &child, &iter))
+      if (gtk_tree_model_get_iter (model, &iter, path))
         {
-          while (gtk_tree_store_remove (priv->store, &child))
+          if (gtk_tree_model_iter_children (model, &child, &iter))
             {
-              /* Do nothing */
+              while (gtk_tree_store_remove (priv->store, &child))
+                { /* Do nothing */ }
             }
         }
 
