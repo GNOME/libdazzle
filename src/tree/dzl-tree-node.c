@@ -661,16 +661,19 @@ dzl_tree_node_invalidate (DzlTreeNode *self)
 gboolean
 dzl_tree_node_get_expanded (DzlTreeNode *self)
 {
-  GtkTreePath *path;
   gboolean ret = TRUE;
 
   g_return_val_if_fail (DZL_IS_TREE_NODE (self), FALSE);
 
   if ((self->tree != NULL) && (self->parent != NULL))
     {
-      path = dzl_tree_node_get_path (self);
-      ret = gtk_tree_view_row_expanded (GTK_TREE_VIEW (self->tree), path);
-      gtk_tree_path_free (path);
+      GtkTreePath *path = dzl_tree_node_get_path (self);
+
+      if (path != NULL)
+        {
+          ret = gtk_tree_view_row_expanded (GTK_TREE_VIEW (self->tree), path);
+          gtk_tree_path_free (path);
+        }
     }
 
   return ret;
