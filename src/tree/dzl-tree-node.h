@@ -115,6 +115,11 @@ gboolean        dzl_tree_node_get_use_dim_label     (DzlTreeNode            *sel
 DZL_AVAILABLE_IN_ALL
 void            dzl_tree_node_set_use_dim_label     (DzlTreeNode            *self,
                                                      gboolean                use_dim_label);
+DZL_AVAILABLE_IN_3_28
+gboolean        dzl_tree_node_get_reset_on_collapse (DzlTreeNode            *self);
+DZL_AVAILABLE_IN_3_28
+void            dzl_tree_node_set_reset_on_collapse (DzlTreeNode            *self,
+                                                     gboolean                reset_on_collapse);
 
 G_END_DECLS
 

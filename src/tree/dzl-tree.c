@@ -600,8 +600,8 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
   g_assert (path != NULL);
 
   model = gtk_tree_view_get_model (tree_view);
-
   gtk_tree_model_get (model, iter, 0, &node, -1);
+  g_assert (DZL_IS_TREE_NODE (node));
 
   /*
    * If we are expanding a row that has a dummy child, we might need to
@@ -612,6 +612,54 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
       _dzl_tree_build_node (self, node);
       dzl_tree_node_expand (node, FALSE);
       dzl_tree_node_select (node);
+    }
+
+  g_clear_object (&node);
+}
+
+static void
+dzl_tree_row_collapsed (GtkTreeView *tree_view,
+                        GtkTreeIter *iter,
+                        GtkTreePath *path)
+{
+  DzlTree *self = (DzlTree *)tree_view;
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+  GtkTreeModel *model;
+  DzlTreeNode *node;
+
+  g_assert (DZL_IS_TREE (self));
+  g_assert (iter != NULL);
+  g_assert (path != NULL);
+
+  model = gtk_tree_view_get_model (tree_view);
+
+  /* Ignore things when we are showing a filter. There isn't a whole lot we
+   * can do here without getting into some weird corner cases, so we'll punt
+   * until someone really asks for the feature.
+   */
+  if (model != GTK_TREE_MODEL (priv->store))
+    return;
+
+  /* Get the node in question */
+  gtk_tree_model_get (model, iter, 0, &node, -1);
+  g_assert (DZL_IS_TREE_NODE (node));
+
+  /*
+   * If we are collapsing a row that requests to have its children removed
+   * and the dummy node re-inserted, go ahead and do so now.
+   */
+  if (dzl_tree_node_get_reset_on_collapse (node))
+    {
+      GtkTreeIter child;
+
+      if (gtk_tree_model_iter_children (model, &child, iter))
+        {
+          while (gtk_tree_store_remove (priv->store, &child))
+            { /* Do Nothing */ }
+        }
+
+      _dzl_tree_node_add_dummy_child (node);
+      _dzl_tree_node_set_needs_build (node, TRUE);
     }
 
   g_clear_object (&node);
@@ -925,6 +973,7 @@ dzl_tree_class_init (DzlTreeClass *klass)
 
   tree_view_class->row_activated = dzl_tree_row_activated;
   tree_view_class->row_expanded = dzl_tree_row_expanded;
+  tree_view_class->row_collapsed = dzl_tree_row_collapsed;
 
   klass->action = dzl_tree_real_action;
 

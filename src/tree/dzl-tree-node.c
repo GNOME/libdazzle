@@ -41,6 +41,7 @@ struct _DzlTreeNode
   guint              is_dummy : 1;
   guint              children_possible : 1;
   guint              use_dim_label : 1;
+  guint              reset_on_collapse : 1;
 };
 
 typedef struct
@@ -59,6 +60,7 @@ enum {
   PROP_GICON,
   PROP_ITEM,
   PROP_PARENT,
+  PROP_RESET_ON_COLLAPSE,
   PROP_TEXT,
   PROP_TREE,
   PROP_USE_DIM_LABEL,
@@ -732,6 +734,10 @@ dzl_tree_node_get_property (GObject    *object,
       g_value_set_object (value, node->parent);
       break;
 
+    case PROP_RESET_ON_COLLAPSE:
+      g_value_set_boolean (value, node->reset_on_collapse);
+      break;
+
     case PROP_TEXT:
       g_value_set_string (value, node->text);
       break;
@@ -777,6 +783,10 @@ dzl_tree_node_set_property (GObject      *object,
 
     case PROP_ITEM:
       dzl_tree_node_set_item (node, g_value_get_object (value));
+      break;
+
+    case PROP_RESET_ON_COLLAPSE:
+      dzl_tree_node_set_reset_on_collapse (node, g_value_get_boolean (value));
       break;
 
     case PROP_TEXT:
@@ -878,6 +888,24 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                          "The parent node.",
                          DZL_TYPE_TREE_NODE,
                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+
+  /**
+   * DzlTreeNode:reset-on-collapse:
+   *
+   * The "reset-on-collapse" property denotes that all children should be
+   * removed from the node when it's row is collapsed. It will also set
+   * #DzlTreeNode:needs-build to %TRUE so the next expansion rebuilds the
+   * children. This is useful for situations where you want to ensure the nodes
+   * are up to date (refreshed) on every expansion.
+   *
+   * Since: 3.28
+   */
+  properties [PROP_RESET_ON_COLLAPSE] =
+    g_param_spec_boolean ("reset-on-collapse",
+                          "Reset on Collapse",
+                          "Reset by clearing children on collapse, requiring a rebuild on next expand",
+                          FALSE,
+                          G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   /**
    * DzlTreeNode:tree:
@@ -1179,4 +1207,27 @@ _dzl_tree_node_get_expanded_icon (DzlTreeNode *node)
   g_return_val_if_fail (DZL_IS_TREE_NODE (node), NULL);
 
   return g_quark_to_string (node->expanded_icon_name);
+}
+
+gboolean
+dzl_tree_node_get_reset_on_collapse (DzlTreeNode *self)
+{
+  g_return_val_if_fail (DZL_IS_TREE_NODE (self), FALSE);
+
+  return self->reset_on_collapse;
+}
+
+void
+dzl_tree_node_set_reset_on_collapse (DzlTreeNode *self,
+                                     gboolean     reset_on_collapse)
+{
+  g_return_if_fail (DZL_IS_TREE_NODE (self));
+
+  reset_on_collapse = !!reset_on_collapse;
+
+  if (reset_on_collapse != self->reset_on_collapse)
+    {
+      self->reset_on_collapse = reset_on_collapse;
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_RESET_ON_COLLAPSE]);
+    }
 }
