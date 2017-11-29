@@ -527,6 +527,8 @@ _dzl_tree_insert_sorted (DzlTree                *self,
 
           gtk_tree_model_get (model, &children, 0, &sibling, -1);
 
+          g_assert (DZL_IS_TREE_NODE (sibling));
+
           if (compare_func (sibling, child, user_data) > 0)
             {
               gtk_tree_store_insert_before (priv->store, &that, parent, &children);
@@ -1651,7 +1653,9 @@ _dzl_tree_get_iter (DzlTree      *self,
   g_return_val_if_fail (DZL_IS_TREE_NODE (node), FALSE);
   g_return_val_if_fail (iter, FALSE);
 
-  if ((path = dzl_tree_node_get_path (node)) != NULL)
+  path = dzl_tree_node_get_path (node);
+
+  if (path != NULL)
     {
       ret = gtk_tree_model_get_iter (GTK_TREE_MODEL (priv->store), iter, path);
       gtk_tree_path_free (path);
