@@ -594,6 +594,7 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
                        GtkTreePath *path)
 {
   DzlTree *self = (DzlTree *)tree_view;
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
   GtkTreeModel *model;
   DzlTreeNode *node;
 
@@ -614,6 +615,13 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
       _dzl_tree_build_node (self, node);
       dzl_tree_node_expand (node, FALSE);
       dzl_tree_node_select (node);
+    }
+
+  /* Notify builders of expand */
+  for (guint i = 0; i < priv->builders->len; i++)
+    {
+      DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
+      _dzl_tree_builder_node_expanded (builder, node);
     }
 
   g_clear_object (&node);
@@ -662,6 +670,13 @@ dzl_tree_row_collapsed (GtkTreeView *tree_view,
 
       _dzl_tree_node_add_dummy_child (node);
       _dzl_tree_node_set_needs_build (node, TRUE);
+    }
+
+  /* Notify builders of collapse */
+  for (guint i = 0; i < priv->builders->len; i++)
+    {
+      DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
+      _dzl_tree_builder_node_collapsed (builder, node);
     }
 
   g_clear_object (&node);

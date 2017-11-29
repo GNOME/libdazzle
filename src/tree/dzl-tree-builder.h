@@ -47,6 +47,12 @@ struct _DzlTreeBuilderClass
   void     (*node_popup)      (DzlTreeBuilder *builder,
                                DzlTreeNode    *node,
                                GMenu          *menu);
+  void     (*node_expanded)   (DzlTreeBuilder *builder,
+                               DzlTreeNode    *node);
+  void     (*node_collapsed)  (DzlTreeBuilder *builder,
+                               DzlTreeNode    *node);
+
+  gpointer padding[12];
 };
 
 DZL_AVAILABLE_IN_ALL

@@ -41,6 +41,8 @@ enum {
   REMOVED,
   BUILD_NODE,
   NODE_ACTIVATED,
+  NODE_COLLAPSED,
+  NODE_EXPANDED,
   NODE_POPUP,
   NODE_SELECTED,
   NODE_UNSELECTED,
@@ -124,6 +126,26 @@ _dzl_tree_builder_removed (DzlTreeBuilder *builder,
 	g_return_if_fail (DZL_IS_TREE (tree));
 
   g_signal_emit (builder, signals [REMOVED], 0, tree);
+}
+
+void
+_dzl_tree_builder_node_collapsed (DzlTreeBuilder *builder,
+                                  DzlTreeNode    *node)
+{
+	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+	g_return_if_fail (DZL_IS_TREE_NODE (node));
+
+  g_signal_emit (builder, signals [NODE_COLLAPSED], 0, node);
+}
+
+void
+_dzl_tree_builder_node_expanded (DzlTreeBuilder *builder,
+                                 DzlTreeNode    *node)
+{
+	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+	g_return_if_fail (DZL_IS_TREE_NODE (node));
+
+  g_signal_emit (builder, signals [NODE_EXPANDED], 0, node);
 }
 
 void
@@ -261,6 +283,34 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                   G_TYPE_BOOLEAN,
                   1,
                   DZL_TYPE_TREE_NODE);
+
+  signals [NODE_COLLAPSED] =
+    g_signal_new ("node-collapsed",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, node_collapsed),
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
+                  G_TYPE_NONE,
+                  1,
+                  DZL_TYPE_TREE_NODE);
+  g_signal_set_va_marshaller (signals [NODE_COLLAPSED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
+
+  signals [NODE_EXPANDED] =
+    g_signal_new ("node-expanded",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, node_expanded),
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
+                  G_TYPE_NONE,
+                  1,
+                  DZL_TYPE_TREE_NODE);
+  g_signal_set_va_marshaller (signals [NODE_EXPANDED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 
   signals [NODE_POPUP] =
     g_signal_new ("node-popup",
