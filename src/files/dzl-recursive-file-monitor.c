@@ -119,6 +119,9 @@ dzl_recursive_file_monitor_changed (DzlRecursiveFileMonitor *self,
   g_assert (!other_file || G_IS_FILE (file));
   g_assert (G_IS_FILE_MONITOR (monitor));
 
+  if (g_cancellable_is_cancelled (self->cancellable))
+    return;
+
   if (dzl_recursive_file_monitor_ignored (self, file))
     return;
 
