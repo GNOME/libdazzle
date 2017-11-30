@@ -38,16 +38,20 @@
 
 struct _DzlRecursiveFileMonitor
 {
-  GObject       parent_instance;
+  GObject                 parent_instance;
 
-  GFile        *root;
-  GCancellable *cancellable;
+  GFile                  *root;
+  GCancellable           *cancellable;
 
-  GMutex        monitor_lock;
-  GHashTable   *monitors_by_file;
-  GHashTable   *files_by_monitor;
+  GMutex                  monitor_lock;
+  GHashTable             *monitors_by_file;
+  GHashTable             *files_by_monitor;
 
-  guint         start_handler;
+  DzlRecursiveIgnoreFunc  ignore_func;
+  gpointer                ignore_func_data;
+  GDestroyNotify          ignore_func_data_destroy;
+
+  guint                   start_handler;
 };
 
 enum {
@@ -71,6 +75,16 @@ G_DEFINE_TYPE (DzlRecursiveFileMonitor, dzl_recursive_file_monitor, G_TYPE_OBJEC
 
 static GParamSpec *properties [N_PROPS];
 static guint signals [N_SIGNALS];
+
+static gboolean
+dzl_recursive_file_monitor_ignored (DzlRecursiveFileMonitor *self,
+                                    GFile                   *file)
+{
+  g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
+  g_assert (G_IS_FILE (file));
+
+  return self->ignore_func (file, self->ignore_func_data);
+}
 
 static void
 dzl_recursive_file_monitor_unwatch (DzlRecursiveFileMonitor *self,
@@ -104,6 +118,9 @@ dzl_recursive_file_monitor_changed (DzlRecursiveFileMonitor *self,
   g_assert (G_IS_FILE (file));
   g_assert (!other_file || G_IS_FILE (file));
   g_assert (G_IS_FILE_MONITOR (monitor));
+
+  if (dzl_recursive_file_monitor_ignored (self, file))
+    return;
 
   if (event == G_FILE_MONITOR_EVENT_DELETED)
     {
@@ -203,6 +220,9 @@ dzl_recursive_file_monitor_worker (GTask        *task,
 
       child = g_file_get_child (root, g_file_info_get_name (info));
 
+      if (dzl_recursive_file_monitor_ignored (self, child))
+        continue;
+
       if (!dzl_recursive_file_monitor_watch (self, child, cancellable, &error))
         break;
     }
@@ -252,7 +272,20 @@ dzl_recursive_file_monitor_constructed (GObject *object)
       return;
     }
 
+  /*
+   * Defer start to the main loop so that the caller can set
+   * things like the ignore func, but not require us to have
+   * soem annoying start/stop API.
+   */
+
   self->start_handler = g_idle_add (dzl_recursive_file_monitor_start, self);
+}
+
+static gboolean
+default_ignore_func (GFile    *file,
+                     gpointer  user_data)
+{
+  return FALSE;
 }
 
 static void
@@ -262,6 +295,18 @@ dzl_recursive_file_monitor_dispose (GObject *object)
 
   dzl_clear_source (&self->start_handler);
   g_cancellable_cancel (self->cancellable);
+
+  if (self->ignore_func_data && self->ignore_func_data_destroy)
+    {
+      gpointer data = self->ignore_func_data;
+      GDestroyNotify notify = self->ignore_func_data_destroy;
+
+      self->ignore_func = NULL;
+      self->ignore_func_data = NULL;
+      self->ignore_func_data_destroy = NULL;
+
+      notify (data);
+    }
 
   G_OBJECT_CLASS (dzl_recursive_file_monitor_parent_class)->dispose (object);
 }
@@ -368,6 +413,7 @@ dzl_recursive_file_monitor_init (DzlRecursiveFileMonitor *self)
                                                   (GEqualFunc) g_file_equal,
                                                   g_object_unref,
                                                   g_object_unref);
+  self->ignore_func = default_ignore_func;
 }
 
 DzlRecursiveFileMonitor *
@@ -412,4 +458,57 @@ dzl_recursive_file_monitor_get_root (DzlRecursiveFileMonitor *self)
   g_return_val_if_fail (DZL_IS_RECURSIVE_FILE_MONITOR (self), NULL);
 
   return self->root;
+}
+
+/**
+ * dzl_recursive_file_monitor_set_ignore_func:
+ * @self: a #DzlRecursiveFileMonitor
+ * @ignore_func: (scope async): a thread-safe #DzlRecursiveIgnoreFunc
+ * @ignore_func_data: closure data for @ignore_func
+ * @ignore_func_data_destroy: destroy notify for @ignore_func_data
+ *
+ * Sets a callback function to determine if a #GFile should be ignored
+ * from signal emission.
+ *
+ * @ignore_func may be called from a thread other than the default
+ * main thread, so any function used here MUST be thread-safe.
+ *
+ * Any use of a non-thread-safe callback for @ignore_func is a programmer
+ * error.
+ *
+ * If @ignore_func is %NULL, it is set to the default which does not
+ * ignore any files or directories.
+ *
+ * Since: 3.28
+ */
+void
+dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor *self,
+                                            DzlRecursiveIgnoreFunc   ignore_func,
+                                            gpointer                 ignore_func_data,
+                                            GDestroyNotify           ignore_func_data_destroy)
+{
+  g_return_if_fail (DZL_IS_RECURSIVE_FILE_MONITOR (self));
+
+  if (ignore_func == NULL)
+    {
+      ignore_func = default_ignore_func;
+      ignore_func_data = NULL;
+      ignore_func_data_destroy = NULL;
+    }
+
+  if (self->ignore_func_data && self->ignore_func_data_destroy)
+    {
+      gpointer data = self->ignore_func_data;
+      GDestroyNotify notify = self->ignore_func_data_destroy;
+
+      self->ignore_func = NULL;
+      self->ignore_func_data = NULL;
+      self->ignore_func_data_destroy = NULL;
+
+      notify (data);
+    }
+
+  self->ignore_func = ignore_func;
+  self->ignore_func_data = ignore_func_data;
+  self->ignore_func_data_destroy = ignore_func_data_destroy;
 }
