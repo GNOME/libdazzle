@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef DZL_RECURSIVE_FILE_MONITOR_H
+#define DZL_RECURSIVE_FILE_MONITOR_H
 
 #include <gio/gio.h>
 
@@ -31,3 +32,5 @@ GFile                   *dzl_recursive_file_monitor_get_root (DzlRecursiveFileMo
 void                     dzl_recursive_file_monitor_cancel   (DzlRecursiveFileMonitor *self);
 
 G_END_DECLS
+
+#endif /* DZL_RECURSIVE_FILE_MONITOR_H */
