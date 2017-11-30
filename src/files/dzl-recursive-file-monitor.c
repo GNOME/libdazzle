@@ -21,6 +21,21 @@
 #include "files/dzl-recursive-file-monitor.h"
 #include "util/dzl-macros.h"
 
+/**
+ * SECTION:dzl-recursive-file-monitor
+ * @title: DzlRecursiveFileMonitor
+ * @short_description: a recursive directory monitor
+ *
+ * This works by creating a #GFileMonitor for each directory underneath a root
+ * directory (and recursively beyond that).
+ *
+ * This is only designed for use on Linux, where we are using a single inotify
+ * FD. You can still hit the max watch limit, but it is much higher than the FD
+ * limit.
+ *
+ * Since: 3.28
+ */
+
 struct _DzlRecursiveFileMonitor
 {
   GObject       parent_instance;
