@@ -306,18 +306,7 @@ dzl_recursive_file_monitor_dispose (GObject *object)
 
   dzl_clear_source (&self->start_handler);
   g_cancellable_cancel (self->cancellable);
-
-  if (self->ignore_func_data && self->ignore_func_data_destroy)
-    {
-      gpointer data = self->ignore_func_data;
-      GDestroyNotify notify = self->ignore_func_data_destroy;
-
-      self->ignore_func = NULL;
-      self->ignore_func_data = NULL;
-      self->ignore_func_data_destroy = NULL;
-
-      notify (data);
-    }
+  dzl_recursive_file_monitor_set_ignore_func (self, NULL, NULL, NULL);
 
   G_OBJECT_CLASS (dzl_recursive_file_monitor_parent_class)->dispose (object);
 }
