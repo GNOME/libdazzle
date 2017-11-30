@@ -47,6 +47,7 @@ G_BEGIN_DECLS
 #include "cache/dzl-task-cache.h"
 #include "files/dzl-directory-model.h"
 #include "files/dzl-directory-reaper.h"
+#include "files/dzl-recursive-file-monitor.h"
 #include "graphing/dzl-cpu-graph.h"
 #include "graphing/dzl-cpu-model.h"
 #include "graphing/dzl-graph-column.h"
