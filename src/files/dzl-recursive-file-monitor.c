@@ -76,6 +76,9 @@ G_DEFINE_TYPE (DzlRecursiveFileMonitor, dzl_recursive_file_monitor, G_TYPE_OBJEC
 static GParamSpec *properties [N_PROPS];
 static guint signals [N_SIGNALS];
 
+/*
+ * You must hold the lock when calling this function.
+ */
 static gboolean
 dzl_recursive_file_monitor_ignored (DzlRecursiveFileMonitor *self,
                                     GFile                   *file)
@@ -86,6 +89,9 @@ dzl_recursive_file_monitor_ignored (DzlRecursiveFileMonitor *self,
   return self->ignore_func (file, self->ignore_func_data);
 }
 
+/*
+ * You must hold the lock when calling this function.
+ */
 static void
 dzl_recursive_file_monitor_unwatch (DzlRecursiveFileMonitor *self,
                                     GFile                   *file)
@@ -122,29 +128,31 @@ dzl_recursive_file_monitor_changed (DzlRecursiveFileMonitor *self,
   if (g_cancellable_is_cancelled (self->cancellable))
     return;
 
+  g_mutex_lock (&self->monitor_lock);
+
   if (dzl_recursive_file_monitor_ignored (self, file))
-    return;
+    goto unlock;
 
   if (event == G_FILE_MONITOR_EVENT_DELETED)
     {
-      g_mutex_lock (&self->monitor_lock);
       if (g_hash_table_contains (self->monitors_by_file, file))
         dzl_recursive_file_monitor_unwatch (self, file);
-      g_mutex_unlock (&self->monitor_lock);
     }
   else if (event == G_FILE_MONITOR_EVENT_CREATED)
     {
       if (g_file_query_file_type (file, 0, NULL) == G_FILE_TYPE_DIRECTORY)
-        {
-          g_mutex_lock (&self->monitor_lock);
-          dzl_recursive_file_monitor_watch (self, file, self->cancellable, NULL);
-          g_mutex_unlock (&self->monitor_lock);
-        }
+        dzl_recursive_file_monitor_watch (self, file, self->cancellable, NULL);
     }
 
   g_signal_emit (self, signals [CHANGED], 0, file, other_file, event);
+
+unlock:
+  g_mutex_unlock (&self->monitor_lock);
 }
 
+/*
+ * You must hold the lock when calling this function.
+ */
 static gboolean
 dzl_recursive_file_monitor_watch (DzlRecursiveFileMonitor  *self,
                                   GFile                    *directory,
@@ -499,6 +507,8 @@ dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor *self,
       ignore_func_data_destroy = NULL;
     }
 
+  g_mutex_lock (&self->monitor_lock);
+
   if (self->ignore_func_data && self->ignore_func_data_destroy)
     {
       gpointer data = self->ignore_func_data;
@@ -508,10 +518,16 @@ dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor *self,
       self->ignore_func_data = NULL;
       self->ignore_func_data_destroy = NULL;
 
+      g_mutex_unlock (&self->monitor_lock);
+
       notify (data);
+
+      g_mutex_lock (&self->monitor_lock);
     }
 
   self->ignore_func = ignore_func;
   self->ignore_func_data = ignore_func_data;
   self->ignore_func_data_destroy = ignore_func_data_destroy;
+
+  g_mutex_unlock (&self->monitor_lock);
 }
