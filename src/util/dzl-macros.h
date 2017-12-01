@@ -22,6 +22,11 @@
 #include <glib.h>
 #include <string.h>
 
+#ifdef __linux__
+# include <sys/types.h>
+# include <sys/syscall.h>
+#endif
+
 G_BEGIN_DECLS
 
 #if defined(_MSC_VER)
@@ -77,6 +82,28 @@ dzl_clear_source (guint *source_ptr)
   *source_ptr = 0;
   if (source != 0)
     g_source_remove (source);
+}
+
+static inline void
+dzl_assert_is_main_thread (void)
+{
+#ifndef __linux__
+  static GThread *main;
+  GThread *self = g_thread_self ();
+
+  if G_LIKELY (main == self)
+    return TRUE;
+
+  /* Slow path, rely on task id == process id */
+  if ((pid_t)syscall (SYS_gettid) == getpid ())
+    {
+      /* Allow for fast path next time */
+      main = self;
+      return;
+    }
+
+  g_assert_not_reached ();
+#endif
 }
 
 G_END_DECLS
