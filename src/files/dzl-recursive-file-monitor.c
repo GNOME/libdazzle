@@ -560,18 +560,14 @@ dzl_recursive_file_monitor_get_root (DzlRecursiveFileMonitor *self)
 /**
  * dzl_recursive_file_monitor_set_ignore_func:
  * @self: a #DzlRecursiveFileMonitor
- * @ignore_func: (scope async): a thread-safe #DzlRecursiveIgnoreFunc
+ * @ignore_func: (scope async): a #DzlRecursiveIgnoreFunc
  * @ignore_func_data: closure data for @ignore_func
  * @ignore_func_data_destroy: destroy notify for @ignore_func_data
  *
  * Sets a callback function to determine if a #GFile should be ignored
  * from signal emission.
  *
- * @ignore_func may be called from a thread other than the default
- * main thread, so any function used here MUST be thread-safe.
- *
- * Any use of a non-thread-safe callback for @ignore_func is a programmer
- * error.
+ * @ignore_func will always be called from the applications main thread.
  *
  * If @ignore_func is %NULL, it is set to the default which does not
  * ignore any files or directories.
