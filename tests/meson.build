@@ -343,13 +343,11 @@ test_pattern_spec = executable('test-pattern-spec', 'test-pattern-spec.c',
 )
 test('test-pattern-spec', test_pattern_spec, env: test_env)
 
-# Test is not automated because file system notification is fairly
-# racey due to what else is going on with the system and how big
-# the notification queue depth is.
 test_recursive_monitor = executable('test-recursive-monitor', 'test-recursive-monitor.c',
         c_args: test_cflags,
      link_args: test_link_args,
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
+test('test-recursive-monitor', test_recursive_monitor, env: test_env)
 
 endif

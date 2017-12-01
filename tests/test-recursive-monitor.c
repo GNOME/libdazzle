@@ -3,36 +3,92 @@
 
 static const gchar *layer1[] = { "a", "b", "c", "d", "e", "f", "g", "h", "i", NULL };
 static const gchar *layer2[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", NULL };
-static GMainLoop *main_loop;
-static GHashTable *created;
-static GHashTable *deleted;
 
-static void
-sync_for_changes (void)
+enum {
+  MODE_CREATE,
+  MODE_DELETE,
+};
+
+typedef struct
 {
-  GMainContext *context = g_main_loop_get_context (main_loop);
-  gint64 enter = g_get_monotonic_time ();
+  GMainLoop               *main_loop;
+  DzlRecursiveFileMonitor *monitor;
+  GHashTable              *created;
+  GHashTable              *deleted;
+  GQueue                   dirs;
+  GList                   *iter;
+  guint                    mode : 1;
+  guint                    did_action : 1;
+} BasicState;
 
-  /*
-   * we need to spin a little bit while we wait for things
-   * to complete.
-   */
+static gboolean
+failed_timeout (gpointer state)
+{
+  /* timed out */
+  g_assert_not_reached ();
+  return G_SOURCE_REMOVE;
+}
 
-  for (;;)
+static gboolean
+begin_test_basic (gpointer data)
+{
+  g_autoptr(GError) error = NULL;
+  BasicState *state = data;
+  GFile *current;
+  gboolean r;
+
+  g_assert (state != NULL);
+  g_assert (state->iter != NULL);
+  g_assert (state->iter->data != NULL);
+  g_assert (G_IS_FILE (state->iter->data));
+
+  current = state->iter->data;
+
+  if (state->mode == MODE_CREATE)
     {
-      gint64 now;
+      if (g_hash_table_contains (state->created, current))
+        {
+          state->iter = state->iter->next;
+          state->did_action = FALSE;
 
-      if (g_main_context_pending (context))
-        g_main_context_iteration (context, FALSE);
-
-      now = g_get_monotonic_time ();
-
-      /* Spin at least a milliseconds */
-      if ((now - enter) > (G_USEC_PER_SEC / 1000))
-        break;
+          if (state->iter == NULL)
+            {
+              state->mode = MODE_DELETE;
+              state->iter = state->dirs.tail;
+            }
+        }
+      else if (!state->did_action)
+        {
+          state->did_action = TRUE;
+          r = g_file_make_directory (current, NULL, &error);
+          g_assert_no_error (error);
+          g_assert_cmpint (r, ==, TRUE);
+        }
     }
+  else if (state->mode == MODE_DELETE)
+    {
+      if (g_hash_table_contains (state->deleted, current))
+        {
+          state->iter = state->iter->prev;
+          state->did_action = FALSE;
 
-  g_main_context_iteration (context, FALSE);
+          if (state->iter == NULL)
+            {
+              g_main_loop_quit (state->main_loop);
+              return G_SOURCE_REMOVE;
+            }
+        }
+      else if (!state->did_action)
+        {
+          state->did_action = TRUE;
+          g_file_delete (current, NULL, &error);
+          g_assert_no_error (error);
+        }
+    }
+  else
+    g_assert_not_reached ();
+
+  return G_SOURCE_CONTINUE;
 }
 
 static void
@@ -42,27 +98,60 @@ monitor_changed_cb (DzlRecursiveFileMonitor *monitor,
                     GFileMonitorEvent        event,
                     gpointer                 data)
 {
-  sync_for_changes ();
+  BasicState *state = data;
 
   if (event == G_FILE_MONITOR_EVENT_CREATED)
-    g_hash_table_insert (created, g_object_ref (file), NULL);
+    g_hash_table_insert (state->created, g_object_ref (file), NULL);
   else if (event == G_FILE_MONITOR_EVENT_DELETED)
-    g_hash_table_insert (deleted, g_object_ref (file), NULL);
+    g_hash_table_insert (state->deleted, g_object_ref (file), NULL);
+}
+
+static void
+started_cb (GObject      *object,
+            GAsyncResult *result,
+            gpointer      user_data)
+{
+  DzlRecursiveFileMonitor *monitor = (DzlRecursiveFileMonitor *)object;
+  BasicState *state = user_data;
+  g_autoptr(GError) error = NULL;
+  gboolean r;
+
+  g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (monitor));
+
+  r = dzl_recursive_file_monitor_start_finish (monitor, result, &error);
+  g_assert_no_error (error);
+  g_assert_cmpint (r, ==, TRUE);
+
+  /*
+   * Now start the async test processing. We use a very
+   * low priority idle to ensure other things process before us.
+   */
+
+  state->iter = state->dirs.head;
+  state->did_action = FALSE;
+  state->mode = MODE_CREATE;
+  g_idle_add_full (G_MAXINT, begin_test_basic, state, NULL);
 }
 
 static void
 test_basic (void)
 {
-  g_autoptr(DzlRecursiveFileMonitor) monitor = NULL;
   g_autoptr(GFile) dir = g_file_new_for_path ("recursive-dir");
-  g_autoptr(GPtrArray) dirs = NULL;
+  BasicState state = { 0 };
   gint r;
 
-  main_loop = g_main_loop_new (NULL, FALSE);
+  state.main_loop = g_main_loop_new (NULL, FALSE);
+  g_queue_init (&state.dirs);
+  state.created = g_hash_table_new_full (g_file_hash,
+                                         (GEqualFunc) g_file_equal,
+                                         g_object_unref,
+                                         g_object_unref);
+  state.deleted = g_hash_table_new_full (g_file_hash,
+                                         (GEqualFunc) g_file_equal,
+                                         g_object_unref,
+                                         g_object_unref);
 
-  created = g_hash_table_new_full (g_file_hash, (GEqualFunc) g_file_equal, g_object_unref, g_object_unref);
-  deleted = g_hash_table_new_full (g_file_hash, (GEqualFunc) g_file_equal, g_object_unref, g_object_unref);
-
+  /* Cleanup any previously failed run */
   if (g_file_test ("recursive-dir", G_FILE_TEST_EXISTS))
     {
       g_autoptr(DzlDirectoryReaper) reaper = dzl_directory_reaper_new ();
@@ -74,62 +163,35 @@ test_basic (void)
       g_assert_cmpint (r, ==, 0);
     }
 
+  /* Create our root directory to use */
   r = g_mkdir ("recursive-dir", 0750);
   g_assert_cmpint (r, ==, 0);
 
-  monitor = dzl_recursive_file_monitor_new (dir);
-  g_assert (monitor != NULL);
-  sync_for_changes ();
-
-  g_signal_connect (monitor,
-                    "changed",
-                    G_CALLBACK (monitor_changed_cb),
-                    NULL);
-
-  /* Make a bunch of directories while we monitor. We'll add files to
-   * the directories afterwards, and then ensure we got notified. This
-   * allows us to ensure that we track changes as we add dirs.
-   */
-  dirs = g_ptr_array_new_with_free_func (g_object_unref);
-
+  /* Build our list of directories to create/test */
   for (guint i = 0; layer1[i]; i++)
     {
-      g_autofree gchar *first = g_build_filename ("recursive-dir", layer1[i], NULL);
-      g_autoptr(GFile) file1 = g_file_new_for_path (first);
+      g_autoptr(GFile) file1 = g_file_new_build_filename ("recursive-dir", layer1[i], NULL);
 
-      r = g_mkdir (first, 0750);
-      g_assert_cmpint (r, ==, 0);
-      sync_for_changes ();
-
-      g_ptr_array_add (dirs, g_object_ref (file1));
-
-      g_assert (g_hash_table_contains (created, file1));
+      g_queue_push_tail (&state.dirs, g_object_ref (file1));
 
       for (guint j = 0; layer2[j]; j++)
         {
-          g_autofree gchar *second = g_build_filename (first, layer2[j], NULL);
-          g_autoptr(GFile) file2 = g_file_new_for_path (second);
-
-          r = g_mkdir (second, 0750);
-          g_assert_cmpint (r, ==, 0);
-          sync_for_changes ();
-
-          g_assert (g_hash_table_contains (created, file2));
-
-          g_ptr_array_add (dirs, g_object_ref (file2));
+          g_autoptr(GFile) file2 = g_file_get_child (file1, layer2[j]);
+          g_queue_push_tail (&state.dirs, g_steal_pointer (&file2));
         }
     }
 
-  for (guint i = dirs->len; i > 0; i--)
-    {
-      GFile *file = g_ptr_array_index (dirs, i - 1);
+  state.monitor = dzl_recursive_file_monitor_new (dir);
+  g_signal_connect (state.monitor, "changed", G_CALLBACK (monitor_changed_cb), &state);
 
-      r = g_file_delete (file, NULL, NULL);
-      g_assert_cmpint (r, ==, TRUE);
-      sync_for_changes ();
+  /* Add a timeout to avoid infinite running */
+  g_timeout_add_seconds (3, failed_timeout, &state);
 
-      g_assert (g_hash_table_contains (deleted, file));
-    }
+  dzl_recursive_file_monitor_start_async (state.monitor, NULL, started_cb, &state);
+
+  g_main_loop_run (state.main_loop);
+
+  dzl_recursive_file_monitor_cancel (state.monitor);
 }
 
 gint
