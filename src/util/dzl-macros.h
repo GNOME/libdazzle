@@ -87,7 +87,8 @@ dzl_clear_source (guint *source_ptr)
 static inline void
 dzl_assert_is_main_thread (void)
 {
-#ifndef __linux__
+#ifndef G_DISABLE_ASSERT
+# ifndef __linux__
   static GThread *main;
   GThread *self = g_thread_self ();
 
@@ -103,6 +104,7 @@ dzl_assert_is_main_thread (void)
     }
 
   g_assert_not_reached ();
+# endif
 #endif
 }
 
