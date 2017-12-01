@@ -21,6 +21,8 @@
 #include "files/dzl-recursive-file-monitor.h"
 #include "util/dzl-macros.h"
 
+#define MONITOR_FLAGS 0
+
 /**
  * SECTION:dzl-recursive-file-monitor
  * @title: DzlRecursiveFileMonitor
@@ -43,15 +45,12 @@ struct _DzlRecursiveFileMonitor
   GFile                  *root;
   GCancellable           *cancellable;
 
-  GMutex                  monitor_lock;
   GHashTable             *monitors_by_file;
   GHashTable             *files_by_monitor;
 
   DzlRecursiveIgnoreFunc  ignore_func;
   gpointer                ignore_func_data;
   GDestroyNotify          ignore_func_data_destroy;
-
-  guint                   start_handler;
 };
 
 enum {
@@ -65,39 +64,23 @@ enum {
   N_SIGNALS
 };
 
-static gboolean
-dzl_recursive_file_monitor_watch (DzlRecursiveFileMonitor  *self,
-                                  GFile                    *directory,
-                                  GCancellable             *cancellable,
-                                  GError                  **error);
-
 G_DEFINE_TYPE (DzlRecursiveFileMonitor, dzl_recursive_file_monitor, G_TYPE_OBJECT)
 
 static GParamSpec *properties [N_PROPS];
 static guint signals [N_SIGNALS];
 
-/*
- * You must hold the lock when calling this function.
- */
-static gboolean
-dzl_recursive_file_monitor_ignored (DzlRecursiveFileMonitor *self,
-                                    GFile                   *file)
-{
-  g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
-  g_assert (G_IS_FILE (file));
+static void
+dzl_recursive_file_monitor_track (DzlRecursiveFileMonitor *self,
+                                  GFile                   *dir,
+                                  GFileMonitor            *monitor);
 
-  return self->ignore_func (file, self->ignore_func_data);
-}
-
-/*
- * You must hold the lock when calling this function.
- */
 static void
 dzl_recursive_file_monitor_unwatch (DzlRecursiveFileMonitor *self,
                                     GFile                   *file)
 {
   GFileMonitor *monitor;
 
+  dzl_assert_is_main_thread ();
   g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
   g_assert (G_IS_FILE (file));
 
@@ -114,12 +97,137 @@ dzl_recursive_file_monitor_unwatch (DzlRecursiveFileMonitor *self,
 }
 
 static void
+dzl_recursive_file_monitor_collect_recursive (GPtrArray    *dirs,
+                                              GFile        *parent,
+                                              GCancellable *cancellable)
+{
+  g_autoptr(GFileEnumerator) enumerator = NULL;
+  g_autoptr(GError) error = NULL;
+  guint begin;
+  guint end;
+
+  g_assert (dirs != NULL);
+  g_assert (G_IS_FILE (parent));
+  g_assert (G_IS_CANCELLABLE (cancellable));
+
+  begin = dirs->len;
+
+  enumerator = g_file_enumerate_children (parent,
+                                          G_FILE_ATTRIBUTE_STANDARD_NAME","
+                                          G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                          cancellable, &error);
+
+  if (error != NULL)
+    {
+      g_warning ("Failed to iterate children: %s", error->message);
+      g_clear_error (&error);
+    }
+
+  if (enumerator != NULL)
+    {
+      gpointer infoptr;
+
+      while (NULL != (infoptr = g_file_enumerator_next_file (enumerator, cancellable, NULL)))
+        {
+          g_autoptr(GFileInfo) info = infoptr;
+
+          if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+            {
+              const gchar *name = g_file_info_get_name (info);
+              g_ptr_array_add (dirs, g_file_get_child (parent, name));
+            }
+        }
+
+      g_file_enumerator_close (enumerator, cancellable, NULL);
+      g_clear_object (&enumerator);
+    }
+
+  end = dirs->len;
+
+  for (guint i = begin; i < end; i++)
+    {
+      GFile *child = g_ptr_array_index (dirs, i);
+
+      dzl_recursive_file_monitor_collect_recursive (dirs, child, cancellable);
+    }
+}
+
+static void
+dzl_recursive_file_monitor_collect_worker (GTask        *task,
+                                           gpointer      source_object,
+                                           gpointer      task_data,
+                                           GCancellable *cancellable)
+{
+  g_autoptr(GPtrArray) dirs = NULL;
+  GFile *root = task_data;
+
+  g_assert (G_IS_TASK (task));
+  g_assert (G_IS_FILE (root));
+
+  dirs = g_ptr_array_new_with_free_func (g_object_unref);
+  g_ptr_array_add (dirs, g_object_ref (root));
+  dzl_recursive_file_monitor_collect_recursive (dirs, root, cancellable);
+
+  g_task_return_pointer (task,
+                         g_steal_pointer (&dirs),
+                         (GDestroyNotify)g_ptr_array_unref);
+}
+
+static void
+dzl_recursive_file_monitor_collect (DzlRecursiveFileMonitor *self,
+                                    GFile                   *root,
+                                    GCancellable            *cancellable,
+                                    GAsyncReadyCallback      callback,
+                                    gpointer                 user_data)
+{
+  g_autoptr(GTask) task = NULL;
+
+  g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
+  g_assert (G_IS_FILE (root));
+  g_assert (G_IS_CANCELLABLE (cancellable));
+
+  task = g_task_new (self, cancellable, callback, user_data);
+  g_task_set_source_tag (task, dzl_recursive_file_monitor_collect);
+  g_task_set_priority (task, G_PRIORITY_LOW);
+  g_task_set_task_data (task, g_object_ref (root), g_object_unref);
+  g_task_run_in_thread (task, dzl_recursive_file_monitor_collect_worker);
+}
+
+static GPtrArray *
+dzl_recursive_file_monitor_collect_finish (DzlRecursiveFileMonitor  *self,
+                                           GAsyncResult             *result,
+                                           GError                  **error)
+{
+  g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
+  g_assert (G_IS_TASK (result));
+  g_assert (g_task_is_valid (G_TASK (result), self));
+
+  return g_task_propagate_pointer (G_TASK (result), error);
+}
+
+static gboolean
+dzl_recursive_file_monitor_ignored (DzlRecursiveFileMonitor *self,
+                                    GFile                   *file)
+{
+  dzl_assert_is_main_thread ();
+  g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
+  g_assert (G_IS_FILE (file));
+
+  if (self->ignore_func != NULL)
+    return self->ignore_func (file, self->ignore_func_data);
+
+  return FALSE;
+}
+
+static void
 dzl_recursive_file_monitor_changed (DzlRecursiveFileMonitor *self,
                                     GFile                   *file,
                                     GFile                   *other_file,
                                     GFileMonitorEvent        event,
                                     GFileMonitor            *monitor)
 {
+  dzl_assert_is_main_thread ();
   g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
   g_assert (G_IS_FILE (file));
   g_assert (!other_file || G_IS_FILE (file));
@@ -128,10 +236,8 @@ dzl_recursive_file_monitor_changed (DzlRecursiveFileMonitor *self,
   if (g_cancellable_is_cancelled (self->cancellable))
     return;
 
-  g_mutex_lock (&self->monitor_lock);
-
   if (dzl_recursive_file_monitor_ignored (self, file))
-    goto unlock;
+    return;
 
   if (event == G_FILE_MONITOR_EVENT_DELETED)
     {
@@ -141,133 +247,145 @@ dzl_recursive_file_monitor_changed (DzlRecursiveFileMonitor *self,
   else if (event == G_FILE_MONITOR_EVENT_CREATED)
     {
       if (g_file_query_file_type (file, 0, NULL) == G_FILE_TYPE_DIRECTORY)
-        dzl_recursive_file_monitor_watch (self, file, self->cancellable, NULL);
+        {
+          g_autoptr(GPtrArray) dirs = NULL;
+
+          dirs = g_ptr_array_new_with_free_func (g_object_unref);
+          g_ptr_array_add (dirs, g_object_ref (file));
+
+          dzl_recursive_file_monitor_collect_recursive (dirs, file, self->cancellable);
+
+          for (guint i = 0; i < dirs->len; i++)
+            {
+              g_autoptr(GFileMonitor) dir_monitor = NULL;
+              GFile *dir = g_ptr_array_index (dirs, i);
+
+              if (!!(dir_monitor = g_file_monitor_directory (dir, MONITOR_FLAGS, self->cancellable, NULL)))
+                dzl_recursive_file_monitor_track (self, dir, dir_monitor);
+            }
+        }
     }
 
   g_signal_emit (self, signals [CHANGED], 0, file, other_file, event);
-
-unlock:
-  g_mutex_unlock (&self->monitor_lock);
 }
 
-/*
- * You must hold the lock when calling this function.
- */
-static gboolean
-dzl_recursive_file_monitor_watch (DzlRecursiveFileMonitor  *self,
-                                  GFile                    *directory,
-                                  GCancellable             *cancellable,
-                                  GError                  **error)
+
+static void
+dzl_recursive_file_monitor_track (DzlRecursiveFileMonitor *self,
+                                  GFile                   *dir,
+                                  GFileMonitor            *monitor)
 {
-  g_autoptr(GFileMonitor) monitor = NULL;
-
+  dzl_assert_is_main_thread ();
   g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
-  g_assert (G_IS_FILE (directory));
-  g_assert (G_IS_CANCELLABLE (cancellable));
+  g_assert (G_IS_FILE (dir));
+  g_assert (G_IS_FILE_MONITOR (monitor));
 
-  monitor = g_file_monitor_directory (directory, 0, cancellable, error);
+  g_hash_table_insert (self->monitors_by_file,
+                       g_object_ref (dir),
+                       g_object_ref (monitor));
 
-  if (monitor == NULL)
-    return FALSE;
+  g_hash_table_insert (self->files_by_monitor,
+                       g_object_ref (monitor),
+                       g_object_ref (dir));
 
   g_signal_connect_object (monitor,
                            "changed",
                            G_CALLBACK (dzl_recursive_file_monitor_changed),
                            self,
                            G_CONNECT_SWAPPED);
-
-  g_hash_table_insert (self->monitors_by_file,
-                       g_object_ref (directory),
-                       g_object_ref (monitor));
-
-  g_hash_table_insert (self->files_by_monitor,
-                       g_object_ref (monitor),
-                       g_object_ref (directory));
-
-  return TRUE;
 }
 
 static void
-dzl_recursive_file_monitor_worker (GTask        *task,
-                                   gpointer      source_object,
-                                   gpointer      task_data,
-                                   GCancellable *cancellable)
+dzl_recursive_file_monitor_start_cb (GObject      *object,
+                                     GAsyncResult *result,
+                                     gpointer      user_data)
 {
-  DzlRecursiveFileMonitor *self = source_object;
-  g_autoptr(GFileEnumerator) enumerator = NULL;
+  DzlRecursiveFileMonitor *self = (DzlRecursiveFileMonitor *)object;
+  g_autoptr(GPtrArray) dirs = NULL;
   g_autoptr(GError) error = NULL;
-  gpointer infoptr;
-  GFile *root = task_data;
+  g_autoptr(GTask) task = user_data;
 
+  dzl_assert_is_main_thread ();
   g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
-  g_assert (G_IS_FILE (root));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (G_IS_TASK (task));
 
-  /* Short circuit if we were cancelled */
-  if (g_cancellable_is_cancelled (cancellable))
-    return;
+  dirs = dzl_recursive_file_monitor_collect_finish (self, result, &error);
 
-  /* Make sure our root is a directory that exists */
-  if (g_file_query_file_type (root, 0, cancellable) != G_FILE_TYPE_DIRECTORY)
-    return;
-
-  g_mutex_lock (&self->monitor_lock);
-
-  if (!dzl_recursive_file_monitor_watch (self, root, cancellable, &error))
-    goto cleanup;
-
-  enumerator = g_file_enumerate_children (root,
-                                          G_FILE_ATTRIBUTE_STANDARD_NAME","
-                                          G_FILE_ATTRIBUTE_STANDARD_TYPE,
-                                          G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
-                                          cancellable, &error);
-
-  while (NULL != (infoptr = g_file_enumerator_next_file (enumerator, cancellable, &error)))
+  if (dirs == NULL)
     {
-      g_autoptr(GFileInfo) info = infoptr;
-      g_autoptr(GFile) child = NULL;
-
-      if (g_file_info_get_file_type (info) != G_FILE_TYPE_DIRECTORY)
-        continue;
-
-      child = g_file_get_child (root, g_file_info_get_name (info));
-
-      if (dzl_recursive_file_monitor_ignored (self, child))
-        continue;
-
-      if (!dzl_recursive_file_monitor_watch (self, child, cancellable, &error))
-        break;
+      g_task_return_error (task, g_steal_pointer (&error));
+      return;
     }
 
-cleanup:
-  g_file_enumerator_close (enumerator, cancellable, NULL);
+  for (guint i = 0; i < dirs->len; i++)
+    {
+      GFile *dir = g_ptr_array_index (dirs, i);
+      g_autoptr(GFileMonitor) monitor = NULL;
 
-  g_mutex_unlock (&self->monitor_lock);
+      g_assert (G_IS_FILE (dir));
 
-  if (error != NULL)
-    g_task_return_error (task, g_steal_pointer (&error));
-  else
-    g_task_return_boolean (task, TRUE);
+      if (dzl_recursive_file_monitor_ignored (self, dir))
+        continue;
+
+      monitor = g_file_monitor_directory (dir, MONITOR_FLAGS, self->cancellable, &error);
+
+      if (monitor == NULL)
+        {
+          g_warning ("Failed to monitor directory: %s", error->message);
+          g_clear_error (&error);
+          continue;
+        }
+
+      dzl_recursive_file_monitor_track (self, dir, monitor);
+    }
+
+  g_task_return_boolean (task, TRUE);
 }
 
-static gboolean
-dzl_recursive_file_monitor_start (gpointer data)
+void
+dzl_recursive_file_monitor_start_async (DzlRecursiveFileMonitor *self,
+                                        GCancellable            *cancellable,
+                                        GAsyncReadyCallback      callback,
+                                        gpointer                 user_data)
 {
-  DzlRecursiveFileMonitor *self = data;
   g_autoptr(GTask) task = NULL;
 
-  g_assert (DZL_IS_RECURSIVE_FILE_MONITOR (self));
-  g_assert (G_IS_FILE (self->root));
+  g_return_if_fail (DZL_IS_RECURSIVE_FILE_MONITOR (self));
+  g_return_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable));
 
-  self->start_handler = 0;
-
-  task = g_task_new (self, self->cancellable, NULL, NULL);
-  g_task_set_source_tag (task, dzl_recursive_file_monitor_start);
-  g_task_set_priority (task, G_PRIORITY_LOW + 100);
-  g_task_set_task_data (task, g_object_ref (self->root), g_object_unref);
+  task = g_task_new (self, cancellable, callback, user_data);
+  g_task_set_source_tag (task, dzl_recursive_file_monitor_start_async);
   g_task_set_return_on_cancel (task, TRUE);
-  g_task_run_in_thread (task, dzl_recursive_file_monitor_worker);
+  g_task_set_task_data (task, g_object_ref (self->root), g_object_unref);
+  g_task_set_priority (task, G_PRIORITY_LOW);
 
-  return G_SOURCE_REMOVE;
+  if (self->root == NULL)
+    {
+      g_task_return_new_error (task,
+                               G_IO_ERROR,
+                               G_IO_ERROR_INVAL,
+                               "Cannot start file monitor, no root directory set");
+      return;
+    }
+
+  dzl_recursive_file_monitor_collect (self,
+                                      self->root,
+                                      self->cancellable,
+                                      dzl_recursive_file_monitor_start_cb,
+                                      g_steal_pointer (&task));
+}
+
+gboolean
+dzl_recursive_file_monitor_start_finish (DzlRecursiveFileMonitor  *self,
+                                         GAsyncResult             *result,
+                                         GError                  **error)
+{
+  g_return_val_if_fail (DZL_IS_RECURSIVE_FILE_MONITOR (self), FALSE);
+  g_return_val_if_fail (G_IS_TASK (result), FALSE);
+  g_return_val_if_fail (g_task_is_valid (G_TASK (result), self), FALSE);
+
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
@@ -278,25 +396,7 @@ dzl_recursive_file_monitor_constructed (GObject *object)
   G_OBJECT_CLASS (dzl_recursive_file_monitor_parent_class)->constructed (object);
 
   if (self->root == NULL)
-    {
-      g_warning ("%s created without a root directory", G_OBJECT_TYPE_NAME (self));
-      return;
-    }
-
-  /*
-   * Defer start to the main loop so that the caller can set
-   * things like the ignore func, but not require us to have
-   * soem annoying start/stop API.
-   */
-
-  self->start_handler = g_idle_add (dzl_recursive_file_monitor_start, self);
-}
-
-static gboolean
-default_ignore_func (GFile    *file,
-                     gpointer  user_data)
-{
-  return FALSE;
+    g_warning ("%s created without a root directory", G_OBJECT_TYPE_NAME (self));
 }
 
 static void
@@ -304,7 +404,6 @@ dzl_recursive_file_monitor_dispose (GObject *object)
 {
   DzlRecursiveFileMonitor *self = (DzlRecursiveFileMonitor *)object;
 
-  dzl_clear_source (&self->start_handler);
   g_cancellable_cancel (self->cancellable);
   dzl_recursive_file_monitor_set_ignore_func (self, NULL, NULL, NULL);
 
@@ -406,14 +505,12 @@ dzl_recursive_file_monitor_class_init (DzlRecursiveFileMonitorClass *klass)
 static void
 dzl_recursive_file_monitor_init (DzlRecursiveFileMonitor *self)
 {
-  g_mutex_init (&self->monitor_lock);
   self->cancellable = g_cancellable_new ();
   self->files_by_monitor = g_hash_table_new_full (NULL, NULL, g_object_unref, g_object_unref);
   self->monitors_by_file = g_hash_table_new_full (g_file_hash,
                                                   (GEqualFunc) g_file_equal,
                                                   g_object_unref,
                                                   g_object_unref);
-  self->ignore_func = default_ignore_func;
 }
 
 DzlRecursiveFileMonitor *
@@ -487,16 +584,14 @@ dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor *self,
                                             gpointer                 ignore_func_data,
                                             GDestroyNotify           ignore_func_data_destroy)
 {
+  dzl_assert_is_main_thread ();
   g_return_if_fail (DZL_IS_RECURSIVE_FILE_MONITOR (self));
 
   if (ignore_func == NULL)
     {
-      ignore_func = default_ignore_func;
       ignore_func_data = NULL;
       ignore_func_data_destroy = NULL;
     }
-
-  g_mutex_lock (&self->monitor_lock);
 
   if (self->ignore_func_data && self->ignore_func_data_destroy)
     {
@@ -507,16 +602,10 @@ dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor *self,
       self->ignore_func_data = NULL;
       self->ignore_func_data_destroy = NULL;
 
-      g_mutex_unlock (&self->monitor_lock);
-
       notify (data);
-
-      g_mutex_lock (&self->monitor_lock);
     }
 
   self->ignore_func = ignore_func;
   self->ignore_func_data = ignore_func_data;
   self->ignore_func_data_destroy = ignore_func_data_destroy;
-
-  g_mutex_unlock (&self->monitor_lock);
 }

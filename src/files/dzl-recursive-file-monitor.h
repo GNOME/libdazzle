@@ -30,13 +30,20 @@ G_DECLARE_FINAL_TYPE (DzlRecursiveFileMonitor, dzl_recursive_file_monitor, DZL, 
 typedef gboolean (*DzlRecursiveIgnoreFunc) (GFile    *file,
                                             gpointer  user_data);
 
-DzlRecursiveFileMonitor *dzl_recursive_file_monitor_new             (GFile                   *root);
-GFile                   *dzl_recursive_file_monitor_get_root        (DzlRecursiveFileMonitor *self);
-void                     dzl_recursive_file_monitor_cancel          (DzlRecursiveFileMonitor *self);
-void                     dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor *self,
-                                                                     DzlRecursiveIgnoreFunc   ignore_func,
-                                                                     gpointer                 ignore_func_data,
-                                                                     GDestroyNotify           ignore_func_data_destroy);
+DzlRecursiveFileMonitor *dzl_recursive_file_monitor_new             (GFile                    *root);
+GFile                   *dzl_recursive_file_monitor_get_root        (DzlRecursiveFileMonitor  *self);
+void                     dzl_recursive_file_monitor_start_async     (DzlRecursiveFileMonitor  *self,
+                                                                     GCancellable             *cancellable,
+                                                                     GAsyncReadyCallback       callback,
+                                                                     gpointer                  user_data);
+gboolean                 dzl_recursive_file_monitor_start_finish    (DzlRecursiveFileMonitor  *self,
+                                                                     GAsyncResult             *result,
+                                                                     GError                  **error);
+void                     dzl_recursive_file_monitor_cancel          (DzlRecursiveFileMonitor  *self);
+void                     dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor  *self,
+                                                                     DzlRecursiveIgnoreFunc    ignore_func,
+                                                                     gpointer                  ignore_func_data,
+                                                                     GDestroyNotify            ignore_func_data_destroy);
 
 G_END_DECLS
 
