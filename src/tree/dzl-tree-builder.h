@@ -57,7 +57,9 @@ struct _DzlTreeBuilderClass
 };
 
 DZL_AVAILABLE_IN_ALL
-DzlTree *dzl_tree_builder_get_tree (DzlTreeBuilder *builder);
+DzlTree        *dzl_tree_builder_get_tree (DzlTreeBuilder *builder);
+DZL_AVAILABLE_IN_3_28
+DzlTreeBuilder *dzl_tree_builder_new      (void);
 
 G_END_DECLS
 

@@ -370,3 +370,9 @@ static void
 dzl_tree_builder_init (DzlTreeBuilder *builder)
 {
 }
+
+DzlTreeBuilder *
+dzl_tree_builder_new (void)
+{
+  return g_object_new (DZL_TYPE_TREE_BUILDER, NULL);
+}
