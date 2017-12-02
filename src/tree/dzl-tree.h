@@ -63,6 +63,9 @@ struct _DzlTreeClass
                           const gchar *param);
   void (*populate_popup) (DzlTree     *self,
                           GtkWidget   *widget);
+
+  /*< private >*/
+  gpointer _padding[12];
 };
 
 DZL_AVAILABLE_IN_ALL
