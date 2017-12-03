@@ -201,6 +201,18 @@ dzl_file_transfer_add (DzlFileTransfer *self,
       DZL_EXIT;
     }
 
+  if (g_file_equal (src, dst))
+    {
+      g_warning ("Source and destination cannot be the same");
+      DZL_EXIT;
+    }
+
+  if (g_file_has_prefix (dst, src))
+    {
+      g_warning ("Destination cannot be within source");
+      DZL_EXIT;
+    }
+
   oper = g_slice_new0 (Oper);
   oper->src = g_object_ref (src);
   oper->dst = g_object_ref (dst);
