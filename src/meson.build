@@ -9,6 +9,8 @@ libdazzle_resources = gnome.compile_resources(
   c_name: 'dzl',
 )
 
+dzl_enum_headers = []
+
 version_data = configuration_data()
 version_data.set('DZL_MAJOR_VERSION', dazzle_version_major)
 version_data.set('DZL_MINOR_VERSION', dazzle_version_minor)
@@ -63,6 +65,16 @@ subdir('theming')
 subdir('tree')
 subdir('util')
 subdir('widgets')
+
+dzl_enums = gnome.mkenums('dzl-enums',
+      h_template: 'dzl-enums.h.in',
+      c_template: 'dzl-enums.c.in',
+         sources: dzl_enum_headers,
+  install_header: true,
+     install_dir: libdazzle_header_dir,
+)
+libdazzle_public_sources += [dzl_enums[0]]
+libdazzle_generated_headers += [dzl_enums[1]]
 
 libdazzle_sources = [
   libdazzle_generated_headers,

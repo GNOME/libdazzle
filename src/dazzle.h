@@ -33,6 +33,7 @@ G_BEGIN_DECLS
 
 #define DAZZLE_INSIDE
 #include "dzl-version.h"
+#include "dzl-enums.h"
 #include "actions/dzl-action-group.h"
 #include "actions/dzl-child-property-action.h"
 #include "actions/dzl-properties-group.h"
@@ -47,6 +48,7 @@ G_BEGIN_DECLS
 #include "cache/dzl-task-cache.h"
 #include "files/dzl-directory-model.h"
 #include "files/dzl-directory-reaper.h"
+#include "files/dzl-file-transfer.h"
 #include "files/dzl-recursive-file-monitor.h"
 #include "graphing/dzl-cpu-graph.h"
 #include "graphing/dzl-cpu-model.h"

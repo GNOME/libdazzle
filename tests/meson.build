@@ -350,6 +350,13 @@ test_recursive_monitor = executable('test-recursive-monitor', 'test-recursive-mo
 )
 test('test-recursive-monitor', test_recursive_monitor, env: test_env)
 
+test_file_transfer = executable('test-file-transfer', 'test-file-transfer.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-file-transfer', test_file_transfer, env: test_env)
+
 test_tree = executable('test-tree', 'test-tree.c',
         c_args: test_cflags,
      link_args: test_link_args,
