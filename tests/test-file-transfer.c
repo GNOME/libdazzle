@@ -33,7 +33,9 @@ test_basic (void)
       g_autoptr(DzlDirectoryReaper) reaper = dzl_directory_reaper_new ();
 
       dzl_directory_reaper_add_directory (reaper, root, 0);
+      dzl_directory_reaper_add_directory (reaper, copy, 0);
       dzl_directory_reaper_add_file (reaper, root, 0);
+      dzl_directory_reaper_add_file (reaper, copy, 0);
       dzl_directory_reaper_execute (reaper, NULL, NULL);
 
       g_assert (!g_file_query_exists (root, NULL));
