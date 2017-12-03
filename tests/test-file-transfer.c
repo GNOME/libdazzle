@@ -20,26 +20,20 @@ write_file (const gchar *path)
 static void
 test_basic (void)
 {
-  g_autoptr(DzlFileTransfer) xfer = NULL;
+  g_autoptr(DzlFileTransfer) xfer = dzl_file_transfer_new ();
   g_autoptr(GFile) root = g_file_new_for_path ("test-file-transfer-data");
   g_autoptr(GFile) copy = g_file_new_for_path ("test-file-transfer-copy");
   g_autoptr(GError) error = NULL;
+  g_autoptr(DzlDirectoryReaper) reaper = dzl_directory_reaper_new ();
   gboolean r;
 
-  xfer = dzl_file_transfer_new ();
-
-  if (g_file_query_exists (root, NULL))
-    {
-      g_autoptr(DzlDirectoryReaper) reaper = dzl_directory_reaper_new ();
-
-      dzl_directory_reaper_add_directory (reaper, root, 0);
-      dzl_directory_reaper_add_directory (reaper, copy, 0);
-      dzl_directory_reaper_add_file (reaper, root, 0);
-      dzl_directory_reaper_add_file (reaper, copy, 0);
-      dzl_directory_reaper_execute (reaper, NULL, NULL);
-
-      g_assert (!g_file_query_exists (root, NULL));
-    }
+  dzl_directory_reaper_add_directory (reaper, root, 0);
+  dzl_directory_reaper_add_directory (reaper, copy, 0);
+  dzl_directory_reaper_add_file (reaper, root, 0);
+  dzl_directory_reaper_add_file (reaper, copy, 0);
+  dzl_directory_reaper_execute (reaper, NULL, NULL);
+  g_assert (!g_file_query_exists (root, NULL));
+  g_assert (!g_file_query_exists (copy, NULL));
 
   g_assert_cmpint (0, ==, g_mkdir ("test-file-transfer-data", 0750));
   g_assert_cmpint (0, ==, g_mkdir ("test-file-transfer-data/a", 0750));
