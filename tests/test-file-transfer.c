@@ -66,6 +66,10 @@ test_basic (void)
   r = dzl_file_transfer_execute (xfer, G_PRIORITY_DEFAULT, NULL, &error);
   g_assert_no_error (error);
   g_assert_cmpint (r, ==, TRUE);
+
+  dzl_directory_reaper_execute (reaper, NULL, NULL);
+  g_assert (!g_file_query_exists (root, NULL));
+  g_assert (!g_file_query_exists (copy, NULL));
 }
 
 gint
