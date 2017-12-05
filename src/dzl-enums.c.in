@@ -5,6 +5,7 @@
 #include "dzl-enums.h"
 
 #include "files/dzl-file-transfer.h"
+#include "tree/dzl-tree-types.h"
 
 /*** END file-header ***/
 

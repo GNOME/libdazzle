@@ -27,6 +27,13 @@ G_BEGIN_DECLS
 #define DZL_TYPE_TREE_NODE    (dzl_tree_node_get_type())
 #define DZL_TYPE_TREE_BUILDER (dzl_tree_builder_get_type())
 
+typedef enum
+{
+  DZL_TREE_DROP_INTO   = 0,
+  DZL_TREE_DROP_BEFORE = 1,
+  DZL_TREE_DROP_AFTER  = 2,
+} DzlTreeDropPosition;
+
 G_DECLARE_DERIVABLE_TYPE (DzlTree,        dzl_tree,         DZL, TREE,         GtkTreeView)
 G_DECLARE_DERIVABLE_TYPE (DzlTreeBuilder, dzl_tree_builder, DZL, TREE_BUILDER, GInitiallyUnowned)
 G_DECLARE_FINAL_TYPE     (DzlTreeNode,    dzl_tree_node,    DZL, TREE_NODE,    GInitiallyUnowned)
