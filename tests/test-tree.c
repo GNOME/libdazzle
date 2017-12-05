@@ -49,17 +49,19 @@ build_node_cb (DzlTreeBuilder *builder,
 }
 
 gint
-main (gint argc,
+main (gint   argc,
       gchar *argv[])
 {
+  g_autoptr(DzlTreeNode) root = NULL;
+  g_autoptr(GFile) home = NULL;
+  DzlTreeBuilder *builder;
   GtkWidget *window;
   GtkWidget *scroller;
   GtkWidget *tree;
-  DzlTreeBuilder *builder;
-  DzlTreeNode *root;
-  g_autoptr(GFile) file = NULL;
 
   gtk_init (&argc, &argv);
+
+  home = g_file_new_for_path (g_get_home_dir ());
 
   window = g_object_new (GTK_TYPE_WINDOW,
                          "default-width", 300,
@@ -67,11 +69,14 @@ main (gint argc,
                          "title", "Tree Test",
                          "visible", TRUE,
                          NULL);
+
   scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
                            "visible", TRUE,
                            NULL);
   gtk_container_add (GTK_CONTAINER (window), scroller);
+
   tree = g_object_new (DZL_TYPE_TREE,
+                       "show-icons", TRUE,
                        "headers-visible", FALSE,
                        "visible", TRUE,
                        NULL);
@@ -82,9 +87,7 @@ main (gint argc,
   dzl_tree_add_builder (DZL_TREE (tree), builder);
 
   root = dzl_tree_node_new ();
-  file = g_file_new_for_path ("/");
-  dzl_tree_node_set_item (root, G_OBJECT (file));
-
+  dzl_tree_node_set_item (root, G_OBJECT (home));
   dzl_tree_set_root (DZL_TREE (tree), root);
 
   g_signal_connect (window, "delete-event", gtk_main_quit, NULL);
