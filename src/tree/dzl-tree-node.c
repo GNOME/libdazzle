@@ -29,14 +29,17 @@ struct _DzlTreeNode
 {
   GInitiallyUnowned  parent_instance;
 
-  GObject           *item;
   DzlTreeNode       *parent;
+
+  GObject           *item;
   gchar             *text;
   DzlTree           *tree;
-  GQuark             icon_name;
-  GQuark             expanded_icon_name;
   GIcon             *gicon;
   GList             *emblems;
+
+  GQuark             icon_name;
+  GQuark             expanded_icon_name;
+
   guint              use_markup : 1;
   guint              needs_build : 1;
   guint              is_dummy : 1;
@@ -677,9 +680,9 @@ dzl_tree_node_finalize (GObject *object)
 
 static void
 dzl_tree_node_get_property (GObject    *object,
-                           guint       prop_id,
-                           GValue     *value,
-                           GParamSpec *pspec)
+                            guint       prop_id,
+                            GValue     *value,
+                            GParamSpec *pspec)
 {
   DzlTreeNode *node = DZL_TREE_NODE (object);
 
@@ -736,9 +739,9 @@ dzl_tree_node_get_property (GObject    *object,
 
 static void
 dzl_tree_node_set_property (GObject      *object,
-                           guint         prop_id,
-                           const GValue *value,
-                           GParamSpec   *pspec)
+                            guint         prop_id,
+                            const GValue *value,
+                            GParamSpec   *pspec)
 {
   DzlTreeNode *node = DZL_TREE_NODE (object);
 
