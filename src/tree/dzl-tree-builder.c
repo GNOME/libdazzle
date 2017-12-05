@@ -22,6 +22,7 @@
 
 #include "tree/dzl-tree.h"
 #include "tree/dzl-tree-builder.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -158,22 +159,8 @@ _dzl_tree_builder_set_tree (DzlTreeBuilder *builder,
   g_return_if_fail (priv->tree == NULL || DZL_IS_TREE (priv->tree));
   g_return_if_fail (DZL_IS_TREE (tree));
 
-  if (priv->tree != tree)
-    {
-      if (priv->tree != NULL)
-        {
-          g_object_remove_weak_pointer (G_OBJECT (priv->tree), (gpointer *)&priv->tree);
-          priv->tree = NULL;
-        }
-
-      if (tree != NULL)
-        {
-          priv->tree = tree;
-          g_object_add_weak_pointer (G_OBJECT (priv->tree), (gpointer *)&priv->tree);
-        }
-
-      g_object_notify_by_pspec (G_OBJECT (builder), properties [PROP_TREE]);
-    }
+  if (dzl_set_weak_pointer (&priv->tree, tree))
+    g_object_notify_by_pspec (G_OBJECT (builder), properties [PROP_TREE]);
 }
 
 /**
@@ -200,11 +187,7 @@ dzl_tree_builder_finalize (GObject *object)
   DzlTreeBuilder *builder = DZL_TREE_BUILDER (object);
   DzlTreeBuilderPrivate *priv = dzl_tree_builder_get_instance_private (builder);
 
-	if (priv->tree)
-    {
-      g_object_remove_weak_pointer (G_OBJECT (priv->tree), (gpointer *)&priv->tree);
-      priv->tree = NULL;
-    }
+  dzl_clear_weak_pointer (&priv->tree);
 
   G_OBJECT_CLASS (dzl_tree_builder_parent_class)->finalize (object);
 }

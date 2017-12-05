@@ -23,6 +23,7 @@
 #include "tree/dzl-tree.h"
 #include "tree/dzl-tree-node.h"
 #include "tree/dzl-tree-private.h"
+#include "util/dzl-macros.h"
 
 struct _DzlTreeNode
 {
@@ -114,20 +115,7 @@ _dzl_tree_node_set_tree (DzlTreeNode *node,
   g_return_if_fail (DZL_IS_TREE_NODE (node));
   g_return_if_fail (!tree || DZL_IS_TREE (tree));
 
-  if (node->tree != tree)
-    {
-      if (node->tree != NULL)
-        {
-          g_object_remove_weak_pointer (G_OBJECT (node->tree), (gpointer *)&node->tree);
-          node->tree = NULL;
-        }
-
-      if (tree != NULL)
-        {
-          node->tree = tree;
-          g_object_add_weak_pointer (G_OBJECT (node->tree), (gpointer *)&node->tree);
-        }
-    }
+  dzl_set_weak_pointer (&node->tree, tree);
 }
 
 /**
@@ -496,20 +484,7 @@ _dzl_tree_node_set_parent (DzlTreeNode *node,
   g_return_if_fail (node->parent == NULL);
   g_return_if_fail (!parent || DZL_IS_TREE_NODE (parent));
 
-  if (parent != node->parent)
-    {
-      if (node->parent != NULL)
-        {
-          g_object_remove_weak_pointer (G_OBJECT (node->parent), (gpointer *)&node->parent);
-          node->parent = NULL;
-        }
-
-      if (parent != NULL)
-        {
-          node->parent = parent;
-          g_object_add_weak_pointer (G_OBJECT (node->parent), (gpointer *)&node->parent);
-        }
-    }
+  dzl_set_weak_pointer (&node->parent, parent);
 }
 
 const gchar *
@@ -687,18 +662,8 @@ dzl_tree_node_finalize (GObject *object)
   g_clear_object (&self->item);
   g_clear_pointer (&self->text, g_free);
 
-  if (self->tree)
-    {
-      g_object_remove_weak_pointer (G_OBJECT (self->tree), (gpointer *)&self->tree);
-      self->tree = NULL;
-    }
-
-  if (self->parent)
-    {
-      g_object_remove_weak_pointer (G_OBJECT (self->parent),
-                                    (gpointer *)&self->parent);
-      self->parent = NULL;
-    }
+  dzl_clear_weak_pointer (&self->tree);
+  dzl_clear_weak_pointer (&self->parent);
 
   G_OBJECT_CLASS (dzl_tree_node_parent_class)->finalize (object);
 }
