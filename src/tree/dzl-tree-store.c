@@ -217,14 +217,18 @@ dzl_tree_store_drag_data_received (GtkTreeDragDest  *dest,
    */
   if (gtk_selection_data_get_target (data) == gdk_atom_intern_static_string ("GTK_TREE_MODEL_ROW"))
     {
-      g_autoptr(GtkTreePath) src_path = NULL;
+      GtkTreePath *src_path = NULL;
       GtkTreeModel *model = NULL;
 
       if (gtk_tree_get_row_drag_data (data, &model, &src_path))
         {
           GtkTreeIter iter;
+          gboolean found;
 
-          if (gtk_tree_model_get_iter (model, &iter, src_path))
+          found = gtk_tree_model_get_iter (model, &iter, src_path);
+          g_clear_pointer (&src_path, gtk_tree_path_free);
+
+          if (found)
             {
               g_autoptr(DzlTreeNode) drag_node = NULL;
 
