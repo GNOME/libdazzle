@@ -66,6 +66,18 @@ void          _dzl_tree_builder_removed                 (DzlTreeBuilder         
                                                          DzlTree                *tree);
 void          _dzl_tree_builder_build_node              (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node);
+gboolean      _dzl_tree_builder_drag_data_get           (DzlTreeBuilder         *builder,
+                                                         DzlTreeNode            *node,
+                                                         GtkSelectionData       *data);
+gboolean      _dzl_tree_builder_drag_data_received      (DzlTreeBuilder         *builder,
+                                                         DzlTreeNode            *drop_node,
+                                                         DzlTreeDropPosition     position,
+                                                         GtkSelectionData       *data);
+gboolean      _dzl_tree_builder_drag_node_received      (DzlTreeBuilder         *builder,
+                                                         DzlTreeNode            *drag_node,
+                                                         DzlTreeNode            *drop_node,
+                                                         DzlTreeDropPosition     position,
+                                                         GtkSelectionData       *data);
 gboolean      _dzl_tree_builder_node_activated          (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node);
 void          _dzl_tree_builder_node_popup              (DzlTreeBuilder         *builder,
@@ -79,6 +91,11 @@ void          _dzl_tree_builder_node_collapsed          (DzlTreeBuilder         
                                                          DzlTreeNode            *node);
 void          _dzl_tree_builder_node_expanded           (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node);
+gboolean      _dzl_tree_builder_node_draggable          (DzlTreeBuilder         *builder,
+                                                         DzlTreeNode            *node);
+gboolean      _dzl_tree_builder_node_droppable          (DzlTreeBuilder         *builder,
+                                                         DzlTreeNode            *node,
+                                                         GtkSelectionData       *data);
 
 G_END_DECLS
 

@@ -52,6 +52,24 @@ struct _DzlTreeBuilderClass
   void     (*node_collapsed)          (DzlTreeBuilder   *builder,
                                        DzlTreeNode      *node);
 
+  gboolean (*node_draggable)          (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node);
+  gboolean (*node_droppable)          (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node,
+                                       GtkSelectionData *data);
+  gboolean (*drag_data_get)           (DzlTreeBuilder   *builder     ,
+                                       DzlTreeNode      *node,
+                                       GtkSelectionData *data);
+  gboolean (*drag_node_received)      (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *drag_node,
+                                       DzlTreeNode         *drop_node,
+                                       DzlTreeDropPosition  position,
+                                       GtkSelectionData    *data);
+  gboolean (*drag_data_received)      (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *drop_node,
+                                       DzlTreeDropPosition  position,
+                                       GtkSelectionData    *data);
+
   /*< private >*/
   gpointer _padding[12];
 };

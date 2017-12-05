@@ -20,6 +20,8 @@
 
 #include <glib/gi18n.h>
 
+#include "dzl-enums.h"
+
 #include "tree/dzl-tree.h"
 #include "tree/dzl-tree-builder.h"
 #include "util/dzl-macros.h"
@@ -41,8 +43,13 @@ enum {
   ADDED,
   REMOVED,
   BUILD_NODE,
+  DRAG_DATA_RECEIVED,
+  DRAG_NODE_RECEIVED,
   NODE_ACTIVATED,
   NODE_COLLAPSED,
+  NODE_DRAGGABLE,
+  NODE_DROPPABLE,
+  DRAG_DATA_GET,
   NODE_EXPANDED,
   NODE_POPUP,
   NODE_SELECTED,
@@ -149,6 +156,92 @@ _dzl_tree_builder_node_expanded (DzlTreeBuilder *builder,
   g_signal_emit (builder, signals [NODE_EXPANDED], 0, node);
 }
 
+gboolean
+_dzl_tree_builder_drag_node_received (DzlTreeBuilder      *builder,
+                                      DzlTreeNode         *drag_node,
+                                      DzlTreeNode         *drop_node,
+                                      DzlTreeDropPosition  position,
+                                      GtkSelectionData    *data)
+{
+  gboolean ret = FALSE;
+
+  g_return_val_if_fail (DZL_IS_TREE_BUILDER (builder), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_NODE (drag_node), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_NODE (drop_node), FALSE);
+  g_return_val_if_fail (data != NULL, FALSE);
+
+  g_signal_emit (builder, signals [DRAG_NODE_RECEIVED], 0,
+                 drag_node, drop_node, position, data,
+                 &ret);
+
+  return ret;
+}
+
+gboolean
+_dzl_tree_builder_node_draggable (DzlTreeBuilder *builder,
+                                  DzlTreeNode    *node)
+{
+  gboolean ret = FALSE;
+
+  g_return_val_if_fail (DZL_IS_TREE_BUILDER (builder), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_NODE (node), FALSE);
+
+  g_signal_emit (builder, signals [NODE_DRAGGABLE], 0, node, &ret);
+
+  return ret;
+}
+
+gboolean
+_dzl_tree_builder_node_droppable (DzlTreeBuilder   *builder,
+                                  DzlTreeNode      *node,
+                                  GtkSelectionData *data)
+{
+  gboolean ret = FALSE;
+
+  g_return_val_if_fail (DZL_IS_TREE_BUILDER (builder), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_NODE (node), FALSE);
+  g_return_val_if_fail (data != NULL, FALSE);
+
+  g_signal_emit (builder, signals [NODE_DROPPABLE], 0, node, data, &ret);
+
+  return ret;
+}
+
+gboolean
+_dzl_tree_builder_drag_data_get (DzlTreeBuilder   *builder,
+                                 DzlTreeNode      *node,
+                                 GtkSelectionData *data)
+{
+  gboolean ret = FALSE;
+
+  g_return_val_if_fail (DZL_IS_TREE_BUILDER (builder), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_NODE (node), FALSE);
+  g_return_val_if_fail (data != NULL, FALSE);
+
+  g_signal_emit (builder, signals [DRAG_DATA_GET], 0, node, data, &ret);
+
+  return ret;
+}
+
+gboolean
+_dzl_tree_builder_drag_data_received (DzlTreeBuilder      *builder,
+                                      DzlTreeNode         *drop_node,
+                                      DzlTreeDropPosition  position,
+                                      GtkSelectionData    *data)
+{
+  gboolean ret = FALSE;
+
+  g_return_val_if_fail (DZL_IS_TREE_BUILDER (builder), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_NODE (drop_node), FALSE);
+  g_return_val_if_fail (data != NULL, FALSE);
+
+  g_signal_emit (builder, signals [DRAG_DATA_RECEIVED], 0,
+                 drop_node, position, data,
+                 &ret);
+
+  return ret;
+}
+
 void
 _dzl_tree_builder_set_tree (DzlTreeBuilder *builder,
                             DzlTree        *tree)
@@ -169,7 +262,7 @@ _dzl_tree_builder_set_tree (DzlTreeBuilder *builder,
  *
  * Gets the tree that owns the builder.
  *
- * Returns: (transfer none) (type DzlTree) (nullable): A #DzlTree or %NULL.
+ * Returns: (transfer none) (nullable): A #DzlTree or %NULL.
  */
 DzlTree *
 dzl_tree_builder_get_tree (DzlTreeBuilder *builder)
@@ -257,6 +350,19 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                               G_TYPE_FROM_CLASS (klass),
                               g_cclosure_marshal_VOID__OBJECTv);
 
+  signals [DRAG_NODE_RECEIVED] =
+    g_signal_new ("drag-node-received",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, drag_node_received),
+                  NULL, NULL, NULL,
+                  G_TYPE_BOOLEAN,
+                  4,
+                  DZL_TYPE_TREE_NODE,
+                  DZL_TYPE_TREE_NODE,
+                  DZL_TYPE_TREE_DROP_POSITION,
+                  GTK_TYPE_SELECTION_DATA);
+
   signals [NODE_ACTIVATED] =
     g_signal_new ("node-activated",
                   G_TYPE_FROM_CLASS (klass),
@@ -266,6 +372,51 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                   G_TYPE_BOOLEAN,
                   1,
                   DZL_TYPE_TREE_NODE);
+
+  signals [NODE_DRAGGABLE] =
+    g_signal_new ("node-draggable",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, node_draggable),
+                  g_signal_accumulator_true_handled, NULL,
+                  NULL,
+                  G_TYPE_BOOLEAN,
+                  1, DZL_TYPE_TREE_NODE);
+
+  signals [DRAG_DATA_GET] =
+    g_signal_new ("drag-data-get",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, drag_data_get),
+                  g_signal_accumulator_true_handled, NULL,
+                  NULL,
+                  G_TYPE_BOOLEAN,
+                  2,
+                  DZL_TYPE_TREE_NODE,
+                  GTK_TYPE_SELECTION_DATA);
+
+  signals [DRAG_DATA_RECEIVED] =
+    g_signal_new ("drag-data-received",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, drag_data_received),
+                  g_signal_accumulator_true_handled, NULL,
+                  NULL,
+                  G_TYPE_BOOLEAN,
+                  3,
+                  DZL_TYPE_TREE_NODE,
+                  DZL_TYPE_TREE_DROP_POSITION,
+                  GTK_TYPE_SELECTION_DATA);
+
+  signals [NODE_DROPPABLE] =
+    g_signal_new ("node-droppable",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, node_droppable),
+                  g_signal_accumulator_true_handled, NULL,
+                  NULL,
+                  G_TYPE_BOOLEAN,
+                  2, DZL_TYPE_TREE_NODE, GTK_TYPE_SELECTION_DATA);
 
   signals [NODE_COLLAPSED] =
     g_signal_new ("node-collapsed",
