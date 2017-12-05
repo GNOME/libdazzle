@@ -98,6 +98,7 @@ gboolean      _dzl_tree_builder_node_draggable          (DzlTreeBuilder         
 gboolean      _dzl_tree_builder_node_droppable          (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node,
                                                          GtkSelectionData       *data);
+GtkTreeStore *_dzl_tree_store_new                       (DzlTree                *tree);
 
 G_END_DECLS
 

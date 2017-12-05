@@ -10,6 +10,7 @@ tree_sources = [
   'dzl-tree-builder.c',
   'dzl-tree.c',
   'dzl-tree-node.c',
+  'dzl-tree-store.c',
   'dzl-list-store-adapter.c',
 ]
 

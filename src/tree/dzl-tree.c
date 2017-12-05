@@ -23,6 +23,7 @@
 #include "tree/dzl-tree.h"
 #include "tree/dzl-tree-node.h"
 #include "tree/dzl-tree-private.h"
+#include "tree/dzl-tree-store.h"
 #include "util/dzl-util-private.h"
 
 typedef struct
@@ -1174,7 +1175,7 @@ dzl_tree_init (DzlTree *self)
 
   priv->builders = g_ptr_array_new ();
   g_ptr_array_set_free_func (priv->builders, g_object_unref);
-  priv->store = gtk_tree_store_new (1, DZL_TYPE_TREE_NODE);
+  priv->store = _dzl_tree_store_new (self);
 
   selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (self));
   g_signal_connect_object (selection, "changed",
