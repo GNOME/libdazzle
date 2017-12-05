@@ -261,10 +261,34 @@ static gboolean
 dzl_tree_store_drag_data_delete (GtkTreeDragSource *source,
                                  GtkTreePath       *path)
 {
-  g_assert (GTK_IS_TREE_DRAG_SOURCE (source));
+  DzlTreeStore *self = (DzlTreeStore *)source;
+  GtkTreeIter iter;
+  GPtrArray *builders;
+
+  g_assert (GTK_IS_TREE_DRAG_SOURCE (self));
+  g_assert (self->tree != NULL);
   g_assert (path != NULL);
 
-  /* XXX: Handle drag data delete */
+  builders = _dzl_tree_get_builders (self->tree);
+  g_assert (builders != NULL);
+
+  if (gtk_tree_model_get_iter (GTK_TREE_MODEL (source), &iter, path))
+    {
+      g_autoptr(DzlTreeNode) node = NULL;
+
+      gtk_tree_model_get (GTK_TREE_MODEL (source), &iter, 0, &node, -1);
+      g_assert (DZL_IS_TREE_NODE (node));
+
+      for (guint i = 0; i < builders->len; i++)
+        {
+          DzlTreeBuilder *builder = g_ptr_array_index (builders, i);
+
+          g_assert (DZL_IS_TREE_BUILDER (builder));
+
+          if (_dzl_tree_builder_drag_node_delete (builder, node))
+            return TRUE;
+        }
+    }
 
   return FALSE;
 }

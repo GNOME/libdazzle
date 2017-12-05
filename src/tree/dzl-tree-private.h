@@ -80,6 +80,8 @@ gboolean      _dzl_tree_builder_drag_node_received      (DzlTreeBuilder         
                                                          DzlTreeNode            *drop_node,
                                                          DzlTreeDropPosition     position,
                                                          GtkSelectionData       *data);
+gboolean      _dzl_tree_builder_drag_node_delete        (DzlTreeBuilder         *builder,
+                                                         DzlTreeNode            *node);
 gboolean      _dzl_tree_builder_node_activated          (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node);
 void          _dzl_tree_builder_node_popup              (DzlTreeBuilder         *builder,

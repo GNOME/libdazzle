@@ -69,6 +69,8 @@ struct _DzlTreeBuilderClass
                                        DzlTreeNode         *drop_node,
                                        DzlTreeDropPosition  position,
                                        GtkSelectionData    *data);
+  gboolean (*drag_node_delete)        (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
 
   /*< private >*/
   gpointer _padding[12];
