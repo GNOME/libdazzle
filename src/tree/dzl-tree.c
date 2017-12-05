@@ -27,19 +27,25 @@
 
 typedef struct
 {
-  GPtrArray          *builders;
-  DzlTreeNode        *root;
-  DzlTreeNode        *selection;
-  GtkTreeViewColumn  *column;
-  GtkCellRenderer    *cell_pixbuf;
-  GtkCellRenderer    *cell_text;
-  GtkTreeStore       *store;
-  GMenuModel         *context_menu;
-  GdkRGBA             dim_foreground;
-  guint               show_icons : 1;
-  guint               always_expand : 1;
+  /* Owned references */
+  GPtrArray               *builders;
+  DzlTreeNode             *root;
+  GtkTreeStore            *store;
+  GMenuModel              *context_menu;
   GtkTreePath             *last_drop_path;
+
+  /* Unowned references */
+  DzlTreeNode             *selection;
+  GtkTreeViewColumn       *column;
+  GtkCellRenderer         *cell_pixbuf;
+  GtkCellRenderer         *cell_text;
+
   GtkTreeViewDropPosition  last_drop_pos;
+
+  GdkRGBA                  dim_foreground;
+
+  guint                    show_icons : 1;
+  guint                    always_expand : 1;
 } DzlTreePrivate;
 
 typedef struct
@@ -1081,9 +1087,9 @@ dzl_tree_class_init (DzlTreeClass *klass)
   object_class->get_property = dzl_tree_get_property;
   object_class->set_property = dzl_tree_set_property;
 
-  widget_class->popup_menu = dzl_tree_popup_menu;
   widget_class->button_press_event = dzl_tree_button_press_event;
   widget_class->destroy = dzl_tree_destroy;
+  widget_class->popup_menu = dzl_tree_popup_menu;
   widget_class->style_updated = dzl_tree_style_updated;
 
   widget_class->drag_motion = dzl_tree_drag_motion;
