@@ -19,6 +19,7 @@ build_node_cb (DzlTreeBuilder *builder,
 
       enumerator = g_file_enumerate_children (file,
                                               G_FILE_ATTRIBUTE_STANDARD_NAME","
+                                              G_FILE_ATTRIBUTE_STANDARD_ICON","
                                               G_FILE_ATTRIBUTE_STANDARD_TYPE,
                                               0, NULL, NULL);
 
@@ -34,15 +35,11 @@ build_node_cb (DzlTreeBuilder *builder,
           child_node = dzl_tree_node_new ();
           dzl_tree_node_set_item (child_node, G_OBJECT (child));
           dzl_tree_node_set_text (child_node, g_file_info_get_name (info));
+          dzl_tree_node_set_gicon (child_node, g_file_info_get_icon (info));
           dzl_tree_node_set_reset_on_collapse (child_node, TRUE);
 
           if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
-            {
-              dzl_tree_node_set_children_possible (child_node, TRUE);
-              dzl_tree_node_set_icon_name (child_node, "folder-symbolic");
-            }
-          else
-            dzl_tree_node_set_icon_name (child_node, "text-x-generic-symbolic");
+            dzl_tree_node_set_children_possible (child_node, TRUE);
 
           dzl_tree_node_append (node, child_node);
         }
