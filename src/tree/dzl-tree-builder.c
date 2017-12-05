@@ -25,15 +25,15 @@
 
 typedef struct
 {
-	DzlTree *tree;
+  DzlTree *tree;
 } DzlTreeBuilderPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlTreeBuilder, dzl_tree_builder, G_TYPE_INITIALLY_UNOWNED)
 
 enum {
-	PROP_0,
-	PROP_TREE,
-	LAST_PROP
+  PROP_0,
+  PROP_TREE,
+  LAST_PROP
 };
 
 enum {
@@ -58,12 +58,12 @@ _dzl_tree_builder_node_activated (DzlTreeBuilder *builder,
 {
   gboolean ret = FALSE;
 
-	g_return_val_if_fail (DZL_IS_TREE_BUILDER(builder), FALSE);
-	g_return_val_if_fail (DZL_IS_TREE_NODE(node), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_BUILDER(builder), FALSE);
+  g_return_val_if_fail (DZL_IS_TREE_NODE(node), FALSE);
 
   g_signal_emit (builder, signals [NODE_ACTIVATED], 0, node, &ret);
 
-	return ret;
+  return ret;
 }
 
 void
@@ -82,8 +82,8 @@ void
 _dzl_tree_builder_node_selected (DzlTreeBuilder *builder,
                                  DzlTreeNode    *node)
 {
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (DZL_IS_TREE_NODE (node));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE_NODE (node));
 
   g_signal_emit (builder, signals [NODE_SELECTED], 0, node);
 }
@@ -92,8 +92,8 @@ void
 _dzl_tree_builder_node_unselected (DzlTreeBuilder *builder,
                                    DzlTreeNode    *node)
 {
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (DZL_IS_TREE_NODE (node));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE_NODE (node));
 
   g_signal_emit (builder, signals [NODE_UNSELECTED], 0, node);
 }
@@ -102,8 +102,8 @@ void
 _dzl_tree_builder_build_node (DzlTreeBuilder *builder,
                               DzlTreeNode    *node)
 {
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (DZL_IS_TREE_NODE (node));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE_NODE (node));
 
   g_signal_emit (builder, signals [BUILD_NODE], 0, node);
 }
@@ -112,8 +112,8 @@ void
 _dzl_tree_builder_added (DzlTreeBuilder *builder,
                          DzlTree        *tree)
 {
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (DZL_IS_TREE (tree));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE (tree));
 
   g_signal_emit (builder, signals [ADDED], 0, tree);
 }
@@ -122,8 +122,8 @@ void
 _dzl_tree_builder_removed (DzlTreeBuilder *builder,
                            DzlTree        *tree)
 {
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (DZL_IS_TREE (tree));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE (tree));
 
   g_signal_emit (builder, signals [REMOVED], 0, tree);
 }
@@ -132,8 +132,8 @@ void
 _dzl_tree_builder_node_collapsed (DzlTreeBuilder *builder,
                                   DzlTreeNode    *node)
 {
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (DZL_IS_TREE_NODE (node));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE_NODE (node));
 
   g_signal_emit (builder, signals [NODE_COLLAPSED], 0, node);
 }
@@ -142,8 +142,8 @@ void
 _dzl_tree_builder_node_expanded (DzlTreeBuilder *builder,
                                  DzlTreeNode    *node)
 {
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (DZL_IS_TREE_NODE (node));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE_NODE (node));
 
   g_signal_emit (builder, signals [NODE_EXPANDED], 0, node);
 }
@@ -152,11 +152,11 @@ void
 _dzl_tree_builder_set_tree (DzlTreeBuilder *builder,
                             DzlTree        *tree)
 {
-	DzlTreeBuilderPrivate *priv = dzl_tree_builder_get_instance_private (builder);
+  DzlTreeBuilderPrivate *priv = dzl_tree_builder_get_instance_private (builder);
 
-	g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
-	g_return_if_fail (priv->tree == NULL || DZL_IS_TREE (priv->tree));
-	g_return_if_fail (DZL_IS_TREE (tree));
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (priv->tree == NULL || DZL_IS_TREE (priv->tree));
+  g_return_if_fail (DZL_IS_TREE (tree));
 
   if (priv->tree != tree)
     {
@@ -197,8 +197,8 @@ dzl_tree_builder_get_tree (DzlTreeBuilder *builder)
 static void
 dzl_tree_builder_finalize (GObject *object)
 {
-	DzlTreeBuilder *builder = DZL_TREE_BUILDER (object);
-	DzlTreeBuilderPrivate *priv = dzl_tree_builder_get_instance_private (builder);
+  DzlTreeBuilder *builder = DZL_TREE_BUILDER (object);
+  DzlTreeBuilderPrivate *priv = dzl_tree_builder_get_instance_private (builder);
 
 	if (priv->tree)
     {
@@ -206,7 +206,7 @@ dzl_tree_builder_finalize (GObject *object)
       priv->tree = NULL;
     }
 
-	G_OBJECT_CLASS (dzl_tree_builder_parent_class)->finalize (object);
+  G_OBJECT_CLASS (dzl_tree_builder_parent_class)->finalize (object);
 }
 
 static void
@@ -215,10 +215,10 @@ dzl_tree_builder_get_property (GObject    *object,
                                GValue     *value,
                                GParamSpec *pspec)
 {
-	DzlTreeBuilder *builder = DZL_TREE_BUILDER (object);
+  DzlTreeBuilder *builder = DZL_TREE_BUILDER (object);
   DzlTreeBuilderPrivate *priv = dzl_tree_builder_get_instance_private (builder);
 
-	switch (prop_id)
+  switch (prop_id)
     {
     case PROP_TREE:
       g_value_set_object (value, priv->tree);
@@ -232,17 +232,17 @@ dzl_tree_builder_get_property (GObject    *object,
 static void
 dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
 {
-	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	object_class->finalize = dzl_tree_builder_finalize;
-	object_class->get_property = dzl_tree_builder_get_property;
+  object_class->finalize = dzl_tree_builder_finalize;
+  object_class->get_property = dzl_tree_builder_get_property;
 
-	properties[PROP_TREE] =
-		g_param_spec_object("tree",
-		                    "Tree",
-		                    "The DzlTree the builder belongs to.",
-		                    DZL_TYPE_TREE,
-		                    G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  properties[PROP_TREE] =
+    g_param_spec_object("tree",
+                        "Tree",
+                        "The DzlTree the builder belongs to.",
+                        DZL_TYPE_TREE,
+                        G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
   g_object_class_install_properties (object_class, LAST_PROP, properties);
 
