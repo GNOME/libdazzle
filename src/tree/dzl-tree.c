@@ -38,6 +38,8 @@ typedef struct
   GdkRGBA             dim_foreground;
   guint               show_icons : 1;
   guint               always_expand : 1;
+  GtkTreePath             *last_drop_path;
+  GtkTreeViewDropPosition  last_drop_pos;
 } DzlTreePrivate;
 
 typedef struct
@@ -860,6 +862,98 @@ dzl_tree_add_child (GtkBuildable *buildable,
   dzl_tree_parent_buildable_iface->add_child (buildable, builder, child, type);
 }
 
+static gboolean
+dzl_tree_drag_motion (GtkWidget      *widget,
+                      GdkDragContext *context,
+                      gint            x,
+                      gint            y,
+                      guint           time_)
+{
+  DzlTree *self = (DzlTree *)widget;
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+  gboolean ret;
+
+  g_assert (DZL_IS_TREE (self));
+  g_assert (GDK_IS_DRAG_CONTEXT (context));
+
+  ret = GTK_WIDGET_CLASS (dzl_tree_parent_class)->drag_motion (widget, context, x, y, time_);
+
+  /*
+   * Cache the current drop position so we can use it
+   * later to determine how to drop on a given node.
+   */
+  g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
+  gtk_tree_view_get_drag_dest_row (GTK_TREE_VIEW (widget),
+                                   &priv->last_drop_path,
+                                   &priv->last_drop_pos);
+
+  return ret;
+}
+
+static void
+dzl_tree_drag_end (GtkWidget      *widget,
+                   GdkDragContext *context)
+{
+  DzlTree *self = (DzlTree *)widget;
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+
+  g_assert (DZL_IS_TREE (self));
+  g_assert (GDK_IS_DRAG_CONTEXT (context));
+
+  priv->last_drop_pos = 0;
+  g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
+
+  GTK_WIDGET_CLASS (dzl_tree_parent_class)->drag_end (widget, context);
+}
+
+DzlTreeNode *
+_dzl_tree_get_drop_node (DzlTree             *self,
+                         DzlTreeDropPosition *pos)
+{
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+  g_autoptr(DzlTreeNode) node = NULL;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+
+  g_return_val_if_fail (DZL_IS_TREE (self), NULL);
+
+  if (pos != NULL)
+    *pos = 0;
+
+  /* We can't do anything if we don't have a path */
+  if (priv->last_drop_path == NULL)
+    return NULL;
+
+  /* We don't have anything to do if path doesn't exist */
+  model = gtk_tree_view_get_model (GTK_TREE_VIEW (self));
+  if (!gtk_tree_model_get_iter (model, &iter, priv->last_drop_path))
+    return NULL;
+
+  gtk_tree_model_get (model, &iter, 0, &node, -1);
+  g_assert (DZL_IS_TREE_NODE (node));
+
+  switch (priv->last_drop_pos)
+    {
+    case GTK_TREE_VIEW_DROP_BEFORE:
+      *pos = DZL_TREE_DROP_BEFORE;
+      break;
+
+    case GTK_TREE_VIEW_DROP_AFTER:
+      *pos = DZL_TREE_DROP_AFTER;
+      break;
+
+    case GTK_TREE_VIEW_DROP_INTO_OR_BEFORE:
+    case GTK_TREE_VIEW_DROP_INTO_OR_AFTER:
+      *pos = DZL_TREE_DROP_INTO;
+      break;
+
+    default:
+      break;
+    }
+
+  return g_steal_pointer (&node);
+}
+
 static void
 dzl_tree_style_updated (GtkWidget *widget)
 {
@@ -881,16 +975,20 @@ dzl_tree_style_updated (GtkWidget *widget)
 }
 
 static void
-dzl_tree_finalize (GObject *object)
+dzl_tree_destroy (GtkWidget *widget)
 {
-  DzlTree *self = DZL_TREE (object);
+  DzlTree *self = (DzlTree *)widget;
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
 
-  g_ptr_array_unref (priv->builders);
+  g_assert (DZL_IS_TREE (self));
+
+  g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
+  g_clear_pointer (&priv->builders, g_ptr_array_unref);
   g_clear_object (&priv->store);
   g_clear_object (&priv->root);
+  g_clear_object (&priv->context_menu);
 
-  G_OBJECT_CLASS (dzl_tree_parent_class)->finalize (object);
+  GTK_WIDGET_CLASS (dzl_tree_parent_class)->destroy (widget);
 }
 
 static void
@@ -980,13 +1078,16 @@ dzl_tree_class_init (DzlTreeClass *klass)
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   GtkTreeViewClass *tree_view_class = GTK_TREE_VIEW_CLASS (klass);
 
-  object_class->finalize = dzl_tree_finalize;
   object_class->get_property = dzl_tree_get_property;
   object_class->set_property = dzl_tree_set_property;
 
   widget_class->popup_menu = dzl_tree_popup_menu;
   widget_class->button_press_event = dzl_tree_button_press_event;
+  widget_class->destroy = dzl_tree_destroy;
   widget_class->style_updated = dzl_tree_style_updated;
+
+  widget_class->drag_motion = dzl_tree_drag_motion;
+  widget_class->drag_end = dzl_tree_drag_end;
 
   tree_view_class->row_activated = dzl_tree_row_activated;
   tree_view_class->row_expanded = dzl_tree_row_expanded;

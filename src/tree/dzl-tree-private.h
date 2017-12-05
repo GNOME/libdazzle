@@ -42,6 +42,8 @@ void          _dzl_tree_insert_sorted                   (DzlTree                
                                                          gpointer                user_data);
 void          _dzl_tree_remove                          (DzlTree                *self,
                                                          DzlTreeNode            *node);
+DzlTreeNode  *_dzl_tree_get_drop_node                   (DzlTree                *self,
+                                                         DzlTreeDropPosition    *pos);
 GPtrArray    *_dzl_tree_get_builders                    (DzlTree                *self);
 gboolean      _dzl_tree_get_iter                        (DzlTree                *self,
                                                          DzlTreeNode            *node,
