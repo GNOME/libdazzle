@@ -1079,6 +1079,8 @@ _dzl_tree_node_add_dummy_child (DzlTreeNode *self)
   model = _dzl_tree_get_store (self->tree);
   dzl_tree_node_get_iter (self, &parent);
   dummy = g_object_ref_sink (dzl_tree_node_new ());
+  _dzl_tree_node_set_tree (dummy, self->tree);
+  _dzl_tree_node_set_parent (dummy, self);
   gtk_tree_store_insert_with_values (model, &iter, &parent, -1,
                                      0, dummy,
                                      -1);
