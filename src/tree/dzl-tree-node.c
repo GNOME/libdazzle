@@ -1046,6 +1046,14 @@ dzl_tree_node_show_popover (DzlTreeNode *self,
     }
 }
 
+gboolean 
+_dzl_tree_node_is_dummy (DzlTreeNode *self)
+{
+  g_return_val_if_fail (DZL_IS_TREE_NODE (self), FALSE);
+
+  return self->is_dummy;
+}
+
 gboolean
 _dzl_tree_node_get_needs_build (DzlTreeNode *self)
 {

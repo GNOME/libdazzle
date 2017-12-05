@@ -79,6 +79,7 @@ void         _dzl_tree_builder_node_collapsed  (DzlTreeBuilder *builder,
                                                 DzlTreeNode    *node);
 void         _dzl_tree_builder_node_expanded   (DzlTreeBuilder *builder,
                                                 DzlTreeNode    *node);
+gboolean      _dzl_tree_node_is_dummy                   (DzlTreeNode            *self);
 
 G_END_DECLS
 
