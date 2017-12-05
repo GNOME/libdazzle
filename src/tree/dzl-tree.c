@@ -1825,3 +1825,13 @@ _dzl_tree_get_store (DzlTree *self)
 
   return priv->store;
 }
+
+GPtrArray *
+_dzl_tree_get_builders (DzlTree *self)
+{
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_TREE (self), NULL);
+
+  return priv->builders;
+}
