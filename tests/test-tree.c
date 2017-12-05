@@ -130,6 +130,21 @@ drag_data_received_cb (DzlTreeBuilder      *builder,
 }
 
 static gboolean
+drag_node_delete_cb (DzlTreeBuilder *builder,
+                     DzlTreeNode    *node)
+{
+  g_assert (DZL_IS_TREE_BUILDER (builder));
+  g_assert (DZL_IS_TREE_NODE (node));
+
+  /* This is called when GTK_ACTION_MOVE is used and we need
+   * to cleanup the old node which is not gone.
+   */
+  g_print ("Delete node %s\n", dzl_tree_node_get_text (node));
+
+  return FALSE;
+}
+
+static gboolean
 drag_node_received_cb (DzlTreeBuilder      *builder,
                        DzlTreeNode         *drag_node,
                        DzlTreeNode         *drop_node,
@@ -147,7 +162,9 @@ drag_node_received_cb (DzlTreeBuilder      *builder,
            dzl_tree_node_get_text (drop_node),
            position);
 
-  return FALSE;
+  /* Pretend we succeeded */
+
+  return TRUE;
 }
 
 gint
@@ -202,6 +219,7 @@ main (gint   argc,
   g_signal_connect (builder, "drag-data-get", G_CALLBACK (node_drag_data_get_cb), NULL);
   g_signal_connect (builder, "drag-data-received", G_CALLBACK (drag_data_received_cb), NULL);
   g_signal_connect (builder, "drag-node-received", G_CALLBACK (drag_node_received_cb), NULL);
+  g_signal_connect (builder, "drag-node-delete", G_CALLBACK (drag_node_delete_cb), NULL);
   g_signal_connect (builder, "node-draggable", G_CALLBACK (node_draggable_cb), NULL);
   g_signal_connect (builder, "node-droppable", G_CALLBACK (node_droppable_cb), NULL);
   dzl_tree_add_builder (DZL_TREE (tree), builder);
