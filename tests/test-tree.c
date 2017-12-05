@@ -48,10 +48,116 @@ build_node_cb (DzlTreeBuilder *builder,
     }
 }
 
+static gboolean
+node_draggable_cb (DzlTreeBuilder *builder,
+                   DzlTreeNode    *node)
+{
+  return TRUE;
+}
+
+static gboolean
+node_droppable_cb (DzlTreeBuilder   *builder,
+                   DzlTreeNode      *node,
+                   GtkSelectionData *data)
+{
+  /* XXX: Check that uri/node is not a parent of node */
+  return TRUE;
+}
+
+static gboolean
+node_drag_data_get_cb (DzlTreeBuilder   *builder,
+                       DzlTreeNode      *node,
+                       GtkSelectionData *data)
+{
+  g_autofree gchar *uri = NULL;
+  gchar *uris[] = { NULL, NULL };
+  GFile *file;
+
+  g_assert (DZL_IS_TREE_BUILDER (builder));
+  g_assert (DZL_IS_TREE_NODE (node));
+
+  if (gtk_selection_data_get_target (data) != gdk_atom_intern_static_string ("text/uri-list"))
+    return FALSE;
+
+  file = G_FILE (dzl_tree_node_get_item (node));
+  uris[0] = uri = g_file_get_uri (file);
+  if (gtk_selection_data_set_uris (data, uris))
+    g_print ("Set uri to %s\n", uri);
+
+  return TRUE;
+}
+
+static gboolean
+drag_data_received_cb (DzlTreeBuilder      *builder,
+                       DzlTreeNode         *node,
+                       DzlTreeDropPosition  position,
+                       GtkSelectionData    *data)
+{
+  g_assert (DZL_IS_TREE_BUILDER (builder));
+  g_assert (DZL_IS_TREE_NODE (node));
+  g_assert (data != NULL);
+
+  g_print ("Drag data received\n");
+
+  if (gtk_selection_data_get_target (data) == gdk_atom_intern ("text/uri-list", FALSE))
+    {
+      g_auto(GStrv) uris = NULL;
+      g_autofree gchar *str = NULL;
+      g_autofree gchar *dst = NULL;
+      GFile *file;
+
+      /*
+       * We get a node inside the parent when dropping onto a parent.
+       * So we really want to try to get the file for the parent node.
+       */
+
+      node = dzl_tree_node_get_parent (node);
+      file = G_FILE (dzl_tree_node_get_item (node));
+
+      g_assert (DZL_IS_TREE_NODE (node));
+      g_assert (G_IS_FILE (file));
+
+      uris = gtk_selection_data_get_uris (data);
+      str = g_strjoinv (" ", uris);
+      dst = g_file_get_uri (file);
+
+      g_print ("Dropping uris: %s onto %s\n", str, dst);
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+static gboolean
+drag_node_received_cb (DzlTreeBuilder      *builder,
+                       DzlTreeNode         *drag_node,
+                       DzlTreeNode         *drop_node,
+                       DzlTreeDropPosition  position,
+                       GtkSelectionData    *data,
+                       gpointer             user_data)
+{
+  g_assert (DZL_IS_TREE_BUILDER (builder));
+  g_assert (DZL_IS_TREE_NODE (drag_node));
+  g_assert (DZL_IS_TREE_NODE (drop_node));
+  g_assert (data != NULL);
+
+  g_print ("Drop %s onto %s with pos %d\n",
+           dzl_tree_node_get_text (drag_node),
+           dzl_tree_node_get_text (drop_node),
+           position);
+
+  return FALSE;
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
 {
+  static const GtkTargetEntry drag_targets[] = {
+    { "GTK_TREE_MODEL_ROW", GTK_TARGET_SAME_WIDGET, 0 },
+    { "text/uri-list", 0, 0 },
+  };
   g_autoptr(DzlTreeNode) root = NULL;
   g_autoptr(GFile) home = NULL;
   DzlTreeBuilder *builder;
@@ -80,10 +186,24 @@ main (gint   argc,
                        "headers-visible", FALSE,
                        "visible", TRUE,
                        NULL);
+  gtk_tree_view_enable_model_drag_source (GTK_TREE_VIEW (tree),
+                                          GDK_BUTTON1_MASK,
+                                          drag_targets, G_N_ELEMENTS (drag_targets),
+                                          GDK_ACTION_COPY | GDK_ACTION_MOVE);
+  gtk_tree_view_enable_model_drag_dest (GTK_TREE_VIEW (tree),
+                                        drag_targets, G_N_ELEMENTS (drag_targets),
+                                        GDK_ACTION_COPY | GDK_ACTION_MOVE);
+  gtk_drag_source_add_uri_targets (tree);
+  gtk_drag_dest_add_uri_targets (tree);
   gtk_container_add (GTK_CONTAINER (scroller), tree);
 
   builder = dzl_tree_builder_new ();
   g_signal_connect (builder, "build-node", G_CALLBACK (build_node_cb), NULL);
+  g_signal_connect (builder, "drag-data-get", G_CALLBACK (node_drag_data_get_cb), NULL);
+  g_signal_connect (builder, "drag-data-received", G_CALLBACK (drag_data_received_cb), NULL);
+  g_signal_connect (builder, "drag-node-received", G_CALLBACK (drag_node_received_cb), NULL);
+  g_signal_connect (builder, "node-draggable", G_CALLBACK (node_draggable_cb), NULL);
+  g_signal_connect (builder, "node-droppable", G_CALLBACK (node_droppable_cb), NULL);
   dzl_tree_add_builder (DZL_TREE (tree), builder);
 
   root = dzl_tree_node_new ();
