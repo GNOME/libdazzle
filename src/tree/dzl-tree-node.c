@@ -268,6 +268,17 @@ dzl_tree_node_get_parent (DzlTreeNode *node)
   return node->parent;
 }
 
+void
+dzl_tree_node_set_gicon (DzlTreeNode *self,
+                         GIcon       *gicon)
+{
+  g_return_if_fail (DZL_IS_TREE_NODE (self));
+  g_return_if_fail (!gicon || G_IS_ICON (gicon));
+
+  if (g_set_object (&self->gicon, gicon))
+    g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_GICON]);
+}
+
 /**
  * dzl_tree_node_get_gicon:
  *
@@ -755,6 +766,10 @@ dzl_tree_node_set_property (GObject      *object,
       node->expanded_icon_name = g_quark_from_string (g_value_get_string (value));
       break;
 
+    case PROP_GICON:
+      dzl_tree_node_set_gicon (node, g_value_get_object (value));
+      break;
+
     case PROP_ICON_NAME:
       dzl_tree_node_set_icon_name (node, g_value_get_string (value));
       break;
@@ -841,7 +856,7 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
                          "GIcon",
                          "The GIcon object",
                          G_TYPE_ICON,
-                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+                         G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS);
 
   /**
    * DzlTreeNode:item:

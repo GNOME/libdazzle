@@ -96,6 +96,9 @@ void            dzl_tree_node_set_use_markup        (DzlTreeNode            *sel
                                                      gboolean                use_markup);
 DZL_AVAILABLE_IN_ALL
 GIcon          *dzl_tree_node_get_gicon             (DzlTreeNode            *self);
+DZL_AVAILABLE_IN_3_28
+void            dzl_tree_node_set_gicon             (DzlTreeNode            *self,
+                                                     GIcon                  *icon);
 DZL_AVAILABLE_IN_ALL
 void            dzl_tree_node_add_emblem            (DzlTreeNode            *self,
                                                      const gchar            *emblem_name);
