@@ -210,8 +210,6 @@ main (gint   argc,
   gtk_tree_view_enable_model_drag_dest (GTK_TREE_VIEW (tree),
                                         drag_targets, G_N_ELEMENTS (drag_targets),
                                         GDK_ACTION_COPY | GDK_ACTION_MOVE);
-  gtk_drag_source_add_uri_targets (tree);
-  gtk_drag_dest_add_uri_targets (tree);
   gtk_container_add (GTK_CONTAINER (scroller), tree);
 
   builder = dzl_tree_builder_new ();
