@@ -98,7 +98,14 @@ dzl_tree_node_get_tree (DzlTreeNode *node)
 {
   g_return_val_if_fail (DZL_IS_TREE_NODE (node), NULL);
 
-  return node->tree;
+  while (node != NULL)
+    {
+      if (node->tree != NULL)
+        return node->tree;
+      node = node->parent;
+    }
+
+  return NULL;
 }
 
 /**
