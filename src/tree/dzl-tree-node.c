@@ -117,7 +117,7 @@ dzl_tree_node_get_tree (DzlTreeNode *node)
  */
 void
 _dzl_tree_node_set_tree (DzlTreeNode *node,
-                        DzlTree     *tree)
+                         DzlTree     *tree)
 {
   g_return_if_fail (DZL_IS_TREE_NODE (node));
   g_return_if_fail (!tree || DZL_IS_TREE (tree));
@@ -1064,7 +1064,7 @@ _dzl_tree_node_get_needs_build (DzlTreeNode *self)
 
 void
 _dzl_tree_node_set_needs_build (DzlTreeNode *self,
-                               gboolean    needs_build)
+                                gboolean     needs_build)
 {
   g_assert (DZL_IS_TREE_NODE (self));
 

@@ -32,25 +32,25 @@ struct _DzlTreeBuilderClass
 {
   GInitiallyUnownedClass parent_class;
 
-  void     (*added)           (DzlTreeBuilder *builder,
-                               GtkWidget      *tree);
-  void     (*removed)         (DzlTreeBuilder *builder,
-                               GtkWidget      *tree);
-  void     (*build_node)      (DzlTreeBuilder *builder,
-                               DzlTreeNode    *node);
-  gboolean (*node_activated)  (DzlTreeBuilder *builder,
-                               DzlTreeNode    *node);
-  void     (*node_selected)   (DzlTreeBuilder *builder,
-                               DzlTreeNode    *node);
-  void     (*node_unselected) (DzlTreeBuilder *builder,
-                               DzlTreeNode    *node);
-  void     (*node_popup)      (DzlTreeBuilder *builder,
-                               DzlTreeNode    *node,
-                               GMenu          *menu);
-  void     (*node_expanded)   (DzlTreeBuilder *builder,
-                               DzlTreeNode    *node);
-  void     (*node_collapsed)  (DzlTreeBuilder *builder,
-                               DzlTreeNode    *node);
+  void     (*added)                   (DzlTreeBuilder   *builder,
+                                       GtkWidget        *tree);
+  void     (*removed)                 (DzlTreeBuilder   *builder,
+                                       GtkWidget        *tree);
+  void     (*build_node)              (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node);
+  gboolean (*node_activated)          (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node);
+  void     (*node_selected)           (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node);
+  void     (*node_unselected)         (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node);
+  void     (*node_popup)              (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node,
+                                       GMenu            *menu);
+  void     (*node_expanded)           (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node);
+  void     (*node_collapsed)          (DzlTreeBuilder   *builder,
+                                       DzlTreeNode      *node);
 
   /*< private >*/
   gpointer _padding[12];
