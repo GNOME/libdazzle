@@ -1288,6 +1288,10 @@ dzl_tree_node_nth_child (DzlTreeNode *self,
           gtk_tree_model_get (model, &iter, 0, &node, -1);
           g_assert (DZL_IS_TREE_NODE (node));
 
+          /* Don't hand back a dummy node */
+          if (_dzl_tree_node_is_dummy (node))
+            return NULL;
+
           return g_steal_pointer (&node);
         }
     }

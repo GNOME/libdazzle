@@ -522,6 +522,7 @@ _dzl_tree_insert_sorted (DzlTree                *self,
 
   _dzl_tree_node_set_tree (child, self);
   _dzl_tree_node_set_parent (child, node);
+  _dzl_tree_node_set_needs_build (child, TRUE);
 
   g_object_ref_sink (child);
 
