@@ -45,6 +45,7 @@ void          _dzl_tree_remove                          (DzlTree                
 DzlTreeNode  *_dzl_tree_get_drop_node                   (DzlTree                *self,
                                                          DzlTreeDropPosition    *pos);
 GPtrArray    *_dzl_tree_get_builders                    (DzlTree                *self);
+GdkDragAction _dzl_tree_get_drag_action                 (DzlTree                *self);
 gboolean      _dzl_tree_get_iter                        (DzlTree                *self,
                                                          DzlTreeNode            *node,
                                                          GtkTreeIter            *iter);

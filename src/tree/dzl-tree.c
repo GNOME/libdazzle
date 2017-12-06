@@ -42,6 +42,7 @@ typedef struct
   GtkCellRenderer         *cell_text;
 
   GtkTreeViewDropPosition  last_drop_pos;
+  GdkDragAction            drag_action;
 
   GdkRGBA                  dim_foreground;
 
@@ -962,6 +963,28 @@ _dzl_tree_get_drop_node (DzlTree             *self,
 }
 
 static void
+dzl_tree_drag_data_received (GtkWidget        *widget,
+                             GdkDragContext   *context,
+                             gint              x,
+                             gint              y,
+                             GtkSelectionData *data,
+                             guint             info,
+                             guint             time_)
+{
+  DzlTree *self = (DzlTree *)widget;
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+
+  g_assert (DZL_IS_TREE (widget));
+  g_assert (GDK_IS_DRAG_CONTEXT (context));
+  g_assert (data != NULL);
+
+  /* Drag the drag action for use in dispatch */
+  priv->drag_action = gdk_drag_context_get_selected_action (context);
+
+  GTK_WIDGET_CLASS (dzl_tree_parent_class)->drag_data_received (widget, context, x, y, data, info, time_);
+}
+
+static void
 dzl_tree_style_updated (GtkWidget *widget)
 {
   DzlTree *self = (DzlTree *)widget;
@@ -1094,6 +1117,7 @@ dzl_tree_class_init (DzlTreeClass *klass)
   widget_class->style_updated = dzl_tree_style_updated;
 
   widget_class->drag_motion = dzl_tree_drag_motion;
+  widget_class->drag_data_received = dzl_tree_drag_data_received;
   widget_class->drag_end = dzl_tree_drag_end;
 
   tree_view_class->row_activated = dzl_tree_row_activated;
@@ -1942,4 +1966,14 @@ _dzl_tree_get_builders (DzlTree *self)
   g_return_val_if_fail (DZL_IS_TREE (self), NULL);
 
   return priv->builders;
+}
+
+GdkDragAction
+_dzl_tree_get_drag_action (DzlTree *self)
+{
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_TREE (self), 0);
+
+  return priv->drag_action;
 }
