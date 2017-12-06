@@ -48,6 +48,11 @@ GtkTreePath    *dzl_tree_node_get_path              (DzlTreeNode            *nod
 DZL_AVAILABLE_IN_ALL
 gboolean        dzl_tree_node_get_iter              (DzlTreeNode            *node,
                                                      GtkTreeIter            *iter);
+DZL_AVAILABLE_IN_3_28
+guint           dzl_tree_node_n_children            (DzlTreeNode            *self);
+DZL_AVAILABLE_IN_3_28
+DzlTreeNode    *dzl_tree_node_nth_child             (DzlTreeNode            *self,
+                                                     guint                   nth);
 DZL_AVAILABLE_IN_ALL
 void            dzl_tree_node_prepend               (DzlTreeNode            *node,
                                                      DzlTreeNode            *child);

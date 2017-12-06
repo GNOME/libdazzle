@@ -1236,3 +1236,61 @@ dzl_tree_node_set_reset_on_collapse (DzlTreeNode *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_RESET_ON_COLLAPSE]);
     }
 }
+
+guint
+dzl_tree_node_n_children (DzlTreeNode *self)
+{
+  g_return_val_if_fail (DZL_IS_TREE_NODE (self), 0);
+
+  if (!self->needs_build && self->tree != NULL)
+    {
+      GtkTreeIter iter;
+      GtkTreeModel *model;
+
+      model = GTK_TREE_MODEL (_dzl_tree_get_store (self->tree));
+
+      if (dzl_tree_node_get_iter (self, &iter))
+        return gtk_tree_model_iter_n_children (model, &iter);
+    }
+
+  return 0;
+}
+
+/**
+ * dzl_tree_node_nth_child:
+ * @self: a #DzlTreeNode
+ * @nth: the index of the child
+ *
+ * Gets the @nth child of @self or %NULL if it does not exist.
+ *
+ * Returns: (transfer full) (nullable): a #DzlTreeNode or %NULL
+ */
+DzlTreeNode *
+dzl_tree_node_nth_child (DzlTreeNode *self,
+                         guint        nth)
+{
+  g_return_val_if_fail (DZL_IS_TREE_NODE (self), NULL);
+  g_return_val_if_fail (!self->needs_build, NULL);
+
+  if (self->tree != NULL)
+    {
+      GtkTreeIter parent;
+      GtkTreeIter iter;
+      GtkTreeModel *model;
+
+      model = GTK_TREE_MODEL (_dzl_tree_get_store (self->tree));
+
+      if (dzl_tree_node_get_iter (self, &parent) &&
+          gtk_tree_model_iter_nth_child (model, &iter, &parent, nth))
+        {
+          g_autoptr(DzlTreeNode) node = NULL;
+
+          gtk_tree_model_get (model, &iter, 0, &node, -1);
+          g_assert (DZL_IS_TREE_NODE (node));
+
+          return g_steal_pointer (&node);
+        }
+    }
+
+  return NULL;
+}
