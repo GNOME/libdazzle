@@ -32,34 +32,33 @@ struct _DzlTreeBuilderClass
 {
   GInitiallyUnownedClass parent_class;
 
-  void     (*added)                   (DzlTreeBuilder   *builder,
-                                       GtkWidget        *tree);
-  void     (*removed)                 (DzlTreeBuilder   *builder,
-                                       GtkWidget        *tree);
-  void     (*build_node)              (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node);
-  gboolean (*node_activated)          (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node);
-  void     (*node_selected)           (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node);
-  void     (*node_unselected)         (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node);
-  void     (*node_popup)              (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node,
-                                       GMenu            *menu);
-  void     (*node_expanded)           (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node);
-  void     (*node_collapsed)          (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node);
-
-  gboolean (*node_draggable)          (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node);
-  gboolean (*node_droppable)          (DzlTreeBuilder   *builder,
-                                       DzlTreeNode      *node,
-                                       GtkSelectionData *data);
-  gboolean (*drag_data_get)           (DzlTreeBuilder   *builder     ,
-                                       DzlTreeNode      *node,
-                                       GtkSelectionData *data);
+  void     (*added)                   (DzlTreeBuilder      *builder,
+                                       GtkWidget           *tree);
+  void     (*removed)                 (DzlTreeBuilder      *builder,
+                                       GtkWidget           *tree);
+  void     (*build_node)              (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
+  gboolean (*node_activated)          (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
+  void     (*node_selected)           (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
+  void     (*node_unselected)         (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
+  void     (*node_popup)              (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node,
+                                       GMenu               *menu);
+  void     (*node_expanded)           (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
+  void     (*node_collapsed)          (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
+  gboolean (*node_draggable)          (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node);
+  gboolean (*node_droppable)          (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node,
+                                       GtkSelectionData    *data);
+  gboolean (*drag_data_get)           (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *node,
+                                       GtkSelectionData    *data);
   gboolean (*drag_node_received)      (DzlTreeBuilder      *builder,
                                        DzlTreeNode         *drag_node,
                                        DzlTreeNode         *drop_node,
