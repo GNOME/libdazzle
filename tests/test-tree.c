@@ -91,6 +91,7 @@ static gboolean
 drag_data_received_cb (DzlTreeBuilder      *builder,
                        DzlTreeNode         *node,
                        DzlTreeDropPosition  position,
+                       GdkDragAction        action,
                        GtkSelectionData    *data)
 {
   g_assert (DZL_IS_TREE_BUILDER (builder));
@@ -149,6 +150,7 @@ drag_node_received_cb (DzlTreeBuilder      *builder,
                        DzlTreeNode         *drag_node,
                        DzlTreeNode         *drop_node,
                        DzlTreeDropPosition  position,
+                       GdkDragAction        action,
                        GtkSelectionData    *data,
                        gpointer             user_data)
 {

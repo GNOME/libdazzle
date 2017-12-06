@@ -75,11 +75,13 @@ gboolean      _dzl_tree_builder_drag_data_get           (DzlTreeBuilder         
 gboolean      _dzl_tree_builder_drag_data_received      (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *drop_node,
                                                          DzlTreeDropPosition     position,
+                                                         GdkDragAction           action,
                                                          GtkSelectionData       *data);
 gboolean      _dzl_tree_builder_drag_node_received      (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *drag_node,
                                                          DzlTreeNode            *drop_node,
                                                          DzlTreeDropPosition     position,
+                                                         GdkDragAction           action,
                                                          GtkSelectionData       *data);
 gboolean      _dzl_tree_builder_drag_node_delete        (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node);

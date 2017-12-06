@@ -162,6 +162,7 @@ _dzl_tree_builder_drag_node_received (DzlTreeBuilder      *builder,
                                       DzlTreeNode         *drag_node,
                                       DzlTreeNode         *drop_node,
                                       DzlTreeDropPosition  position,
+                                      GdkDragAction        action,
                                       GtkSelectionData    *data)
 {
   gboolean ret = FALSE;
@@ -172,7 +173,7 @@ _dzl_tree_builder_drag_node_received (DzlTreeBuilder      *builder,
   g_return_val_if_fail (data != NULL, FALSE);
 
   g_signal_emit (builder, signals [DRAG_NODE_RECEIVED], 0,
-                 drag_node, drop_node, position, data,
+                 drag_node, drop_node, position, action, data,
                  &ret);
 
   return ret;
@@ -242,6 +243,7 @@ gboolean
 _dzl_tree_builder_drag_data_received (DzlTreeBuilder      *builder,
                                       DzlTreeNode         *drop_node,
                                       DzlTreeDropPosition  position,
+                                      GdkDragAction        action,
                                       GtkSelectionData    *data)
 {
   gboolean ret = FALSE;
@@ -251,7 +253,7 @@ _dzl_tree_builder_drag_data_received (DzlTreeBuilder      *builder,
   g_return_val_if_fail (data != NULL, FALSE);
 
   g_signal_emit (builder, signals [DRAG_DATA_RECEIVED], 0,
-                 drop_node, position, data,
+                 drop_node, position, action, data,
                  &ret);
 
   return ret;
@@ -372,10 +374,11 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                   G_STRUCT_OFFSET (DzlTreeBuilderClass, drag_node_received),
                   NULL, NULL, NULL,
                   G_TYPE_BOOLEAN,
-                  4,
+                  5,
                   DZL_TYPE_TREE_NODE,
                   DZL_TYPE_TREE_NODE,
                   DZL_TYPE_TREE_DROP_POSITION,
+                  GDK_TYPE_DRAG_ACTION,
                   GTK_TYPE_SELECTION_DATA);
 
   signals [DRAG_NODE_DELETE] =
@@ -426,9 +429,10 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                   g_signal_accumulator_true_handled, NULL,
                   NULL,
                   G_TYPE_BOOLEAN,
-                  3,
+                  4,
                   DZL_TYPE_TREE_NODE,
                   DZL_TYPE_TREE_DROP_POSITION,
+                  GDK_TYPE_DRAG_ACTION,
                   GTK_TYPE_SELECTION_DATA);
 
   signals [NODE_DROPPABLE] =

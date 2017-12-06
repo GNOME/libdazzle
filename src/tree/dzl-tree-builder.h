@@ -63,10 +63,12 @@ struct _DzlTreeBuilderClass
                                        DzlTreeNode         *drag_node,
                                        DzlTreeNode         *drop_node,
                                        DzlTreeDropPosition  position,
+                                       GdkDragAction        action,
                                        GtkSelectionData    *data);
   gboolean (*drag_data_received)      (DzlTreeBuilder      *builder,
                                        DzlTreeNode         *drop_node,
                                        DzlTreeDropPosition  position,
+                                       GdkDragAction        action,
                                        GtkSelectionData    *data);
   gboolean (*drag_node_delete)        (DzlTreeBuilder      *builder,
                                        DzlTreeNode         *node);

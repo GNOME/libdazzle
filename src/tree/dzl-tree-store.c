@@ -201,6 +201,7 @@ dzl_tree_store_drag_data_received (GtkTreeDragDest  *dest,
   g_autoptr(DzlTreeNode) drop_node = NULL;
   GPtrArray *builders;
   DzlTreeDropPosition pos = 0;
+  GdkDragAction action;
 
   g_assert (GTK_IS_TREE_DRAG_DEST (self));
   g_assert (self->tree != NULL);
@@ -209,6 +210,7 @@ dzl_tree_store_drag_data_received (GtkTreeDragDest  *dest,
 
   builders = _dzl_tree_get_builders (self->tree);
   drop_node = _dzl_tree_get_drop_node (self->tree, &pos);
+  action = _dzl_tree_get_drag_action (self->tree);
 
   /*
    * If we have a drag/drop of a node onto/adjacent another node, then
@@ -241,7 +243,7 @@ dzl_tree_store_drag_data_received (GtkTreeDragDest  *dest,
 
                   g_assert (DZL_IS_TREE_BUILDER (builder));
 
-                  if (_dzl_tree_builder_drag_node_received (builder, drag_node, drop_node, pos, data))
+                  if (_dzl_tree_builder_drag_node_received (builder, drag_node, drop_node, pos, action, data))
                     return TRUE;
                 }
             }
@@ -254,7 +256,7 @@ dzl_tree_store_drag_data_received (GtkTreeDragDest  *dest,
 
       g_assert (DZL_IS_TREE_BUILDER (builder));
 
-      if (_dzl_tree_builder_drag_data_received (builder, drop_node, pos, data))
+      if (_dzl_tree_builder_drag_data_received (builder, drop_node, pos, action, data))
         return TRUE;
     }
 
