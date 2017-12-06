@@ -145,10 +145,10 @@ dzl_fuzzy_index_load_file_worker (GTask        *task,
   g_autoptr(GVariant) keys = NULL;
   g_autoptr(GVariant) tables = NULL;
   g_autoptr(GVariant) metadata = NULL;
+  g_autoptr(GError) error = NULL;
   DzlFuzzyIndex *self = source_object;
   GFile *file = task_data;
   GVariantDict dict;
-  GError *error = NULL;
   gint version = 0;
   gboolean case_sensitive = FALSE;
 
@@ -178,7 +178,7 @@ dzl_fuzzy_index_load_file_worker (GTask        *task,
 
   if (NULL == (mapped_file = g_mapped_file_new (path, FALSE, &error)))
     {
-      g_task_return_error (task, error);
+      g_task_return_error (task, g_steal_pointer (&error));
       return;
     }
 
@@ -305,14 +305,14 @@ dzl_fuzzy_index_query_cb (GObject      *object,
 {
   DzlFuzzyIndexCursor *cursor = (DzlFuzzyIndexCursor *)object;
   g_autoptr(GTask) task = user_data;
-  GError *error = NULL;
+  g_autoptr(GError) error = NULL;
 
   g_assert (DZL_IS_FUZZY_INDEX_CURSOR (cursor));
   g_assert (G_IS_ASYNC_RESULT (result));
   g_assert (G_IS_TASK (task));
 
   if (!g_async_initable_init_finish (G_ASYNC_INITABLE (cursor), result, &error))
-    g_task_return_error (task, error);
+    g_task_return_error (task, g_steal_pointer (&error));
   else
     g_task_return_pointer (task, g_object_ref (cursor), g_object_unref);
 }
