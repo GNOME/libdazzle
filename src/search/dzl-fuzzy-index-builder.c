@@ -452,9 +452,9 @@ dzl_fuzzy_index_builder_write_worker (GTask        *task,
   DzlFuzzyIndexBuilder *self = source_object;
   g_autoptr(GVariant) variant = NULL;
   g_autoptr(GVariant) documents = NULL;
+  g_autoptr(GError) error = NULL;
   GVariantDict dict;
   GFile *file = task_data;
-  GError *error = NULL;
 
   g_assert (G_IS_TASK (task));
   g_assert (DZL_IS_FUZZY_INDEX_BUILDER (self));
@@ -518,7 +518,7 @@ dzl_fuzzy_index_builder_write_worker (GTask        *task,
                                 NULL,
                                 cancellable,
                                 &error))
-    g_task_return_error (task, error);
+    g_task_return_error (task, g_steal_pointer (&error));
   else
     g_task_return_boolean (task, TRUE);
 }
