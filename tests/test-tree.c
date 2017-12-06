@@ -98,7 +98,7 @@ drag_data_received_cb (DzlTreeBuilder      *builder,
   g_assert (DZL_IS_TREE_NODE (node));
   g_assert (data != NULL);
 
-  g_print ("Drag data received\n");
+  g_print ("Drag data received: action = %d\n", action);
 
   if (gtk_selection_data_get_target (data) == gdk_atom_intern ("text/uri-list", FALSE))
     {
@@ -159,10 +159,10 @@ drag_node_received_cb (DzlTreeBuilder      *builder,
   g_assert (DZL_IS_TREE_NODE (drop_node));
   g_assert (data != NULL);
 
-  g_print ("Drop %s onto %s with pos %d\n",
+  g_print ("Drop %s onto %s with pos %d and action %d\n",
            dzl_tree_node_get_text (drag_node),
            dzl_tree_node_get_text (drop_node),
-           position);
+           position, action);
 
   /* Pretend we succeeded */
 
