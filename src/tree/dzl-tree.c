@@ -895,6 +895,9 @@ dzl_tree_drag_motion (GtkWidget      *widget,
                                    &priv->last_drop_path,
                                    &priv->last_drop_pos);
 
+  /* Save the drag action for builders dispatch */
+  priv->drag_action = gdk_drag_context_get_selected_action (context);
+
   return ret;
 }
 
@@ -908,6 +911,7 @@ dzl_tree_drag_end (GtkWidget      *widget,
   g_assert (DZL_IS_TREE (self));
   g_assert (GDK_IS_DRAG_CONTEXT (context));
 
+  priv->drag_action = 0;
   priv->last_drop_pos = 0;
   g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
 
@@ -960,28 +964,6 @@ _dzl_tree_get_drop_node (DzlTree             *self,
     }
 
   return g_steal_pointer (&node);
-}
-
-static void
-dzl_tree_drag_data_received (GtkWidget        *widget,
-                             GdkDragContext   *context,
-                             gint              x,
-                             gint              y,
-                             GtkSelectionData *data,
-                             guint             info,
-                             guint             time_)
-{
-  DzlTree *self = (DzlTree *)widget;
-  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
-
-  g_assert (DZL_IS_TREE (widget));
-  g_assert (GDK_IS_DRAG_CONTEXT (context));
-  g_assert (data != NULL);
-
-  /* Drag the drag action for use in dispatch */
-  priv->drag_action = gdk_drag_context_get_selected_action (context);
-
-  GTK_WIDGET_CLASS (dzl_tree_parent_class)->drag_data_received (widget, context, x, y, data, info, time_);
 }
 
 static void
@@ -1117,7 +1099,6 @@ dzl_tree_class_init (DzlTreeClass *klass)
   widget_class->style_updated = dzl_tree_style_updated;
 
   widget_class->drag_motion = dzl_tree_drag_motion;
-  widget_class->drag_data_received = dzl_tree_drag_data_received;
   widget_class->drag_end = dzl_tree_drag_end;
 
   tree_view_class->row_activated = dzl_tree_row_activated;
