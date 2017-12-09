@@ -103,14 +103,10 @@ dzl_recursive_file_monitor_collect_recursive (GPtrArray    *dirs,
 {
   g_autoptr(GFileEnumerator) enumerator = NULL;
   g_autoptr(GError) error = NULL;
-  guint begin;
-  guint end;
 
   g_assert (dirs != NULL);
   g_assert (G_IS_FILE (parent));
   g_assert (G_IS_CANCELLABLE (cancellable));
-
-  begin = dirs->len;
 
   enumerator = g_file_enumerate_children (parent,
                                           G_FILE_ATTRIBUTE_STANDARD_NAME","
@@ -135,21 +131,23 @@ dzl_recursive_file_monitor_collect_recursive (GPtrArray    *dirs,
           if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
             {
               const gchar *name = g_file_info_get_name (info);
-              g_ptr_array_add (dirs, g_file_get_child (parent, name));
+              g_autoptr(GFile) child = g_file_get_child (parent, name);
+
+              /*
+               * We add the child, and then recurse into the child immediately
+               * so that we can keep the invariant that all descendants
+               * immediately follow their ancestor. This allows us to simplify
+               * our ignored-directory checks when we get back to the main
+               * thread.
+               */
+
+              g_ptr_array_add (dirs, g_object_ref (child));
+              dzl_recursive_file_monitor_collect_recursive (dirs, child, cancellable);
             }
         }
 
       g_file_enumerator_close (enumerator, cancellable, NULL);
       g_clear_object (&enumerator);
-    }
-
-  end = dirs->len;
-
-  for (guint i = begin; i < end; i++)
-    {
-      GFile *child = g_ptr_array_index (dirs, i);
-
-      dzl_recursive_file_monitor_collect_recursive (dirs, child, cancellable);
     }
 }
 
@@ -326,7 +324,23 @@ dzl_recursive_file_monitor_start_cb (GObject      *object,
       g_assert (G_IS_FILE (dir));
 
       if (dzl_recursive_file_monitor_ignored (self, dir))
-        continue;
+        {
+          /*
+           * Skip ahead to the next directory that does not have this directory
+           * as a prefix. We can do this because we know the descendants are
+           * guaranteed to immediately follow this directory.
+           */
+
+          for (guint j = i + 1; j < dirs->len; j++, i++)
+            {
+              GFile *next = g_ptr_array_index (dirs, j);
+
+              if (!g_file_has_prefix (next, dir))
+                break;
+            }
+
+          continue;
+        }
 
       monitor = g_file_monitor_directory (dir, MONITOR_FLAGS, self->cancellable, &error);
 
