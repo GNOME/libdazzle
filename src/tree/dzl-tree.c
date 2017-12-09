@@ -927,11 +927,14 @@ _dzl_tree_get_drop_node (DzlTree             *self,
   g_autoptr(DzlTreeNode) node = NULL;
   GtkTreeModel *model;
   GtkTreeIter iter;
+  DzlTreeDropPosition dummy_pos;
 
   g_return_val_if_fail (DZL_IS_TREE (self), NULL);
 
-  if (pos != NULL)
-    *pos = 0;
+  if (pos == NULL)
+    pos = &dummy_pos;
+
+  *pos = 0;
 
   /* We can't do anything if we don't have a path */
   if (priv->last_drop_path == NULL)
