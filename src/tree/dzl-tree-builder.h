@@ -38,6 +38,8 @@ struct _DzlTreeBuilderClass
                                        GtkWidget           *tree);
   void     (*build_node)              (DzlTreeBuilder      *builder,
                                        DzlTreeNode         *node);
+  void     (*build_children)          (DzlTreeBuilder      *builder,
+                                       DzlTreeNode         *parent);
   gboolean (*node_activated)          (DzlTreeBuilder      *builder,
                                        DzlTreeNode         *node);
   void     (*node_selected)           (DzlTreeBuilder      *builder,
@@ -79,6 +81,7 @@ struct _DzlTreeBuilderClass
 
 DZL_AVAILABLE_IN_ALL
 DzlTree        *dzl_tree_builder_get_tree (DzlTreeBuilder *builder);
+
 DZL_AVAILABLE_IN_3_28
 DzlTreeBuilder *dzl_tree_builder_new      (void);
 

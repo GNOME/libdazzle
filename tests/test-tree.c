@@ -1,8 +1,8 @@
 #include <dazzle.h>
 
 static void
-build_node_cb (DzlTreeBuilder *builder,
-               DzlTreeNode    *node)
+build_children_cb (DzlTreeBuilder *builder,
+                   DzlTreeNode    *node)
 {
   GFile *file;
 
@@ -215,7 +215,7 @@ main (gint   argc,
   gtk_container_add (GTK_CONTAINER (scroller), tree);
 
   builder = dzl_tree_builder_new ();
-  g_signal_connect (builder, "build-node", G_CALLBACK (build_node_cb), NULL);
+  g_signal_connect (builder, "build-children", G_CALLBACK (build_children_cb), NULL);
   g_signal_connect (builder, "drag-data-get", G_CALLBACK (node_drag_data_get_cb), NULL);
   g_signal_connect (builder, "drag-data-received", G_CALLBACK (drag_data_received_cb), NULL);
   g_signal_connect (builder, "drag-node-received", G_CALLBACK (drag_node_received_cb), NULL);

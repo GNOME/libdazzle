@@ -42,6 +42,7 @@ enum {
 enum {
   ADDED,
   REMOVED,
+  BUILD_CHILDREN,
   BUILD_NODE,
   DRAG_DATA_GET,
   DRAG_DATA_RECEIVED,
@@ -105,6 +106,16 @@ _dzl_tree_builder_node_unselected (DzlTreeBuilder *builder,
   g_return_if_fail (DZL_IS_TREE_NODE (node));
 
   g_signal_emit (builder, signals [NODE_UNSELECTED], 0, node);
+}
+
+void
+_dzl_tree_builder_build_children (DzlTreeBuilder *builder,
+                                  DzlTreeNode    *node)
+{
+  g_return_if_fail (DZL_IS_TREE_BUILDER (builder));
+  g_return_if_fail (DZL_IS_TREE_NODE (node));
+
+  g_signal_emit (builder, signals [BUILD_CHILDREN], 0, node);
 }
 
 void
@@ -364,6 +375,20 @@ dzl_tree_builder_class_init (DzlTreeBuilderClass *klass)
                   1,
                   DZL_TYPE_TREE_NODE);
   g_signal_set_va_marshaller (signals [BUILD_NODE],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
+
+  signals [BUILD_CHILDREN] =
+    g_signal_new ("build-children",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlTreeBuilderClass, build_children),
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
+                  G_TYPE_NONE,
+                  1,
+                  DZL_TYPE_TREE_NODE);
+  g_signal_set_va_marshaller (signals [BUILD_CHILDREN],
                               G_TYPE_FROM_CLASS (klass),
                               g_cclosure_marshal_VOID__OBJECTv);
 

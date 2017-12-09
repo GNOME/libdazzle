@@ -41,7 +41,7 @@ struct _DzlTreeNode
   GQuark             expanded_icon_name;
 
   guint              use_markup : 1;
-  guint              needs_build : 1;
+  guint              needs_build_children : 1;
   guint              is_dummy : 1;
   guint              children_possible : 1;
   guint              use_dim_label : 1;
@@ -949,7 +949,7 @@ dzl_tree_node_class_init (DzlTreeNodeClass *klass)
 static void
 dzl_tree_node_init (DzlTreeNode *node)
 {
-  node->needs_build = TRUE;
+  node->needs_build_children = TRUE;
 }
 
 static gboolean
@@ -1073,22 +1073,22 @@ _dzl_tree_node_is_dummy (DzlTreeNode *self)
 }
 
 gboolean
-_dzl_tree_node_get_needs_build (DzlTreeNode *self)
+_dzl_tree_node_get_needs_build_children (DzlTreeNode *self)
 {
   g_assert (DZL_IS_TREE_NODE (self));
 
-  return self->needs_build;
+  return self->needs_build_children;
 }
 
 void
-_dzl_tree_node_set_needs_build (DzlTreeNode *self,
-                                gboolean     needs_build)
+_dzl_tree_node_set_needs_build_children (DzlTreeNode *self,
+                                         gboolean     needs_build_children)
 {
   g_assert (DZL_IS_TREE_NODE (self));
 
-  self->needs_build = !!needs_build;
+  self->needs_build_children = !!needs_build_children;
 
-  if (!needs_build)
+  if (!needs_build_children)
     self->is_dummy = FALSE;
 }
 
@@ -1155,7 +1155,7 @@ dzl_tree_node_get_children_possible (DzlTreeNode *self)
  */
 void
 dzl_tree_node_set_children_possible (DzlTreeNode *self,
-                                    gboolean    children_possible)
+                                     gboolean     children_possible)
 {
   g_return_if_fail (DZL_IS_TREE_NODE (self));
 
@@ -1165,7 +1165,7 @@ dzl_tree_node_set_children_possible (DzlTreeNode *self,
     {
       self->children_possible = children_possible;
 
-      if (self->tree && self->needs_build)
+      if (self->tree != NULL && self->needs_build_children)
         {
           if (self->children_possible)
             _dzl_tree_node_add_dummy_child (self);
@@ -1242,7 +1242,7 @@ dzl_tree_node_n_children (DzlTreeNode *self)
 {
   g_return_val_if_fail (DZL_IS_TREE_NODE (self), 0);
 
-  if (!self->needs_build && self->tree != NULL)
+  if (!self->needs_build_children && self->tree != NULL)
     {
       GtkTreeIter iter;
       GtkTreeModel *model;
@@ -1270,7 +1270,7 @@ dzl_tree_node_nth_child (DzlTreeNode *self,
                          guint        nth)
 {
   g_return_val_if_fail (DZL_IS_TREE_NODE (self), NULL);
-  g_return_val_if_fail (!self->needs_build, NULL);
+  g_return_val_if_fail (!self->needs_build_children, NULL);
 
   if (self->tree != NULL)
     {

@@ -27,6 +27,8 @@ void          _dzl_tree_invalidate                      (DzlTree                
                                                          DzlTreeNode            *node);
 GtkTreePath  *_dzl_tree_get_path                        (DzlTree                *tree,
                                                          GList                  *list);
+void          _dzl_tree_build_children                  (DzlTree                *self,
+                                                         DzlTreeNode            *node);
 void          _dzl_tree_build_node                      (DzlTree                *self,
                                                          DzlTreeNode            *node);
 void          _dzl_tree_append                          (DzlTree                *self,
@@ -55,9 +57,9 @@ void          _dzl_tree_node_set_tree                   (DzlTreeNode            
 void          _dzl_tree_node_set_parent                 (DzlTreeNode            *node,
                                                          DzlTreeNode            *parent);
 const gchar  *_dzl_tree_node_get_expanded_icon          (DzlTreeNode            *node);
-gboolean      _dzl_tree_node_get_needs_build            (DzlTreeNode            *node);
-void          _dzl_tree_node_set_needs_build            (DzlTreeNode            *node,
-                                                         gboolean                needs_build);
+gboolean      _dzl_tree_node_get_needs_build_children   (DzlTreeNode            *node);
+void          _dzl_tree_node_set_needs_build_children   (DzlTreeNode            *node,
+                                                         gboolean                needs_build_children);
 void          _dzl_tree_node_add_dummy_child            (DzlTreeNode            *node);
 void          _dzl_tree_node_remove_dummy_child         (DzlTreeNode            *node);
 gboolean      _dzl_tree_node_is_dummy                   (DzlTreeNode            *self);
@@ -68,6 +70,8 @@ void          _dzl_tree_builder_added                   (DzlTreeBuilder         
 void          _dzl_tree_builder_removed                 (DzlTreeBuilder         *builder,
                                                          DzlTree                *tree);
 void          _dzl_tree_builder_build_node              (DzlTreeBuilder         *builder,
+                                                         DzlTreeNode            *node);
+void          _dzl_tree_builder_build_children          (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node);
 gboolean      _dzl_tree_builder_drag_data_get           (DzlTreeBuilder         *builder,
                                                          DzlTreeNode            *node,

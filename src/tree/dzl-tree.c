@@ -124,20 +124,40 @@ _dzl_tree_build_node (DzlTree     *self,
                       DzlTreeNode *node)
 {
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
-  gsize i;
 
   g_assert (DZL_IS_TREE (self));
   g_assert (DZL_IS_TREE_NODE (node));
 
-  _dzl_tree_node_set_needs_build (node, FALSE);
+  for (guint i = 0; i < priv->builders->len; i++)
+    {
+      DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
+
+      _dzl_tree_builder_build_node (builder, node);
+    }
+
+  if (!priv->always_expand &&
+      dzl_tree_node_get_children_possible (node) &&
+      dzl_tree_node_n_children (node) == 0)
+    _dzl_tree_node_add_dummy_child (node);
+}
+
+void
+_dzl_tree_build_children (DzlTree     *self,
+                          DzlTreeNode *node)
+{
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+
+  g_assert (DZL_IS_TREE (self));
+  g_assert (DZL_IS_TREE_NODE (node));
+
+  _dzl_tree_node_set_needs_build_children (node, FALSE);
   _dzl_tree_node_remove_dummy_child (node);
 
-  for (i = 0; i < priv->builders->len; i++)
+  for (guint i = 0; i < priv->builders->len; i++)
     {
-      DzlTreeBuilder *builder;
+      DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
 
-      builder = g_ptr_array_index (priv->builders, i);
-      _dzl_tree_builder_build_node (builder, node);
+      _dzl_tree_builder_build_children (builder, node);
     }
 }
 
@@ -314,17 +334,24 @@ dzl_tree_add_builder_foreach_cb (GtkTreeModel *model,
                                  GtkTreeIter  *iter,
                                  gpointer      user_data)
 {
+  g_autoptr(DzlTreeNode) node = NULL;
   DzlTreeBuilder *builder = user_data;
-  DzlTreeNode *node = NULL;
+  DzlTreePrivate *priv;
+  DzlTree *tree;
 
   g_return_val_if_fail (GTK_IS_TREE_MODEL (model), FALSE);
   g_return_val_if_fail (path != NULL, FALSE);
   g_return_val_if_fail (iter != NULL, FALSE);
 
+  tree = dzl_tree_builder_get_tree (builder);
+  priv = dzl_tree_get_instance_private (tree);
+
   gtk_tree_model_get (model, iter, 0, &node, -1);
-  if (!_dzl_tree_node_get_needs_build (node))
-    _dzl_tree_builder_build_node (builder, node);
-  g_clear_object (&node);
+
+  _dzl_tree_builder_build_node (builder, node);
+
+  if (priv->always_expand || !_dzl_tree_node_get_needs_build_children (node))
+    _dzl_tree_builder_build_children (builder, node);
 
   return FALSE;
 }
@@ -484,17 +511,19 @@ dzl_tree_add (DzlTree     *self,
                                      0, child,
                                      -1);
 
+  _dzl_tree_build_node (self, child);
+
   if (dzl_tree_node_get_children_possible (child))
     _dzl_tree_node_add_dummy_child (child);
 
   if (priv->always_expand)
     {
-      _dzl_tree_build_node (self, child);
+      _dzl_tree_build_children (self, child);
       dzl_tree_node_expand (child, TRUE);
     }
   else if (node == priv->root)
     {
-      _dzl_tree_build_node (self, child);
+      _dzl_tree_build_children (self, child);
     }
 
   g_object_unref (child);
@@ -522,7 +551,7 @@ _dzl_tree_insert_sorted (DzlTree                *self,
 
   _dzl_tree_node_set_tree (child, self);
   _dzl_tree_node_set_parent (child, node);
-  _dzl_tree_node_set_needs_build (child, TRUE);
+  _dzl_tree_node_set_needs_build_children (child, TRUE);
 
   g_object_ref_sink (child);
 
@@ -554,8 +583,10 @@ _dzl_tree_insert_sorted (DzlTree                *self,
   gtk_tree_store_set (priv->store, &children, 0, child, -1);
 
 inserted:
-  if (node == priv->root)
-    _dzl_tree_build_node (self, child);
+  _dzl_tree_build_node (self, child);
+
+  if (priv->always_expand || priv->root == child)
+    _dzl_tree_build_children (self, child);
 
   g_object_unref (child);
 }
@@ -618,12 +649,13 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
   g_assert (DZL_IS_TREE_NODE (node));
 
   /*
-   * If we are expanding a row that has a dummy child, we might need to
-   * build the node immediately, and re-expand it.
+   * If we are expanding a row that has a dummy child, we need to allow
+   * the builders to add children to the node.
    */
-  if (_dzl_tree_node_get_needs_build (node))
+
+  if (_dzl_tree_node_get_needs_build_children (node))
     {
-      _dzl_tree_build_node (self, node);
+      _dzl_tree_build_children (self, node);
       dzl_tree_node_expand (node, FALSE);
       dzl_tree_node_select (node);
     }
@@ -680,7 +712,7 @@ dzl_tree_row_collapsed (GtkTreeView *tree_view,
         }
 
       _dzl_tree_node_add_dummy_child (node);
-      _dzl_tree_node_set_needs_build (node, TRUE);
+      _dzl_tree_node_set_needs_build_children (node, TRUE);
     }
 
   /* Notify builders of collapse */
@@ -1511,7 +1543,7 @@ dzl_tree_set_root (DzlTree     *self,
           priv->root = g_object_ref_sink (root);
           _dzl_tree_node_set_parent (priv->root, NULL);
           _dzl_tree_node_set_tree (priv->root, self);
-          _dzl_tree_build_node (self, priv->root);
+          _dzl_tree_build_children (self, priv->root);
         }
 
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ROOT]);
@@ -1535,7 +1567,7 @@ dzl_tree_rebuild (DzlTree *self)
   if (priv->root != NULL)
     {
       gtk_tree_store_clear (priv->store);
-      _dzl_tree_build_node (self, priv->root);
+      _dzl_tree_build_children (self, priv->root);
     }
 }
 
@@ -1661,12 +1693,17 @@ _dzl_tree_invalidate (DzlTree     *self,
       gtk_tree_path_free (path);
     }
 
-  _dzl_tree_node_set_needs_build (node, TRUE);
+  _dzl_tree_node_set_needs_build_children (node, TRUE);
 
   parent = dzl_tree_node_get_parent (node);
 
-  if ((parent == NULL) || dzl_tree_node_get_expanded (parent))
+  /* Build the node (unless it's the root */
+  if (parent != NULL)
     _dzl_tree_build_node (self, node);
+
+  /* Now build the children if necessary */
+  if ((parent == NULL) || dzl_tree_node_get_expanded (parent))
+    _dzl_tree_build_children (self, node);
 }
 
 /**
@@ -1707,8 +1744,8 @@ dzl_tree_find_child_node (DzlTree         *self,
       return NULL;
     }
 
-  if (_dzl_tree_node_get_needs_build (node))
-    _dzl_tree_build_node (self, node);
+  if (_dzl_tree_node_get_needs_build_children (node))
+    _dzl_tree_build_children (self, node);
 
   model = GTK_TREE_MODEL (priv->store);
   path = dzl_tree_node_get_path (node);
@@ -1827,7 +1864,7 @@ dzl_tree_model_filter_recursive (GtkTreeModel *model,
               if (filter->filter_func (filter->self, node, filter->filter_data))
                 return TRUE;
 
-              if (!_dzl_tree_node_get_needs_build (node))
+              if (!_dzl_tree_node_get_needs_build_children (node))
                 {
                   if (dzl_tree_model_filter_recursive (model, &child, filter))
                     return TRUE;
