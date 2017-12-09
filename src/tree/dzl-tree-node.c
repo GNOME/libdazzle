@@ -268,6 +268,15 @@ dzl_tree_node_get_parent (DzlTreeNode *node)
   return node->parent;
 }
 
+static void
+dzl_tree_node_queue_draw (DzlTreeNode *self)
+{
+  g_assert (DZL_IS_TREE_NODE (self));
+
+  if (self->tree != NULL)
+    gtk_widget_queue_draw (GTK_WIDGET (self->tree));
+}
+
 void
 dzl_tree_node_set_gicon (DzlTreeNode *self,
                          GIcon       *gicon)
@@ -360,6 +369,7 @@ dzl_tree_node_set_icon_name (DzlTreeNode *node,
       g_clear_object (&node->gicon);
       g_object_notify_by_pspec (G_OBJECT (node), properties [PROP_ICON_NAME]);
       g_object_notify_by_pspec (G_OBJECT (node), properties [PROP_GICON]);
+      dzl_tree_node_queue_draw (node);
     }
 }
 
@@ -389,6 +399,7 @@ dzl_tree_node_add_emblem (DzlTreeNode *self,
   self->emblems = g_list_prepend (self->emblems, g_strdup (emblem));
   g_clear_object (&self->gicon);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_GICON]);
+  dzl_tree_node_queue_draw (self);
 }
 
 void
@@ -407,6 +418,7 @@ dzl_tree_node_remove_emblem (DzlTreeNode *self,
           self->emblems = g_list_delete_link (self->emblems, iter);
           g_clear_object (&self->gicon);
           g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_GICON]);
+          dzl_tree_node_queue_draw (self);
           return;
         }
     }
@@ -426,6 +438,7 @@ dzl_tree_node_clear_emblems (DzlTreeNode *self)
   self->emblems = NULL;
   g_clear_object (&self->gicon);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_GICON]);
+  dzl_tree_node_queue_draw (self);
 }
 
 /**
@@ -476,6 +489,7 @@ dzl_tree_node_set_emblems (DzlTreeNode         *self,
 
   g_clear_object (&self->gicon);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_GICON]);
+  dzl_tree_node_queue_draw (self);
 }
 
 /**
