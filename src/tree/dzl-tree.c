@@ -460,7 +460,7 @@ text_func (GtkCellLayout   *cell_layout,
 
   if (node)
     {
-      GdkRGBA *rgba = NULL;
+      const GdkRGBA *rgba = NULL;
       const gchar *text;
       gboolean use_markup;
 
@@ -469,6 +469,8 @@ text_func (GtkCellLayout   *cell_layout,
 
       if (dzl_tree_node_get_use_dim_label (node))
         rgba = &priv->dim_foreground;
+      else
+        rgba = dzl_tree_node_get_foreground_rgba (node);
 
       g_object_set (cell,
                     use_markup ? "markup" : "text", text,

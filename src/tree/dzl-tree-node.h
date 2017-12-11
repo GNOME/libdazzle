@@ -128,6 +128,11 @@ gboolean        dzl_tree_node_get_reset_on_collapse (DzlTreeNode            *sel
 DZL_AVAILABLE_IN_3_28
 void            dzl_tree_node_set_reset_on_collapse (DzlTreeNode            *self,
                                                      gboolean                reset_on_collapse);
+DZL_AVAILABLE_IN_3_28
+const GdkRGBA  *dzl_tree_node_get_foreground_rgba   (DzlTreeNode            *self);
+DZL_AVAILABLE_IN_3_28
+void            dzl_tree_node_set_foreground_rgba   (DzlTreeNode            *self,
+                                                     const GdkRGBA          *foreground_rgba);
 
 G_END_DECLS
 

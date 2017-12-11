@@ -19,6 +19,7 @@
 #define G_LOG_DOMAIN "dzl-tree-node"
 
 #include <glib/gi18n.h>
+#include <string.h>
 
 #include "tree/dzl-tree.h"
 #include "tree/dzl-tree-node.h"
@@ -34,18 +35,21 @@ struct _DzlTreeNode
   GObject           *item;
   gchar             *text;
   DzlTree           *tree;
+
   GIcon             *gicon;
   GList             *emblems;
-
   GQuark             icon_name;
   GQuark             expanded_icon_name;
 
-  guint              use_markup : 1;
-  guint              needs_build_children : 1;
-  guint              is_dummy : 1;
+  GdkRGBA            foreground_rgba;
+
   guint              children_possible : 1;
-  guint              use_dim_label : 1;
+  guint              is_dummy : 1;
+  guint              foreground_rgba_set : 1;
+  guint              needs_build_children : 1;
   guint              reset_on_collapse : 1;
+  guint              use_dim_label : 1;
+  guint              use_markup : 1;
 };
 
 typedef struct
@@ -1311,4 +1315,52 @@ dzl_tree_node_nth_child (DzlTreeNode *self,
     }
 
   return NULL;
+}
+
+/**
+ * dzl_tree_node_get_foreground_rgba:
+ * @self: a #DzlTreeNode
+ *
+ * Gets the foreground-rgba to use for row text.
+ *
+ * If %NULL, the default foreground color should be used.
+ *
+ * Returns: (nullable) (transfer none): A #GdkRGBA or %NULL
+ *
+ * Since: 3.28
+ */
+const GdkRGBA *
+dzl_tree_node_get_foreground_rgba (DzlTreeNode *self)
+{
+  g_return_val_if_fail (DZL_IS_TREE_NODE (self), NULL);
+
+  if (self->foreground_rgba_set)
+    return &self->foreground_rgba;
+
+  return NULL;
+}
+
+/**
+ * dzl_tree_node_set_foreground_rgba:
+ * @self: a #DzlTreeNode
+ * @foreground_rgba: (nullable): A #GdkRGBA or %NULL
+ *
+ * Sets the foreground-rgba to be used by the row text.
+ *
+ * If @foreground_rgba is %NULL, the value is reset to the default.
+ *
+ * Since: 3.28
+ */
+void
+dzl_tree_node_set_foreground_rgba (DzlTreeNode   *self,
+                                   const GdkRGBA *foreground_rgba)
+{
+  g_return_if_fail (DZL_IS_TREE_NODE (self));
+
+  if (foreground_rgba != NULL)
+    self->foreground_rgba = *foreground_rgba;
+  else
+    memset (&self->foreground_rgba, 0, sizeof self->foreground_rgba);
+
+  self->foreground_rgba_set = !!foreground_rgba;
 }
