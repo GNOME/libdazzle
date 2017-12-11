@@ -14,6 +14,7 @@ build_children_cb (DzlTreeBuilder *builder,
 
   if (g_file_query_file_type (file, 0, NULL) == G_FILE_TYPE_DIRECTORY)
     {
+      static const GdkRGBA dim = { 0, 0, 0, 0.5 };
       g_autoptr(GFileEnumerator) enumerator = NULL;
       gpointer infoptr;
 
@@ -29,7 +30,8 @@ build_children_cb (DzlTreeBuilder *builder,
       while (!!(infoptr = g_file_enumerator_next_file (enumerator, NULL, NULL)))
         {
           g_autoptr(GFileInfo) info = infoptr;
-          g_autoptr(GFile) child = g_file_get_child (file, g_file_info_get_name (info));
+          const gchar *name = g_file_info_get_name (info);
+          g_autoptr(GFile) child = g_file_get_child (file, name);
           DzlTreeNode *child_node;
 
           child_node = dzl_tree_node_new ();
@@ -37,6 +39,9 @@ build_children_cb (DzlTreeBuilder *builder,
           dzl_tree_node_set_text (child_node, g_file_info_get_name (info));
           dzl_tree_node_set_gicon (child_node, g_file_info_get_icon (info));
           dzl_tree_node_set_reset_on_collapse (child_node, TRUE);
+
+          if (*name == '.')
+            dzl_tree_node_set_foreground_rgba (child_node, &dim);
 
           if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
             dzl_tree_node_set_children_possible (child_node, TRUE);
