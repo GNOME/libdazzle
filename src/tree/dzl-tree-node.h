@@ -77,6 +77,8 @@ void            dzl_tree_node_get_area              (DzlTreeNode            *nod
                                                      GdkRectangle           *area);
 DZL_AVAILABLE_IN_ALL
 void            dzl_tree_node_invalidate            (DzlTreeNode            *node);
+DZL_AVAILABLE_IN_3_28
+void            dzl_tree_node_rebuild               (DzlTreeNode            *self);
 DZL_AVAILABLE_IN_ALL
 gboolean        dzl_tree_node_get_expanded          (DzlTreeNode            *node);
 DZL_AVAILABLE_IN_ALL

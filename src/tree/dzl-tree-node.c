@@ -1364,3 +1364,25 @@ dzl_tree_node_set_foreground_rgba (DzlTreeNode   *self,
 
   self->foreground_rgba_set = !!foreground_rgba;
 }
+
+/**
+ * dzl_tree_node_rebuild:
+ * @self: a #DzlTreeNode
+ *
+ * Rebuilds a node, without invalidating children nodes. If you want to
+ * ensure that children are also rebuilt, use dzl_tree_node_invalidate().
+ *
+ * Since: 3.28
+ */
+void
+dzl_tree_node_rebuild (DzlTreeNode *self)
+{
+  DzlTree *tree;
+
+  g_return_if_fail (DZL_IS_TREE_NODE (self));
+
+  tree = dzl_tree_node_get_tree (self);
+
+  if (tree != NULL)
+    _dzl_tree_build_node (tree, self);
+}
