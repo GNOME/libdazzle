@@ -1,4 +1,26 @@
 ==============
+Version 3.27.3
+==============
+
+Changes in this release:
+
+ • A new DzlRecursiveFileMonitor for recursive file monitors. This is
+   only guaranteed to use a single FD when inotify is used (ie: Linux).
+ • Fixes for age comparison in directory reaper.
+ • Improvements to legacy activation in shortcuts.
+ • Avoid potential spinning in progress-menu-button.
+ • DzlFileTransfer is a new high-level API to help in copying or moving
+   directory trees. It is not as smart as libglnx, but it is simpler to
+   use and we'd like to see this improve.
+ • DzlTreeBuilder has broken ABI this cycle and gained padding to help
+   us avoid breaking ABI in the future. Those who only use it from signals
+   and dzl_tree_builder_new() are not effected by this alone.
+ • DzlTreeBuilder has also added build-children signal so that it can
+   disambiguate between building nodes (adding anscillary data) and
+   creating children in a lazy tree. This does, unfortunately, break
+   existing code as it needs to switch to using build-children.
+
+==============
 Version 3.27.2
 ==============
 
