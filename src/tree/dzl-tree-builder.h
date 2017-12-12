@@ -74,9 +74,12 @@ struct _DzlTreeBuilderClass
                                        GtkSelectionData    *data);
   gboolean (*drag_node_delete)        (DzlTreeBuilder      *builder,
                                        DzlTreeNode         *node);
+  void     (*cell_data_func)          (DzlTreeBuilder      *tree,
+                                       DzlTreeNode         *node,
+                                       GtkCellRenderer     *cell);
 
   /*< private >*/
-  gpointer _padding[12];
+  gpointer _padding[11];
 };
 
 DZL_AVAILABLE_IN_ALL

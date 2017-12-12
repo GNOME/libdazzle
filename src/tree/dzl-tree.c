@@ -458,7 +458,7 @@ text_func (GtkCellLayout   *cell_layout,
 
   gtk_tree_model_get (tree_model, iter, 0, &node, -1);
 
-  if (node)
+  if G_LIKELY (node != NULL)
     {
       const GdkRGBA *rgba = NULL;
       const gchar *text;
@@ -476,6 +476,14 @@ text_func (GtkCellLayout   *cell_layout,
                     use_markup ? "markup" : "text", text,
                     "foreground-rgba", rgba,
                     NULL);
+
+      for (guint i = 0; i < priv->builders->len; i++)
+        {
+          DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
+
+          if (DZL_TREE_BUILDER_GET_CLASS (builder)->cell_data_func)
+            DZL_TREE_BUILDER_GET_CLASS (builder)->cell_data_func (builder, node, cell);
+        }
     }
 }
 
