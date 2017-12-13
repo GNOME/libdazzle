@@ -25,7 +25,7 @@
 
 G_BEGIN_DECLS
 
-DZL_AVAILABLE_IN_ALL
+DZL_DEPRECATED_FOR (gtk_selection_data_get_uris)
 gchar **dzl_dnd_get_uri_list (GtkSelectionData *selection_data);
 
 G_END_DECLS

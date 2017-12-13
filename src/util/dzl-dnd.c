@@ -33,12 +33,5 @@
 gchar **
 dzl_dnd_get_uri_list (GtkSelectionData *selection_data)
 {
-  const gchar *data;
-
-  g_return_val_if_fail (selection_data, NULL);
-  g_return_val_if_fail (gtk_selection_data_get_length (selection_data) > 0, NULL);
-
-  data = (const gchar *)gtk_selection_data_get_data (selection_data);
-
-  return g_uri_list_extract_uris (data);
+  return gtk_selection_data_get_uris (selection_data);
 }
