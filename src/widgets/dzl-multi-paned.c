@@ -2189,3 +2189,53 @@ dzl_multi_paned_get_nth_child (DzlMultiPaned *self,
 
   return g_array_index (priv->children, DzlMultiPanedChild, nth).widget;
 }
+
+/**
+ * dzl_multi_paned_get_at_point:
+ * @self: a #DzlMultiPaned
+ * @x: x coordinate
+ * @y: y coordinate
+ *
+ * Locates the widget at position x,y within widget.
+ *
+ * @x and @y should be relative to @self.
+ *
+ * Returns: (transfer none) (nullable): a #GtkWidget or %NULL
+ *
+ * Since: 3.28
+ */
+GtkWidget *
+dzl_multi_paned_get_at_point (DzlMultiPaned *self,
+                              gint           x,
+                              gint           y)
+{
+  DzlMultiPanedPrivate *priv = dzl_multi_paned_get_instance_private (self);
+  GtkAllocation alloc;
+
+  g_return_val_if_fail (DZL_IS_MULTI_PANED (self), NULL);
+
+  gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
+
+  if (IS_HORIZONTAL (priv->orientation))
+    {
+      for (guint i = 0; i < priv->children->len; i++)
+        {
+          const DzlMultiPanedChild *child = &g_array_index (priv->children, DzlMultiPanedChild, i);
+
+          if (x >= child->alloc.x && x < (child->alloc.x + child->alloc.width))
+            return child->widget;
+        }
+    }
+  else
+    {
+      for (guint i = 0; i < priv->children->len; i++)
+        {
+          const DzlMultiPanedChild *child = &g_array_index (priv->children, DzlMultiPanedChild, i);
+
+          if (y >= child->alloc.y && y < (child->alloc.y + child->alloc.height))
+            return child->widget;
+        }
+    }
+
+  return NULL;
+}

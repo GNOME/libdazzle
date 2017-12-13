@@ -60,6 +60,10 @@ guint      dzl_multi_paned_get_n_children (DzlMultiPaned *self);
 DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_multi_paned_get_nth_child  (DzlMultiPaned *self,
                                            guint          nth);
+DZL_AVAILABLE_IN_3_28
+GtkWidget *dzl_multi_paned_get_at_point   (DzlMultiPaned *self,
+                                           gint           x,
+                                           gint           y);
 
 G_END_DECLS
 
