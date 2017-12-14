@@ -398,7 +398,7 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
                                   const gchar *mux_key)
 {
   const gchar * const *old_prefixes = NULL;
-  const gchar **prefixes = NULL;
+  g_autofree const gchar **prefixes = NULL;
 
   g_return_if_fail (GTK_IS_WIDGET (widget));
   g_return_if_fail (!from_widget || GTK_IS_WIDGET (from_widget));
