@@ -139,7 +139,7 @@ dzl_dock_widget_get_property (GObject    *object,
       break;
 
     case PROP_ICON_NAME:
-      g_value_set_string (value, dzl_dock_widget_item_get_icon_name (DZL_DOCK_ITEM (self)));
+      g_value_take_string (value, dzl_dock_widget_item_get_icon_name (DZL_DOCK_ITEM (self)));
       break;
 
     case PROP_MANAGER:
@@ -147,7 +147,7 @@ dzl_dock_widget_get_property (GObject    *object,
       break;
 
     case PROP_TITLE:
-      g_value_set_string (value, dzl_dock_widget_item_get_title (DZL_DOCK_ITEM (self)));
+      g_value_take_string (value, dzl_dock_widget_item_get_title (DZL_DOCK_ITEM (self)));
       break;
 
     default:
