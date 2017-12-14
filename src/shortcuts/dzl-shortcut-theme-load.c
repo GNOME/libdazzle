@@ -239,7 +239,7 @@ load_state_commit_property (LoadState  *state,
                            state->stack->pspec->name,
                            &value);
 
-  g_string_free (state->text, FALSE);
+  g_string_free (state->text, TRUE);
   state->text = NULL;
 }
 
