@@ -352,7 +352,7 @@ dzl_shortcut_theme_add_context (DzlShortcutTheme   *self,
 
   g_return_if_fail (name != NULL);
 
-  g_hash_table_insert (priv->contexts, g_strdup (name), g_object_ref (context));
+  g_hash_table_insert (priv->contexts, (gchar *)g_intern_string (name), g_object_ref (context));
 }
 
 DzlShortcutTheme *
