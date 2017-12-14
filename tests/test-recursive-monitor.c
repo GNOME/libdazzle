@@ -145,11 +145,11 @@ test_basic (void)
   state.created = g_hash_table_new_full (g_file_hash,
                                          (GEqualFunc) g_file_equal,
                                          g_object_unref,
-                                         g_object_unref);
+                                         NULL);
   state.deleted = g_hash_table_new_full (g_file_hash,
                                          (GEqualFunc) g_file_equal,
                                          g_object_unref,
-                                         g_object_unref);
+                                         NULL);
 
   /* Cleanup any previously failed run */
   if (g_file_test ("recursive-dir", G_FILE_TEST_EXISTS))
@@ -192,6 +192,11 @@ test_basic (void)
   g_main_loop_run (state.main_loop);
 
   dzl_recursive_file_monitor_cancel (state.monitor);
+
+  g_clear_pointer (&state.main_loop, g_main_loop_unref);
+  g_clear_pointer (&state.created, g_hash_table_unref);
+  g_clear_pointer (&state.deleted, g_hash_table_unref);
+  g_clear_object (&state.monitor);
 }
 
 gint

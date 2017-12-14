@@ -124,6 +124,8 @@ test_dzl_trie_gauntlet (void)
 
    g_strfreev(words);
    words = NULL;
+
+   g_timer_destroy (timer);
 }
 
 gint
