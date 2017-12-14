@@ -117,6 +117,7 @@ test_index_builder_basic (void)
   g_assert (r);
 
   g_object_unref (file);
+  g_main_loop_unref (main_loop);
 }
 
 static void
