@@ -221,8 +221,12 @@ dzl_suggestion_popover_hide (GtkWidget *widget)
   g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
 
   if (self->transient_for != NULL)
-    gtk_window_group_remove_window (gtk_window_get_group (self->transient_for),
-                                    GTK_WINDOW (self));
+    {
+      GtkWindowGroup *group = gtk_window_get_group (self->transient_for);
+
+      if (group != NULL)
+        gtk_window_group_remove_window (group, GTK_WINDOW (self));
+    }
 
   g_signal_handler_disconnect (self->transient_for, self->delete_event_handler);
   g_signal_handler_disconnect (self->transient_for, self->size_allocate_handler);
