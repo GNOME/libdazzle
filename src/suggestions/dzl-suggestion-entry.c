@@ -341,9 +341,9 @@ dzl_suggestion_entry_destroy (GtkWidget *widget)
 
   g_clear_object (&priv->model);
 
-  GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->destroy (widget);
-
   g_assert (priv->popover == NULL);
+
+  GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->destroy (widget);
 }
 
 static void
