@@ -51,6 +51,9 @@ GListModel  *dzl_list_box_get_model         (DzlListBox  *self);
 DZL_AVAILABLE_IN_ALL
 void         dzl_list_box_set_model         (DzlListBox  *self,
                                              GListModel  *model);
+DZL_AVAILABLE_IN_3_28
+void         dzl_list_box_set_recycle_max   (DzlListBox  *self,
+                                             guint        recycle_max);
 
 G_END_DECLS
 

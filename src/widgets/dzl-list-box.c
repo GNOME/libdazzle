@@ -35,6 +35,8 @@
 #include "dzl-list-box.h"
 #include "dzl-list-box-row.h"
 
+#define RECYCLE_MAX_DEFAULT 25
+
 typedef struct
 {
   GListModel *model;
@@ -294,7 +296,7 @@ dzl_list_box_init (DzlListBox *self)
   DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
 
   priv->row_type = G_TYPE_INVALID;
-  priv->recycle_max = 25;
+  priv->recycle_max = RECYCLE_MAX_DEFAULT;
 
   g_queue_init (&priv->trashed_rows);
 }
@@ -368,4 +370,28 @@ dzl_list_box_set_model (DzlListBox *self,
                            dzl_list_box_create_row,
                            self,
                            NULL);
+}
+
+/**
+ * dzl_list_box_set_recycle_max:
+ * @self: a #DzlListBox
+ * @recycle_max: max number of rows to cache
+ *
+ * Sets the max number of rows to cache for reuse.  Set to 0 to return
+ * to the default.
+ *
+ * Since: 3.28
+ */
+void
+dzl_list_box_set_recycle_max (DzlListBox *self,
+                              guint       recycle_max)
+{
+  DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_LIST_BOX (self));
+
+  if (recycle_max == 0)
+    priv->recycle_max = RECYCLE_MAX_DEFAULT;
+  else
+    priv->recycle_max = recycle_max;
 }
