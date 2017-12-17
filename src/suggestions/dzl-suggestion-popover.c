@@ -568,6 +568,8 @@ dzl_suggestion_popover_init (DzlSuggestionPopover *self)
                            G_CALLBACK (dzl_suggestion_popover_list_box_row_selected),
                            self,
                            G_CONNECT_SWAPPED);
+
+  dzl_list_box_set_recycle_max (self->list_box, 50);
 }
 
 GtkWidget *
