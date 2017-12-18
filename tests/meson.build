@@ -363,4 +363,11 @@ test_tree = executable('test-tree', 'test-tree.c',
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_cancellable = executable('test-cancellable', 'test-cancellable.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-cancellable', test_cancellable, env: test_env)
+
 endif

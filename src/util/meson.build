@@ -1,5 +1,6 @@
 util_headers = [
   'dzl-cairo.h',
+  'dzl-cancellable.h',
   'dzl-date-time.h',
   'dzl-dnd.h',
   'dzl-file-manager.h',
@@ -16,6 +17,7 @@ util_headers = [
 
 util_sources = [
   'dzl-cairo.c',
+  'dzl-cancellable.c',
   'dzl-date-time.c',
   'dzl-dnd.c',
   'dzl-file-manager.c',
