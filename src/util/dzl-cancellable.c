@@ -21,16 +21,56 @@
 #include <gio/gio.h>
 
 #include "util/dzl-cancellable.h"
+#include "util/dzl-macros.h"
+
+typedef struct
+{
+  GWeakRef self;
+  GWeakRef other;
+  gulong   other_handler;
+} ChainedInfo;
 
 static void
-dzl_cancellable_cancelled_cb (GCancellable *dep,
-                              GCancellable *parent)
+chained_info_free (gpointer data)
 {
-  g_assert (G_IS_CANCELLABLE (dep));
-  g_assert (G_IS_CANCELLABLE (parent));
+  ChainedInfo *info = data;
+  g_autoptr(GCancellable) self = NULL;
+  g_autoptr(GCancellable) other = NULL;
 
-  if (!g_cancellable_is_cancelled (parent))
-    g_cancellable_cancel (parent);
+  g_assert (info != NULL);
+
+  self = g_weak_ref_get (&info->self);
+  other = g_weak_ref_get (&info->other);
+
+  if (other != NULL && info->other_handler != 0)
+    dzl_clear_signal_handler (other, &info->other_handler);
+  else
+    info->other_handler = 0;
+
+  g_weak_ref_clear (&info->other);
+  g_weak_ref_clear (&info->self);
+
+  g_slice_free (ChainedInfo, info);
+}
+
+static void
+dzl_cancellable_cancelled_cb (GCancellable *other,
+                              ChainedInfo  *info)
+{
+  g_autoptr(GCancellable) self = NULL;
+
+  g_assert (G_IS_CANCELLABLE (other));
+  g_assert (info != NULL);
+
+  self = g_weak_ref_get (&info->self);
+
+  if (self != NULL)
+    {
+      if (!g_cancellable_is_cancelled (self))
+        g_cancellable_cancel (self);
+    }
+
+  dzl_clear_signal_handler (other, &info->other_handler);
 }
 
 /**
@@ -47,14 +87,25 @@ void
 dzl_cancellable_chain (GCancellable *self,
                        GCancellable *other)
 {
+  ChainedInfo *info;
+
   g_return_if_fail (!self || G_IS_CANCELLABLE (self));
   g_return_if_fail (!other || G_IS_CANCELLABLE (other));
 
   if (self == NULL || other == NULL)
     return;
 
-  g_cancellable_connect (other,
-                         G_CALLBACK (dzl_cancellable_cancelled_cb),
-                         g_object_ref (self),
-                         g_object_unref);
+  /*
+   * We very much want to avoid taking a reference in the process
+   * here because that makes it difficult to know if we've created
+   * any sort of reference cycles or cancellable leaks.
+   */
+
+  info = g_slice_new0 (ChainedInfo);
+  g_weak_ref_init (&info->self, self);
+  g_weak_ref_init (&info->other, other);
+  info->other_handler = g_cancellable_connect (other,
+                                               G_CALLBACK (dzl_cancellable_cancelled_cb),
+                                               info,
+                                               chained_info_free);
 }
