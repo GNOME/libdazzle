@@ -119,7 +119,7 @@ dzl_binding_group_connect (DzlBindingGroup *self,
 #ifdef DEBUG_BINDINGS
   {
     GFlagsClass *flags_class;
-    g_autofree gchar *flags_str;
+    g_autofree gchar *flags_str = NULL;
 
     flags_class = g_type_class_ref (G_TYPE_BINDING_FLAGS);
     flags_str = _g_flags_to_string (flags_class,
