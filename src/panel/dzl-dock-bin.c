@@ -1054,6 +1054,8 @@ dzl_dock_bin_size_allocate (GtkWidget     *widget,
             gdk_window_hide (child->handle);
         }
     }
+
+  gtk_widget_queue_draw (GTK_WIDGET (self));
 }
 
 static void
