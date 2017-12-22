@@ -487,6 +487,46 @@ text_func (GtkCellLayout   *cell_layout,
     }
 }
 
+void
+_dzl_tree_insert (DzlTree     *self,
+                  DzlTreeNode *parent,
+                  DzlTreeNode *child,
+                  guint        position)
+{
+  DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+  GtkTreeIter parent_iter;
+  GtkTreeIter iter;
+
+  g_return_if_fail (DZL_IS_TREE (self));
+  g_return_if_fail (DZL_IS_TREE_NODE (parent));
+  g_return_if_fail (DZL_IS_TREE_NODE (child));
+
+  g_object_ref_sink (child);
+
+  if (dzl_tree_node_get_iter (parent, &parent_iter))
+    {
+      _dzl_tree_node_set_tree (child, self);
+      _dzl_tree_node_set_parent (child, parent);
+
+      gtk_tree_store_insert_with_values (priv->store, &iter, &parent_iter, position,
+                                         0, child,
+                                         -1);
+
+      _dzl_tree_build_node (self, child);
+
+      if (dzl_tree_node_get_children_possible (child))
+        _dzl_tree_node_add_dummy_child (child);
+
+      if (priv->always_expand)
+        {
+          _dzl_tree_build_children (self, child);
+          dzl_tree_node_expand (child, TRUE);
+        }
+    }
+
+  g_object_unref (child);
+}
+
 static void
 dzl_tree_add (DzlTree     *self,
               DzlTreeNode *node,

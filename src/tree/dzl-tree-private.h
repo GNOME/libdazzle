@@ -31,6 +31,10 @@ void          _dzl_tree_build_children                  (DzlTree                
                                                          DzlTreeNode            *node);
 void          _dzl_tree_build_node                      (DzlTree                *self,
                                                          DzlTreeNode            *node);
+void          _dzl_tree_insert                          (DzlTree                *self,
+                                                         DzlTreeNode            *node,
+                                                         DzlTreeNode            *child,
+                                                         guint                   position);
 void          _dzl_tree_append                          (DzlTree                *self,
                                                          DzlTreeNode            *node,
                                                          DzlTreeNode            *child);

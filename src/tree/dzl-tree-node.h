@@ -30,6 +30,10 @@ DzlTreeNode    *dzl_tree_node_new                   (void);
 DZL_AVAILABLE_IN_ALL
 void            dzl_tree_node_append                (DzlTreeNode            *node,
                                                      DzlTreeNode            *child);
+DZL_AVAILABLE_IN_3_28
+void            dzl_tree_node_insert                (DzlTreeNode            *self,
+                                                     DzlTreeNode            *child,
+                                                     guint                   position);
 DZL_AVAILABLE_IN_ALL
 void            dzl_tree_node_insert_sorted         (DzlTreeNode            *node,
                                                      DzlTreeNode            *child,

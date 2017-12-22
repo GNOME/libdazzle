@@ -133,6 +133,27 @@ _dzl_tree_node_set_tree (DzlTreeNode *node,
 }
 
 /**
+ * dzl_tree_node_insert:
+ * @self: a #DzlTreeNode
+ * @child: a #DzlTreeNode
+ * @position: the position for the child
+ *
+ * Inserts @child as a child of @self at @position.
+ *
+ * Since: 3.28
+ */
+void
+dzl_tree_node_insert (DzlTreeNode *self,
+                      DzlTreeNode *child,
+                      guint        position)
+{
+  g_return_if_fail (DZL_IS_TREE_NODE (self));
+  g_return_if_fail (DZL_IS_TREE_NODE (child));
+
+  _dzl_tree_insert (self->tree, self, child, position);
+}
+
+/**
  * dzl_tree_node_insert_sorted:
  * @node: A #DzlTreeNode.
  * @child: A #DzlTreeNode.
