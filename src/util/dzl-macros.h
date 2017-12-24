@@ -25,6 +25,7 @@
 #ifdef __linux__
 # include <sys/types.h>
 # include <sys/syscall.h>
+# include <unistd.h>
 #endif
 
 G_BEGIN_DECLS
@@ -88,18 +89,18 @@ static inline void
 dzl_assert_is_main_thread (void)
 {
 #ifndef G_DISABLE_ASSERT
-# ifndef __linux__
-  static GThread *main;
+# ifdef __linux__
+  static GThread *main_thread;
   GThread *self = g_thread_self ();
 
-  if G_LIKELY (main == self)
-    return TRUE;
+  if G_LIKELY (main_thread == self)
+    return;
 
   /* Slow path, rely on task id == process id */
   if ((pid_t)syscall (SYS_gettid) == getpid ())
     {
       /* Allow for fast path next time */
-      main = self;
+      main_thread = self;
       return;
     }
 
