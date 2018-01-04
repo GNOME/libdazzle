@@ -32,6 +32,7 @@ dzl_gdk_synthesize_event_key (GdkWindow *window,
                               gunichar   ch)
 {
   GdkDisplay *display;
+  GdkKeymap *keymap;
   GdkDevice *device;
   GdkSeat *seat;
   GdkEvent *ev;
@@ -74,7 +75,9 @@ dzl_gdk_synthesize_event_key (GdkWindow *window,
       break;
     }
 
-  gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
+  display = gdk_window_get_display (window);
+  keymap = gdk_keymap_get_for_display (display);
+  gdk_keymap_get_entries_for_keyval (keymap,
                                      ev->key.keyval,
                                      &keys,
                                      &n_keys);
@@ -88,7 +91,6 @@ dzl_gdk_synthesize_event_key (GdkWindow *window,
       g_free (keys);
     }
 
-  display = gdk_window_get_display (ev->any.window);
   seat = gdk_display_get_default_seat (display);
   device = gdk_seat_get_keyboard (seat);
   gdk_event_set_device (ev, device);
@@ -107,6 +109,7 @@ dzl_gdk_synthesize_event_keyval (GdkWindow *window,
 {
   GdkDisplay *display;
   GdkDevice *device;
+  GdkKeymap *keymap;
   GdkEvent *ev;
   GdkSeat *seat;
   GdkKeymapKey *keys = NULL;
@@ -132,7 +135,9 @@ dzl_gdk_synthesize_event_keyval (GdkWindow *window,
   ev->key.string = g_strdup (str);
   ev->key.length = strlen (str);
 
-  gdk_keymap_get_entries_for_keyval (gdk_keymap_get_default (),
+  display = gdk_window_get_display (window);
+  keymap = gdk_keymap_get_for_display (display);
+  gdk_keymap_get_entries_for_keyval (keymap,
                                      ev->key.keyval,
                                      &keys,
                                      &n_keys);
@@ -146,7 +151,6 @@ dzl_gdk_synthesize_event_keyval (GdkWindow *window,
       g_free (keys);
     }
 
-  display = gdk_window_get_display (ev->any.window);
   seat = gdk_display_get_default_seat (display);
   device = gdk_seat_get_keyboard (seat);
   gdk_event_set_device (ev, device);
