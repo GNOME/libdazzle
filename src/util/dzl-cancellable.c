@@ -81,19 +81,37 @@ dzl_cancellable_cancelled_cb (GCancellable *other,
  * If both @self and @other are not %NULL, then the cancellation of
  * @other will be propagated to @self if @other is cancelled.
  *
+ * If @self and @other are the same, @self is returned and no additional
+ * chaining will occur.
+ *
+ * If @self and @other are %NULL, then %NULL is returned.
+ * If @self is non-%NULL, it will be returned.
+ * If @self is %NULL and @other is non-%NULL, other will be
+ * returned. This is useful to succinctly chain cancellables like:
+ *
+ * |[
+ * cancellable = dzl_cancellable_chain (cancellable, self->cancellable);
+ * ]|
+ *
+ * Returns: (transfer none) (nullable): a #GCancellable or %NULL
+ *
  * Since: 3.28
  */
-void
+GCancellable *
 dzl_cancellable_chain (GCancellable *self,
                        GCancellable *other)
 {
   ChainedInfo *info;
 
-  g_return_if_fail (!self || G_IS_CANCELLABLE (self));
-  g_return_if_fail (!other || G_IS_CANCELLABLE (other));
+  g_return_val_if_fail (!self || G_IS_CANCELLABLE (self), NULL);
+  g_return_val_if_fail (!other || G_IS_CANCELLABLE (other), NULL);
 
-  if (self == NULL || other == NULL)
-    return;
+  if (self == other)
+    return self;
+  else if (self == NULL)
+    return other;
+  else if (other == NULL)
+    return self;
 
   /*
    * We very much want to avoid taking a reference in the process
@@ -108,4 +126,6 @@ dzl_cancellable_chain (GCancellable *self,
                                                G_CALLBACK (dzl_cancellable_cancelled_cb),
                                                info,
                                                chained_info_free);
+
+  return self;
 }

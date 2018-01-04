@@ -22,7 +22,7 @@
 
 G_BEGIN_DECLS
 
-void dzl_cancellable_chain (GCancellable *self,
-                            GCancellable *other);
+GCancellable *dzl_cancellable_chain (GCancellable *self,
+                                     GCancellable *other);
 
 G_END_DECLS
