@@ -435,7 +435,7 @@ pixbuf_func (GtkCellLayout   *cell_layout,
 
   icon = dzl_tree_node_get_gicon (node);
   g_object_get (cell, "gicon", &old_icon, NULL);
-  if (icon != old_icon)
+  if (icon != old_icon || icon == NULL)
     g_object_set (cell, "gicon", icon, NULL);
 }
 
