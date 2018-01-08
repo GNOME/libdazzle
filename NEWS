@@ -1,4 +1,24 @@
 ==============
+Version 3.27.4
+==============
+
+Changes in this release:
+
+ • DzlTree has gained a number of improvements for dynamically styling tree
+   nodes.
+ • DzlMultiPaned gained a helper to locate a widget at an X,Y coordinate.
+ • Various memory leak fixes in shortcuts and unit tests.
+ • DzlListBox allows setting the number of rows to recycle. This may improve
+   performance in situations where the consuming API knows the maximum number
+   of rows, saving on widget creation and style propagation costs.
+ • A new cancellation chain helper that can be used until g_cancellable_chain()
+   lands upstream. When that happens, this will wrap that API, or be removed
+   in case it lands in 2.56.
+ • DzlTree gained support for inserting a child at a specific position.
+ • Fixes for API deprecations in Gdk.
+ • Fixes for main thread assertions on Linux.
+
+==============
 Version 3.27.3
 ==============
 
