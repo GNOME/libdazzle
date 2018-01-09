@@ -343,7 +343,6 @@ dzl_fuzzy_index_builder_build_lookaside (DzlFuzzyIndexBuilder *self)
 static GVariant *
 dzl_fuzzy_index_builder_build_index (DzlFuzzyIndexBuilder *self)
 {
-  g_autoptr(GPtrArray) ar = NULL;
   g_autoptr(GHashTable) rows = NULL;
   GVariantDict dict;
   GHashTableIter iter;
@@ -353,8 +352,7 @@ dzl_fuzzy_index_builder_build_index (DzlFuzzyIndexBuilder *self)
 
   g_assert (DZL_IS_FUZZY_INDEX_BUILDER (self));
 
-  ar = g_ptr_array_new_with_free_func ((GDestroyNotify)g_array_unref);
-  rows = g_hash_table_new (NULL, NULL);
+  rows = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify)g_array_unref);
 
   for (i = 0; i < self->kv_pairs->len; i++)
     {
