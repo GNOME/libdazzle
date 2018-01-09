@@ -1073,8 +1073,8 @@ dzl_tab_set_action_target_value (GtkActionable *actionable,
   if (priv->action_target_value != variant)
     {
       g_clear_pointer (&priv->action_target_value, g_variant_unref);
-      if (variant)
-        priv->action_target_value = g_variant_ref (variant);
+      if (variant != NULL)
+        priv->action_target_value = g_variant_ref_sink (variant);
       g_object_notify (G_OBJECT (self), "action-target");
     }
 }
