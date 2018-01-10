@@ -534,7 +534,6 @@ dzl_tree_add (DzlTree     *self,
               gboolean     prepend)
 {
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
-  GtkTreePath *path;
   GtkTreeIter *parentptr = NULL;
   GtkTreeIter iter;
   GtkTreeIter parent;
@@ -550,9 +549,12 @@ dzl_tree_add (DzlTree     *self,
 
   if (node != priv->root)
     {
+      GtkTreePath *path;
+
       path = dzl_tree_node_get_path (node);
       gtk_tree_model_get_iter (GTK_TREE_MODEL (priv->store), &parent, path);
       parentptr = &parent;
+
       g_clear_pointer (&path, gtk_tree_path_free);
     }
 

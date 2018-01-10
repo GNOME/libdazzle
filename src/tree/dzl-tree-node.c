@@ -1050,8 +1050,8 @@ dzl_tree_node_show_popover (DzlTreeNode *self,
 {
   GdkRectangle cell_area;
   GdkRectangle visible_rect;
-  DzlTree *tree;
   PopupRequest *popreq;
+  DzlTree *tree;
 
   g_return_if_fail (DZL_IS_TREE_NODE (self));
   g_return_if_fail (GTK_IS_POPOVER (popover));
@@ -1080,7 +1080,7 @@ dzl_tree_node_show_popover (DzlTreeNode *self,
 
       path = dzl_tree_node_get_path (self);
       gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (tree), path, NULL, FALSE, 0, 0);
-      gtk_tree_path_free (path);
+      g_clear_pointer (&path, gtk_tree_path_free);
 
       /*
        * FIXME: Time period comes from gtk animation duration.
@@ -1096,14 +1096,14 @@ dzl_tree_node_show_popover (DzlTreeNode *self,
       g_timeout_add (300,
                      dzl_tree_node_show_popover_timeout_cb,
                      popreq);
+
+      return;
     }
-  else
-    {
-      dzl_tree_node_show_popover_timeout_cb (popreq);
-    }
+
+  dzl_tree_node_show_popover_timeout_cb (g_steal_pointer (&popreq));
 }
 
-gboolean 
+gboolean
 _dzl_tree_node_is_dummy (DzlTreeNode *self)
 {
   g_return_val_if_fail (DZL_IS_TREE_NODE (self), FALSE);
