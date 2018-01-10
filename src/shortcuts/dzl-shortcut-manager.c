@@ -824,6 +824,11 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
       if (gtk_bindings_activate (G_OBJECT (toplevel), keyval, state))
         return TRUE;
 
+      /* See if there is a mnemonic active that should be activated */
+      if (GTK_IS_WINDOW (toplevel) &&
+          gtk_window_mnemonic_activate (GTK_WINDOW (toplevel), keyval, state))
+        return TRUE;
+
       /*
        * See if we have something defined for this theme that
        * can be activated directly.
