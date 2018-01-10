@@ -287,41 +287,42 @@ dzl_tree_popup_menu (GtkWidget *widget)
 }
 
 static void
-dzl_tree_selection_changed (DzlTree         *self,
-                           GtkTreeSelection *selection)
+dzl_tree_selection_changed (DzlTree          *self,
+                            GtkTreeSelection *selection)
 {
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
-  DzlTreeBuilder *builder;
   GtkTreeModel *model;
-  GtkTreeIter iter;
-  DzlTreeNode *node;
   DzlTreeNode *unselection;
+  GtkTreeIter iter;
 
   g_return_if_fail (DZL_IS_TREE (self));
   g_return_if_fail (GTK_IS_TREE_SELECTION (selection));
 
-  if ((unselection = priv->selection))
+  /* unowned reference */
+  unselection = g_steal_pointer (&priv->selection);
+
+  if (unselection != NULL)
     {
-      priv->selection = NULL;
       for (guint i = 0; i < priv->builders->len; i++)
         {
-          builder = g_ptr_array_index (priv->builders, i);
+          DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
           _dzl_tree_builder_node_unselected (builder, unselection);
         }
     }
 
   if (gtk_tree_selection_get_selected (selection, &model, &iter))
     {
+      g_autoptr(DzlTreeNode) node = NULL;
+
       gtk_tree_model_get (model, &iter, 0, &node, -1);
-      if (node)
+
+      if (node != NULL)
         {
           for (guint i = 0; i < priv->builders->len; i++)
             {
-              builder = g_ptr_array_index (priv->builders, i);
+              DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
               _dzl_tree_builder_node_selected (builder, node);
             }
-
-          g_object_unref (node);
         }
     }
 
@@ -448,7 +449,7 @@ text_func (GtkCellLayout   *cell_layout,
 {
   DzlTree *self = data;
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
-  DzlTreeNode *node = NULL;
+  g_autoptr(DzlTreeNode) node = NULL;
 
   g_assert (DZL_IS_TREE (self));
   g_assert (GTK_IS_CELL_LAYOUT (cell_layout));
@@ -650,27 +651,31 @@ dzl_tree_row_activated (GtkTreeView       *tree_view,
 {
   DzlTree *self = (DzlTree *)tree_view;
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
-  DzlTreeBuilder *builder;
   GtkTreeModel *model;
   GtkTreeIter iter;
-  DzlTreeNode *node = NULL;
   gboolean handled = FALSE;
 
   g_return_if_fail (DZL_IS_TREE (self));
   g_return_if_fail (path != NULL);
+  g_return_if_fail (!column || GTK_IS_TREE_VIEW_COLUMN (column));
 
   model = gtk_tree_view_get_model (tree_view);
 
   if (gtk_tree_model_get_iter (model, &iter, path))
     {
+      g_autoptr(DzlTreeNode) node = NULL;
+
       gtk_tree_model_get (model, &iter, 0, &node, -1);
+      g_assert (node != NULL);
+      g_assert (DZL_IS_TREE_NODE (node));
+
       for (guint i = 0; i < priv->builders->len; i++)
         {
-          builder = g_ptr_array_index (priv->builders, i);
+          DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
+
           if ((handled = _dzl_tree_builder_node_activated (builder, node)))
             break;
         }
-      g_clear_object (&node);
     }
 
   if (!handled)
@@ -689,8 +694,8 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
 {
   DzlTree *self = (DzlTree *)tree_view;
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+  g_autoptr(DzlTreeNode) node = NULL;
   GtkTreeModel *model;
-  DzlTreeNode *node;
 
   g_assert (DZL_IS_TREE (self));
   g_assert (iter != NULL);
@@ -698,6 +703,7 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
 
   model = gtk_tree_view_get_model (tree_view);
   gtk_tree_model_get (model, iter, 0, &node, -1);
+  g_assert (node != NULL);
   g_assert (DZL_IS_TREE_NODE (node));
 
   /*
@@ -718,8 +724,6 @@ dzl_tree_row_expanded (GtkTreeView *tree_view,
       DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
       _dzl_tree_builder_node_expanded (builder, node);
     }
-
-  g_clear_object (&node);
 }
 
 static void
@@ -729,8 +733,8 @@ dzl_tree_row_collapsed (GtkTreeView *tree_view,
 {
   DzlTree *self = (DzlTree *)tree_view;
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
+  g_autoptr(DzlTreeNode) node = NULL;
   GtkTreeModel *model;
-  DzlTreeNode *node;
 
   g_assert (DZL_IS_TREE (self));
   g_assert (iter != NULL);
@@ -747,6 +751,7 @@ dzl_tree_row_collapsed (GtkTreeView *tree_view,
 
   /* Get the node in question */
   gtk_tree_model_get (model, iter, 0, &node, -1);
+  g_assert (node != NULL);
   g_assert (DZL_IS_TREE_NODE (node));
 
   /*
@@ -756,6 +761,8 @@ dzl_tree_row_collapsed (GtkTreeView *tree_view,
   if (dzl_tree_node_get_reset_on_collapse (node))
     {
       GtkTreeIter child;
+
+      g_print ("parent ref count: %d\n", G_OBJECT (node)->ref_count);
 
       if (gtk_tree_model_iter_children (model, &child, iter))
         {
@@ -773,8 +780,6 @@ dzl_tree_row_collapsed (GtkTreeView *tree_view,
       DzlTreeBuilder *builder = g_ptr_array_index (priv->builders, i);
       _dzl_tree_builder_node_collapsed (builder, node);
     }
-
-  g_clear_object (&node);
 }
 
 static gboolean
@@ -783,10 +788,7 @@ dzl_tree_button_press_event (GtkWidget      *widget,
 {
   DzlTree *self = (DzlTree *)widget;
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
-  GtkAllocation alloc;
-  GtkTreePath *tree_path = NULL;
   GtkTreeIter iter;
-  DzlTreeNode *node = NULL;
   gint cell_y;
 
   g_assert (DZL_IS_TREE (self));
@@ -794,6 +796,8 @@ dzl_tree_button_press_event (GtkWidget      *widget,
 
   if ((button->type == GDK_BUTTON_PRESS) && (button->button == GDK_BUTTON_SECONDARY))
     {
+      GtkTreePath *tree_path = NULL;
+
       if (!gtk_widget_has_focus (GTK_WIDGET (self)))
         gtk_widget_grab_focus (GTK_WIDGET (self));
 
@@ -805,22 +809,27 @@ dzl_tree_button_press_event (GtkWidget      *widget,
                                      NULL,
                                      &cell_y);
 
-      if (!tree_path)
+      if (tree_path == NULL)
         {
           dzl_tree_unselect (self);
         }
       else
         {
+          GtkAllocation alloc;
+
           gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
-          gtk_tree_model_get_iter (GTK_TREE_MODEL (priv->store), &iter, tree_path);
-          gtk_tree_model_get (GTK_TREE_MODEL (priv->store), &iter, 0, &node, -1);
-          dzl_tree_select (self, node);
-          dzl_tree_popup (self, node, button,
-                          alloc.x + alloc.width,
-                          button->y - cell_y);
-          g_object_unref (node);
-          gtk_tree_path_free (tree_path);
+
+          if (gtk_tree_model_get_iter (GTK_TREE_MODEL (priv->store), &iter, tree_path))
+            {
+              g_autoptr(DzlTreeNode) node = NULL;
+
+              gtk_tree_model_get (GTK_TREE_MODEL (priv->store), &iter, 0, &node, -1);
+              dzl_tree_select (self, node);
+              dzl_tree_popup (self, node, button, alloc.x + alloc.width, button->y - cell_y);
+            }
         }
+
+      g_clear_pointer (&tree_path, gtk_tree_path_free);
 
       return GDK_EVENT_STOP;
     }
@@ -834,7 +843,7 @@ dzl_tree_find_item_foreach_cb (GtkTreeModel *model,
                                GtkTreeIter  *iter,
                                gpointer      user_data)
 {
-  DzlTreeNode *node = NULL;
+  g_autoptr(DzlTreeNode) node = NULL;
   NodeLookup *lookup = user_data;
   gboolean ret = FALSE;
 
@@ -847,18 +856,15 @@ dzl_tree_find_item_foreach_cb (GtkTreeModel *model,
 
   if (node != NULL)
     {
-      GObject *item;
-
-      item = dzl_tree_node_get_item (node);
+      GObject *item = dzl_tree_node_get_item (node);
 
       if (lookup->equal_func (lookup->key, item))
         {
+          /* We only want a borrowed reference to node */
           lookup->result = node;
           ret = TRUE;
         }
     }
-
-  g_clear_object (&node);
 
   return ret;
 }
@@ -905,7 +911,7 @@ dzl_tree_default_search_equal_func (GtkTreeModel *model,
                                     GtkTreeIter  *iter,
                                     gpointer      user_data)
 {
-  DzlTreeNode *node = NULL;
+  g_autoptr(DzlTreeNode) node = NULL;
   gboolean ret = TRUE;
 
   g_assert (GTK_IS_TREE_MODEL (model));
@@ -917,11 +923,8 @@ dzl_tree_default_search_equal_func (GtkTreeModel *model,
 
   if (node != NULL)
     {
-      const gchar *text;
-
-      text = dzl_tree_node_get_text (node);
+      const gchar *text = dzl_tree_node_get_text (node);
       ret = !(strstr (key, text) != NULL);
-      g_object_unref (node);
     }
 
   return ret;
@@ -1030,6 +1033,7 @@ _dzl_tree_get_drop_node (DzlTree             *self,
     return NULL;
 
   gtk_tree_model_get (model, &iter, 0, &node, -1);
+  g_assert (node != NULL);
   g_assert (DZL_IS_TREE_NODE (node));
 
   switch (priv->last_drop_pos)
@@ -1935,7 +1939,7 @@ dzl_tree_model_filter_visible_func (GtkTreeModel *model,
                                     GtkTreeIter  *iter,
                                     gpointer      data)
 {
-  DzlTreeNode *node = NULL;
+  g_autoptr(DzlTreeNode) node = NULL;
   FilterFunc *filter = data;
   gboolean ret;
 
@@ -1962,17 +1966,12 @@ dzl_tree_model_filter_visible_func (GtkTreeModel *model,
 
   gtk_tree_model_get (model, iter, 0, &node, -1);
   ret = filter->filter_func (filter->self, node, filter->filter_data);
-  g_clear_object (&node);
 
-  /*
-   * Short circuit if we already matched.
-   */
+  /* Short circuit if we already matched. */
   if (ret)
     return TRUE;
 
-  /*
-   * If any of our children match, we should match.
-   */
+  /* If any of our children match, we should match. */
   if (dzl_tree_model_filter_recursive (model, iter, filter))
     return TRUE;
 
