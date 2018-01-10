@@ -1037,9 +1037,9 @@ dzl_tree_node_show_popover_timeout_cb (gpointer data)
   gtk_popover_popup (popreq->popover);
 
 cleanup:
-  g_object_unref (popreq->self);
-  g_object_unref (popreq->popover);
-  g_free (popreq);
+  g_clear_object (&popreq->self);
+  g_clear_object (&popreq->popover);
+  g_slice_free (PopupRequest, popreq);
 
   return G_SOURCE_REMOVE;
 }
@@ -1065,7 +1065,7 @@ dzl_tree_node_show_popover (DzlTreeNode *self,
                                                    &cell_area.x,
                                                    &cell_area.y);
 
-  popreq = g_new0 (PopupRequest, 1);
+  popreq = g_slice_new0 (PopupRequest);
   popreq->self = g_object_ref (self);
   popreq->popover = g_object_ref (popover);
 
