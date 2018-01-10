@@ -762,8 +762,6 @@ dzl_tree_row_collapsed (GtkTreeView *tree_view,
     {
       GtkTreeIter child;
 
-      g_print ("parent ref count: %d\n", G_OBJECT (node)->ref_count);
-
       if (gtk_tree_model_iter_children (model, &child, iter))
         {
           while (gtk_tree_store_remove (priv->store, &child))
