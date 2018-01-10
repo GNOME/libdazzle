@@ -437,6 +437,8 @@ text_func (GtkCellLayout   *cell_layout,
                     use_markup ? "markup" : "text", text,
                     "foreground-rgba", rgba,
                     NULL);
+
+      g_object_unref (node);
     }
 }
 
