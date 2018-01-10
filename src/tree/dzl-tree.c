@@ -1778,7 +1778,8 @@ dzl_tree_find_child_node (DzlTree         *self,
 {
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
   GtkTreeModel *model;
-  GtkTreePath *path;
+  GtkTreePath *path = NULL;
+  DzlTreeNode *ret = NULL;
   GtkTreeIter iter;
   GtkTreeIter children;
 
@@ -1805,41 +1806,41 @@ dzl_tree_find_child_node (DzlTree         *self,
   if (path != NULL)
     {
       if (!gtk_tree_model_get_iter (model, &iter, path))
-        goto failure;
+        goto finish;
 
       if (!gtk_tree_model_iter_children (model, &children, &iter))
-        goto failure;
+        goto finish;
     }
   else
     {
       if (!gtk_tree_model_iter_children (model, &children, NULL))
-        goto failure;
+        goto finish;
     }
 
   do
     {
-      DzlTreeNode *child = NULL;
+      g_autoptr(DzlTreeNode) child = NULL;
 
       gtk_tree_model_get (model, &children, 0, &child, -1);
 
       if (find_func (self, node, child, user_data))
         {
           /*
-           * We want to returned a borrowed reference to the child node.
-           * It is safe to unref the child here before we return.
+           * We want to returned a borrowed reference to the child node but
+           * we got a full reference when calling gtk_tree_model_get().
+           * It is safe to unref the child here before we return as long
+           * as the item is in our model.
            */
-          g_object_unref (child);
-          return child;
+          ret = child;
+          goto finish;
         }
-
-      g_clear_object (&child);
     }
   while (gtk_tree_model_iter_next (model, &children));
 
-failure:
+finish:
   g_clear_pointer (&path, gtk_tree_path_free);
 
-  return NULL;
+  return ret;
 }
 
 void
