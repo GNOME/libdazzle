@@ -821,6 +821,11 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
       if (gtk_bindings_activate (G_OBJECT (toplevel), keyval, state))
         return TRUE;
 
+      /* See if there is a mnemonic active that should be activated */
+      if (GTK_IS_WINDOW (toplevel) &&
+          gtk_window_mnemonic_activate (GTK_WINDOW (toplevel), keyval, state))
+        return TRUE;
+
       if (GTK_IS_APPLICATION (app))
         {
           g_autofree gchar *accel = dzl_shortcut_chord_to_string (chord);
