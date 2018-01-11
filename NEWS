@@ -1,4 +1,24 @@
 ==============
+Version 3.26.2
+==============
+
+Changes in this release:
+
+ • Progress menu button will now avoid spinning in some conditions.
+ • Leak fixed in DzlTree text rendering.
+ • Shortcut mneumonics are now properly activated.
+ • Fixes to avoid various deprecated API.
+ • A number of leaks detected by ASAN were fixed.
+ • The directory reaper handles various mtime comparisons more
+   correctly now.
+ • Some G-I annotations were improved.
+ • DzlMenuMerger is more flexible with input.
+ • Some performance improvements when dealing with CSS and other
+   resources paths.
+
+It's recommended that all distributions update to this release.
+
+==============
 Version 3.26.1
 ==============
 
