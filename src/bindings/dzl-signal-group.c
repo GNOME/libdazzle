@@ -182,7 +182,10 @@ dzl_signal_group_bind_handler (DzlSignalGroup *self,
   g_assert (handler != NULL);
   g_assert (handler->signal_id != 0);
   g_assert (handler->closure != NULL);
-  g_assert (handler->handler_id == 0);
+
+  /* Possibly a re-entrancy issue */
+  if (handler->handler_id != 0)
+    return;
 
   handler->handler_id = g_signal_connect_closure_by_id (self->target,
                                                         handler->signal_id,
