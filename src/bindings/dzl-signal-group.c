@@ -233,24 +233,32 @@ dzl_signal_group_bind (DzlSignalGroup *self,
 static void
 dzl_signal_group_unbind (DzlSignalGroup *self)
 {
-  GObject *target;
-  gsize i;
+  g_autoptr(GObject) target = NULL;
 
   g_return_if_fail (DZL_IS_SIGNAL_GROUP (self));
 
-  if (self->target == NULL)
-    return;
+  if (NULL != (target = g_steal_pointer (&self->target)))
+    {
+      /*
+       * If we have a valid target, we want to hold a reference to it
+       * while we do the disconnections, just to ensure it is not
+       * finalized out from underneath us.
+       */
+      g_object_ref (target);
 
-  target = self->target;
-  self->target = NULL;
+      /*
+       * Let go of our weak reference now that we have a full reference
+       * for the life of this function.
+       */
+      g_object_weak_unref (target,
+                           dzl_signal_group__target_weak_notify,
+                           self);
+    }
 
-  g_object_weak_unref (target,
-                       dzl_signal_group__target_weak_notify,
-                       self);
-
-  for (i = 0; i < self->handlers->len; i++)
+  for (guint i = 0; i < self->handlers->len; i++)
     {
       SignalHandler *handler;
+      gulong handler_id;
 
       handler = g_ptr_array_index (self->handlers, i);
 
@@ -258,15 +266,17 @@ dzl_signal_group_unbind (DzlSignalGroup *self)
       g_assert (handler->signal_id != 0);
       g_assert (handler->closure != NULL);
 
-      if (handler->handler_id != 0)
-        {
-          gulong handler_id;
+      handler_id = handler->handler_id;
+      handler->handler_id = 0;
 
-          handler_id = handler->handler_id;
-          handler->handler_id = 0;
+      /*
+       * If @target is NULL, we lost a race to cleanup the weak
+       * instance and the signal connections have already been
+       * finalized and therefore nothing to do.
+       */
 
-          g_signal_handler_disconnect (target, handler_id);
-        }
+      if (target != NULL && handler_id != 0)
+        g_signal_handler_disconnect (target, handler_id);
     }
 
   g_signal_emit (self, signals [UNBIND], 0);
