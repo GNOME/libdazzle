@@ -203,8 +203,6 @@ static void
 dzl_signal_group_bind (DzlSignalGroup *self,
                        GObject        *target)
 {
-  gsize i;
-
   g_assert (DZL_IS_SIGNAL_GROUP (self));
   g_assert (self->target == NULL);
   g_assert (!target || G_IS_OBJECT (target));
@@ -212,14 +210,14 @@ dzl_signal_group_bind (DzlSignalGroup *self,
   if (target == NULL)
     return;
 
+  g_object_ref (target);
+
   self->target = target;
   g_object_weak_ref (self->target,
                      dzl_signal_group__target_weak_notify,
                      self);
 
-  g_object_ref (target);
-
-  for (i = 0; i < self->handlers->len; i++)
+  for (guint i = 0; i < self->handlers->len; i++)
     {
       SignalHandler *handler;
 
@@ -228,6 +226,7 @@ dzl_signal_group_bind (DzlSignalGroup *self,
     }
 
   g_signal_emit (self, signals [BIND], 0, target);
+
   g_object_unref (target);
 }
 
