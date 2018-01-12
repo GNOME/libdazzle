@@ -56,6 +56,8 @@ struct _DzlSignalGroup
   GPtrArray  *handlers;
   GType       target_type;
   gsize       block_count;
+
+  guint       has_bound_at_least_once : 1;
 };
 
 struct _DzlSignalGroupClass
@@ -124,13 +126,12 @@ dzl_signal_group__target_weak_notify (gpointer  data,
                                       GObject  *where_object_was)
 {
   DzlSignalGroup *self = data;
-  gsize i;
 
   g_assert (DZL_IS_SIGNAL_GROUP (self));
   g_assert (where_object_was != NULL);
   g_assert (self->target == where_object_was);
 
-  for (i = 0; i < self->handlers->len; i++)
+  for (guint i = 0; i < self->handlers->len; i++)
     {
       SignalHandler *handler;
 
@@ -209,6 +210,8 @@ dzl_signal_group_bind (DzlSignalGroup *self,
 
   if (target == NULL)
     return;
+
+  self->has_bound_at_least_once = TRUE;
 
   g_object_ref (target);
 
@@ -419,8 +422,12 @@ dzl_signal_group_set_target (DzlSignalGroup *self,
   if (!dzl_signal_group_check_target_type (self, target))
     return;
 
-  dzl_signal_group_unbind (self);
+  /* Only emit unbind if we've ever called bind */
+  if (self->has_bound_at_least_once)
+    dzl_signal_group_unbind (self);
+
   dzl_signal_group_bind (self, target);
+
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_TARGET]);
 }
 
@@ -460,7 +467,9 @@ dzl_signal_group_dispose (GObject *object)
 {
   DzlSignalGroup *self = (DzlSignalGroup *)object;
 
-  dzl_signal_group_unbind (self);
+  if (self->has_bound_at_least_once)
+    dzl_signal_group_unbind (self);
+
   g_clear_pointer (&self->handlers, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_signal_group_parent_class)->dispose (object);
