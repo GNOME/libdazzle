@@ -63,9 +63,18 @@ tracked_widget_free (gpointer data)
   TrackedWidget *tracked = data;
 
   if (tracked->widget != NULL)
-    g_signal_handler_disconnect (tracked->widget, tracked->handler);
+    {
+      dzl_clear_signal_handler (tracked->widget, &tracked->handler);
+      tracked->widget = NULL;
+    }
+
+  tracked->handler = 0;
+  tracked->id = 0;
+
   g_slice_free (TrackedWidget, tracked);
 }
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (TrackedWidget, tracked_widget_free)
 
 static void
 dzl_preferences_view_track (DzlPreferencesView *self,
@@ -849,10 +858,10 @@ dzl_preferences_view_remove_id (DzlPreferences *preferences,
 {
   DzlPreferencesView *self = (DzlPreferencesView *)preferences;
   DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
-  TrackedWidget *tracked;
+  g_autoptr(TrackedWidget) tracked = NULL;
 
   g_assert (DZL_IS_PREFERENCES_VIEW (self));
-  g_assert (widget_id);
+  g_assert (widget_id != 0);
 
   tracked = g_hash_table_lookup (priv->widgets, GUINT_TO_POINTER (widget_id));
 
@@ -860,7 +869,10 @@ dzl_preferences_view_remove_id (DzlPreferences *preferences,
     {
       GtkWidget *widget = tracked->widget;
 
-      g_hash_table_remove (priv->widgets, GUINT_TO_POINTER (widget_id));
+      /* We have to steal the structure so that we retain access to
+       * the structure after removing it from the hashtable.
+       */
+      g_hash_table_steal (priv->widgets, GUINT_TO_POINTER (widget_id));
 
       if (widget != NULL && !gtk_widget_in_destruction (widget))
         {
@@ -871,9 +883,9 @@ dzl_preferences_view_remove_id (DzlPreferences *preferences,
             gtk_widget_destroy (parent);
           else
             gtk_widget_destroy (widget);
-
-          return TRUE;
         }
+
+      return TRUE;
     }
 
   return FALSE;
