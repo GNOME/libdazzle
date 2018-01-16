@@ -44,6 +44,9 @@
  *  %G_TYPE_DOUBLE
  *
  * Since: 3.26
+ *
+ * Since 3.28 enums are supported by using their enum value nick as
+ * a string.
  */
 
 struct _DzlPropertiesGroup
@@ -136,6 +139,19 @@ get_action_state (GObject       *object,
       break;
 
     default:
+      if (g_type_is_a (mapping->property_type, G_TYPE_ENUM))
+        {
+          GEnumClass *eclass = g_type_class_ref (mapping->property_type);
+          GEnumValue *eval = g_enum_get_value (eclass, g_value_get_enum (&value));
+
+          if (eval != NULL)
+            ret = g_variant_new_string (eval->value_nick);
+
+          g_clear_pointer (&eclass, g_type_class_unref);
+
+          break;
+        }
+
       g_assert_not_reached ();
     }
 
@@ -381,6 +397,30 @@ dzl_properties_group_change_action_state (GActionGroup *group,
               break;
 
             default:
+              if (g_type_is_a (mapping->property_type, G_TYPE_ENUM))
+                {
+                  const gchar *str = g_variant_get_string (variant, NULL);
+                  GEnumClass *eclass = g_type_class_ref (mapping->property_type);
+
+                  if (eclass != NULL)
+                    {
+                      GEnumValue *eval = g_enum_get_value_by_nick (eclass, str);
+
+                      if (eval != NULL)
+                        {
+                          g_value_init (&value, mapping->property_type);
+                          g_value_set_enum (&value, eval->value);
+                          g_clear_pointer (&eclass, g_type_class_unref);
+                          break;
+                        }
+                    }
+
+                  g_clear_pointer (&eclass, g_type_class_unref);
+                  g_warning ("Failed to transform '%s' to %s",
+                             str, g_type_name (mapping->property_type));
+                  return;
+                }
+
               g_assert_not_reached ();
             }
 
@@ -500,6 +540,9 @@ get_param_type_for_type (GType              type,
       return NULL;
 
     default:
+      if (g_type_is_a (type, G_TYPE_ENUM))
+        return G_VARIANT_TYPE_STRING;
+
       g_warning ("%s is not a supported type", g_type_name (type));
       return NULL;
     }
@@ -515,7 +558,11 @@ get_state_type_for_type (GType type)
     case G_TYPE_BOOLEAN: return G_VARIANT_TYPE_BOOLEAN;
     case G_TYPE_STRING:  return G_VARIANT_TYPE_STRING;
     case G_TYPE_DOUBLE:  return G_VARIANT_TYPE_DOUBLE;
+
     default:
+      if (g_type_is_a (type, G_TYPE_ENUM))
+        return G_VARIANT_TYPE_STRING;
+
       g_warning ("%s is not a supported type", g_type_name (type));
       return NULL;
     }
@@ -923,6 +970,8 @@ dzl_properties_group_add_all_properties (DzlPropertiesGroup *self)
           break;
 
         default:
+          if (g_type_is_a (pspec[i]->value_type, G_TYPE_ENUM))
+            dzl_properties_group_add_property (self, pspec[i]->name, pspec[i]->name);
           break;
         }
     }
