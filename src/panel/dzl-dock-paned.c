@@ -49,40 +49,10 @@ dzl_dock_paned_add (GtkContainer *container,
 }
 
 static void
-dzl_dock_paned_get_property (GObject    *object,
-                             guint       prop_id,
-                             GValue     *value,
-                             GParamSpec *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-dzl_dock_paned_set_property (GObject      *object,
-                             guint         prop_id,
-                             const GValue *value,
-                             GParamSpec   *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
 dzl_dock_paned_class_init (DzlDockPanedClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
-
-  object_class->get_property = dzl_dock_paned_get_property;
-  object_class->set_property = dzl_dock_paned_set_property;
 
   container_class->add = dzl_dock_paned_add;
 
