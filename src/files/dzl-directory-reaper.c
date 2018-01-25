@@ -168,6 +168,7 @@ remove_directory_with_children (GFile         *file,
   g_debug ("Removing uri recursively \"%s\"", uri);
 
   enumerator = g_file_enumerate_children (file,
+                                          G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK","
                                           G_FILE_ATTRIBUTE_STANDARD_NAME","
                                           G_FILE_ATTRIBUTE_STANDARD_TYPE","
                                           G_FILE_ATTRIBUTE_TIME_MODIFIED,
@@ -190,8 +191,9 @@ remove_directory_with_children (GFile         *file,
     {
       g_autoptr(GFileInfo) info = infoptr;
       g_autoptr(GFile) child = g_file_enumerator_get_child (enumerator, info);
+      GFileType file_type = g_file_info_get_file_type (info);
 
-      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+      if (!g_file_info_get_is_symlink (info) && file_type == G_FILE_TYPE_DIRECTORY)
         {
           if (!remove_directory_with_children (child, cancellable, error))
             return FALSE;
@@ -277,7 +279,9 @@ dzl_directory_reaper_execute_worker (GTask        *task,
             }
 
           enumerator = g_file_enumerate_children (p->glob.directory,
+                                                  G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK","
                                                   G_FILE_ATTRIBUTE_STANDARD_NAME","
+                                                  G_FILE_ATTRIBUTE_STANDARD_TYPE","
                                                   G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                                   G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                                   cancellable,
@@ -292,9 +296,6 @@ dzl_directory_reaper_execute_worker (GTask        *task,
 
           while (NULL != (info = g_file_enumerator_next_file (enumerator, cancellable, NULL)))
             {
-              const gchar *name;
-
-              name = g_file_info_get_name (info);
               v64 = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_TIME_MODIFIED);
 
               /* mtime is in seconds */
@@ -302,21 +303,27 @@ dzl_directory_reaper_execute_worker (GTask        *task,
 
               if (v64 < now - p->min_age)
                 {
-                  g_autoptr(GFile) file = g_file_get_child (p->glob.directory, name);
+                  g_autoptr(GFile) file = g_file_enumerator_get_child (enumerator, info);
+                  GFileType file_type = g_file_info_get_file_type (info);
 
-                  if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, cancellable) == G_FILE_TYPE_DIRECTORY)
+                  if (g_file_info_get_is_symlink (info) || file_type != G_FILE_TYPE_DIRECTORY)
                     {
+                      if (!g_file_delete (file, cancellable, &error))
+                        {
+                          g_warning ("%s", error->message);
+                          g_clear_error (&error);
+                        }
+                    }
+                  else
+                    {
+                      g_assert (file_type == G_FILE_TYPE_DIRECTORY);
+
                       if (!remove_directory_with_children (file, cancellable, &error) ||
                           !g_file_delete (file, cancellable, &error))
                         {
                           g_warning ("%s", error->message);
                           g_clear_error (&error);
                         }
-                    }
-                  else if (!g_file_delete (file, cancellable, &error))
-                    {
-                      g_warning ("%s", error->message);
-                      g_clear_error (&error);
                     }
                 }
 
