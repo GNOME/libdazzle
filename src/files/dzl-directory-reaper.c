@@ -189,8 +189,7 @@ remove_directory_with_children (GFile         *file,
   while (NULL != (infoptr = g_file_enumerator_next_file (enumerator, cancellable, &enum_error)))
     {
       g_autoptr(GFileInfo) info = infoptr;
-      const gchar *name = g_file_info_get_name (info);
-      g_autoptr(GFile) child = g_file_get_child (file, name);
+      g_autoptr(GFile) child = g_file_enumerator_get_child (enumerator, info);
 
       if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
         {
