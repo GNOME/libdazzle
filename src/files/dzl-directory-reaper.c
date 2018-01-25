@@ -121,7 +121,7 @@ dzl_directory_reaper_add_glob (DzlDirectoryReaper *self,
     glob = "*";
 
   p.type = PATTERN_GLOB;
-  p.min_age = min_age;
+  p.min_age = ABS (min_age);
   p.glob.directory = g_object_ref (directory);
   p.glob.glob = g_strdup (glob);
 
@@ -139,7 +139,7 @@ dzl_directory_reaper_add_file (DzlDirectoryReaper *self,
   g_return_if_fail (G_IS_FILE (file));
 
   p.type = PATTERN_FILE;
-  p.min_age = min_age;
+  p.min_age = ABS (min_age);
   p.file.file = g_object_ref (file);
 
   g_array_append_val (self->patterns, p);
