@@ -69,6 +69,15 @@ test_reaper_basic (void)
       g_assert_cmpint (r, ==, TRUE);
     }
 
+  /* Add a symlink to ../ so that we keep ourselves honest ;) */
+  {
+    g_autofree gchar *cwd = g_get_current_dir ();
+    g_autofree gchar *name = g_build_filename ("reaper", "parent-link", NULL);
+
+    if (symlink (cwd, name) != 0)
+      g_error ("Failed to create symlink");
+  }
+
   dzl_directory_reaper_add_directory (reaper, file, 0);
 
   r = dzl_directory_reaper_execute (reaper, NULL, &error);
