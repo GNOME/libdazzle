@@ -27,6 +27,7 @@
 
 #define QUERY_ATTRS (G_FILE_ATTRIBUTE_STANDARD_NAME"," \
                      G_FILE_ATTRIBUTE_STANDARD_TYPE"," \
+                     G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK"," \
                      G_FILE_ATTRIBUTE_STANDARD_SIZE)
 #define QUERY_FLAGS (G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS)
 
@@ -163,7 +164,7 @@ dzl_file_transfer_class_init (DzlFileTransferClass *klass)
                          "The transfer progress, from 0 to 1",
                          0.0, 1.0, 0.0,
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-  
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -225,7 +226,7 @@ dzl_file_transfer_add (DzlFileTransfer *self,
   DZL_EXIT;
 }
 
-DzlFileTransferFlags 
+DzlFileTransferFlags
 dzl_file_transfer_get_flags (DzlFileTransfer *self)
 {
   DzlFileTransferPrivate *priv = dzl_file_transfer_get_instance_private (self);
@@ -285,6 +286,9 @@ file_walk_full (GFile            *parent,
     return;
 
   callback (parent, info, user_data);
+
+  if (g_file_info_get_is_symlink (info))
+    return;
 
   if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
     {
@@ -347,7 +351,7 @@ handle_preflight_cb (GFile     *file,
   g_assert (stat_buf != NULL);
 
   file_type = g_file_info_get_file_type (child_info);
-  
+
   if (file_type == G_FILE_TYPE_DIRECTORY)
     {
       stat_buf->n_dirs_total++;
