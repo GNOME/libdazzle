@@ -1,4 +1,18 @@
 ==============
+Version 3.27.5
+==============
+
+Changes in this release:
+
+ • A memory leak in the fuzzy index builder was fixed.
+ • DzlTab now properly sinks a variant floating ref.
+ • Various memory leak fixes in DzlTree and associated objects.
+ • The shortcut manager now properly activates mnemonics.
+ • Signal group ties to be more flexible with re-entrancy situations.
+ • DirectoryReaper and FileTransfer attempt to be more defensive against
+   following through symlinks.
+
+==============
 Version 3.27.4
 ==============
 
