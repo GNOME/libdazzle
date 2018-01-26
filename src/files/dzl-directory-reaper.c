@@ -233,6 +233,7 @@ dzl_directory_reaper_execute_worker (GTask        *task,
     {
       const Pattern *p = &g_array_index (patterns, Pattern, i);
       g_autoptr(GFileInfo) info = NULL;
+      g_autoptr(GFileInfo) dir_info = NULL;
       g_autoptr(GPatternSpec) spec = NULL;
       g_autoptr(GFileEnumerator) enumerator = NULL;
       g_autoptr(GError) error = NULL;
@@ -277,6 +278,25 @@ dzl_directory_reaper_execute_worker (GTask        *task,
               g_warning ("Invalid pattern spec \"%s\"", p->glob.glob);
               break;
             }
+
+          dir_info = g_file_query_info (p->glob.directory,
+                                        G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK","
+                                        G_FILE_ATTRIBUTE_STANDARD_TYPE",",
+                                        G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                        cancellable,
+                                        &error);
+
+          if (dir_info == NULL)
+            {
+              if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+                g_warning ("%s", error->message);
+              break;
+            }
+
+          /* Do not follow through symlinks. */
+          if (g_file_info_get_is_symlink (dir_info) ||
+              g_file_info_get_file_type (dir_info) != G_FILE_TYPE_DIRECTORY)
+            break;
 
           enumerator = g_file_enumerate_children (p->glob.directory,
                                                   G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK","
