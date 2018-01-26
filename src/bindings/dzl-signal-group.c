@@ -52,7 +52,7 @@ struct _DzlSignalGroup
 {
   GObject     parent_instance;
 
-  GObject    *target;
+  GWeakRef    target_ref;
   GPtrArray  *handlers;
   GType       target_type;
   gsize       block_count;
@@ -73,7 +73,6 @@ typedef struct
   DzlSignalGroup *group;
   gulong          handler_id;
   GClosure       *closure;
-  GObject        *object;
   guint           signal_id;
   GQuark          signal_detail;
   guint           connect_after : 1;
@@ -122,6 +121,29 @@ dzl_signal_group_set_target_type (DzlSignalGroup *self,
 }
 
 static void
+dzl_signal_group_gc_handlers (DzlSignalGroup *self)
+{
+  g_assert (DZL_IS_SIGNAL_GROUP (self));
+
+  /*
+   * Remove any handlers for which the closures have become invalid. We do
+   * this cleanup lazily to avoid situations where we could have disposal
+   * active on both the signal group and the peer object.
+   */
+
+  for (guint i = self->handlers->len; i > 0; i--)
+    {
+      const SignalHandler *handler = g_ptr_array_index (self->handlers, i - 1);
+
+      g_assert (handler != NULL);
+      g_assert (handler->closure != NULL);
+
+      if (handler->closure->is_invalid)
+        g_ptr_array_remove_index (self->handlers, i - 1);
+    }
+}
+
+static void
 dzl_signal_group__target_weak_notify (gpointer  data,
                                       GObject  *where_object_was)
 {
@@ -129,66 +151,34 @@ dzl_signal_group__target_weak_notify (gpointer  data,
 
   g_assert (DZL_IS_SIGNAL_GROUP (self));
   g_assert (where_object_was != NULL);
-  g_assert (self->target == where_object_was);
+
+  g_weak_ref_set (&self->target_ref, NULL);
 
   for (guint i = 0; i < self->handlers->len; i++)
     {
-      SignalHandler *handler;
+      SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
-      handler = g_ptr_array_index (self->handlers, i);
       handler->handler_id = 0;
     }
-
-  self->target = NULL;
 
   g_signal_emit (self, signals [UNBIND], 0);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_TARGET]);
 }
 
 static void
-dzl_signal_group__connect_object_weak_notify (gpointer  data,
-                                              GObject  *where_object_was)
-{
-  DzlSignalGroup *self = data;
-  gsize i;
-
-  g_assert (DZL_IS_SIGNAL_GROUP (self));
-  g_assert (where_object_was != NULL);
-
-  for (i = 0; i < self->handlers->len; ++i)
-    {
-      SignalHandler *handler;
-
-      handler = g_ptr_array_index (self->handlers, i);
-
-      if (handler->object == where_object_was)
-        {
-          handler->object = NULL;
-          g_ptr_array_remove_index_fast (self->handlers, i);
-          return;
-        }
-    }
-
-  g_critical ("Failed to find handler for %p", (void *)where_object_was);
-}
-
-static void
 dzl_signal_group_bind_handler (DzlSignalGroup *self,
-                               SignalHandler  *handler)
+                               SignalHandler  *handler,
+                               GObject        *target)
 {
-  gsize i;
-
   g_assert (self != NULL);
-  g_assert (self->target != NULL);
+  g_assert (G_IS_OBJECT (target));
   g_assert (handler != NULL);
   g_assert (handler->signal_id != 0);
   g_assert (handler->closure != NULL);
+  g_assert (handler->closure->is_invalid == 0);
+  g_assert (handler->handler_id == 0);
 
-  /* Possibly a re-entrancy issue */
-  if (handler->handler_id != 0)
-    return;
-
-  handler->handler_id = g_signal_connect_closure_by_id (self->target,
+  handler->handler_id = g_signal_connect_closure_by_id (target,
                                                         handler->signal_id,
                                                         handler->signal_detail,
                                                         handler->closure,
@@ -196,16 +186,17 @@ dzl_signal_group_bind_handler (DzlSignalGroup *self,
 
   g_assert (handler->handler_id != 0);
 
-  for (i = 0; i < self->block_count; i++)
-    g_signal_handler_block (self->target, handler->handler_id);
+  for (guint i = 0; i < self->block_count; i++)
+    g_signal_handler_block (target, handler->handler_id);
 }
 
 static void
 dzl_signal_group_bind (DzlSignalGroup *self,
                        GObject        *target)
 {
+  g_autoptr(GObject) hold = NULL;
+
   g_assert (DZL_IS_SIGNAL_GROUP (self));
-  g_assert (self->target == NULL);
   g_assert (!target || G_IS_OBJECT (target));
 
   if (target == NULL)
@@ -213,24 +204,21 @@ dzl_signal_group_bind (DzlSignalGroup *self,
 
   self->has_bound_at_least_once = TRUE;
 
-  g_object_ref (target);
+  hold = g_object_ref (target);
 
-  self->target = target;
-  g_object_weak_ref (self->target,
-                     dzl_signal_group__target_weak_notify,
-                     self);
+  g_weak_ref_set (&self->target_ref, hold);
+  g_object_weak_ref (hold, dzl_signal_group__target_weak_notify, self);
+
+  dzl_signal_group_gc_handlers (self);
 
   for (guint i = 0; i < self->handlers->len; i++)
     {
-      SignalHandler *handler;
+      SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
-      handler = g_ptr_array_index (self->handlers, i);
-      dzl_signal_group_bind_handler (self, handler);
+      dzl_signal_group_bind_handler (self, handler, hold);
     }
 
-  g_signal_emit (self, signals [BIND], 0, target);
-
-  g_object_unref (target);
+  g_signal_emit (self, signals [BIND], 0, hold);
 }
 
 static void
@@ -240,14 +228,17 @@ dzl_signal_group_unbind (DzlSignalGroup *self)
 
   g_return_if_fail (DZL_IS_SIGNAL_GROUP (self));
 
-  if (NULL != (target = g_steal_pointer (&self->target)))
+  target = g_weak_ref_get (&self->target_ref);
+
+  /*
+   * Target may be NULL by this point, as we got notified of its destruction.
+   * However, if we're early enough, we may get a full reference back and can
+   * cleanly disconnect our connections.
+   */
+
+  if (target != NULL)
     {
-      /*
-       * If we have a valid target, we want to hold a reference to it
-       * while we do the disconnections, just to ensure it is not
-       * finalized out from underneath us.
-       */
-      g_object_ref (target);
+      g_weak_ref_set (&self->target_ref, NULL);
 
       /*
        * Let go of our weak reference now that we have a full reference
@@ -257,6 +248,8 @@ dzl_signal_group_unbind (DzlSignalGroup *self)
                            dzl_signal_group__target_weak_notify,
                            self);
     }
+
+  dzl_signal_group_gc_handlers (self);
 
   for (guint i = 0; i < self->handlers->len; i++)
     {
@@ -317,28 +310,28 @@ dzl_signal_group_check_target_type (DzlSignalGroup *self,
 void
 dzl_signal_group_block (DzlSignalGroup *self)
 {
-  gsize i;
+  g_autoptr(GObject) target = NULL;
 
   g_return_if_fail (DZL_IS_SIGNAL_GROUP (self));
   g_return_if_fail (self->block_count != G_MAXSIZE);
 
   self->block_count++;
 
-  if (self->target == NULL)
+  target = g_weak_ref_get (&self->target_ref);
+
+  if (target == NULL)
     return;
 
-  for (i = 0; i < self->handlers->len; i++)
+  for (guint i = 0; i < self->handlers->len; i++)
     {
-      SignalHandler *handler;
-
-      handler = g_ptr_array_index (self->handlers, i);
+      const SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
       g_assert (handler != NULL);
       g_assert (handler->signal_id != 0);
       g_assert (handler->closure != NULL);
       g_assert (handler->handler_id != 0);
 
-      g_signal_handler_block (self->target, handler->handler_id);
+      g_signal_handler_block (target, handler->handler_id);
     }
 }
 
@@ -356,28 +349,28 @@ dzl_signal_group_block (DzlSignalGroup *self)
 void
 dzl_signal_group_unblock (DzlSignalGroup *self)
 {
-  gsize i;
+  g_autoptr(GObject) target = NULL;
 
   g_return_if_fail (DZL_IS_SIGNAL_GROUP (self));
   g_return_if_fail (self->block_count != 0);
 
   self->block_count--;
 
-  if (self->target == NULL)
+  target = g_weak_ref_get (&self->target_ref);
+
+  if (target == NULL)
     return;
 
-  for (i = 0; i < self->handlers->len; i++)
+  for (guint i = 0; i < self->handlers->len; i++)
     {
-      SignalHandler *handler;
-
-      handler = g_ptr_array_index (self->handlers, i);
+      const SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
       g_assert (handler != NULL);
       g_assert (handler->signal_id != 0);
       g_assert (handler->closure != NULL);
       g_assert (handler->handler_id != 0);
 
-      g_signal_handler_unblock (self->target, handler->handler_id);
+      g_signal_handler_unblock (target, handler->handler_id);
     }
 }
 
@@ -392,9 +385,27 @@ dzl_signal_group_unblock (DzlSignalGroup *self)
 gpointer
 dzl_signal_group_get_target (DzlSignalGroup *self)
 {
+  g_autoptr(GObject) target = NULL;
+
   g_return_val_if_fail (DZL_IS_SIGNAL_GROUP (self), NULL);
 
-  return (gpointer)self->target;
+  target = g_weak_ref_get (&self->target_ref);
+
+  /*
+   * It is expected that this is called from a thread that owns a reference to
+   * the target, so we can pass back a borrowed reference. However, to ensure
+   * that we aren't racing in finalization of @target, we must ensure that the
+   * ref_count >= 2 (as our get just incremented by one).
+   */
+
+  if (target == NULL || target->ref_count < 2)
+    return NULL;
+
+  /* Unref and pass back a borrowed reference. This looks unsafe, but is safe
+   * because of our reference check above, so much as the assertion holds that
+   * the caller obeyed the ownership rules of this class.
+   */
+  return target;
 }
 
 /**
@@ -414,9 +425,13 @@ void
 dzl_signal_group_set_target (DzlSignalGroup *self,
                              gpointer        target)
 {
+  g_autoptr(GObject) object = NULL;
+
   g_return_if_fail (DZL_IS_SIGNAL_GROUP (self));
 
-  if (target == (gpointer)self->target)
+  object = g_weak_ref_get (&self->target_ref);
+
+  if (object == (GObject *)target)
     return;
 
   if (!dzl_signal_group_check_target_type (self, target))
@@ -436,18 +451,13 @@ signal_handler_free (gpointer data)
 {
   SignalHandler *handler = data;
 
-  if (handler->object != NULL)
-    {
-      g_object_weak_unref (handler->object,
-                           dzl_signal_group__connect_object_weak_notify,
-                           handler->group);
-      handler->object = NULL;
-    }
+  if (handler->closure != NULL)
+    g_closure_invalidate (handler->closure);
 
-  g_clear_pointer (&handler->closure, g_closure_unref);
   handler->handler_id = 0;
   handler->signal_id = 0;
   handler->signal_detail = 0;
+  g_clear_pointer (&handler->closure, g_closure_unref);
   g_slice_free (SignalHandler, handler);
 }
 
@@ -455,8 +465,9 @@ static void
 dzl_signal_group_constructed (GObject *object)
 {
   DzlSignalGroup *self = (DzlSignalGroup *)object;
+  g_autoptr(GObject) target = g_weak_ref_get (&self->target_ref);
 
-  if (!dzl_signal_group_check_target_type (self, self->target))
+  if (!dzl_signal_group_check_target_type (self, target))
     dzl_signal_group_set_target (self, NULL);
 
   G_OBJECT_CLASS (dzl_signal_group_parent_class)->constructed (object);
@@ -467,12 +478,24 @@ dzl_signal_group_dispose (GObject *object)
 {
   DzlSignalGroup *self = (DzlSignalGroup *)object;
 
+  dzl_signal_group_gc_handlers (self);
+
   if (self->has_bound_at_least_once)
     dzl_signal_group_unbind (self);
 
   g_clear_pointer (&self->handlers, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_signal_group_parent_class)->dispose (object);
+}
+
+static void
+dzl_signal_group_finalize (GObject *object)
+{
+  DzlSignalGroup *self = (DzlSignalGroup *)object;
+
+  g_weak_ref_clear (&self->target_ref);
+
+  G_OBJECT_CLASS (dzl_signal_group_parent_class)->finalize (object);
 }
 
 static void
@@ -486,7 +509,7 @@ dzl_signal_group_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_TARGET:
-      g_value_set_object (value, dzl_signal_group_get_target (self));
+      g_value_take_object (value, g_weak_ref_get (&self->target_ref));
       break;
 
     case PROP_TARGET_TYPE:
@@ -528,6 +551,7 @@ dzl_signal_group_class_init (DzlSignalGroupClass *klass)
 
   object_class->constructed = dzl_signal_group_constructed;
   object_class->dispose = dzl_signal_group_dispose;
+  object_class->finalize = dzl_signal_group_finalize;
   object_class->get_property = dzl_signal_group_get_property;
   object_class->set_property = dzl_signal_group_set_property;
 
@@ -541,7 +565,7 @@ dzl_signal_group_class_init (DzlSignalGroupClass *klass)
                          "Target",
                          "The target instance used when connecting signals.",
                          G_TYPE_OBJECT,
-                         (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   /**
    * DzlSignalGroup:target-type
@@ -631,6 +655,7 @@ dzl_signal_group_connect_full (DzlSignalGroup *self,
                                GConnectFlags   flags,
                                gboolean        is_object)
 {
+  g_autoptr(GObject) target = NULL;
   SignalHandler *handler;
   GClosure *closure;
   guint signal_id;
@@ -641,6 +666,7 @@ dzl_signal_group_connect_full (DzlSignalGroup *self,
   g_return_if_fail (g_signal_parse_name (detailed_signal, self->target_type,
                                          &signal_id, &signal_detail, TRUE) != 0);
   g_return_if_fail (callback != NULL);
+  g_return_if_fail (!is_object || G_IS_OBJECT (data));
 
   if ((flags & G_CONNECT_SWAPPED) != 0)
     closure = g_cclosure_new_swap (callback, data, notify);
@@ -658,19 +684,21 @@ dzl_signal_group_connect_full (DzlSignalGroup *self,
 
   if (is_object)
     {
-      /* This is what g_cclosure_new_object() does */
+      /* Set closure->is_invalid when data is disposed. We only track this to avoid
+       * reconnecting in the future. However, we do a round of cleanup when ever we
+       * connect a new object or the target changes to GC the old handlers.
+       */
       g_object_watch_closure (data, closure);
-
-      handler->object = data;
-      g_object_weak_ref (data,
-                         dzl_signal_group__connect_object_weak_notify,
-                         self);
     }
 
   g_ptr_array_add (self->handlers, handler);
 
-  if (self->target != NULL)
-    dzl_signal_group_bind_handler (self, handler);
+  target = g_weak_ref_get (&self->target_ref);
+  if (target != NULL)
+    dzl_signal_group_bind_handler (self, handler, target);
+
+  /* Lazily remove any old handlers on connect */
+  dzl_signal_group_gc_handlers (self);
 }
 
 /**
