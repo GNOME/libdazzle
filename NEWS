@@ -1,4 +1,24 @@
 ==============
+Version 3.26.3
+==============
+
+Changes in this release:
+
+ • A number of fixes to DzlSignalGroup to be more re-entrant safe
+   and handle disposal cycles better.
+ • DzlPreferences is more aggressive about protecting against
+   widget disposal.
+ • A static inline dzl_clear_signal_handler() was backported for
+   use in other backports from master.
+ • A number of protections were added to DzlDirectoryReaper to
+   protect against potentially following through symlinks.
+ • Max age in DzlDirectoryReaper was changed to always ensure
+   a positive value for use in date comparisons.
+ • A leak of GFile instances in the directory reaper was fixed.
+
+It's recommended that all distributions update to this release.
+
+==============
 Version 3.26.2
 ==============
 
