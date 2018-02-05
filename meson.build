@@ -1,5 +1,5 @@
 project('libdazzle', 'c',
-          version: '3.27.5',
+          version: '3.27.90',
           license: 'GPLv3+',
     meson_version: '>= 0.40.1',
   default_options: [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=gnu11' ],

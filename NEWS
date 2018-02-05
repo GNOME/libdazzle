@@ -1,3 +1,15 @@
+===============
+Version 3.27.90
+===============
+
+Changes in this release:
+
+ • Further protections to ensure we don't follow symlinks in the
+   directory reaper.
+ • DzlSignalGroup now uses GWeakRef. Additionally, it allows objects
+   to invalidate closures instead of doing weak-ref tracking. This
+   should improve a number of situations.
+
 ==============
 Version 3.27.5
 ==============
