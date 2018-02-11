@@ -30,8 +30,6 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (DzlAnimation, dzl_animation, DZL, ANIMATION, GInitiallyUnowned)
 
-typedef enum   _DzlAnimationMode    DzlAnimationMode;
-
 enum _DzlAnimationMode
 {
   DZL_ANIMATION_LINEAR,
@@ -44,6 +42,8 @@ enum _DzlAnimationMode
 
   DZL_ANIMATION_LAST
 };
+
+typedef enum   _DzlAnimationMode    DzlAnimationMode;
 
 DZL_AVAILABLE_IN_ALL
 GType         dzl_animation_mode_get_type      (void);
