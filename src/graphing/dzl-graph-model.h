@@ -47,6 +47,8 @@ DZL_AVAILABLE_IN_ALL
 guint      dzl_graph_view_model_add_column         (DzlGraphModel     *self,
                                         DzlGraphColumn    *column);
 DZL_AVAILABLE_IN_ALL
+guint      dzl_graph_view_model_get_n_columns      (DzlGraphModel     *self);
+DZL_AVAILABLE_IN_ALL
 GTimeSpan  dzl_graph_view_model_get_timespan       (DzlGraphModel     *self);
 DZL_AVAILABLE_IN_ALL
 void       dzl_graph_view_model_set_timespan       (DzlGraphModel     *self,

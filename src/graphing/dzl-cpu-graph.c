@@ -63,7 +63,7 @@ dzl_cpu_graph_constructed (GObject *object)
 {
   static DzlCpuModel *model;
   DzlCpuGraph *self = (DzlCpuGraph *)object;
-  guint n_cpu;
+  guint n_columns;
   guint i;
 
   G_OBJECT_CLASS (dzl_cpu_graph_parent_class)->constructed (object);
@@ -87,9 +87,9 @@ dzl_cpu_graph_constructed (GObject *object)
       dzl_graph_view_set_model (DZL_GRAPH_VIEW (self), DZL_GRAPH_MODEL (model));
     }
 
-  n_cpu = g_get_num_processors ();
+  n_columns = dzl_graph_view_model_get_n_columns (DZL_GRAPH_MODEL (model));
 
-  for (i = 0; i < n_cpu; i++)
+  for (i = 0; i < n_columns; i++)
     {
       DzlGraphRenderer *renderer;
 
