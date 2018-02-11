@@ -138,6 +138,16 @@ dzl_graph_view_model_add_column (DzlGraphModel  *self,
 }
 
 guint
+dzl_graph_view_model_get_n_columns (DzlGraphModel  *self)
+{
+  DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_GRAPH_MODEL (self), 0);
+
+  return priv->columns->len;
+}
+
+guint
 dzl_graph_view_model_get_max_samples (DzlGraphModel *self)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
