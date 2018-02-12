@@ -1,6 +1,0 @@
-{
-global:
-    dzl_*;
-local:
-    *;
-};
