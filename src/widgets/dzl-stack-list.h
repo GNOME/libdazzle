@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_STACK_LIST (dzl_stack_list_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlStackList, dzl_stack_list, DZL, STACK_LIST, GtkBin)
 
 struct _DzlStackListClass

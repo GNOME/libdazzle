@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-dock-transient-grab"
+
+#include "config.h"
+
 #include "dzl-dock-transient-grab.h"
 
 struct _DzlDockTransientGrab

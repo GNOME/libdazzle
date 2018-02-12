@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_BIN (dzl_preferences_bin_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlPreferencesBin, dzl_preferences_bin, DZL, PREFERENCES_BIN, GtkBin)
 
 struct _DzlPreferencesBinClass

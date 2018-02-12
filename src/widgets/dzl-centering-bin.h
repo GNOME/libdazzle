@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_CENTERING_BIN (dzl_centering_bin_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlCenteringBin, dzl_centering_bin, DZL, CENTERING_BIN, GtkBin)
 
 struct _DzlCenteringBinClass

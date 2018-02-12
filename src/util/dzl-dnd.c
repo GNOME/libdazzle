@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-dnd"
 
+#include "config.h"
+
 #include "dzl-dnd.h"
 
 /**

@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PATH_BAR (dzl_path_bar_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPathBar, dzl_path_bar, DZL, PATH_BAR, GtkBox)
 
 DZL_AVAILABLE_IN_ALL

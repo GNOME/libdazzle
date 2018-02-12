@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_DOCK_TRANSIENT_GRAB (dzl_dock_transient_grab_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlDockTransientGrab, dzl_dock_transient_grab, DZL, DOCK_TRANSIENT_GRAB, GObject)
 
 DZL_AVAILABLE_IN_ALL

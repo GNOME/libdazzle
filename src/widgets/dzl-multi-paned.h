@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_MULTI_PANED (dzl_multi_paned_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlMultiPaned, dzl_multi_paned, DZL, MULTI_PANED, GtkContainer)
 
 struct _DzlMultiPanedClass

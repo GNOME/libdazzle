@@ -18,6 +18,8 @@
 
 #include <string.h>
 
+#include "config.h"
+
 #include "dzl-simple-label.h"
 
 struct _DzlSimpleLabel

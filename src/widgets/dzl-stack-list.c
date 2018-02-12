@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-stack-list"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "animation/dzl-animation.h"

@@ -16,6 +16,10 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-frame-source"
+
+#include "config.h"
+
 #include "dzl-frame-source.h"
 
 typedef struct

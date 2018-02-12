@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_LIST_BOX (dzl_list_box_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlListBox, dzl_list_box, DZL, LIST_BOX, GtkListBox)
 
 struct _DzlListBoxClass

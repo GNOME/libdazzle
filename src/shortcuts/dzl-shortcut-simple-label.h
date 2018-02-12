@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_SIMPLE_LABEL (dzl_shortcut_simple_label_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlShortcutSimpleLabel, dzl_shortcut_simple_label, DZL, SHORTCUT_SIMPLE_LABEL, GtkBox)
 
 DZL_AVAILABLE_IN_ALL

@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SEARCH_BAR (dzl_search_bar_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlSearchBar, dzl_search_bar, DZL, SEARCH_BAR, GtkBin)
 
 struct _DzlSearchBarClass

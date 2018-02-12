@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-dock-window"
+
+#include "config.h"
+
 #include "dzl-dock-item.h"
 #include "dzl-dock-window.h"
 

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-pill-box"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "dzl-pill-box.h"

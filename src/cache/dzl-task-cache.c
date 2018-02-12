@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-task-cache"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "cache/dzl-task-cache.h"

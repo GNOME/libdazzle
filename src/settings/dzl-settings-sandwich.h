@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SETTINGS_SANDWICH (dzl_settings_sandwich_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlSettingsSandwich, dzl_settings_sandwich, DZL, SETTINGS_SANDWICH, GObject)
 
 DZL_AVAILABLE_IN_ALL

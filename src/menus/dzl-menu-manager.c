@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-menu-manager"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "menus/dzl-menu-manager.h"

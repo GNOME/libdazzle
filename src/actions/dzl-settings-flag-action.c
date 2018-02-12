@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-settings-flag-action"
+
+#include "config.h"
+
 #include "dzl-settings-flag-action.h"
 
 struct _DzlSettingsFlagAction

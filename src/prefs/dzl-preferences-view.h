@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_VIEW (dzl_preferences_view_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlPreferencesView, dzl_preferences_view, DZL, PREFERENCES_VIEW, GtkBin)
 
 struct _DzlPreferencesViewClass

@@ -19,6 +19,8 @@
 #define G_LOG_DOMAIN    "dzl-fuzzy-index-builder"
 #define MAX_KEY_ENTRIES (0x00FFFFFF)
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
 

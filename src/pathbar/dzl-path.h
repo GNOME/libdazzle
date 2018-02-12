@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PATH (dzl_path_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPath, dzl_path, DZL, PATH, GObject)
 
 DZL_AVAILABLE_IN_ALL

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-simple-label"
 
+#include "config.h"
+
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-simple-label.h"
 #include "util/dzl-gtk.h"

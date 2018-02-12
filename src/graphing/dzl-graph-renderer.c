@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <cairo.h>
 
 #include "dzl-graph-renderer.h"
@@ -42,13 +44,13 @@ dzl_graph_view_renderer_default_init (DzlGraphRendererInterface *iface)
 
 void
 dzl_graph_view_renderer_render (DzlGraphRenderer                  *self,
-                    DzlGraphModel                     *table,
-                    gint64                       x_begin,
-                    gint64                       x_end,
-                    gdouble                      y_begin,
-                    gdouble                      y_end,
-                    cairo_t                     *cr,
-                    const cairo_rectangle_int_t *area)
+                                DzlGraphModel                     *table,
+                                gint64                       x_begin,
+                                gint64                       x_end,
+                                gdouble                      y_begin,
+                                gdouble                      y_end,
+                                cairo_t                     *cr,
+                                const cairo_rectangle_int_t *area)
 {
   g_return_if_fail (DZL_IS_GRAPH_RENDERER (self));
   g_return_if_fail (cr != NULL);

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-cairo"
 
+#include "config.h"
+
 #include "dzl-cairo.h"
 
 cairo_region_t *

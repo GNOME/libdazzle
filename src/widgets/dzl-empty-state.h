@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_EMPTY_STATE (dzl_empty_state_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlEmptyState, dzl_empty_state, DZL, EMPTY_STATE, GtkBin)
 
 struct _DzlEmptyStateClass

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-menu-button-item"
 
+#include "config.h"
+
 #include "menus/dzl-menu-button.h"
 #include "menus/dzl-menu-button-item.h"
 #include "shortcuts/dzl-shortcut-label.h"

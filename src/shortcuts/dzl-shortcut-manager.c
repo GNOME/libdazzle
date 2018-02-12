@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-manager.h"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "dzl-debug.h"

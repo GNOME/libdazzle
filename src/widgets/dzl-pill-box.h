@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PILL_BOX (dzl_pill_box_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPillBox, dzl_pill_box, DZL, PILL_BOX, GtkEventBox)
 
 DZL_AVAILABLE_IN_ALL

@@ -92,6 +92,7 @@ libdazzle_deps = [
 ]
 
 libdazzle_args = []
+libdazzle_args += hidden_visibility_args
 if get_option('enable_rdtscp')
   libdazzle_args += '-DDZL_HAVE_RDTSCP'
 endif

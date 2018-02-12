@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-closure-chain"
 
+#include "config.h"
+
 #include <gobject/gvaluecollector.h>
 #include <string.h>
 

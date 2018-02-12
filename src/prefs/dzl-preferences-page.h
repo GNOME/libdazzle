@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_PAGE (dzl_preferences_page_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesPage, dzl_preferences_page, DZL, PREFERENCES_PAGE, GtkBin)
 
 DZL_AVAILABLE_IN_ALL

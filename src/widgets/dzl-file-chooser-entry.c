@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-file-chooser-entry"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "dzl-file-chooser-entry.h"

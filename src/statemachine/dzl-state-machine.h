@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_STATE_MACHINE  (dzl_state_machine_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlStateMachine, dzl_state_machine, DZL, STATE_MACHINE, GObject)
 
 struct _DzlStateMachineClass

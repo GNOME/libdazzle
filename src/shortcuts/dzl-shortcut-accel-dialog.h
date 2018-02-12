@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_ACCEL_DIALOG (dzl_shortcut_accel_dialog_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlShortcutAccelDialog, dzl_shortcut_accel_dialog, DZL, SHORTCUT_ACCEL_DIALOG, GtkDialog)
 
 DZL_AVAILABLE_IN_ALL

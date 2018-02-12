@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-ring"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "dzl-ring.h"

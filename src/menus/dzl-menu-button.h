@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_MENU_BUTTON (dzl_menu_button_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlMenuButton, dzl_menu_button, DZL, MENU_BUTTON, GtkMenuButton)
 
 struct _DzlMenuButtonClass

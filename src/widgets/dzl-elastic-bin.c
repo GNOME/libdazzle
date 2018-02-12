@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-elastic-bin"
 
+#include "config.h"
+
 #include "animation/dzl-animation.h"
 #include "widgets/dzl-elastic-bin.h"
 

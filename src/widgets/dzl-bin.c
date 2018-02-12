@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-bin"
 
+#include "config.h"
+
 /**
  * SECTION:dzl-bin
  * @title: DzlBin

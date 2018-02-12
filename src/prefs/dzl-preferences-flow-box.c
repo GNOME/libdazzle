@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-preferences-flow-box"
+
+#include "config.h"
+
 #include "prefs/dzl-preferences-flow-box.h"
 
 struct _DzlPreferencesFlowBox

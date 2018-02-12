@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include "util/dzl-util-private.h"
 #include "prefs/dzl-preferences-spin-button.h"
 

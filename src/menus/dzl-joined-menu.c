@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-joined-menu"
 
+#include "config.h"
+
 #include "dzl-joined-menu.h"
 
 typedef struct

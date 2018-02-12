@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_BOLDING_LABEL (dzl_bolding_label_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlBoldingLabel, dzl_bolding_label, DZL, BOLDING_LABEL, GtkLabel)
 
 DZL_AVAILABLE_IN_ALL

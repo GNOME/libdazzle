@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_JOINED_MENU (dzl_joined_menu_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlJoinedMenu, dzl_joined_menu, DZL, JOINED_MENU, GMenuModel)
 
 DZL_AVAILABLE_IN_ALL

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-pango"
 
+#include "config.h"
+
 #include <gdk/gdk.h>
 #include <glib/gstdio.h>
 #include <math.h>

@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_TREE         (dzl_tree_get_type())
@@ -34,8 +36,11 @@ typedef enum
   DZL_TREE_DROP_AFTER  = 2,
 } DzlTreeDropPosition;
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlTree,        dzl_tree,         DZL, TREE,         GtkTreeView)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlTreeBuilder, dzl_tree_builder, DZL, TREE_BUILDER, GInitiallyUnowned)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE     (DzlTreeNode,    dzl_tree_node,    DZL, TREE_NODE,    GInitiallyUnowned)
 
 typedef gint (*DzlTreeNodeCompareFunc) (DzlTreeNode *a,

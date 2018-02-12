@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_DIRECTORY_MODEL (dzl_directory_model_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlDirectoryModel, dzl_directory_model, DZL, DIRECTORY_MODEL, GObject)
 
 typedef gboolean (*DzlDirectoryModelVisibleFunc) (DzlDirectoryModel *self,

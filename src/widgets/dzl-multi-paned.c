@@ -19,6 +19,8 @@
 
 #define G_LOG_DOMAIN "dzl-multi-paned"
 
+#include "config.h"
+
 #include "widgets/dzl-multi-paned.h"
 #include "util/dzl-util-private.h"
 

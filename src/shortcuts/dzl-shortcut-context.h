@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_CONTEXT (dzl_shortcut_context_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlShortcutContext, dzl_shortcut_context, DZL, SHORTCUT_CONTEXT, GObject)
 
 DZL_AVAILABLE_IN_ALL

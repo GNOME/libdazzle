@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION (dzl_suggestion_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlSuggestion, dzl_suggestion, DZL, SUGGESTION, GObject)
 
 struct _DzlSuggestionClass

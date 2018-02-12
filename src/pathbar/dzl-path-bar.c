@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-path-bar"
 
+#include "config.h"
+
 #include <dazzle.h>
 #include <string.h>
 

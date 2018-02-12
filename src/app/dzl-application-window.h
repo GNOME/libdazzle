@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_APPLICATION_WINDOW (dzl_application_window_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlApplicationWindow, dzl_application_window, DZL, APPLICATION_WINDOW, GtkApplicationWindow)
 
 struct _DzlApplicationWindowClass

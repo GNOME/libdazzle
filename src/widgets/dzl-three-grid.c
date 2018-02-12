@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-three-grid"
 
+#include "config.h"
+
 #include <math.h>
 
 #include "dzl-three-grid.h"

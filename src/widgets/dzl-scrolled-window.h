@@ -21,10 +21,13 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_SCROLLED_WINDOW (dzl_scrolled_window_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlScrolledWindow, dzl_scrolled_window, DZL, SCROLLED_WINDOW, GtkScrolledWindow)
 
 G_END_DECLS

@@ -20,8 +20,11 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_3_28
 GCancellable *dzl_cancellable_chain (GCancellable *self,
                                      GCancellable *other);
 

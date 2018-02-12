@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-phase"
 
+#include "config.h"
+
 #include "shortcuts/dzl-shortcut-phase.h"
 
 GType

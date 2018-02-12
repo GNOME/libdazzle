@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-fuzzy-index"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "dzl-fuzzy-index.h"

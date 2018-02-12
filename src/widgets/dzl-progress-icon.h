@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PROGRESS_ICON (dzl_progress_icon_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlProgressIcon, dzl_progress_icon, DZL, PROGRESS_ICON, GtkDrawingArea)
 
 DZL_AVAILABLE_IN_ALL

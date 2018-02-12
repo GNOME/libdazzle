@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION_ENTRY_BUFFER (dzl_suggestion_entry_buffer_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlSuggestionEntryBuffer, dzl_suggestion_entry_buffer, DZL, SUGGESTION_ENTRY_BUFFER, GtkEntryBuffer)
 
 struct _DzlSuggestionEntryBufferClass

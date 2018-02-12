@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-list-box"
 
+#include "config.h"
+
 /*
  * This widget is just like GtkListBox, except that it allows you to
  * very simply re-use existing widgets instead of creating new widgets

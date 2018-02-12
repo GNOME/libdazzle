@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-model"
 
+#include "config.h"
+
 #include "shortcuts/dzl-shortcut-model.h"
 #include "shortcuts/dzl-shortcut-private.h"
 

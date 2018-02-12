@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SIMPLE_POPOVER (dzl_simple_popover_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlSimplePopover, dzl_simple_popover, DZL, SIMPLE_POPOVER, GtkPopover)
 
 struct _DzlSimplePopoverClass

@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION_ENTRY (dzl_suggestion_entry_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlSuggestionEntry, dzl_suggestion_entry, DZL, SUGGESTION_ENTRY, GtkEntry)
 
 /**

@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_FUZZY_INDEX_MATCH (dzl_fuzzy_index_match_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlFuzzyIndexMatch, dzl_fuzzy_index_match, DZL, FUZZY_INDEX_MATCH, GObject)
 
 DZL_AVAILABLE_IN_ALL

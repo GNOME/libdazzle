@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 #define DZL_TYPE_SLIDER          (dzl_slider_get_type())
 #define DZL_TYPE_SLIDER_POSITION (dzl_slider_position_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlSlider, dzl_slider, DZL, SLIDER, GtkContainer)
 
 typedef enum

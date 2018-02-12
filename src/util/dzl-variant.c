@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-variant"
 
+#include "config.h"
+
 #include "util/dzl-variant.h"
 
 guint

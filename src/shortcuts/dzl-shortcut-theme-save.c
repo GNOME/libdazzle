@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-theme-save"
 
+#include "config.h"
+
 #include "shortcuts/dzl-shortcut-theme.h"
 #include "shortcuts/dzl-shortcut-private.h"
 

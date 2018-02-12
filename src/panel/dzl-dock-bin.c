@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-dock-bin"
+
+#include "config.h"
+
 #include <stdlib.h>
 
 #include "actions/dzl-child-property-action.h"

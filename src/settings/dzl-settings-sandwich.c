@@ -19,6 +19,8 @@
 #define G_LOG_DOMAIN "dzl-settings-sandwich"
 #define G_SETTINGS_ENABLE_BACKEND
 
+#include "config.h"
+
 #include <gio/gsettingsbackend.h>
 #include <glib/gi18n.h>
 

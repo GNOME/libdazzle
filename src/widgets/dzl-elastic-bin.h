@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_ELASTIC_BIN (dzl_elastic_bin_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlElasticBin, dzl_elastic_bin, DZL, ELASTIC_BIN, GtkBin)
 
 struct _DzlElasticBinClass

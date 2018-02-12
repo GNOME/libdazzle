@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_MODEL (dzl_shortcut_model_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlShortcutModel, dzl_shortcut_model, DZL, SHORTCUT_MODEL, GtkTreeStore)
 
 DZL_AVAILABLE_IN_ALL

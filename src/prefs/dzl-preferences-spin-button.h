@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_SPIN_BUTTON (dzl_preferences_spin_button_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesSpinButton, dzl_preferences_spin_button, DZL, PREFERENCES_SPIN_BUTTON, DzlPreferencesBin)
 
 DZL_AVAILABLE_IN_ALL

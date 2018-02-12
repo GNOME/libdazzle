@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-dock-revealer"
 
+#include "config.h"
+
 #include "animation/dzl-animation.h"
 #include "panel/dzl-dock-revealer.h"
 #include "util/dzl-util-private.h"

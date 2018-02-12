@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 #define DZL_TYPE_THREE_GRID        (dzl_three_grid_get_type())
 #define DZL_TYPE_THREE_GRID_COLUMN (dzl_three_grid_column_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlThreeGrid, dzl_three_grid, DZL, THREE_GRID, GtkContainer)
 
 struct _DzlThreeGridClass

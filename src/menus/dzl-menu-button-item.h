@@ -25,6 +25,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_MENU_BUTTON_ITEM (dzl_menu_button_item_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlMenuButtonItem, dzl_menu_button_item, DZL, MENU_BUTTON_ITEM, GtkCheckButton)
 
 G_END_DECLS

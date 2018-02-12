@@ -21,10 +21,13 @@
 
 #include <gtk/gtk.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_BOX_THEATRIC (dzl_box_theatric_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlBoxTheatric, dzl_box_theatric, DZL, BOX_THEATRIC, GObject)
 
 G_END_DECLS

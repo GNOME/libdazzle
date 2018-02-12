@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_COLUMN_LAYOUT (dzl_column_layout_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlColumnLayout, dzl_column_layout, DZL, COLUMN_LAYOUT, GtkContainer)
 
 struct _DzlColumnLayoutClass

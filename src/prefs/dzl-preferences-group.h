@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_GROUP (dzl_preferences_group_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesGroup, dzl_preferences_group, DZL, PREFERENCES_GROUP, GtkBin)
 
 DZL_AVAILABLE_IN_ALL

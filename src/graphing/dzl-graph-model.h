@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_GRAPH_MODEL (dzl_graph_view_model_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlGraphModel, dzl_graph_view_model, DZL, GRAPH_MODEL, GObject)
 
 struct _DzlGraphModelClass
@@ -45,47 +46,47 @@ DZL_AVAILABLE_IN_ALL
 DzlGraphModel   *dzl_graph_view_model_new                (void);
 DZL_AVAILABLE_IN_ALL
 guint      dzl_graph_view_model_add_column         (DzlGraphModel     *self,
-                                        DzlGraphColumn    *column);
+                                                    DzlGraphColumn    *column);
 DZL_AVAILABLE_IN_ALL
 guint      dzl_graph_view_model_get_n_columns      (DzlGraphModel     *self);
 DZL_AVAILABLE_IN_ALL
 GTimeSpan  dzl_graph_view_model_get_timespan       (DzlGraphModel     *self);
 DZL_AVAILABLE_IN_ALL
 void       dzl_graph_view_model_set_timespan       (DzlGraphModel     *self,
-                                        GTimeSpan    timespan);
+                                                    GTimeSpan    timespan);
 DZL_AVAILABLE_IN_ALL
 gint64     dzl_graph_view_model_get_end_time       (DzlGraphModel     *self);
 DZL_AVAILABLE_IN_ALL
 guint      dzl_graph_view_model_get_max_samples    (DzlGraphModel     *self);
 DZL_AVAILABLE_IN_ALL
 void       dzl_graph_view_model_set_max_samples    (DzlGraphModel     *self,
-                                        guint        n_rows);
+                                                    guint        n_rows);
 DZL_AVAILABLE_IN_ALL
 void       dzl_graph_view_model_push               (DzlGraphModel     *self,
-                                        DzlGraphModelIter *iter,
-                                        gint64       timestamp);
+                                                    DzlGraphModelIter *iter,
+                                                    gint64       timestamp);
 DZL_AVAILABLE_IN_ALL
 gboolean   dzl_graph_view_model_get_iter_first     (DzlGraphModel     *self,
-                                        DzlGraphModelIter *iter);
+                                                    DzlGraphModelIter *iter);
 DZL_AVAILABLE_IN_ALL
 gboolean   dzl_graph_view_model_get_iter_last      (DzlGraphModel     *self,
-                                        DzlGraphModelIter *iter);
+                                                    DzlGraphModelIter *iter);
 DZL_AVAILABLE_IN_ALL
 gboolean   dzl_graph_view_model_iter_next          (DzlGraphModelIter *iter);
 DZL_AVAILABLE_IN_ALL
 void       dzl_graph_view_model_iter_get           (DzlGraphModelIter *iter,
-                                        gint         first_column,
-                                        ...);
+                                                    gint         first_column,
+                                                    ...);
 DZL_AVAILABLE_IN_ALL
 void       dzl_graph_view_model_iter_get_value     (DzlGraphModelIter *iter,
-                                        guint        column,
-                                        GValue      *value);
+                                                    guint        column,
+                                                    GValue      *value);
 DZL_AVAILABLE_IN_ALL
 gint64     dzl_graph_view_model_iter_get_timestamp (DzlGraphModelIter *iter);
 DZL_AVAILABLE_IN_ALL
 void       dzl_graph_view_model_iter_set           (DzlGraphModelIter *iter,
-                                        gint         first_column,
-                                        ...);
+                                                    gint         first_column,
+                                                    ...);
 
 G_END_DECLS
 

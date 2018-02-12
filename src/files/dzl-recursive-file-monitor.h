@@ -21,25 +21,34 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_RECURSIVE_FILE_MONITOR (dzl_recursive_file_monitor_get_type())
 
+DZL_AVAILABLE_IN_3_28
 G_DECLARE_FINAL_TYPE (DzlRecursiveFileMonitor, dzl_recursive_file_monitor, DZL, RECURSIVE_FILE_MONITOR, GObject)
 
 typedef gboolean (*DzlRecursiveIgnoreFunc) (GFile    *file,
                                             gpointer  user_data);
 
+DZL_AVAILABLE_IN_3_28
 DzlRecursiveFileMonitor *dzl_recursive_file_monitor_new             (GFile                    *root);
+DZL_AVAILABLE_IN_3_28
 GFile                   *dzl_recursive_file_monitor_get_root        (DzlRecursiveFileMonitor  *self);
+DZL_AVAILABLE_IN_3_28
 void                     dzl_recursive_file_monitor_start_async     (DzlRecursiveFileMonitor  *self,
                                                                      GCancellable             *cancellable,
                                                                      GAsyncReadyCallback       callback,
                                                                      gpointer                  user_data);
+DZL_AVAILABLE_IN_3_28
 gboolean                 dzl_recursive_file_monitor_start_finish    (DzlRecursiveFileMonitor  *self,
                                                                      GAsyncResult             *result,
                                                                      GError                  **error);
+DZL_AVAILABLE_IN_3_28
 void                     dzl_recursive_file_monitor_cancel          (DzlRecursiveFileMonitor  *self);
+DZL_AVAILABLE_IN_3_28
 void                     dzl_recursive_file_monitor_set_ignore_func (DzlRecursiveFileMonitor  *self,
                                                                      DzlRecursiveIgnoreFunc    ignore_func,
                                                                      gpointer                  ignore_func_data,

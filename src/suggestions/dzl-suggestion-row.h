@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION_ROW (dzl_suggestion_row_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlSuggestionRow, dzl_suggestion_row, DZL, SUGGESTION_ROW, DzlListBoxRow)
 
 struct _DzlSuggestionRowClass

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-state-machine"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 #include <gobject/gvaluecollector.h>
 

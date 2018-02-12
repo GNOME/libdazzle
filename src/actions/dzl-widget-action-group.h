@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_WIDGET_ACTION_GROUP (dzl_widget_action_group_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlWidgetActionGroup, dzl_widget_action_group, DZL, WIDGET_ACTION_GROUP, GObject)
 
 DZL_AVAILABLE_IN_ALL

@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PATH_ELEMENT (dzl_path_element_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPathElement, dzl_path_element, DZL, PATH_ELEMENT, GObject)
 
 DZL_AVAILABLE_IN_ALL

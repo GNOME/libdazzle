@@ -20,10 +20,13 @@
 
 #include <gio/gio.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define DZL_TYPE_FILE_TRANSFER (dzl_file_transfer_get_type())
 
+DZL_AVAILABLE_IN_3_28
 G_DECLARE_DERIVABLE_TYPE (DzlFileTransfer, dzl_file_transfer, DZL, FILE_TRANSFER, GObject)
 
 struct _DzlFileTransferClass
@@ -53,24 +56,33 @@ typedef struct
   gint64 _padding[10];
 } DzlFileTransferStat;
 
+DZL_AVAILABLE_IN_3_28
 DzlFileTransfer      *dzl_file_transfer_new            (void);
+DZL_AVAILABLE_IN_3_28
 DzlFileTransferFlags  dzl_file_transfer_get_flags      (DzlFileTransfer       *self);
+DZL_AVAILABLE_IN_3_28
 void                  dzl_file_transfer_set_flags      (DzlFileTransfer       *self,
                                                         DzlFileTransferFlags   flags);
+DZL_AVAILABLE_IN_3_28
 gdouble               dzl_file_transfer_get_progress   (DzlFileTransfer       *self);
+DZL_AVAILABLE_IN_3_28
 void                  dzl_file_transfer_stat           (DzlFileTransfer       *self,
                                                         DzlFileTransferStat   *stat_buf);
+DZL_AVAILABLE_IN_3_28
 void                  dzl_file_transfer_add            (DzlFileTransfer       *self,
                                                         GFile                 *src,
                                                         GFile                 *dest);
+DZL_AVAILABLE_IN_3_28
 void                  dzl_file_transfer_execute_async  (DzlFileTransfer       *self,
                                                         gint                   io_priority,
                                                         GCancellable          *cancellable,
                                                         GAsyncReadyCallback    callback,
                                                         gpointer               user_data);
+DZL_AVAILABLE_IN_3_28
 gboolean              dzl_file_transfer_execute_finish (DzlFileTransfer       *self,
                                                         GAsyncResult          *result,
                                                         GError               **error);
+DZL_AVAILABLE_IN_3_28
 gboolean              dzl_file_transfer_execute        (DzlFileTransfer       *self,
                                                         gint                   io_priority,
                                                         GCancellable          *cancellable,

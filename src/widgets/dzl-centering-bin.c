@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-centering-bin"
 
+#include "config.h"
+
 #include "widgets/dzl-centering-bin.h"
 #include "bindings/dzl-signal-group.h"
 

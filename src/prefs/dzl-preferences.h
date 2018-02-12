@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES (dzl_preferences_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_INTERFACE (DzlPreferences, dzl_preferences, DZL, PREFERENCES, GObject)
 
 struct _DzlPreferencesInterface

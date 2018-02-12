@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-tree-store"
 
+#include "config.h"
+
 #include "tree/dzl-tree-builder.h"
 #include "tree/dzl-tree-node.h"
 #include "tree/dzl-tree-private.h"

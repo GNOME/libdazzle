@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-file-transfer"
 
+#include "config.h"
+
 #include "dzl-debug.h"
 #include "dzl-enums.h"
 

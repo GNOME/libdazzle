@@ -16,6 +16,10 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-animation"
+
+#include "config.h"
+
 #include <glib/gi18n.h>
 #include <gobject/gvaluecollector.h>
 #include <gdk/gdk.h>

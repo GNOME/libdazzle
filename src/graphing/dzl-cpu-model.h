@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_CPU_MODEL (dzl_cpu_model_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlCpuModel, dzl_cpu_model, DZL, CPU_MODEL, DzlGraphModel)
 
 DZL_AVAILABLE_IN_ALL

@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PROPERTIES_GROUP (dzl_properties_group_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPropertiesGroup, dzl_properties_group, DZL, PROPERTIES_GROUP, GObject)
 
 typedef enum

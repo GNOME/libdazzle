@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-suggestion"
 
+#include "config.h"
+
 #include "dzl-suggestion.h"
 
 typedef struct

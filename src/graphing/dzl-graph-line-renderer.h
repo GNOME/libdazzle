@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_GRAPH_LINE_RENDERER (dzl_graph_view_line_renderer_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlGraphLineRenderer, dzl_graph_view_line_renderer, DZL, GRAPH_LINE_RENDERER, GObject)
 
 DZL_AVAILABLE_IN_ALL

@@ -19,6 +19,8 @@
 
 #define G_LOG_DOMAIN "dzl-progress-icon"
 
+#include "config.h"
+
 #include <math.h>
 
 #include "dzl-progress-icon.h"

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-rect-helper"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "widgets/dzl-rect-helper.h"

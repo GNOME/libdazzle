@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 #define DZL_TYPE_ANIMATION      (dzl_animation_get_type())
 #define DZL_TYPE_ANIMATION_MODE (dzl_animation_mode_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlAnimation, dzl_animation, DZL, ANIMATION, GInitiallyUnowned)
 
 enum _DzlAnimationMode

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-recursive-file-monitor"
 
+#include "config.h"
+
 #include "files/dzl-recursive-file-monitor.h"
 #include "util/dzl-macros.h"
 
@@ -493,7 +495,7 @@ dzl_recursive_file_monitor_class_init (DzlRecursiveFileMonitorClass *klass)
                          "The root directory to monitor",
                          G_TYPE_FILE,
                          (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-  
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
   /**

@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_MENU_MANAGER (dzl_menu_manager_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlMenuManager, dzl_menu_manager, DZL, MENU_MANAGER, GObject)
 
 DZL_AVAILABLE_IN_ALL

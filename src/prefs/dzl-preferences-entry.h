@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_ENTRY (dzl_preferences_entry_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlPreferencesEntry, dzl_preferences_entry, DZL, PREFERENCES_ENTRY, DzlPreferencesBin)
 
 struct _DzlPreferencesEntryClass

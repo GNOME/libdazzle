@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 #define DZL_TYPE_DOCK_REVEALER_TRANSITION_TYPE (dzl_dock_revealer_transition_type_get_type())
 #define DZL_TYPE_DOCK_REVEALER                 (dzl_dock_revealer_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockRevealer, dzl_dock_revealer, DZL, DOCK_REVEALER, DzlBin)
 
 typedef enum

@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_THEME_MANAGER (dzl_theme_manager_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlThemeManager, dzl_theme_manager, DZL, THEME_MANAGER, GObject)
 
 DZL_AVAILABLE_IN_ALL

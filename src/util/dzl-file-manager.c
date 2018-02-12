@@ -19,7 +19,7 @@
 
 #define G_LOG_DOMAIN "dzl-file-manager"
 
-#include "util/dzl-file-manager.h"
+#include "config.h"
 
 #include <glib/gi18n.h>
 
@@ -36,6 +36,8 @@
 #ifdef PLATFORM_OSX
 #include <AppKit/AppKit.h>
 #endif
+
+#include "util/dzl-file-manager.h"
 
 /* Copied from the GIMP */
 gboolean

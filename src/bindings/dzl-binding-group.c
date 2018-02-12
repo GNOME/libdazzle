@@ -19,6 +19,8 @@
 
 #define G_LOG_DOMAIN "dzl-binding-group"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "dzl-binding-group.h"

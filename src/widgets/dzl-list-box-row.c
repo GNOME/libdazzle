@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-list-box-row"
 
+#include "config.h"
+
 #include "dzl-list-box.h"
 #include "dzl-list-box-private.h"
 #include "dzl-list-box-row.h"

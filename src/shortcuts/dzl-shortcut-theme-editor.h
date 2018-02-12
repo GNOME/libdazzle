@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_THEME_EDITOR (dzl_shortcut_theme_editor_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlShortcutThemeEditor, dzl_shortcut_theme_editor, DZL, SHORTCUT_THEME_EDITOR, GtkBin)
 
 struct _DzlShortcutThemeEditorClass

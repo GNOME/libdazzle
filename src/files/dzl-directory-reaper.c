@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-directory-reaper"
 
+#include "config.h"
+
 #include "files/dzl-directory-reaper.h"
 
 typedef enum

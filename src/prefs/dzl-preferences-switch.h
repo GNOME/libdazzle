@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_SWITCH (dzl_preferences_switch_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesSwitch, dzl_preferences_switch, DZL, PREFERENCES_SWITCH, DzlPreferencesBin)
 
 G_END_DECLS

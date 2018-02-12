@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_THEME (dzl_shortcut_theme_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlShortcutTheme, dzl_shortcut_theme, DZL, SHORTCUT_THEME, GObject)
 
 struct _DzlShortcutThemeClass

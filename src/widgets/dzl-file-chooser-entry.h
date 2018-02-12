@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_FILE_CHOOSER_ENTRY (dzl_file_chooser_entry_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlFileChooserEntry, dzl_file_chooser_entry, DZL, FILE_CHOOSER_ENTRY, GtkBin)
 
 struct _DzlFileChooserEntryClass

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-theme"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "shortcuts/dzl-shortcut-context.h"

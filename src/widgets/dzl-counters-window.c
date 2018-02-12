@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-counters-window"
 
+#include "config.h"
+
 #include "dzl-counters-window.h"
 
 typedef struct

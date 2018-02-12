@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_FONT_BUTTON (dzl_preferences_font_button_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesFontButton, dzl_preferences_font_button, DZL, PREFERENCES_FONT_BUTTON, DzlPreferencesBin)
 
 G_END_DECLS

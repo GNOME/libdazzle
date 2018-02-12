@@ -36,6 +36,7 @@ G_BEGIN_DECLS
 #define DZL_APPLICATION_DEFAULT (DZL_APPLICATION (g_application_get_default ()))
 #define DZL_TYPE_APPLICATION    (dzl_application_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlApplication, dzl_application, DZL, APPLICATION, GtkApplication)
 
 struct _DzlApplicationClass

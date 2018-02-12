@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-preferences"
+
+#include "config.h"
+
 #include <string.h>
 
 #include "prefs/dzl-preferences.h"

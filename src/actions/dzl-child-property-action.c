@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-child-property-action"
 
+#include "config.h"
+
 #include "dzl-child-property-action.h"
 #include "../util/dzl-util-private.h"
 

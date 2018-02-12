@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-directory-model"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "dzl-directory-model.h"

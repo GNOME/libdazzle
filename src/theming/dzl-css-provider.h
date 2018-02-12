@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_CSS_PROVIDER (dzl_css_provider_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlCssProvider, dzl_css_provider, DZL, CSS_PROVIDER, GtkCssProvider)
 
 DZL_AVAILABLE_IN_ALL

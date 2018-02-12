@@ -25,6 +25,8 @@
 
 #define G_LOG_DOMAIN "dzl-priority-box"
 
+#include "config.h"
+
 #include "dzl-priority-box.h"
 
 typedef struct

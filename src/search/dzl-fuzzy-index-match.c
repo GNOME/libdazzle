@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-fuzzy-index-match"
 
+#include "config.h"
+
 #include "dzl-fuzzy-index-match.h"
 
 struct _DzlFuzzyIndexMatch

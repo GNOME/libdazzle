@@ -16,8 +16,12 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+
 #include <glib.h>
 #include <string.h>
+
+#include "dzl-levenshtein.h"
 
 gint
 dzl_levenshtein (const gchar *needle,

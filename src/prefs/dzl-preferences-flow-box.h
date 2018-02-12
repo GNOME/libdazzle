@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_FLOW_BOX (dzl_preferences_flow_box_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesFlowBox, dzl_preferences_flow_box, DZL, PREFERENCES_FLOW_BOX, DzlColumnLayout)
 
 DZL_AVAILABLE_IN_ALL

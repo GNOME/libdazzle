@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-path"
 
+#include "config.h"
+
 #include "dzl-path.h"
 #include "dzl-path-element.h"
 

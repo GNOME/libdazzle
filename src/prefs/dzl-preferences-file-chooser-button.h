@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PREFERENCES_FILE_CHOOSER_BUTTON (dzl_preferences_file_chooser_button_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesFileChooserButton, dzl_preferences_file_chooser_button, DZL, PREFERENCES_FILE_CHOOSER_BUTTON, DzlPreferencesBin)
 
 G_END_DECLS

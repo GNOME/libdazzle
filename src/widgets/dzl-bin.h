@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_BIN (dzl_bin_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlBin, dzl_bin, DZL, BIN, GtkBin)
 
 struct _DzlBinClass

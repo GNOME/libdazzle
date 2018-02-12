@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-menu-button-section"
 
+#include "config.h"
+
 #include "bindings/dzl-signal-group.h"
 #include "menus/dzl-menu-button-section.h"
 #include "menus/dzl-menu-button-item.h"

@@ -24,6 +24,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_TREE_STORE (dzl_tree_store_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlTreeStore, dzl_tree_store, DZL, TREE_STORE, GtkTreeStore)
 
 G_END_DECLS

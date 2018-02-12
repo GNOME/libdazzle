@@ -21,14 +21,14 @@
 
 #include <glib-object.h>
 
-#include "dzl-version-macros.h"
-
 #include "dzl-graph-model.h"
+#include "dzl-version-macros.h"
 
 G_BEGIN_DECLS
 
 #define DZL_TYPE_GRAPH_RENDERER (dzl_graph_view_renderer_get_type ())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_INTERFACE (DzlGraphRenderer, dzl_graph_view_renderer, DZL, GRAPH_RENDERER, GObject)
 
 struct _DzlGraphRendererInterface
@@ -47,13 +47,13 @@ struct _DzlGraphRendererInterface
 
 DZL_AVAILABLE_IN_ALL
 void dzl_graph_view_renderer_render (DzlGraphRenderer                  *self,
-                         DzlGraphModel                     *table,
-                         gint64                       x_begin,
-                         gint64                       x_end,
-                         gdouble                      y_begin,
-                         gdouble                      y_end,
-                         cairo_t                     *cr,
-                         const cairo_rectangle_int_t *area);
+                                     DzlGraphModel                     *table,
+                                     gint64                       x_begin,
+                                     gint64                       x_end,
+                                     gdouble                      y_begin,
+                                     gdouble                      y_end,
+                                     cairo_t                     *cr,
+                                     const cairo_rectangle_int_t *area);
 
 G_END_DECLS
 

@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_BINDING_GROUP (dzl_binding_group_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlBindingGroup, dzl_binding_group, DZL, BINDING_GROUP, GObject)
 
 DZL_AVAILABLE_IN_ALL

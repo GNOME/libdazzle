@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-dock-manager"
 
+#include "config.h"
+
 #include "panel/dzl-dock-manager.h"
 #include "panel/dzl-dock-transient-grab.h"
 #include "util/dzl-util-private.h"

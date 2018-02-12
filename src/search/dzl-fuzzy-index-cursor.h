@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_FUZZY_INDEX_CURSOR (dzl_fuzzy_index_cursor_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlFuzzyIndexCursor, dzl_fuzzy_index_cursor, DZL, FUZZY_INDEX_CURSOR, GObject)
 
 DZL_AVAILABLE_IN_ALL

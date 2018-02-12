@@ -19,6 +19,8 @@
 
 #define G_LOG_DOMAIN "dzl-tab-strip"
 
+#include "config.h"
+
 #include "dzl-dock-item.h"
 #include "dzl-dock-widget.h"
 #include "dzl-tab.h"

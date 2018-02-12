@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_CONTROLLER (dzl_shortcut_controller_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlShortcutController, dzl_shortcut_controller, DZL, SHORTCUT_CONTROLLER, GObject)
 
 DZL_AVAILABLE_IN_ALL

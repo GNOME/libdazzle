@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-application-window"
 
+#include "config.h"
+
 #include "app/dzl-application-window.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "util/dzl-gtk.h"

@@ -19,6 +19,8 @@
 
 #define G_LOG_DOMAIN "dzl-tab"
 
+#include "config.h"
+
 #include "panel/dzl-dock-item.h"
 #include "panel/dzl-tab.h"
 #include "panel/dzl-tab-private.h"

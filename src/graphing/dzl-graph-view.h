@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_GRAPH_VIEW (dzl_graph_view_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlGraphView, dzl_graph_view, DZL, GRAPH_VIEW, GtkDrawingArea)
 
 struct _DzlGraphViewClass

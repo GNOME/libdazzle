@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-suggestion-entry-buffer"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "dzl-suggestion-entry-buffer.h"

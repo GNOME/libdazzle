@@ -20,6 +20,8 @@
 
 #define G_LOG_DOMAIN "dzl-progress-button"
 
+#include "config.h"
+
 #include "widgets/dzl-progress-button.h"
 #include "util/dzl-util-private.h"
 

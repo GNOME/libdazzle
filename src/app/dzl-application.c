@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-application"
 
+#include "config.h"
+
 #include "app/dzl-application.h"
 
 /**

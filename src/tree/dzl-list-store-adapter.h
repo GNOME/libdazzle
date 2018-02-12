@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_LIST_STORE_ADAPTER (dzl_list_store_adapter_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlListStoreAdapter, dzl_list_store_adapter, DZL, LIST_STORE_ADAPTER, GObject)
 
 struct _DzlListStoreAdapterClass

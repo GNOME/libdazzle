@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_BOX (dzl_box_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlBox, dzl_box, DZL, BOX, GtkBox)
 
 struct _DzlBoxClass

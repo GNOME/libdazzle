@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_COUNTERS_WINDOW (dzl_counters_window_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlCountersWindow, dzl_counters_window, DZL, COUNTERS_WINDOW, GtkWindow)
 
 struct _DzlCountersWindowClass

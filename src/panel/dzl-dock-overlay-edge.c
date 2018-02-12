@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-dock-overlay-edge"
 
+#include "config.h"
+
 #include "panel/dzl-dock-item.h"
 #include "panel/dzl-dock-overlay-edge.h"
 #include "panel/dzl-dock-paned.h"

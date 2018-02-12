@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-preferences-view"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "prefs/dzl-preferences-file-chooser-button.h"

@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-cancellable"
 
+#include "config.h"
+
 #include <gio/gio.h>
 
 #include "util/dzl-cancellable.h"

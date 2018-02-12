@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PROGRESS_MENU_BUTTON (dzl_progress_menu_button_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlProgressMenuButton, dzl_progress_menu_button, DZL, PROGRESS_MENU_BUTTON, GtkMenuButton)
 
 struct _DzlProgressMenuButtonClass

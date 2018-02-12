@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-progress-menu-button"
 
+#include "config.h"
+
 #include "animation/dzl-animation.h"
 #include "animation/dzl-box-theatric.h"
 #include "widgets/dzl-progress-icon.h"

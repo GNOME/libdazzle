@@ -25,6 +25,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_LIST_BOX_ROW (dzl_list_box_row_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlListBoxRow, dzl_list_box_row, DZL, LIST_BOX_ROW, GtkListBoxRow)
 
 struct _DzlListBoxRowClass
@@ -32,6 +33,7 @@ struct _DzlListBoxRowClass
   GtkListBoxRowClass parent_class;
 };
 
+DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_list_box_row_new (void);
 
 G_END_DECLS

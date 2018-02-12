@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SUGGESTION_POPOVER (dzl_suggestion_popover_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlSuggestionPopover, dzl_suggestion_popover, DZL, SUGGESTION_POPOVER, GtkWindow)
 
 DZL_AVAILABLE_IN_ALL

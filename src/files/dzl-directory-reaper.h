@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_DIRECTORY_REAPER (dzl_directory_reaper_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlDirectoryReaper, dzl_directory_reaper, DZL, DIRECTORY_REAPER, GObject)
 
 DZL_AVAILABLE_IN_ALL

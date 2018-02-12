@@ -16,6 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define G_LOG_DOMAIN "dzl-preferences-file-chooser-button"
+
+#include "config.h"
+
 #include "util/dzl-util-private.h"
 #include "prefs/dzl-preferences-file-chooser-button.h"
 

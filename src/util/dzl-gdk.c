@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-gdk"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "dzl-gdk.h"

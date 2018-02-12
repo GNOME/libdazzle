@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_PRIORITY_BOX (dzl_priority_box_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlPriorityBox, dzl_priority_box, DZL, PRIORITY_BOX, GtkBox)
 
 struct _DzlPriorityBoxClass

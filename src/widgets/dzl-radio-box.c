@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-radio-box"
 
+#include "config.h"
+
 #include "dzl-radio-box.h"
 
 /*

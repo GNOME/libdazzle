@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-rgba"
 
+#include "config.h"
+
 #include "dzl-rgba.h"
 
 /*

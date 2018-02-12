@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-list-store-adapter"
 
+#include "config.h"
+
 #include "bindings/dzl-signal-group.h"
 #include "tree/dzl-list-store-adapter.h"
 

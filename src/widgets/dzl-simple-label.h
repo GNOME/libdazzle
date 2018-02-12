@@ -34,6 +34,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SIMPLE_LABEL (dzl_simple_label_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlSimpleLabel, dzl_simple_label, DZL, SIMPLE_LABEL, GtkWidget)
 
 DZL_AVAILABLE_IN_ALL

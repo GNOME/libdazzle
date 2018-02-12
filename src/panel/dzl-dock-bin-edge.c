@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-dock-bin-edge"
 
+#include "config.h"
+
 #include "panel/dzl-dock-bin.h"
 #include "panel/dzl-dock-bin-edge.h"
 #include "panel/dzl-dock-bin-edge-private.h"

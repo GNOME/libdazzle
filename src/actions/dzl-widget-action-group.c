@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-widget-action-group"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "dzl-widget-action-group.h"

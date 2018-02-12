@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_FUZZY_INDEX_BUILDER (dzl_fuzzy_index_builder_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlFuzzyIndexBuilder, dzl_fuzzy_index_builder, DZL, FUZZY_INDEX_BUILDER, GObject)
 
 DZL_AVAILABLE_IN_ALL

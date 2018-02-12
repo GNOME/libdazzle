@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_TASK_CACHE (dzl_task_cache_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlTaskCache, dzl_task_cache, DZL, TASK_CACHE, GObject)
 
 /**

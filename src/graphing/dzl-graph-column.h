@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_GRAPH_COLUMN (dzl_graph_view_column_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlGraphColumn, dzl_graph_view_column, DZL, GRAPH_COLUMN, GObject)
 
 struct _DzlGraphColumnClass
@@ -35,13 +36,13 @@ struct _DzlGraphColumnClass
 };
 
 DZL_AVAILABLE_IN_ALL
-DzlGraphColumn    *dzl_graph_view_column_new      (const gchar *name,
-                                 GType        value_type);
+DzlGraphColumn    *dzl_graph_view_column_new  (const gchar    *name,
+                                               GType           value_type);
 DZL_AVAILABLE_IN_ALL
-const gchar *dzl_graph_view_column_get_name (DzlGraphColumn    *self);
+const gchar *dzl_graph_view_column_get_name   (DzlGraphColumn *self);
 DZL_AVAILABLE_IN_ALL
-void         dzl_graph_view_column_set_name (DzlGraphColumn    *self,
-                                 const gchar *name);
+void         dzl_graph_view_column_set_name   (DzlGraphColumn *self,
+                                               const gchar    *name);
 
 G_END_DECLS
 

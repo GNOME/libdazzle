@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-scrolled-window"
 
+#include "config.h"
+
 #include "dzl-scrolled-window.h"
 
 struct _DzlScrolledWindow

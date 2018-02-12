@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-properties-group"
 
+#include "config.h"
+
 #include "dzl-properties-group.h"
 
 /**

@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SIGNAL_GROUP (dzl_signal_group_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlSignalGroup, dzl_signal_group, DZL, SIGNAL_GROUP, GObject)
 
 DZL_AVAILABLE_IN_ALL

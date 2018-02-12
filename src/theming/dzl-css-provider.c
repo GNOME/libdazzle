@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-css-provider"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "theming/dzl-css-provider.h"

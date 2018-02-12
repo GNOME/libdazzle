@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-util"
 
+#include "config.h"
+
 #include <string.h>
 
 #include "dzl-util-private.h"

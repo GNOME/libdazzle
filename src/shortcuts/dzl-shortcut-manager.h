@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_SHORTCUT_MANAGER (dzl_shortcut_manager_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlShortcutManager, dzl_shortcut_manager, DZL, SHORTCUT_MANAGER, GObject)
 
 /**

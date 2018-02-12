@@ -18,6 +18,8 @@
 
 #define G_LOG_DOMAIN "dzl-gtk"
 
+#include "config.h"
+
 #include "animation/dzl-animation.h"
 #include "util/dzl-gtk.h"
 

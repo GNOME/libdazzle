@@ -22,6 +22,8 @@
 
 #define G_LOG_DOMAIN "dzl-shortcut-accel-dialog"
 
+#include "config.h"
+
 #include <glib/gi18n.h>
 
 #include "shortcuts/dzl-shortcut-accel-dialog.h"

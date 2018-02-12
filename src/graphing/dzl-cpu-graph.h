@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_CPU_GRAPH (dzl_cpu_graph_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlCpuGraph, dzl_cpu_graph, DZL, CPU_GRAPH, DzlGraphView)
 
 DZL_AVAILABLE_IN_ALL

@@ -49,20 +49,33 @@ G_BEGIN_DECLS
 #define DZL_TYPE_TAB_STRIP              (dzl_tab_strip_get_type())
 #define DZL_TYPE_TAB_STYLE              (dzl_tab_style_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockBin,             dzl_dock_bin,               DZL, DOCK_BIN,              GtkContainer)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockBinEdge,         dzl_dock_bin_edge,          DZL, DOCK_BIN_EDGE,         DzlDockRevealer)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockManager,         dzl_dock_manager,           DZL, DOCK_MANAGER,          GObject)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockOverlay,         dzl_dock_overlay,           DZL, DOCK_OVERLAY,          GtkEventBox)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockPaned,           dzl_dock_paned,             DZL, DOCK_PANED,            DzlMultiPaned)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockStack,           dzl_dock_stack,             DZL, DOCK_STACK,            GtkBox)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockWidget,          dzl_dock_widget,            DZL, DOCK_WIDGET,           DzlBin)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlDockWindow,          dzl_dock_window,            DZL, DOCK_WINDOW,           GtkWindow)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlTabStrip,            dzl_tab_strip,              DZL, TAB_STRIP,             GtkBox)
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE     (DzlTab,                 dzl_tab,                    DZL, TAB,                   DzlBin)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE     (DzlDockOverlayEdge,     dzl_dock_overlay_edge,      DZL, DOCK_OVERLAY_EDGE,     DzlBin)
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_INTERFACE      (DzlDock,                dzl_dock,                   DZL, DOCK,                  GtkContainer)
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_INTERFACE      (DzlDockItem,            dzl_dock_item,              DZL, DOCK_ITEM,             GtkWidget)
 
 typedef enum

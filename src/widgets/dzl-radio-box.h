@@ -27,6 +27,7 @@ G_BEGIN_DECLS
 
 #define DZL_TYPE_RADIO_BOX (dzl_radio_box_get_type())
 
+DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlRadioBox, dzl_radio_box, DZL, RADIO_BOX, GtkBin)
 
 struct _DzlRadioBoxClass
