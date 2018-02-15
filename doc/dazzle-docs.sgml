@@ -68,7 +68,6 @@
     <xi:include href="xml/dzl-animation.xml"/>
     <xi:include href="xml/dzl-frame-source.xml"/>
     <xi:include href="xml/dzl-box-theatric.xml"/>
-    <xi:include href="xml/dzl-rect-helper.xml"/>
   </part>
 
   <part id="dazzle-groups">
