@@ -606,6 +606,31 @@ dzl_tab_minimize_clicked (DzlTab    *self,
   g_object_unref (self);
 }
 
+static gboolean
+dzl_tab_query_tooltip (GtkWidget  *widget,
+                       gint        x,
+                       gint        y,
+                       gboolean    keyboard,
+                       GtkTooltip *tooltip)
+{
+  DzlTab *self = (DzlTab *)widget;
+  DzlTabPrivate *priv = dzl_tab_get_instance_private (self);
+  const gchar *title;
+
+  g_assert (DZL_IS_TAB (self));
+  g_assert (GTK_IS_TOOLTIP (tooltip));
+
+  title = gtk_label_get_label (priv->title);
+
+  if (title != NULL)
+    {
+      gtk_tooltip_set_text (tooltip, title);
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 static void
 dzl_tab_get_property (GObject    *object,
                       guint       prop_id,
@@ -724,6 +749,7 @@ dzl_tab_class_init (DzlTabClass *klass)
   widget_class->realize = dzl_tab_realize;
   widget_class->size_allocate = dzl_tab_size_allocate;
   widget_class->hierarchy_changed = dzl_tab_hierarchy_changed;
+  widget_class->query_tooltip = dzl_tab_query_tooltip;
 
   gtk_widget_class_set_css_name (widget_class, "dzltab");
 
@@ -803,6 +829,8 @@ dzl_tab_init (DzlTab *self)
                          GDK_LEAVE_NOTIFY_MASK);
   gtk_widget_set_hexpand (GTK_WIDGET (self), TRUE);
   gtk_widget_set_vexpand (GTK_WIDGET (self), FALSE);
+
+  gtk_widget_set_has_tooltip (GTK_WIDGET (self), TRUE);
 
   priv->box = g_object_new (GTK_TYPE_BOX,
                             "orientation", GTK_ORIENTATION_HORIZONTAL,
