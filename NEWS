@@ -1,4 +1,17 @@
 ===============
+Version 3.27.91
+===============
+
+Changes in this release:
+
+ • libdazzle now properly sets the default ABI visibility for symbols
+   so that symbols without DZL_AVAILABLE_IN_* macros are not exported.
+ • DzlTab now supports tooltips using the tab's title.
+ • Various gtk-doc generation issues have been fixed.
+ • DzlGraphModel now provides an accessor to get the column count.
+ • Some fixes for pedantic compiler warnings.
+
+===============
 Version 3.27.90
 ===============
 
