@@ -52,8 +52,9 @@ struct _DzlAnimation
   GInitiallyUnowned  parent_instance;
 
   gpointer           target;              /* Target object to animate */
-  guint64            begin_msec;          /* Time in which animation started */
-  guint              duration_msec;       /* Duration of animation */
+  gint64             begin_time;          /* Time in which animation started */
+  gint64             end_time;            /* Deadline for the animation */
+  guint              duration_msec;       /* Duration in milliseconds */
   guint              mode;                /* Tween mode */
   gulong             tween_handler;       /* GSource or signal handler */
   gulong             after_paint_handler; /* signal handler */
@@ -312,9 +313,6 @@ static gdouble
 dzl_animation_get_offset (DzlAnimation *animation,
                           gint64        frame_time)
 {
-  gdouble offset;
-  gint64 frame_msec;
-
   g_assert (DZL_IS_ANIMATION (animation));
 
   if (frame_time == 0)
@@ -325,12 +323,14 @@ dzl_animation_get_offset (DzlAnimation *animation,
         frame_time = g_get_monotonic_time ();
     }
 
-  frame_msec = frame_time / 1000L;
+  frame_time = CLAMP (frame_time, animation->begin_time, animation->end_time);
 
-  offset = (gdouble) (frame_msec - animation->begin_msec) /
-           (gdouble) MAX (animation->duration_msec, 1);
+  if (frame_time == animation->begin_time)
+    return 0.0;
+  else if (frame_time == animation->end_time)
+    return 1.0;
 
-  return CLAMP (offset, 0.0, 1.0);
+  return (frame_time - animation->begin_time) / (gdouble)(animation->duration_msec * 1000L);
 }
 
 
@@ -623,10 +623,11 @@ dzl_animation_start (DzlAnimation *animation)
    * We want the real current time instead of the GdkFrameClocks current time
    * because if the clock was asleep, it could be innaccurate.
    */
-  animation->begin_msec = g_get_monotonic_time () / 1000UL;
 
   if (animation->frame_clock)
     {
+      animation->begin_time = gdk_frame_clock_get_frame_time (animation->frame_clock);
+      animation->end_time = animation->begin_time + (animation->duration_msec * 1000L);
       animation->tween_handler =
         g_signal_connect (animation->frame_clock,
                           "update",
@@ -641,6 +642,8 @@ dzl_animation_start (DzlAnimation *animation)
     }
   else
     {
+      animation->begin_time = g_get_monotonic_time ();
+      animation->end_time = animation->begin_time + (animation->duration_msec * 1000L);
       animation->tween_handler = dzl_frame_source_add (FALLBACK_FRAME_RATE,
                                                        dzl_animation_timeout_cb,
                                                        animation);
