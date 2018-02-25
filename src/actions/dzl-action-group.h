@@ -81,6 +81,16 @@ _##prefix##_get_action_info (GActionGroup *group,                               
     {                                                                             \
       info = g_slice_new0 (Type##ActionInfo);                                     \
       info->enabled = TRUE;                                                       \
+      for (guint i = 0; i < G_N_ELEMENTS(prefix##_actions); i++)                  \
+        {                                                                         \
+          if (g_strcmp0 (prefix##_actions[i].name, name) == 0)                    \
+            {                                                                     \
+              if (prefix##_actions[i].state != NULL)                              \
+                info->state = g_variant_take_ref (g_variant_parse (               \
+                  NULL, prefix##_actions[i].state, NULL, NULL, NULL));            \
+              break;                                                              \
+            }                                                                     \
+        }                                                                         \
       g_object_set_data_full (G_OBJECT (group), fullname, info,                   \
                               _##prefix##_action_info_free);                      \
     }                                                                             \
