@@ -131,7 +131,7 @@ dzl_graph_view_tick_cb (GtkWidget     *widget,
 
   gtk_widget_get_allocation (widget, &alloc);
 
-  frame_time = gdk_frame_clock_get_frame_time (frame_clock);
+  frame_time = g_get_monotonic_time ();
   end_time = dzl_graph_view_model_get_end_time (priv->model);
 
   x_offset = -((frame_time - end_time) / (gdouble)timespan);
