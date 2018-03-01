@@ -22,6 +22,7 @@
 
 #include "animation/dzl-animation.h"
 #include "widgets/dzl-elastic-bin.h"
+#include "util/dzl-macros.h"
 
 #if 0
 # define _TRACE_LEVEL (1<<G_LOG_LEVEL_USER_SHIFT)
@@ -51,20 +52,16 @@ static void
 dzl_elastic_bin_cancel_animation (DzlElasticBin *self)
 {
   DzlElasticBinPrivate *priv = dzl_elastic_bin_get_instance_private (self);
+  DzlAnimation *anim;
 
   ENTRY;
 
   g_assert (DZL_IS_ELASTIC_BIN (self));
 
-  if (priv->hanim != NULL)
-    {
-      DzlAnimation *anim = priv->hanim;
-
-      g_object_remove_weak_pointer (G_OBJECT (priv->hanim), (gpointer *)&priv->hanim);
-      priv->hanim = NULL;
-
-      dzl_animation_stop (anim);
-    }
+  anim = priv->hanim;
+  dzl_clear_weak_pointer (&priv->hanim);
+  if (anim != NULL)
+    dzl_animation_stop (anim);
 
   EXIT;
 }
@@ -95,6 +92,7 @@ dzl_elastic_bin_animate_to (DzlElasticBin *self,
                             gdouble        value)
 {
   DzlElasticBinPrivate *priv = dzl_elastic_bin_get_instance_private (self);
+  DzlAnimation *anim;
   guint duration;
 
   ENTRY;
@@ -109,13 +107,13 @@ dzl_elastic_bin_animate_to (DzlElasticBin *self,
 
   TRACE_MSG ("Duration is %u milliseconds", duration);
 
-  priv->hanim = dzl_object_animate (priv->hadj,
-                                    DZL_ANIMATION_EASE_OUT_CUBIC,
-                                    duration,
-                                    gtk_widget_get_frame_clock (GTK_WIDGET (self)),
-                                    "value", value,
-                                    NULL);
-  g_object_add_weak_pointer (G_OBJECT (priv->hanim), (gpointer *)&priv->hanim);
+  anim = dzl_object_animate (priv->hadj,
+                             DZL_ANIMATION_EASE_OUT_CUBIC,
+                             duration,
+                             gtk_widget_get_frame_clock (GTK_WIDGET (self)),
+                             "value", value,
+                             NULL);
+  dzl_set_weak_pointer (&priv->hanim, anim);
 
   EXIT;
 }
