@@ -105,6 +105,12 @@ dzl_elastic_bin_animate_to (DzlElasticBin *self,
                                                  gtk_adjustment_get_value (priv->hadj),
                                                  value);
 
+  if (duration == 0)
+    {
+      gtk_adjustment_set_value (priv->hadj, value);
+      EXIT;
+    }
+
   TRACE_MSG ("Duration is %u milliseconds", duration);
 
   anim = dzl_object_animate (priv->hadj,
