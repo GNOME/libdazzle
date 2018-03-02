@@ -62,7 +62,7 @@ dzl_g_date_time_format_for_display (GDateTime *self)
   else if (diff < (60 * 60 * 24 * 7))
     return g_date_time_format (self, "%A");
   else if (diff < (60 * 60 * 24 * 365))
-    return g_date_time_format (self, "%B");
+    return g_date_time_format (self, "%OB");
   else if (diff < (60 * 60 * 24 * 365 * 1.5))
     return g_strdup (_("About a year ago"));
 
