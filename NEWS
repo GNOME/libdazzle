@@ -1,4 +1,15 @@
 ===============
+Version 3.27.92
+===============
+
+Changes in this release:
+
+ • Improvements to animation frame timings to more closely match
+   upstream changes in Gtk.
+ • DZL_DEFINE_ACTION_GROUP macro will now set initial action state.
+ • ElasticBin will avoid animating when duration is 0.
+
+===============
 Version 3.27.91
 ===============
 
