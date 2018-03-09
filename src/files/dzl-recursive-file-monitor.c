@@ -20,6 +20,9 @@
 
 #include "config.h"
 
+#include <limits.h>
+#include <stdlib.h>
+
 #include "files/dzl-recursive-file-monitor.h"
 #include "util/dzl-macros.h"
 
@@ -153,6 +156,36 @@ dzl_recursive_file_monitor_collect_recursive (GPtrArray    *dirs,
     }
 }
 
+static GFile *
+resolve_file (GFile *file)
+{
+  g_autofree gchar *orig_path = NULL;
+  g_autoptr(GFile) new_file = NULL;
+  char *real_path;
+
+  g_assert (G_IS_FILE (file));
+
+  /*
+   * The goal here is to work our way up to the root and resolve any
+   * symlinks in the path. If the file is not native, we don't care
+   * about symlinks.
+   */
+  if (!g_file_is_native (file))
+    return g_object_ref (file);
+
+  orig_path = g_file_get_path (file);
+  real_path = realpath (orig_path, NULL);
+
+  /* unlikely, but PATH_MAX exceeded */
+  if (real_path == NULL)
+    return g_object_ref (file);
+
+  new_file = g_file_new_for_path (real_path);
+  free (real_path);
+
+  return g_steal_pointer (&new_file);
+}
+
 static void
 dzl_recursive_file_monitor_collect_worker (GTask        *task,
                                            gpointer      source_object,
@@ -160,14 +193,23 @@ dzl_recursive_file_monitor_collect_worker (GTask        *task,
                                            GCancellable *cancellable)
 {
   g_autoptr(GPtrArray) dirs = NULL;
+  g_autoptr(GFile) resolved = NULL;
   GFile *root = task_data;
 
   g_assert (G_IS_TASK (task));
   g_assert (G_IS_FILE (root));
 
+  /* The first thing we want to do is resolve any symlinks out of
+   * the path so that we are consistently working with the real
+   * system path. This improves interaction with other APIs that
+   * might not have given the callee back the symlink'd path and
+   * instead the real path.
+   */
+  resolved = resolve_file (root);
+
   dirs = g_ptr_array_new_with_free_func (g_object_unref);
-  g_ptr_array_add (dirs, g_object_ref (root));
-  dzl_recursive_file_monitor_collect_recursive (dirs, root, cancellable);
+  g_ptr_array_add (dirs, g_object_ref (resolved));
+  dzl_recursive_file_monitor_collect_recursive (dirs, resolved, cancellable);
 
   g_task_return_pointer (task,
                          g_steal_pointer (&dirs),
