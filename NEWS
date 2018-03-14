@@ -1,3 +1,16 @@
+==============
+Version 3.28.0
+==============
+
+Changes in this release:
+
+ • DzlRecursiveFileMonitor will now translate symlink root directories
+   up-front to increase the chance that the GFile you see will match
+   GFile in other GIO based API. This fixes some issues in Builder on
+   systems such as Fedora Atomic Workstation where home is a symlink.
+ • dzl_g_date_time_format_for_display() now uses the new %OB format
+   present in glib 3.56.
+
 ===============
 Version 3.27.92
 ===============
