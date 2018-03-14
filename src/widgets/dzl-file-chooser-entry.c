@@ -221,6 +221,8 @@ dzl_file_chooser_entry_changed (DzlFileChooserEntry *self,
 
   file = file_expand (gtk_entry_get_text (entry));
   g_set_object (&priv->file, file);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FILE]);
 }
 
 static void
@@ -556,4 +558,6 @@ dzl_file_chooser_entry_set_file (DzlFileChooserEntry *self,
 
   collapsed = file_collapse (file);
   gtk_entry_set_text (priv->entry, collapsed);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FILE]);
 }
