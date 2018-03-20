@@ -3,3 +3,9 @@ Dazzle name="Dazzle"
 *.*.cancellable#parameter nullable default=null
 *.*.io_priority default=GLib.Priority.LOW
 
+StackList
+  .push skip=false
+  .push.create_widget_func nullable
+StackListCreateWidgetFunc skip=false
+  .item type="GLib.Object"
+

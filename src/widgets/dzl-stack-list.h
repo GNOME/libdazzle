@@ -49,6 +49,16 @@ struct _DzlStackListClass
   gpointer _reserved8;
 };
 
+/**
+ * DzlStackListCreateWidgetFunc:
+ * @item: (type GObject): the item from the model for which to create a widget for
+ * @user_data: (closure): user data from dzl_stack_list_push()
+ *
+ * Called for stack lists that are bound to a #GListModel with
+ * dzl_stack_list_push() for each item that gets added to the model.
+ *
+ * Returns: (transfer full): a #GtkWidget that represents @item
+ */
 typedef GtkWidget *(*DzlStackListCreateWidgetFunc) (gpointer item,
                                                     gpointer user_data);
 
