@@ -115,6 +115,8 @@ libdazzle_dep = declare_dependency(
   include_directories: include_directories('.'),
 )
 
+libdazzle_package = 'libdazzle-@0@'.format(apiversion)
+
 if get_option('with_introspection')
 
   libdazzle_gir = gnome.generate_gir(libdazzle,
@@ -128,6 +130,7 @@ if get_option('with_introspection')
                 install: true,
         install_dir_gir: girdir,
     install_dir_typelib: typelibdir,
+        export_packages: libdazzle_package,
              extra_args: [ '--c-include=dazzle.h', '--quiet' ],
   )
 
@@ -151,7 +154,7 @@ pkgg.generate(
       subdirs: libdazzle_header_subdir,
       version: meson.project_version(),
          name: 'Dazzle',
-     filebase: 'libdazzle-@0@'.format(apiversion),
+     filebase: libdazzle_package,
   description: 'Razzle Dazzle for Gtk+ 3.x applications',
      requires: 'gtk+-3.0',
   install_dir: join_paths(libdir, 'pkgconfig'),
