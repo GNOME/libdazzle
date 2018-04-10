@@ -1,4 +1,17 @@
 ==============
+Version 3.28.1
+==============
+
+Changes in this release:
+
+ • Speciy pkg-config package in gir file
+ • Add Dazzle.StackList.push() to vala wrapper
+ • DzlFileChooserEntry will now notify when files change
+ • Shortcuts now ignore caps-lock when activating shortcuts, to be
+   more like gtk+ itself does.
+ • transfer ownership fix for registering signals in code
+
+==============
 Version 3.28.0
 ==============
 
