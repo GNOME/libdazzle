@@ -315,7 +315,7 @@ load_state_add_signal (LoadState *state)
   LoadStateFrame *signal;
   LoadStateFrame *shortcut;
   LoadStateFrame *context;
-  GArray *values;
+  g_autoptr(GArray) values = NULL;
 
   g_assert (state->stack != NULL);
   g_assert (state->stack->type == LOAD_STATE_SIGNAL);
@@ -334,6 +334,7 @@ load_state_add_signal (LoadState *state)
   g_assert (context->type == LOAD_STATE_CONTEXT);
 
   values = g_array_sized_new (FALSE, FALSE, sizeof (GValue), g_slist_length (signal->params));
+  g_array_set_clear_func (values, (GDestroyNotify)g_value_unset);
 
   for (const GSList *iter = signal->params; iter != NULL; iter = iter->next)
     {
