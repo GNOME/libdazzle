@@ -369,13 +369,11 @@ dzl_shortcut_context_add_signal (DzlShortcutContext *self,
  * @self: a #DzlShortcutContext
  * @accel: the accelerator for the shortcut
  * @signal_name: the name of the signal
- * @values: (element-type GObject.Value) (nullable) (transfer container): The
+ * @values: (element-type GObject.Value) (nullable) (transfer none): The
  *   values to use when calling the signal.
  *
  * This is similar to dzl_shortcut_context_add_signal() but is easier to use
  * from language bindings.
- *
- * Note that this transfers ownership of the @values array.
  */
 void
 dzl_shortcut_context_add_signalv (DzlShortcutContext *self,
