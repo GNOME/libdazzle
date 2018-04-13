@@ -22,28 +22,14 @@
 
 #include <glib/gi18n.h>
 
+#include "dzl-debug.h"
+
 #include "suggestions/dzl-suggestion.h"
 #include "suggestions/dzl-suggestion-entry.h"
 #include "suggestions/dzl-suggestion-entry-buffer.h"
 #include "suggestions/dzl-suggestion-popover.h"
 #include "suggestions/dzl-suggestion-private.h"
 #include "util/dzl-util-private.h"
-
-#if 0
-# define _TRACE_LEVEL (1<<G_LOG_LEVEL_USER_SHIFT)
-# define _TRACE(...) do { g_log(G_LOG_DOMAIN, _TRACE_LEVEL, __VA_ARGS__); } while (0)
-# define DZL_TRACE_MSG(m,...) _TRACE("   MSG: %s():%u: "m, G_STRFUNC, __LINE__, __VA_ARGS__)
-# define DZL_ENTRY _TRACE(" ENTRY: %s(): %u", G_STRFUNC, __LINE__)
-# define DZL_EXIT do { _TRACE("  EXIT: %s(): %u", G_STRFUNC, __LINE__); return; } while (0)
-# define DZL_RETURN(r) do { _TRACE("  EXIT: %s(): %u", G_STRFUNC, __LINE__); return (r); } while (0)
-# define DZL_GOTO(_l) do { _TRACE("  GOTO: %s(): %u: %s", G_STRFUNC, __LINE__, #_l); goto _l; } while (0)
-#else
-# define DZL_TRACE_MSG(m,...) do { } while (0)
-# define DZL_ENTRY            do { } while (0)
-# define DZL_EXIT             return
-# define DZL_RETURN(r)        return (r)
-# define DZL_GOTO(_l)         goto _l
-#endif
 
 typedef struct
 {
