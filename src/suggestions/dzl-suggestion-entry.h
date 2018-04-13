@@ -62,14 +62,8 @@ struct _DzlSuggestionEntryClass
   void (*suggestion_activated) (DzlSuggestionEntry *self,
                                 DzlSuggestion      *suggestion);
 
-  gpointer _reserved1;
-  gpointer _reserved2;
-  gpointer _reserved3;
-  gpointer _reserved4;
-  gpointer _reserved5;
-  gpointer _reserved6;
-  gpointer _reserved7;
-  gpointer _reserved8;
+  /*< private >*/
+  gpointer _reserved[8];
 };
 
 DZL_AVAILABLE_IN_ALL
