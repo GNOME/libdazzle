@@ -35,18 +35,21 @@
  */
 
 #include "dzl-list-box.h"
+#include "dzl-list-box-private.h"
 #include "dzl-list-box-row.h"
 
 #define RECYCLE_MAX_DEFAULT 25
 
 typedef struct
 {
-  GListModel *model;
-  gchar      *property_name;
-  GType       row_type;
-  guint       recycle_max;
-  GQueue      trashed_rows;
-  guint       destroying : 1;
+  DzlListBoxAttachFunc  attach_func;
+  gpointer              attach_data;
+  GListModel           *model;
+  gchar                *property_name;
+  GType                 row_type;
+  guint                 recycle_max;
+  GQueue                trashed_rows;
+  guint                 destroying : 1;
 } DzlListBoxPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlListBox, dzl_list_box, GTK_TYPE_LIST_BOX)
@@ -125,6 +128,9 @@ dzl_list_box_create_row (gpointer item,
     }
 
   g_return_val_if_fail (DZL_IS_LIST_BOX_ROW (row), NULL);
+
+  if (priv->attach_func)
+    priv->attach_func (self, DZL_LIST_BOX_ROW (row), priv->attach_data);
 
   return GTK_WIDGET (row);
 }
@@ -420,4 +426,17 @@ _dzl_list_box_forall (DzlListBox  *self,
       iter = iter->next;
       callback (widget, user_data);
     }
+}
+
+void
+_dzl_list_box_set_attach_func (DzlListBox           *self,
+                               DzlListBoxAttachFunc  func,
+                               gpointer              user_data)
+{
+  DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_LIST_BOX (self));
+
+  priv->attach_func = func;
+  priv->attach_data = user_data;
 }

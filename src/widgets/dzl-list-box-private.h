@@ -24,11 +24,18 @@
 
 G_BEGIN_DECLS
 
-gboolean _dzl_list_box_cache  (DzlListBox    *self,
-                               DzlListBoxRow *row);
-void     _dzl_list_box_forall (DzlListBox    *self,
-                               GtkCallback    callback,
-                               gpointer       user_data);
+typedef void (*DzlListBoxAttachFunc) (DzlListBox    *list_box,
+                                      DzlListBoxRow *row,
+                                      gpointer       user_data);
+
+gboolean _dzl_list_box_cache           (DzlListBox           *self,
+                                        DzlListBoxRow        *row);
+void     _dzl_list_box_forall          (DzlListBox           *self,
+                                        GtkCallback           callback,
+                                        gpointer              user_data);
+void     _dzl_list_box_set_attach_func (DzlListBox           *self,
+                                        DzlListBoxAttachFunc  func,
+                                        gpointer              user_data);
 
 G_END_DECLS
 
