@@ -34,10 +34,8 @@ struct _DzlListBoxClass
 {
   GtkListBoxClass parent_class;
 
-  gpointer _reserved1;
-  gpointer _reserved2;
-  gpointer _reserved3;
-  gpointer _reserved4;
+  /*< private >*/
+  gpointer _reserved[4];
 };
 
 DZL_AVAILABLE_IN_ALL
