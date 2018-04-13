@@ -397,3 +397,27 @@ dzl_list_box_set_recycle_max (DzlListBox *self,
   else
     priv->recycle_max = recycle_max;
 }
+
+/* Like gtk_container_forall() but also calls for all cached rows */
+void
+_dzl_list_box_forall (DzlListBox  *self,
+                      GtkCallback  callback,
+                      gpointer     user_data)
+{
+  DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
+  const GList *iter;
+
+  g_assert (DZL_IS_LIST_BOX (self));
+  g_assert (callback != NULL);
+
+  gtk_container_foreach (GTK_CONTAINER (self), callback, user_data);
+
+  iter = priv->trashed_rows.head;
+
+  while (iter != NULL)
+    {
+      GtkWidget *widget = iter->data;
+      iter = iter->next;
+      callback (widget, user_data);
+    }
+}
