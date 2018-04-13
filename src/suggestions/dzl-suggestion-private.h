@@ -22,6 +22,7 @@
 
 #include "suggestions/dzl-suggestion-entry.h"
 #include "suggestions/dzl-suggestion-popover.h"
+#include "suggestions/dzl-suggestion-row.h"
 
 void _dzl_suggestion_entry_reposition       (DzlSuggestionEntry   *entry,
                                              DzlSuggestionPopover *popover);
@@ -29,5 +30,8 @@ void _dzl_suggestion_popover_set_max_height (DzlSuggestionPopover *popover,
                                              gint                  max_height);
 void _dzl_suggestion_popover_adjust_margin  (DzlSuggestionPopover *popover,
                                              GdkRectangle         *area);
+void _dzl_suggestion_row_set_ellipsize      (DzlSuggestionRow     *self,
+                                             PangoEllipsizeMode    title,
+                                             PangoEllipsizeMode    subtitle);
 
 #endif /* DZL_SUGGESTION_PRIVATE_H */

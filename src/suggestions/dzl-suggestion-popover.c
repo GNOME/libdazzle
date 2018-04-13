@@ -31,6 +31,7 @@
 #include "util/dzl-util-private.h"
 #include "widgets/dzl-elastic-bin.h"
 #include "widgets/dzl-list-box.h"
+#include "widgets/dzl-list-box-private.h"
 
 struct _DzlSuggestionPopover
 {
@@ -53,6 +54,9 @@ struct _DzlSuggestionPopover
   gulong              configure_event_handler;
   gulong              size_allocate_handler;
   gulong              items_changed_handler;
+
+  PangoEllipsizeMode  subtitle_ellipsize;
+  PangoEllipsizeMode  title_ellipsize;
 };
 
 enum {
@@ -60,6 +64,8 @@ enum {
   PROP_MODEL,
   PROP_RELATIVE_TO,
   PROP_SELECTED,
+  PROP_SUBTITLE_ELLIPSIZE,
+  PROP_TITLE_ELLIPSIZE,
   N_PROPS
 };
 
@@ -402,6 +408,39 @@ dzl_suggestion_popover_list_box_row_selected (DzlSuggestionPopover *self,
 }
 
 static void
+update_ellipsize_cb (GtkWidget *widget,
+                     gpointer   user_data)
+{
+  DzlSuggestionPopover *self = user_data;
+
+  _dzl_suggestion_row_set_ellipsize (DZL_SUGGESTION_ROW (widget),
+                                     self->title_ellipsize,
+                                     self->subtitle_ellipsize);
+}
+
+static void
+dzl_suggestion_popover_set_title_ellipsize (DzlSuggestionPopover *self,
+                                            PangoEllipsizeMode    title_ellipsize)
+{
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+
+  self->title_ellipsize = title_ellipsize;
+
+  _dzl_list_box_forall (self->list_box, update_ellipsize_cb, self);
+}
+
+static void
+dzl_suggestion_popover_set_subtitle_ellipsize (DzlSuggestionPopover *self,
+                                               PangoEllipsizeMode    subtitle_ellipsize)
+{
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+
+  self->subtitle_ellipsize = subtitle_ellipsize;
+
+  _dzl_list_box_forall (self->list_box, update_ellipsize_cb, self);
+}
+
+static void
 dzl_suggestion_popover_destroy (GtkWidget *widget)
 {
   DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
@@ -454,6 +493,14 @@ dzl_suggestion_popover_get_property (GObject    *object,
       g_value_set_object (value, dzl_suggestion_popover_get_selected (self));
       break;
 
+    case PROP_SUBTITLE_ELLIPSIZE:
+      g_value_set_enum (value, self->subtitle_ellipsize);
+      break;
+
+    case PROP_TITLE_ELLIPSIZE:
+      g_value_set_enum (value, self->title_ellipsize);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -479,6 +526,14 @@ dzl_suggestion_popover_set_property (GObject      *object,
 
     case PROP_SELECTED:
       dzl_suggestion_popover_set_selected (self, g_value_get_object (value));
+      break;
+
+    case PROP_SUBTITLE_ELLIPSIZE:
+      dzl_suggestion_popover_set_subtitle_ellipsize (self, g_value_get_enum (value));
+      break;
+
+    case PROP_TITLE_ELLIPSIZE:
+      dzl_suggestion_popover_set_title_ellipsize (self, g_value_get_enum (value));
       break;
 
     default:
@@ -522,6 +577,22 @@ dzl_suggestion_popover_class_init (DzlSuggestionPopoverClass *klass)
                          DZL_TYPE_SUGGESTION,
                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  properties [PROP_SUBTITLE_ELLIPSIZE] =
+    g_param_spec_enum ("subtitle-ellipsize",
+                       "Subtitle Ellipsize",
+                       "How to use ellipsis with subtitle",
+                       PANGO_TYPE_ELLIPSIZE_MODE,
+                       PANGO_ELLIPSIZE_END,
+                       (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_TITLE_ELLIPSIZE] =
+    g_param_spec_enum ("title-ellipsize",
+                       "Title Ellipsize",
+                       "How to use ellipsis with title",
+                       PANGO_TYPE_ELLIPSIZE_MODE,
+                       PANGO_ELLIPSIZE_END,
+                       (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
   signals [SUGGESTION_ACTIVATED] =
@@ -548,6 +619,8 @@ static void
 dzl_suggestion_popover_init (DzlSuggestionPopover *self)
 {
   self->row_type = DZL_TYPE_SUGGESTION_ROW;
+  self->title_ellipsize = PANGO_ELLIPSIZE_END;
+  self->subtitle_ellipsize = PANGO_ELLIPSIZE_END;
 
   gtk_widget_init_template (GTK_WIDGET (self));
 

@@ -207,3 +207,16 @@ dzl_suggestion_row_set_suggestion (DzlSuggestionRow *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SUGGESTION]);
     }
 }
+
+void
+_dzl_suggestion_row_set_ellipsize (DzlSuggestionRow   *self,
+                                   PangoEllipsizeMode  title,
+                                   PangoEllipsizeMode  subtitle)
+{
+  DzlSuggestionRowPrivate *priv = dzl_suggestion_row_get_instance_private (self);
+
+  g_assert (DZL_IS_SUGGESTION_ROW (self));
+
+  gtk_label_set_ellipsize (priv->title, title);
+  gtk_label_set_ellipsize (priv->subtitle, subtitle);
+}
