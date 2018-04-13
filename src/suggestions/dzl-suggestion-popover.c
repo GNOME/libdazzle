@@ -441,6 +441,22 @@ dzl_suggestion_popover_set_subtitle_ellipsize (DzlSuggestionPopover *self,
 }
 
 static void
+attach_cb (DzlListBox    *list_box,
+           DzlListBoxRow *row,
+           gpointer       user_data)
+{
+  DzlSuggestionPopover *self = user_data;
+
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+  g_assert (DZL_IS_SUGGESTION_ROW (row));
+  g_assert (DZL_IS_LIST_BOX (list_box));
+
+  _dzl_suggestion_row_set_ellipsize (DZL_SUGGESTION_ROW (row),
+                                     self->title_ellipsize,
+                                     self->subtitle_ellipsize);
+}
+
+static void
 dzl_suggestion_popover_destroy (GtkWidget *widget)
 {
   DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
@@ -647,6 +663,8 @@ dzl_suggestion_popover_init (DzlSuggestionPopover *self)
                            G_CALLBACK (dzl_suggestion_popover_list_box_row_selected),
                            self,
                            G_CONNECT_SWAPPED);
+
+  _dzl_list_box_set_attach_func (self->list_box, attach_cb, self);
 
   dzl_list_box_set_recycle_max (self->list_box, 50);
 }
