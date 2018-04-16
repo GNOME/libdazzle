@@ -66,6 +66,19 @@ dzl_theme_manager_new (void)
   return g_object_new (DZL_TYPE_THEME_MANAGER, NULL);
 }
 
+static gboolean
+has_child_resources (const gchar *path)
+{
+  g_auto(GStrv) children = NULL;
+
+  if (g_str_has_prefix (path, "resource://"))
+    path += strlen ("resource://");
+
+  children = g_resources_enumerate_children (path, 0, NULL);
+
+  return children != NULL && children[0] != NULL;
+}
+
 /**
  * dzl_theme_manager_add_resources:
  * @self: a #DzlThemeManager
@@ -94,8 +107,8 @@ dzl_theme_manager_add_resources (DzlThemeManager *self,
   g_autoptr(GtkCssProvider) provider = NULL;
   g_autofree gchar *css_dir = NULL;
   g_autofree gchar *icons_dir = NULL;
-  GtkIconTheme *theme;
   const gchar *real_path = resource_path;
+  GtkIconTheme *theme;
 
   g_return_if_fail (DZL_IS_THEME_MANAGER (self));
   g_return_if_fail (resource_path != NULL);
@@ -112,11 +125,15 @@ dzl_theme_manager_add_resources (DzlThemeManager *self,
    */
   css_dir = g_build_path ("/", resource_path, "themes/", NULL);
   g_debug ("Including CSS overrides from %s", css_dir);
-  provider = dzl_css_provider_new (css_dir);
-  g_hash_table_insert (self->providers_by_path, g_strdup (resource_path), g_object_ref (provider));
-  gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
-                                             GTK_STYLE_PROVIDER (provider),
-                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+  if (has_child_resources (css_dir))
+    {
+      provider = dzl_css_provider_new (css_dir);
+      g_hash_table_insert (self->providers_by_path, g_strdup (resource_path), g_object_ref (provider));
+      gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                                 GTK_STYLE_PROVIDER (provider),
+                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
 
   /*
    * Add the icons sub-directory so that Gtk can locate the themed
