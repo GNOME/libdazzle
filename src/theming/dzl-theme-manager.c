@@ -167,7 +167,6 @@ dzl_theme_manager_remove_resources (DzlThemeManager *self,
 
   g_return_if_fail (DZL_IS_THEME_MANAGER (self));
   g_return_if_fail (resource_path != NULL);
-  g_return_if_fail (g_hash_table_contains (self->providers_by_path, resource_path));
 
   if (NULL != (provider = g_hash_table_lookup (self->providers_by_path, resource_path)))
     {
