@@ -23,6 +23,7 @@
 #include <glib/gi18n.h>
 
 #include "theming/dzl-css-provider.h"
+#include "util/dzl-macros.h"
 
 struct _DzlCssProvider
 {
@@ -169,7 +170,10 @@ dzl_css_provider_queue_update (DzlCssProvider *self)
   g_assert (DZL_IS_CSS_PROVIDER (self));
 
   if (self->queued_update == 0)
-    self->queued_update = g_timeout_add (0, dzl_css_provider_do_update, self);
+    self->queued_update = g_idle_add_full (G_PRIORITY_LOW,
+                                           dzl_css_provider_do_update,
+                                           g_object_ref (self),
+                                           g_object_unref);
 }
 
 static void
@@ -250,6 +254,7 @@ dzl_css_provider_finalize (GObject *object)
   DzlCssProvider *self = (DzlCssProvider *)object;
 
   g_clear_pointer (&self->base_path, g_free);
+  dzl_clear_source (&self->queued_update);
 
   G_OBJECT_CLASS (dzl_css_provider_parent_class)->finalize (object);
 }
