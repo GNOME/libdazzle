@@ -1,4 +1,16 @@
 ==============
+Version 3.29.1
+==============
+
+Changes in this release:
+
+ • DzlListBox allows ellipsis control in GtkBuilder interfaces.
+ • DzlThemeManager avoids creating CSS providers when no resources
+   were found within the given path.
+ • Various fixes to the shortcut engine to closer match gtk.
+ • Various GObject Introspection fixes.
+
+==============
 Version 3.28.0
 ==============
 
