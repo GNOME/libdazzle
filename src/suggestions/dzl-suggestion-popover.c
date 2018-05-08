@@ -54,6 +54,7 @@ struct _DzlSuggestionPopover
   gulong              configure_event_handler;
   gulong              size_allocate_handler;
   gulong              items_changed_handler;
+  gulong              destroy_handler;
 
   PangoEllipsizeMode  subtitle_ellipsize;
   PangoEllipsizeMode  title_ellipsize;
@@ -73,6 +74,9 @@ enum {
   SUGGESTION_ACTIVATED,
   N_SIGNALS
 };
+
+static void dzl_suggestion_popover_set_transient_for (DzlSuggestionPopover *self,
+                                                      GtkWindow            *window);
 
 G_DEFINE_TYPE (DzlSuggestionPopover, dzl_suggestion_popover, GTK_TYPE_WINDOW)
 
@@ -228,23 +232,7 @@ dzl_suggestion_popover_hide (GtkWidget *widget)
 
   g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
 
-  if (self->transient_for != NULL)
-    {
-      GtkWindowGroup *group = gtk_window_get_group (self->transient_for);
-
-      if (group != NULL)
-        gtk_window_group_remove_window (group, GTK_WINDOW (self));
-    }
-
-  g_signal_handler_disconnect (self->transient_for, self->delete_event_handler);
-  g_signal_handler_disconnect (self->transient_for, self->size_allocate_handler);
-  g_signal_handler_disconnect (self->transient_for, self->configure_event_handler);
-
-  self->delete_event_handler = 0;
-  self->size_allocate_handler = 0;
-  self->configure_event_handler = 0;
-
-  self->transient_for = NULL;
+  dzl_suggestion_popover_set_transient_for (self, NULL);
 
   GTK_WIDGET_CLASS (dzl_suggestion_popover_parent_class)->hide (widget);
 }
@@ -290,6 +278,63 @@ dzl_suggestion_popover_transient_for_configure_event (DzlSuggestionPopover *self
 }
 
 static void
+dzl_suggestion_popover_set_transient_for (DzlSuggestionPopover *self,
+                                          GtkWindow            *window)
+{
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+  g_assert (!window || GTK_IS_WINDOW (window));
+
+  if (self->transient_for == window)
+    return;
+
+  if (self->transient_for != NULL)
+    {
+      g_signal_handler_disconnect (self->transient_for, self->size_allocate_handler);
+      g_signal_handler_disconnect (self->transient_for, self->configure_event_handler);
+      g_signal_handler_disconnect (self->transient_for, self->delete_event_handler);
+      g_signal_handler_disconnect (self->transient_for, self->destroy_handler);
+
+      self->size_allocate_handler = 0;
+      self->configure_event_handler = 0;
+      self->delete_event_handler = 0;
+      self->destroy_handler = 0;
+    }
+
+  self->transient_for = window;
+
+  if (self->transient_for != NULL)
+    {
+      GtkWindowGroup *group = gtk_window_get_group (self->transient_for);
+
+      gtk_window_group_add_window (group, GTK_WINDOW (self));
+
+      self->destroy_handler =
+        g_signal_connect (self->transient_for,
+                          "destroy",
+                          G_CALLBACK (gtk_widget_destroyed),
+                          &self->transient_for);
+      self->delete_event_handler =
+        g_signal_connect_object (self->transient_for,
+                                 "delete-event",
+                                 G_CALLBACK (dzl_suggestion_popover_transient_for_delete_event),
+                                 self,
+                                 G_CONNECT_SWAPPED);
+      self->size_allocate_handler =
+        g_signal_connect_object (self->transient_for,
+                                 "size-allocate",
+                                 G_CALLBACK (dzl_suggestion_popover_transient_for_size_allocate),
+                                 self,
+                                 G_CONNECT_SWAPPED | G_CONNECT_AFTER);
+      self->configure_event_handler =
+        g_signal_connect_object (self->transient_for,
+                                 "configure-event",
+                                 G_CALLBACK (dzl_suggestion_popover_transient_for_configure_event),
+                                 self,
+                                 G_CONNECT_SWAPPED);
+    }
+}
+
+static void
 dzl_suggestion_popover_show (GtkWidget *widget)
 {
   DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
@@ -298,33 +343,11 @@ dzl_suggestion_popover_show (GtkWidget *widget)
 
   if (self->relative_to != NULL)
     {
-      GtkWidget *toplevel;
+      GtkWidget *toplevel = gtk_widget_get_ancestor (self->relative_to, GTK_TYPE_WINDOW);
 
-      toplevel = gtk_widget_get_ancestor (GTK_WIDGET (self->relative_to), GTK_TYPE_WINDOW);
-
-      if (GTK_IS_WINDOW (toplevel))
+      if (toplevel != NULL)
         {
-          self->transient_for = GTK_WINDOW (toplevel);
-          gtk_window_group_add_window (gtk_window_get_group (self->transient_for),
-                                       GTK_WINDOW (self));
-          self->delete_event_handler =
-            g_signal_connect_object (toplevel,
-                                     "delete-event",
-                                     G_CALLBACK (dzl_suggestion_popover_transient_for_delete_event),
-                                     self,
-                                     G_CONNECT_SWAPPED);
-          self->size_allocate_handler =
-            g_signal_connect_object (toplevel,
-                                     "size-allocate",
-                                     G_CALLBACK (dzl_suggestion_popover_transient_for_size_allocate),
-                                     self,
-                                     G_CONNECT_SWAPPED | G_CONNECT_AFTER);
-          self->configure_event_handler =
-            g_signal_connect_object (toplevel,
-                                     "configure-event",
-                                     G_CALLBACK (dzl_suggestion_popover_transient_for_configure_event),
-                                     self,
-                                     G_CONNECT_SWAPPED);
+          dzl_suggestion_popover_set_transient_for (self, GTK_WINDOW (toplevel));
           dzl_suggestion_popover_reposition (self);
         }
     }
@@ -461,18 +484,7 @@ dzl_suggestion_popover_destroy (GtkWidget *widget)
 {
   DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
 
-  if (self->transient_for != NULL)
-    {
-      g_signal_handler_disconnect (self->transient_for, self->size_allocate_handler);
-      g_signal_handler_disconnect (self->transient_for, self->configure_event_handler);
-      g_signal_handler_disconnect (self->transient_for, self->delete_event_handler);
-
-      self->size_allocate_handler = 0;
-      self->configure_event_handler = 0;
-      self->delete_event_handler = 0;
-
-      self->transient_for = NULL;
-    }
+  dzl_suggestion_popover_set_transient_for (self, NULL);
 
   if (self->scroll_anim != NULL)
     {
