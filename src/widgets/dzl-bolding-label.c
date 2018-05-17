@@ -31,6 +31,11 @@
  *
  * This might be useful when you want to change a label based on some
  * selection state without it affecting the size request or layout.
+ *
+ * Remember that bold and non-bold variants of fonts can often be very
+ * different in terms of styling. To reduce the chances that you see
+ * shifts in placement, you may want to set the #GtkLabel:xalign or
+ * #GtkLabel:halign properties to 0.0 or %GTK_ALIGN_START respectively.
  */
 
 struct _DzlBoldingLabel
