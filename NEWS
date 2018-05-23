@@ -1,4 +1,12 @@
 ==============
+Version 3.28.2
+==============
+
+Changes in this release:
+
+ • theming: avoid creating unnecessary css providers
+
+==============
 Version 3.28.1
 ==============
 
