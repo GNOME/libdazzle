@@ -160,6 +160,7 @@ _dzl_counter_arena_init_local (DzlCounterArena *arena)
   gsize size;
   gint page_size;
   ShmHeader *header;
+  gboolean needs_warning = TRUE;
 #ifndef G_OS_WIN32
   gpointer mem;
   unsigned pid;
@@ -192,7 +193,10 @@ _dzl_counter_arena_init_local (DzlCounterArena *arena)
   arena->is_local_arena = TRUE;
 
   if (getenv ("DZL_COUNTER_DISABLE_SHM"))
-    goto use_malloc;
+    {
+      needs_warning = FALSE;
+      goto use_malloc;
+    }
 
   pid = getpid ();
   g_snprintf (name, sizeof name, NAME_FORMAT, pid);
@@ -241,8 +245,9 @@ failure:
 #endif
 
 use_malloc:
-  g_warning ("Failed to allocate shared memory for counters. "
-             "Counters will not be available to external processes.");
+  if (needs_warning)
+    g_warning ("Failed to allocate shared memory for counters. "
+               "Counters will not be available to external processes.");
 
   /*
    * Ask for double memory than required so that we can be certain
