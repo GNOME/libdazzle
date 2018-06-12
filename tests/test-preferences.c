@@ -65,6 +65,8 @@ main (gint   argc,
       gchar *argv[])
 {
   GtkWidget *window;
+  GtkWidget *headerbar;
+  GtkWidget *toggle;
   GtkWidget *view;
 
   gtk_init (&argc, &argv);
@@ -77,10 +79,23 @@ main (gint   argc,
                          "default-height", 600,
                          NULL);
 
+  headerbar = g_object_new (GTK_TYPE_HEADER_BAR,
+                            "show-close-button", TRUE,
+                            "visible", TRUE,
+                            NULL);
+  gtk_window_set_titlebar (GTK_WINDOW (window), headerbar);
+
   view = g_object_new (DZL_TYPE_PREFERENCES_VIEW,
                        "visible", TRUE,
                        NULL);
   gtk_container_add (GTK_CONTAINER (window), view);
+
+  toggle = g_object_new (GTK_TYPE_SWITCH,
+                         "visible", TRUE,
+                         NULL);
+  g_object_bind_property (view, "use-sidebar", toggle, "active",
+                          G_BINDING_BIDIRECTIONAL | G_BINDING_SYNC_CREATE);
+  gtk_container_add (GTK_CONTAINER (headerbar), toggle);
 
   add_preferences (DZL_PREFERENCES (view));
 

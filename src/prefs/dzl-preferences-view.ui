@@ -7,7 +7,7 @@
         <property name="orientation">horizontal</property>
         <property name="visible">true</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="sidebar">
             <property name="orientation">vertical</property>
             <property name="visible">true</property>
             <child>
@@ -35,32 +35,45 @@
             <property name="visible">true</property>
             <child>
               <object class="GtkBox">
-                <property name="orientation">horizontal</property>
+                <property name="orientation">vertical</property>
                 <property name="visible">true</property>
                 <child>
-                  <object class="GtkStack" id="page_stack">
-                    <property name="margin">24</property>
-                    <property name="homogeneous">false</property>
-                    <property name="transition-duration">333</property>
-                    <property name="transition-type">crossfade</property>
-                    <property name="visible">true</property>
+                  <object class="GtkStackSwitcher" id="top_stack_switcher">
+                    <property name="stack">page_stack</property>
+                    <property name="visible">false</property>
                   </object>
                 </child>
                 <child>
                   <object class="GtkBox">
-                    <property name="hexpand">true</property>
+                    <property name="orientation">horizontal</property>
+                    <property name="expand">true</property>
                     <property name="visible">true</property>
                     <child>
-                      <object class="GtkStack" id="subpage_stack">
-                        <property name="margin-start">0</property>
-                        <property name="margin-end">24</property>
-                        <property name="margin-top">24</property>
-                        <property name="margin-bottom">24</property>
-                        <property name="halign">start</property>
-                        <property name="hexpand">false</property>
+                      <object class="GtkStack" id="page_stack">
+                        <property name="margin">24</property>
                         <property name="homogeneous">false</property>
                         <property name="transition-duration">333</property>
                         <property name="transition-type">crossfade</property>
+                        <property name="visible">true</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="hexpand">true</property>
+                        <property name="visible">true</property>
+                        <child>
+                          <object class="GtkStack" id="subpage_stack">
+                            <property name="margin-start">0</property>
+                            <property name="margin-end">24</property>
+                            <property name="margin-top">24</property>
+                            <property name="margin-bottom">24</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">false</property>
+                            <property name="homogeneous">false</property>
+                            <property name="transition-duration">333</property>
+                            <property name="transition-type">crossfade</property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

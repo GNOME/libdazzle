@@ -39,11 +39,15 @@ typedef struct
 
   GtkScrolledWindow     *scroller;
   GtkStack              *page_stack;
-  GtkStackSwitcher      *page_stack_sidebar;
+  GtkStackSidebar       *page_stack_sidebar;
   GtkSearchEntry        *search_entry;
   GtkStack              *subpage_stack;
+  GtkBox                *sidebar;
+  GtkStackSwitcher      *top_stack_switcher;
 
   guint                  last_widget_id;
+
+  guint                  use_sidebar : 1;
 } DzlPreferencesViewPrivate;
 
 typedef struct
@@ -58,6 +62,14 @@ static void dzl_preferences_iface_init (DzlPreferencesInterface *iface);
 G_DEFINE_TYPE_WITH_CODE (DzlPreferencesView, dzl_preferences_view, GTK_TYPE_BIN,
                          G_ADD_PRIVATE (DzlPreferencesView)
                          G_IMPLEMENT_INTERFACE (DZL_TYPE_PREFERENCES, dzl_preferences_iface_init))
+
+enum {
+  PROP_0,
+  PROP_USE_SIDEBAR,
+  N_PROPS
+};
+
+static GParamSpec *properties [N_PROPS];
 
 static void
 tracked_widget_free (gpointer data)
@@ -217,12 +229,52 @@ dzl_preferences_view_finalize (GObject *object)
 }
 
 static void
+dzl_preferences_view_get_property (GObject    *object,
+                                   guint       prop_id,
+                                   GValue     *value,
+                                   GParamSpec *pspec)
+{
+  DzlPreferencesView *self = DZL_PREFERENCES_VIEW (object);
+
+  switch (prop_id)
+    {
+    case PROP_USE_SIDEBAR:
+      g_value_set_boolean (value, dzl_preferences_view_get_use_sidebar (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+dzl_preferences_view_set_property (GObject      *object,
+                                   guint         prop_id,
+                                   const GValue *value,
+                                   GParamSpec   *pspec)
+{
+  DzlPreferencesView *self = DZL_PREFERENCES_VIEW (object);
+
+  switch (prop_id)
+    {
+    case PROP_USE_SIDEBAR:
+      dzl_preferences_view_set_use_sidebar (self, g_value_get_boolean (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 dzl_preferences_view_class_init (DzlPreferencesViewClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->finalize = dzl_preferences_view_finalize;
+  object_class->get_property = dzl_preferences_view_get_property;
+  object_class->set_property = dzl_preferences_view_set_property;
 
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/dazzle/ui/dzl-preferences-view.ui");
   gtk_widget_class_set_css_name (widget_class, "dzlpreferencesview");
@@ -230,7 +282,18 @@ dzl_preferences_view_class_init (DzlPreferencesViewClass *klass)
   gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, page_stack_sidebar);
   gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, scroller);
   gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, search_entry);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, sidebar);
   gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, subpage_stack);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlPreferencesView, top_stack_switcher);
+
+  properties [PROP_USE_SIDEBAR] =
+    g_param_spec_boolean ("use-sidebar",
+                          "Use Sidebar",
+                          "Use Sidebar",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -298,6 +361,8 @@ dzl_preferences_view_init (DzlPreferencesView *self)
   static const GActionEntry entries[] = {
     { "go-back", go_back_activate },
   };
+
+  priv->use_sidebar = TRUE;
 
   gtk_widget_init_template (GTK_WIDGET (self));
 
@@ -962,4 +1027,35 @@ GtkWidget *
 dzl_preferences_view_new (void)
 {
   return g_object_new (DZL_TYPE_PREFERENCES_VIEW, NULL);
+}
+
+gboolean
+dzl_preferences_view_get_use_sidebar (DzlPreferencesView *self)
+{
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_PREFERENCES_VIEW (self), FALSE);
+
+  return priv->use_sidebar;
+}
+
+void
+dzl_preferences_view_set_use_sidebar (DzlPreferencesView *self,
+                                      gboolean            use_sidebar)
+{
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_PREFERENCES_VIEW (self));
+
+  use_sidebar = !!use_sidebar;
+
+  if (priv->use_sidebar != use_sidebar)
+    {
+      priv->use_sidebar = use_sidebar;
+
+      gtk_widget_set_visible (GTK_WIDGET (priv->sidebar), use_sidebar);
+      gtk_widget_set_visible (GTK_WIDGET (priv->top_stack_switcher), !use_sidebar);
+
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_USE_SIDEBAR]);
+    }
 }

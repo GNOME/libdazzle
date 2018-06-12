@@ -40,3 +40,7 @@ dzlpreferencesview dzlpreferencesgroup list entry {
   background: none;
   min-height: 0px;
 }
+
+dzlpreferencesview stackswitcher {
+  margin: 12px;
+}
