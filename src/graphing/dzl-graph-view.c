@@ -31,6 +31,7 @@ typedef struct
   cairo_surface_t *surface;
   guint            tick_handler;
   gdouble          x_offset;
+  guint            missed_count;
   guint            surface_dirty : 1;
 } DzlGraphViewPrivate;
 
@@ -124,6 +125,21 @@ dzl_graph_view_tick_cb (GtkWidget     *widget,
 
   if ((priv->surface == NULL) || (priv->model == NULL) || !gtk_widget_get_visible (widget))
     goto remove_handler;
+
+  /*
+   * If we've missed drawings for the last 10 tick callbacks, chances are we're
+   * visible, but not being displayed to the user because we're not top-most.
+   * Disable ourselves in that case too so that we don't spin the frame-clock.
+   *
+   * We'll be re-enabled when the next ensure_surface() is called (upon a real
+   * draw by the system).
+   *
+   * The missed_count is reset on draw().
+   */
+  if (priv->missed_count > 10)
+    goto remove_handler;
+  else
+    priv->missed_count++;
 
   timespan = dzl_graph_view_model_get_timespan (priv->model);
   if (timespan == 0)
@@ -235,6 +251,8 @@ dzl_graph_view_draw (GtkWidget *widget,
   GtkAllocation alloc;
 
   g_assert (DZL_IS_GRAPH_VIEW (self));
+
+  priv->missed_count = 0;
 
   gtk_widget_get_allocation (widget, &alloc);
 
