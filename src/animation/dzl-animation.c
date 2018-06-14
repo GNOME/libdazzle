@@ -629,15 +629,17 @@ dzl_animation_start (DzlAnimation *animation)
       animation->begin_time = gdk_frame_clock_get_frame_time (animation->frame_clock);
       animation->end_time = animation->begin_time + (animation->duration_msec * 1000L);
       animation->tween_handler =
-        g_signal_connect (animation->frame_clock,
-                          "update",
-                          G_CALLBACK (dzl_animation_widget_tick_cb),
-                          animation);
+        g_signal_connect_object (animation->frame_clock,
+                                 "update",
+                                 G_CALLBACK (dzl_animation_widget_tick_cb),
+                                 animation,
+                                 0);
       animation->after_paint_handler =
-        g_signal_connect (animation->frame_clock,
-                          "after-paint",
-                          G_CALLBACK (dzl_animation_widget_after_paint_cb),
-                          animation);
+        g_signal_connect_object (animation->frame_clock,
+                                 "after-paint",
+                                 G_CALLBACK (dzl_animation_widget_after_paint_cb),
+                                 animation,
+                                 0);
       gdk_frame_clock_begin_updating (animation->frame_clock);
     }
   else
