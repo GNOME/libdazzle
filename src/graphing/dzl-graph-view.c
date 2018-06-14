@@ -276,8 +276,8 @@ dzl_graph_view_size_allocate (GtkWidget     *widget,
 }
 
 static void
-dzl_graph_view__model_changed (DzlGraphView  *self,
-                               DzlGraphModel *model)
+dzl_graph_view__model__changed (DzlGraphView  *self,
+                                DzlGraphModel *model)
 {
   DzlGraphViewPrivate *priv = dzl_graph_view_get_instance_private (self);
 
@@ -287,6 +287,20 @@ dzl_graph_view__model_changed (DzlGraphView  *self,
   priv->x_offset = 0;
 
   dzl_graph_view_clear_surface (self);
+}
+
+static void
+dzl_graph_view__model__notify_timespan (DzlGraphView  *self,
+                                        GParamSpec    *pspec,
+                                        DzlGraphModel *model)
+{
+  g_assert (DZL_IS_GRAPH_VIEW (self));
+  g_assert (DZL_IS_GRAPH_MODEL (model));
+
+  /* Avoid this in a number of scenarios */
+  if (gtk_widget_get_visible (GTK_WIDGET (self)) &&
+      gtk_widget_get_child_visible (GTK_WIDGET (self)))
+    gtk_widget_queue_draw (GTK_WIDGET (self));
 }
 
 static void
@@ -406,13 +420,13 @@ dzl_graph_view_init (DzlGraphView *self)
 
   dzl_signal_group_connect_object (priv->model_signals,
                                    "notify::timespan",
-                                   G_CALLBACK (gtk_widget_queue_allocate),
+                                   G_CALLBACK (dzl_graph_view__model__notify_timespan),
                                    self,
                                    G_CONNECT_SWAPPED);
 
   dzl_signal_group_connect_object (priv->model_signals,
                                    "changed",
-                                   G_CALLBACK (dzl_graph_view__model_changed),
+                                   G_CALLBACK (dzl_graph_view__model__changed),
                                    self,
                                    G_CONNECT_SWAPPED);
 }
