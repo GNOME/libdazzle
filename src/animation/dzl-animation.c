@@ -63,6 +63,7 @@ struct _DzlAnimation
   GdkFrameClock     *frame_clock;         /* An optional frame-clock for sync. */
   GDestroyNotify     notify;              /* Notify callback */
   gpointer           notify_data;         /* Data for notify */
+  guint              stop_called : 1;
 };
 
 G_DEFINE_TYPE (DzlAnimation, dzl_animation, G_TYPE_INITIALLY_UNOWNED)
@@ -686,6 +687,11 @@ dzl_animation_stop (DzlAnimation *animation)
 {
   if (animation == NULL)
     return;
+
+  g_return_if_fail (DZL_IS_ANIMATION (animation));
+  g_return_if_fail (animation->stop_called == FALSE);
+
+  animation->stop_called = TRUE;
 
   if (animation->tween_handler)
     {
