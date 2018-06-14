@@ -301,6 +301,8 @@ dzl_graph_view_destroy (GtkWidget *widget)
       priv->tick_handler = 0;
     }
 
+  g_clear_pointer (&priv->surface, cairo_surface_destroy);
+
   GTK_WIDGET_CLASS (dzl_graph_view_parent_class)->destroy (widget);
 }
 
@@ -312,7 +314,6 @@ dzl_graph_view_finalize (GObject *object)
 
   g_clear_object (&priv->model);
   g_clear_object (&priv->model_signals);
-  g_clear_pointer (&priv->surface, cairo_surface_destroy);
   g_clear_pointer (&priv->renderers, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_graph_view_parent_class)->finalize (object);
