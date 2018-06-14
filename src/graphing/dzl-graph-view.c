@@ -376,7 +376,7 @@ dzl_graph_view_class_init (DzlGraphViewClass *klass)
                          "Table",
                          "The data model for the graph.",
                          DZL_TYPE_GRAPH_MODEL,
-                         (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, LAST_PROP, properties);
 
