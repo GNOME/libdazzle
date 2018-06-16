@@ -327,7 +327,7 @@ main (gint   argc,
   for (guint i = 1; i < argc; i++)
     g_ptr_array_add (ar, argv[i]);
   if (ar->len == 0)
-    g_ptr_array_add (ar, "/usr/share/applications");
+    g_ptr_array_add (ar, (gchar *)"/usr/share/applications");
 
   for (guint i = 0; i < ar->len; i++)
     {

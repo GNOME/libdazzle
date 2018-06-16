@@ -179,8 +179,8 @@ main (gint   argc,
       gchar *argv[])
 {
   static const GtkTargetEntry drag_targets[] = {
-    { "GTK_TREE_MODEL_ROW", GTK_TARGET_SAME_WIDGET, 0 },
-    { "text/uri-list", 0, 0 },
+    { (gchar *)"GTK_TREE_MODEL_ROW", GTK_TARGET_SAME_WIDGET, 0 },
+    { (gchar *)"text/uri-list", 0, 0 },
   };
   g_autoptr(DzlTreeNode) root = NULL;
   g_autoptr(GFile) home = NULL;

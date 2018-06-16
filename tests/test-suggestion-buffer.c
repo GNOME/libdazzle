@@ -25,10 +25,10 @@ test_basic (void)
   dzl_suggestion_set_title (suggestion, "this is the title");
   dzl_suggestion_set_subtitle (suggestion, "this is the subtitle");
   dzl_suggestion_set_icon_name (suggestion, "gtk-missing-symbolic");
-  g_signal_connect (suggestion, "suggest-suffix", G_CALLBACK (suggest_suffix), "abcd");
+  g_signal_connect (suggestion, "suggest-suffix", G_CALLBACK (suggest_suffix), (gchar *)"abcd");
 
   suggestion2 = dzl_suggestion_new ();
-  g_signal_connect (suggestion2, "suggest-suffix", G_CALLBACK (suggest_suffix), "99999");
+  g_signal_connect (suggestion2, "suggest-suffix", G_CALLBACK (suggest_suffix), (gchar *)"99999");
 
   dzl_suggestion_entry_buffer_set_suggestion (buffer, suggestion);
   g_assert (suggestion == dzl_suggestion_entry_buffer_get_suggestion (buffer));

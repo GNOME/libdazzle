@@ -6,19 +6,19 @@ test_dzl_trie_insert (void)
    DzlTrie *trie;
 
    trie = dzl_trie_new(NULL);
-   dzl_trie_insert(trie, "a", "a");
+   dzl_trie_insert(trie, "a", (gchar *)"a");
    g_assert_cmpstr("a", ==, dzl_trie_lookup(trie, "a"));
-   dzl_trie_insert(trie, "b", "b");
+   dzl_trie_insert(trie, "b", (gchar *)"b");
    g_assert_cmpstr("b", ==, dzl_trie_lookup(trie, "b"));
-   dzl_trie_insert(trie, "c", "c");
+   dzl_trie_insert(trie, "c", (gchar *)"c");
    g_assert_cmpstr("c", ==, dzl_trie_lookup(trie, "c"));
-   dzl_trie_insert(trie, "d", "d");
+   dzl_trie_insert(trie, "d", (gchar *)"d");
    g_assert_cmpstr("d", ==, dzl_trie_lookup(trie, "d"));
-   dzl_trie_insert(trie, "e", "e");
+   dzl_trie_insert(trie, "e", (gchar *)"e");
    g_assert_cmpstr("e", ==, dzl_trie_lookup(trie, "e"));
-   dzl_trie_insert(trie, "f", "f");
+   dzl_trie_insert(trie, "f", (gchar *)"f");
    g_assert_cmpstr("f", ==, dzl_trie_lookup(trie, "f"));
-   dzl_trie_insert(trie, "g", "g");
+   dzl_trie_insert(trie, "g", (gchar *)"g");
    g_assert_cmpstr("g", ==, dzl_trie_lookup(trie, "g"));
    dzl_trie_destroy(trie);
 }

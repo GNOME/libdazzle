@@ -43,7 +43,7 @@ enum {
 
 static GParamSpec *properties[LAST_PROP];
 
-static gchar *colors[] = {
+static const gchar *colors[] = {
   "#73d216",
   "#f57900",
   "#3465a4",
