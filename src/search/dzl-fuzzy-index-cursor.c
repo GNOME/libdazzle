@@ -459,7 +459,7 @@ dzl_fuzzy_index_cursor_worker (GTask        *task,
       guint score = dzl_int_pair_first (pair);
       guint last_offset = dzl_int_pair_second (pair);
       gpointer other_score;
-      DzlFuzzyMatch match;
+      DzlFuzzyMatch match = {0};
       guint lookaside_id = GPOINTER_TO_UINT (key);
 
       if G_UNLIKELY (!_dzl_fuzzy_index_resolve (self->index,

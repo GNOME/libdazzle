@@ -479,6 +479,9 @@ _dzl_fuzzy_index_resolve (DzlFuzzyIndex  *self,
   g_assert (out_score != NULL);
   g_assert (priority != NULL);
 
+  if (self->keys == NULL || self->lookaside_raw == NULL)
+    return FALSE;
+
   /* Mask off the key priority */
   lookaside_id &= 0x00FFFFFF;
 
