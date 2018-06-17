@@ -19,6 +19,9 @@
 #include "config.h"
 
 #include <ctype.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #if defined(__FreeBSD__)
 # include <errno.h>
@@ -27,7 +30,12 @@
 # include <sys/types.h>
 #endif
 
-#include "dzl-cpu-model.h"
+#include "graphing/dzl-cpu-model.h"
+#include "util/dzl-macros.h"
+
+#ifdef __linux__
+# define PROC_STAT_BUF_SIZE 4096
+#endif
 
 typedef struct
 {
@@ -52,6 +60,11 @@ struct _DzlCpuModel
   GArray  *cpu_info;
   guint    n_cpu;
 
+#ifdef __linux__
+  gint     stat_fd;
+  gchar   *stat_buf;
+#endif
+
   guint    poll_source;
   guint    poll_interval_msec;
 };
@@ -59,6 +72,30 @@ struct _DzlCpuModel
 G_DEFINE_TYPE (DzlCpuModel, dzl_cpu_model, DZL_TYPE_GRAPH_MODEL)
 
 #ifdef __linux__
+static gboolean
+read_stat (DzlCpuModel *self)
+{
+  gssize len;
+
+  g_assert (self != NULL);
+  g_assert (self->stat_fd != -1);
+  g_assert (self->stat_buf != NULL);
+
+  if (lseek (self->stat_fd, 0, SEEK_SET) != 0)
+    return FALSE;
+
+  len = read (self->stat_fd, self->stat_buf, PROC_STAT_BUF_SIZE);
+  if (len <= 0)
+    return FALSE;
+
+  if (len < PROC_STAT_BUF_SIZE)
+    self->stat_buf[len] = 0;
+  else
+    self->stat_buf[PROC_STAT_BUF_SIZE-1] = 0;
+
+  return TRUE;
+}
+
 static void
 dzl_cpu_model_poll (DzlCpuModel *self)
 {
@@ -83,23 +120,23 @@ dzl_cpu_model_poll (DzlCpuModel *self)
   glong steal_calc;
   glong guest_calc;
   glong guest_nice_calc;
-  gchar *buf = NULL;
   glong total;
   gchar *line;
   gint ret;
   gint id;
-  gint i;
 
-  if (g_file_get_contents("/proc/stat", &buf, NULL, NULL))
+  if (read_stat (self))
     {
-      line = buf;
-      for (i = 0; buf[i]; i++)
+      line = self->stat_buf;
+
+      for (gsize i = 0; self->stat_buf[i]; i++)
         {
-          if (buf[i] == '\n') {
-            buf[i] = '\0';
-            if (g_str_has_prefix(line, "cpu"))
+          if (self->stat_buf[i] == '\n') {
+            self->stat_buf[i] = '\0';
+
+            if (strncmp (line, "cpu", 3) == 0)
               {
-                if (isdigit(line[3]))
+                if (isdigit (line[3]))
                   {
                     CpuInfo *cpu_info;
 
@@ -147,15 +184,15 @@ dzl_cpu_model_poll (DzlCpuModel *self)
                 break;
               }
 
-          next:
-            line = &buf[i + 1];
-          }
-      }
-  }
-
-  g_free (buf);
+            next:
+              line = &self->stat_buf[i + 1];
+            }
+        }
+    }
 }
+
 #elif defined(__FreeBSD__)
+
 static void
 dzl_cpu_model_poll (DzlCpuModel *self)
 {
@@ -250,7 +287,6 @@ dzl_cpu_model_constructed (GObject *object)
   DzlCpuModel *self = (DzlCpuModel *)object;
   gint64 timespan;
   guint max_samples;
-  guint i;
 
   G_OBJECT_CLASS (dzl_cpu_model_parent_class)->constructed (object);
 
@@ -267,7 +303,7 @@ dzl_cpu_model_constructed (GObject *object)
 
   self->n_cpu = g_get_num_processors ();
 
-  for (i = 0; i < self->n_cpu; i++)
+  for (guint i = 0; i < self->n_cpu; i++)
     {
       CpuInfo cpu_info = { 0 };
       DzlGraphColumn *column;
@@ -293,12 +329,13 @@ dzl_cpu_model_finalize (GObject *object)
 {
   DzlCpuModel *self = (DzlCpuModel *)object;
 
-  if (self->poll_source != 0)
-    {
-      g_source_remove (self->poll_source);
-      self->poll_source = 0;
-    }
+#ifdef __linux__
+  g_clear_pointer (&self->stat_buf, g_free);
+  if (self->stat_fd != -1)
+    close (self->stat_fd);
+#endif
 
+  dzl_clear_source (&self->poll_source);
   g_clear_pointer (&self->cpu_info, g_array_unref);
 
   G_OBJECT_CLASS (dzl_cpu_model_parent_class)->finalize (object);
@@ -317,6 +354,11 @@ static void
 dzl_cpu_model_init (DzlCpuModel *self)
 {
   self->cpu_info = g_array_new (FALSE, FALSE, sizeof (CpuInfo));
+
+#ifdef __linux__
+  self->stat_fd = open ("/proc/stat", O_RDONLY);
+  self->stat_buf = g_malloc (PROC_STAT_BUF_SIZE);
+#endif
 
   g_object_set (self,
                 "value-min", 0.0,
