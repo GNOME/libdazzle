@@ -137,7 +137,7 @@ dzl_preferences_spin_button_value_changed (DzlPreferencesSpinButton *self,
 
   g_variant_ref_sink (variant);
   g_settings_set_value (self->settings, self->key, variant);
-  g_clear_pointer (&variant, g_variant_unref);
+  dzl_clear_pointer (&variant, g_variant_unref);
 }
 
 static void
@@ -220,14 +220,14 @@ dzl_preferences_spin_button_connect (DzlPreferencesBin *bin,
   dzl_preferences_spin_button_setting_changed (self, self->key, self->settings);
 
 cleanup:
-  g_clear_pointer (&key, g_settings_schema_key_unref);
-  g_clear_pointer (&type, g_free);
-  g_clear_pointer (&signal_detail, g_free);
-  g_clear_pointer (&range, g_variant_unref);
-  g_clear_pointer (&values, g_variant_unref);
-  g_clear_pointer (&lower, g_variant_unref);
-  g_clear_pointer (&upper, g_variant_unref);
-  g_clear_pointer (&schema, g_settings_schema_unref);
+  dzl_clear_pointer (&key, g_settings_schema_key_unref);
+  dzl_clear_pointer (&type, g_free);
+  dzl_clear_pointer (&signal_detail, g_free);
+  dzl_clear_pointer (&range, g_variant_unref);
+  dzl_clear_pointer (&values, g_variant_unref);
+  dzl_clear_pointer (&lower, g_variant_unref);
+  dzl_clear_pointer (&upper, g_variant_unref);
+  dzl_clear_pointer (&schema, g_settings_schema_unref);
 }
 
 static void
@@ -271,7 +271,7 @@ dzl_preferences_spin_button_finalize (GObject *object)
 {
   DzlPreferencesSpinButton *self = (DzlPreferencesSpinButton *)object;
 
-  g_clear_pointer (&self->key, g_free);
+  dzl_clear_pointer (&self->key, g_free);
   g_clear_object (&self->settings);
 
   G_OBJECT_CLASS (dzl_preferences_spin_button_parent_class)->finalize (object);

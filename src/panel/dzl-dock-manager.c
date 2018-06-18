@@ -268,7 +268,7 @@ dzl_dock_manager_finalize (GObject *object)
   DzlDockManager *self = (DzlDockManager *)object;
   DzlDockManagerPrivate *priv = dzl_dock_manager_get_instance_private (self);
 
-  g_clear_pointer (&priv->queued_focus_by_toplevel, g_hash_table_unref);
+  dzl_clear_pointer (&priv->queued_focus_by_toplevel, g_hash_table_unref);
 
   if (priv->queued_handler)
     {
@@ -284,7 +284,7 @@ dzl_dock_manager_finalize (GObject *object)
       g_ptr_array_remove_index (priv->docks, priv->docks->len - 1);
     }
 
-  g_clear_pointer (&priv->docks, g_ptr_array_unref);
+  dzl_clear_pointer (&priv->docks, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_dock_manager_parent_class)->finalize (object);
 }

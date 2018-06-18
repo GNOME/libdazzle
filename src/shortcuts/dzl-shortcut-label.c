@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "shortcuts/dzl-shortcut-label.h"
+#include "util/dzl-macros.h"
 
 struct _DzlShortcutLabel
 {
@@ -44,7 +45,7 @@ dzl_shortcut_label_finalize (GObject *object)
 {
   DzlShortcutLabel *self = (DzlShortcutLabel *)object;
 
-  g_clear_pointer (&self->chord, dzl_shortcut_chord_free);
+  dzl_clear_pointer (&self->chord, dzl_shortcut_chord_free);
 
   G_OBJECT_CLASS (dzl_shortcut_label_parent_class)->finalize (object);
 }

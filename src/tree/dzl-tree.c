@@ -558,7 +558,7 @@ dzl_tree_add (DzlTree     *self,
       gtk_tree_model_get_iter (GTK_TREE_MODEL (priv->store), &parent, path);
       parentptr = &parent;
 
-      g_clear_pointer (&path, gtk_tree_path_free);
+      dzl_clear_pointer (&path, gtk_tree_path_free);
     }
 
   gtk_tree_store_insert_with_values (priv->store, &iter, parentptr,
@@ -829,7 +829,7 @@ dzl_tree_button_press_event (GtkWidget      *widget,
             }
         }
 
-      g_clear_pointer (&tree_path, gtk_tree_path_free);
+      dzl_clear_pointer (&tree_path, gtk_tree_path_free);
 
       return GDK_EVENT_STOP;
     }
@@ -978,7 +978,7 @@ dzl_tree_drag_motion (GtkWidget      *widget,
    * Cache the current drop position so we can use it
    * later to determine how to drop on a given node.
    */
-  g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
+  dzl_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
   gtk_tree_view_get_drag_dest_row (GTK_TREE_VIEW (widget),
                                    &priv->last_drop_path,
                                    &priv->last_drop_pos);
@@ -1001,7 +1001,7 @@ dzl_tree_drag_end (GtkWidget      *widget,
 
   priv->drag_action = 0;
   priv->last_drop_pos = 0;
-  g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
+  dzl_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
 
   GTK_WIDGET_CLASS (dzl_tree_parent_class)->drag_end (widget, context);
 }
@@ -1086,8 +1086,8 @@ dzl_tree_destroy (GtkWidget *widget)
 
   g_assert (DZL_IS_TREE (self));
 
-  g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
-  g_clear_pointer (&priv->builders, g_ptr_array_unref);
+  dzl_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
+  dzl_clear_pointer (&priv->builders, g_ptr_array_unref);
   g_clear_object (&priv->store);
   g_clear_object (&priv->root);
   g_clear_object (&priv->context_menu);
@@ -1842,7 +1842,7 @@ dzl_tree_find_child_node (DzlTree         *self,
   while (gtk_tree_model_iter_next (model, &children));
 
 finish:
-  g_clear_pointer (&path, gtk_tree_path_free);
+  dzl_clear_pointer (&path, gtk_tree_path_free);
 
   return ret;
 }

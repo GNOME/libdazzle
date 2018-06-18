@@ -22,9 +22,10 @@
 
 #include <string.h>
 
-#include "dzl-fuzzy-index.h"
-#include "dzl-fuzzy-index-cursor.h"
-#include "dzl-fuzzy-index-private.h"
+#include "search/dzl-fuzzy-index.h"
+#include "search/dzl-fuzzy-index-cursor.h"
+#include "search/dzl-fuzzy-index-private.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -104,12 +105,12 @@ dzl_fuzzy_index_finalize (GObject *object)
 {
   DzlFuzzyIndex *self = (DzlFuzzyIndex *)object;
 
-  g_clear_pointer (&self->mapped_file, g_mapped_file_unref);
-  g_clear_pointer (&self->variant, g_variant_unref);
-  g_clear_pointer (&self->documents, g_variant_unref);
-  g_clear_pointer (&self->keys, g_variant_unref);
-  g_clear_pointer (&self->tables, g_variant_dict_unref);
-  g_clear_pointer (&self->lookaside, g_variant_unref);
+  dzl_clear_pointer (&self->mapped_file, g_mapped_file_unref);
+  dzl_clear_pointer (&self->variant, g_variant_unref);
+  dzl_clear_pointer (&self->documents, g_variant_unref);
+  dzl_clear_pointer (&self->keys, g_variant_unref);
+  dzl_clear_pointer (&self->tables, g_variant_dict_unref);
+  dzl_clear_pointer (&self->lookaside, g_variant_unref);
 
   G_OBJECT_CLASS (dzl_fuzzy_index_parent_class)->finalize (object);
 }

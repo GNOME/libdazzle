@@ -16,11 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-
 #include "config.h"
 
-#include "dzl-simple-label.h"
+#define G_LOG_DOMAIN "dzl-simple-labels"
+
+#include <string.h>
+
+#include "util/dzl-macros.h"
+#include "widgets/dzl-simple-label.h"
 
 struct _DzlSimpleLabel
 {
@@ -180,7 +183,7 @@ dzl_simple_label_destroy (GtkWidget *widget)
 {
   DzlSimpleLabel *self = (DzlSimpleLabel *)widget;
 
-  g_clear_pointer (&self->label, g_free);
+  dzl_clear_pointer (&self->label, g_free);
   g_clear_object (&self->cached_layout);
 
   GTK_WIDGET_CLASS (dzl_simple_label_parent_class)->destroy (widget);

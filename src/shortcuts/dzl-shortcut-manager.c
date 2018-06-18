@@ -310,9 +310,9 @@ dzl_shortcut_manager_finalize (GObject *object)
       g_clear_object (&priv->theme);
     }
 
-  g_clear_pointer (&priv->seen_entries, g_hash_table_unref);
-  g_clear_pointer (&priv->themes, g_ptr_array_unref);
-  g_clear_pointer (&priv->user_dir, g_free);
+  dzl_clear_pointer (&priv->seen_entries, g_hash_table_unref);
+  dzl_clear_pointer (&priv->themes, g_ptr_array_unref);
+  dzl_clear_pointer (&priv->user_dir, g_free);
   g_clear_object (&priv->internal_theme);
 
   G_OBJECT_CLASS (dzl_shortcut_manager_parent_class)->finalize (object);

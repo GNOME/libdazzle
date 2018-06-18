@@ -18,12 +18,15 @@
 
 #include "config.h"
 
+#define G_LOG_DOMAIN "dzl-preferences-page"
+
 #include <glib/gi18n.h>
 
 #include "prefs/dzl-preferences-group.h"
 #include "prefs/dzl-preferences-group-private.h"
 #include "prefs/dzl-preferences-page.h"
 #include "prefs/dzl-preferences-page-private.h"
+#include "util/dzl-macros.h"
 
 enum {
   PROP_0,
@@ -40,7 +43,7 @@ dzl_preferences_page_finalize (GObject *object)
 {
   DzlPreferencesPage *self = (DzlPreferencesPage *)object;
 
-  g_clear_pointer (&self->groups_by_name, g_hash_table_unref);
+  dzl_clear_pointer (&self->groups_by_name, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_preferences_page_parent_class)->finalize (object);
 }

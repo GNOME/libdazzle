@@ -23,7 +23,8 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-signal-group.h"
+#include "bindings/dzl-signal-group.h"
+#include "util/dzl-macros.h"
 
 /**
  * SECTION:dzlsignalgroup
@@ -459,7 +460,7 @@ signal_handler_free (gpointer data)
   handler->handler_id = 0;
   handler->signal_id = 0;
   handler->signal_detail = 0;
-  g_clear_pointer (&handler->closure, g_closure_unref);
+  dzl_clear_pointer (&handler->closure, g_closure_unref);
   g_slice_free (SignalHandler, handler);
 }
 
@@ -485,7 +486,7 @@ dzl_signal_group_dispose (GObject *object)
   if (self->has_bound_at_least_once)
     dzl_signal_group_unbind (self);
 
-  g_clear_pointer (&self->handlers, g_ptr_array_unref);
+  dzl_clear_pointer (&self->handlers, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_signal_group_parent_class)->dispose (object);
 }

@@ -30,6 +30,7 @@
 #include "shortcuts/dzl-shortcut-context.h"
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-private.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -72,7 +73,7 @@ dzl_shortcut_context_finalize (GObject *object)
   DzlShortcutContext *self = (DzlShortcutContext *)object;
   DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
 
-  g_clear_pointer (&priv->table, dzl_shortcut_chord_table_free);
+  dzl_clear_pointer (&priv->table, dzl_shortcut_chord_table_free);
 
   G_OBJECT_CLASS (dzl_shortcut_context_parent_class)->finalize (object);
 }

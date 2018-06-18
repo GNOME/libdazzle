@@ -22,6 +22,7 @@
 
 #include "shortcuts/dzl-shortcuts-group.h"
 #include "shortcuts/dzl-shortcuts-section.h"
+#include "util/dzl-macros.h"
 
 /**
  * SECTION:dzl-shortcuts-section
@@ -224,9 +225,9 @@ dzl_shortcuts_section_finalize (GObject *object)
 {
   DzlShortcutsSection *self = (DzlShortcutsSection *)object;
 
-  g_clear_pointer (&self->name, g_free);
-  g_clear_pointer (&self->title, g_free);
-  g_clear_pointer (&self->view_name, g_free);
+  dzl_clear_pointer (&self->name, g_free);
+  dzl_clear_pointer (&self->title, g_free);
+  dzl_clear_pointer (&self->view_name, g_free);
   g_clear_object (&self->pan_gesture);
 
   G_OBJECT_CLASS (dzl_shortcuts_section_parent_class)->finalize (object);

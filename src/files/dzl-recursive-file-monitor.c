@@ -476,8 +476,8 @@ dzl_recursive_file_monitor_finalize (GObject *object)
   g_clear_object (&self->root);
   g_clear_object (&self->cancellable);
 
-  g_clear_pointer (&self->files_by_monitor, g_hash_table_unref);
-  g_clear_pointer (&self->monitors_by_file, g_hash_table_unref);
+  dzl_clear_pointer (&self->files_by_monitor, g_hash_table_unref);
+  dzl_clear_pointer (&self->monitors_by_file, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_recursive_file_monitor_parent_class)->finalize (object);
 }

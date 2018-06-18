@@ -18,7 +18,10 @@
 
 #include "config.h"
 
-#include "dzl-column-layout.h"
+#define G_LOG_DOMAIN "dzl-column-layout"
+
+#include "util/dzl-macros.h"
+#include "widgets/dzl-column-layout.h"
 
 typedef struct
 {
@@ -588,7 +591,7 @@ dzl_column_layout_finalize (GObject *object)
   DzlColumnLayout *self = (DzlColumnLayout *)object;
   DzlColumnLayoutPrivate *priv = dzl_column_layout_get_instance_private (self);
 
-  g_clear_pointer (&priv->children, g_array_unref);
+  dzl_clear_pointer (&priv->children, g_array_unref);
 
   G_OBJECT_CLASS (dzl_column_layout_parent_class)->finalize (object);
 }

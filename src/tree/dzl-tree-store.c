@@ -230,7 +230,7 @@ dzl_tree_store_drag_data_received (GtkTreeDragDest  *dest,
           gboolean found;
 
           found = gtk_tree_model_get_iter (model, &iter, src_path);
-          g_clear_pointer (&src_path, gtk_tree_path_free);
+          dzl_clear_pointer (&src_path, gtk_tree_path_free);
 
           if (found)
             {

@@ -22,7 +22,8 @@
 
 #include <string.h>
 
-#include "dzl-suggestion-entry-buffer.h"
+#include "suggestions/dzl-suggestion-entry-buffer.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -55,7 +56,7 @@ dzl_suggestion_entry_buffer_drop_suggestion (DzlSuggestionEntryBuffer *self)
       guint length = GTK_ENTRY_BUFFER_CLASS (dzl_suggestion_entry_buffer_parent_class)->get_length (GTK_ENTRY_BUFFER (self));
       guint suffix_len = strlen (priv->suffix);
 
-      g_clear_pointer (&priv->suffix, g_free);
+      dzl_clear_pointer (&priv->suffix, g_free);
       gtk_entry_buffer_emit_deleted_text (GTK_ENTRY_BUFFER (self), length, suffix_len);
     }
 }
@@ -149,7 +150,7 @@ dzl_suggestion_entry_buffer_inserted_text (GtkEntryBuffer *buffer,
 
   g_assert (GTK_IS_ENTRY_BUFFER (buffer));
 
-  g_clear_pointer (&priv->text, g_free);
+  dzl_clear_pointer (&priv->text, g_free);
 
   GTK_ENTRY_BUFFER_CLASS (dzl_suggestion_entry_buffer_parent_class)->inserted_text (buffer, position, chars, n_chars);
 }
@@ -164,7 +165,7 @@ dzl_suggestion_entry_buffer_deleted_text (GtkEntryBuffer *buffer,
 
   g_assert (GTK_IS_ENTRY_BUFFER (buffer));
 
-  g_clear_pointer (&priv->text, g_free);
+  dzl_clear_pointer (&priv->text, g_free);
 
   GTK_ENTRY_BUFFER_CLASS (dzl_suggestion_entry_buffer_parent_class)->deleted_text (buffer, position, n_chars);
 }
@@ -244,8 +245,8 @@ dzl_suggestion_entry_buffer_finalize (GObject *object)
   DzlSuggestionEntryBufferPrivate *priv = dzl_suggestion_entry_buffer_get_instance_private (self);
 
   g_clear_object (&priv->suggestion);
-  g_clear_pointer (&priv->text, g_free);
-  g_clear_pointer (&priv->suffix, g_free);
+  dzl_clear_pointer (&priv->text, g_free);
+  dzl_clear_pointer (&priv->suffix, g_free);
 
   G_OBJECT_CLASS (dzl_suggestion_entry_buffer_parent_class)->finalize (object);
 }

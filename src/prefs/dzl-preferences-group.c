@@ -25,6 +25,7 @@
 #include "prefs/dzl-preferences-entry.h"
 #include "prefs/dzl-preferences-group.h"
 #include "prefs/dzl-preferences-group-private.h"
+#include "util/dzl-macros.h"
 
 G_DEFINE_TYPE (DzlPreferencesGroup, dzl_preferences_group, GTK_TYPE_BIN)
 
@@ -134,7 +135,7 @@ dzl_preferences_group_finalize (GObject *object)
 {
   DzlPreferencesGroup *self = (DzlPreferencesGroup *)object;
 
-  g_clear_pointer (&self->widgets, g_ptr_array_unref);
+  dzl_clear_pointer (&self->widgets, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_preferences_group_parent_class)->finalize (object);
 }

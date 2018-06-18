@@ -25,9 +25,9 @@
 
 #include "bindings/dzl-binding-group.h"
 #include "bindings/dzl-signal-group.h"
-
 #include "statemachine/dzl-state-machine.h"
 #include "statemachine/dzl-state-machine-buildable.h"
+#include "util/dzl-macros.h"
 
 G_DEFINE_QUARK (dzl_state_machine_error, dzl_state_machine_error)
 
@@ -378,8 +378,8 @@ dzl_state_machine_finalize (GObject *object)
         }
     }
 
-  g_clear_pointer (&priv->states, g_hash_table_unref);
-  g_clear_pointer (&priv->state, g_free);
+  dzl_clear_pointer (&priv->states, g_hash_table_unref);
+  dzl_clear_pointer (&priv->state, g_free);
 
   G_OBJECT_CLASS (dzl_state_machine_parent_class)->finalize (object);
 }

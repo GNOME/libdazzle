@@ -253,7 +253,7 @@ dzl_css_provider_finalize (GObject *object)
 {
   DzlCssProvider *self = (DzlCssProvider *)object;
 
-  g_clear_pointer (&self->base_path, g_free);
+  dzl_clear_pointer (&self->base_path, g_free);
   dzl_clear_source (&self->queued_update);
 
   G_OBJECT_CLASS (dzl_css_provider_parent_class)->finalize (object);

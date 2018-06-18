@@ -123,7 +123,7 @@ dzl_preferences_file_chooser_button_finalize (GObject *object)
 {
   DzlPreferencesFileChooserButton *self = (DzlPreferencesFileChooserButton *)object;
 
-  g_clear_pointer (&self->key, g_free);
+  dzl_clear_pointer (&self->key, g_free);
   g_clear_object (&self->settings);
 
   G_OBJECT_CLASS (dzl_preferences_file_chooser_button_parent_class)->finalize (object);

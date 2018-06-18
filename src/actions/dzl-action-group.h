@@ -66,8 +66,8 @@ static void                                                                     
 _##prefix##_action_info_free (gpointer data)                                      \
 {                                                                                 \
   Type##ActionInfo *info = data;                                                  \
-  g_clear_pointer (&info->state, g_variant_unref);                                \
-  g_clear_pointer (&info->state_hint, g_variant_unref);                           \
+  dzl_clear_pointer (&info->state, g_variant_unref);                                \
+  dzl_clear_pointer (&info->state_hint, g_variant_unref);                           \
   g_slice_free (Type##ActionInfo, info);                                          \
 }                                                                                 \
                                                                                   \
@@ -106,7 +106,7 @@ prefix##_set_action_state (Type *self,                                          
                                                         name);                    \
   if (state != info->state)                                                       \
     {                                                                             \
-      g_clear_pointer (&info->state, g_variant_unref);                            \
+      dzl_clear_pointer (&info->state, g_variant_unref);                            \
       info->state = state ? g_variant_ref_sink (state) : NULL;                    \
       g_action_group_action_state_changed (G_ACTION_GROUP (self), name, state);   \
     }                                                                             \

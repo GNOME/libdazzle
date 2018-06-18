@@ -25,6 +25,7 @@
 
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-private.h"
+#include "util/dzl-macros.h"
 
 #define MAX_CHORD_SIZE 4
 
@@ -106,7 +107,7 @@ dzl_shortcut_chord_new_from_event (const GdkEventKey *key)
     self->keys[0].modifier |= GDK_SHIFT_MASK;
 
   if (!dzl_shortcut_chord_is_valid (self))
-    g_clear_pointer (&self, dzl_shortcut_chord_free);
+    dzl_clear_pointer (&self, dzl_shortcut_chord_free);
 
   return self;
 }
@@ -134,7 +135,7 @@ dzl_shortcut_chord_new_from_string (const gchar *accelerator)
 
   /* Ensure we got a valid first key at least */
   if (!dzl_shortcut_chord_is_valid (self))
-    g_clear_pointer (&self, dzl_shortcut_chord_free);
+    dzl_clear_pointer (&self, dzl_shortcut_chord_free);
 
   return self;
 }

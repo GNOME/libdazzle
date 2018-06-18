@@ -20,7 +20,8 @@
 
 #include "config.h"
 
-#include "dzl-joined-menu.h"
+#include "menus/dzl-joined-menu.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -174,7 +175,7 @@ dzl_joined_menu_finalize (GObject *object)
 {
   DzlJoinedMenu *self = (DzlJoinedMenu *)object;
 
-  g_clear_pointer (&self->menus, g_array_unref);
+  dzl_clear_pointer (&self->menus, g_array_unref);
 
   G_OBJECT_CLASS (dzl_joined_menu_parent_class)->finalize (object);
 }

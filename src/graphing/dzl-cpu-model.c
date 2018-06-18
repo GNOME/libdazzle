@@ -330,13 +330,13 @@ dzl_cpu_model_finalize (GObject *object)
   DzlCpuModel *self = (DzlCpuModel *)object;
 
 #ifdef __linux__
-  g_clear_pointer (&self->stat_buf, g_free);
+  dzl_clear_pointer (&self->stat_buf, g_free);
   if (self->stat_fd != -1)
     close (self->stat_fd);
 #endif
 
   dzl_clear_source (&self->poll_source);
-  g_clear_pointer (&self->cpu_info, g_array_unref);
+  dzl_clear_pointer (&self->cpu_info, g_array_unref);
 
   G_OBJECT_CLASS (dzl_cpu_model_parent_class)->finalize (object);
 }

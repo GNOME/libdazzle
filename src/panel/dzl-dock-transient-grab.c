@@ -20,7 +20,8 @@
 
 #include "config.h"
 
-#include "dzl-dock-transient-grab.h"
+#include "panel/dzl-dock-transient-grab.h"
+#include "util/dzl-macros.h"
 
 struct _DzlDockTransientGrab
 {
@@ -66,8 +67,8 @@ dzl_dock_transient_grab_finalize (GObject *object)
                          dzl_dock_transient_grab_weak_notify,
                          self);
 
-  g_clear_pointer (&self->items, g_ptr_array_unref);
-  g_clear_pointer (&self->hidden, g_hash_table_unref);
+  dzl_clear_pointer (&self->items, g_ptr_array_unref);
+  dzl_clear_pointer (&self->hidden, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_dock_transient_grab_parent_class)->finalize (object);
 }

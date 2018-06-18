@@ -20,7 +20,8 @@
 
 #include "config.h"
 
-#include "dzl-radio-box.h"
+#include "util/dzl-macros.h"
+#include "widgets/dzl-radio-box.h"
 
 /*
  * XXX: Ideally we would manage all the size requests ourselves. However,
@@ -114,8 +115,8 @@ dzl_radio_box_finalize (GObject *object)
   DzlRadioBox *self = (DzlRadioBox *)object;
   DzlRadioBoxPrivate *priv = dzl_radio_box_get_instance_private (self);
 
-  g_clear_pointer (&priv->items, g_array_unref);
-  g_clear_pointer (&priv->active_id, g_free);
+  dzl_clear_pointer (&priv->items, g_array_unref);
+  dzl_clear_pointer (&priv->active_id, g_free);
 
   G_OBJECT_CLASS (dzl_radio_box_parent_class)->finalize (object);
 }
@@ -381,7 +382,7 @@ item_parser_start_element (GMarkupParseContext  *context,
     {
       const gchar *translatable = NULL;
 
-      g_clear_pointer (&parser_data->id, g_free);
+      dzl_clear_pointer (&parser_data->id, g_free);
       g_string_truncate (parser_data->text, 0);
 
       if (!g_markup_collect_attributes (element_name, attribute_names, attribute_values, error,

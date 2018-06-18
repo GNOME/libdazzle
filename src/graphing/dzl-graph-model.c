@@ -18,10 +18,13 @@
 
 #include "config.h"
 
+#define G_LOG_DOMAIN "dzl-graph-model"
+
 #include <glib/gi18n.h>
 
-#include "dzl-graph-column-private.h"
-#include "dzl-graph-model.h"
+#include "graphing/dzl-graph-column-private.h"
+#include "graphing/dzl-graph-model.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -444,7 +447,7 @@ dzl_graph_view_model_finalize (GObject *object)
   DzlGraphModel *self = (DzlGraphModel *)object;
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
 
-  g_clear_pointer (&priv->columns, g_ptr_array_unref);
+  dzl_clear_pointer (&priv->columns, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_graph_view_model_parent_class)->finalize (object);
 }

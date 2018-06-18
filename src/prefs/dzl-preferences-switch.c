@@ -276,8 +276,8 @@ dzl_preferences_switch_finalize (GObject *object)
 {
   DzlPreferencesSwitch *self = (DzlPreferencesSwitch *)object;
 
-  g_clear_pointer (&self->key, g_free);
-  g_clear_pointer (&self->target, g_variant_unref);
+  dzl_clear_pointer (&self->key, g_free);
+  dzl_clear_pointer (&self->target, g_variant_unref);
   g_clear_object (&self->settings);
 
   G_OBJECT_CLASS (dzl_preferences_switch_parent_class)->finalize (object);

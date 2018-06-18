@@ -183,7 +183,7 @@ dzl_shortcut_theme_editor_row_activated (DzlShortcutThemeEditor *self,
       GtkDialog *dialog;
       GtkWidget *toplevel;
 
-      g_clear_pointer (&priv->selected, gtk_tree_path_free);
+      dzl_clear_pointer (&priv->selected, gtk_tree_path_free);
       priv->selected = gtk_tree_path_copy (tree_path);
 
       gtk_tree_model_get (model, &iter,
@@ -292,8 +292,8 @@ dzl_shortcut_theme_editor_finalize (GObject *object)
 
   g_clear_object (&priv->model);
   g_clear_object (&priv->theme);
-  g_clear_pointer (&priv->selected, gtk_tree_path_free);
-  g_clear_pointer (&priv->attrs, pango_attr_list_unref);
+  dzl_clear_pointer (&priv->selected, gtk_tree_path_free);
+  dzl_clear_pointer (&priv->attrs, pango_attr_list_unref);
 
   G_OBJECT_CLASS (dzl_shortcut_theme_editor_parent_class)->finalize (object);
 }

@@ -21,10 +21,11 @@
 
 #include "config.h"
 
-#include "dzl-dock-item.h"
-#include "dzl-dock-widget.h"
-#include "dzl-tab.h"
-#include "dzl-tab-strip.h"
+#include "panel/dzl-dock-item.h"
+#include "panel/dzl-dock-widget.h"
+#include "panel/dzl-tab.h"
+#include "panel/dzl-tab-strip.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -73,7 +74,7 @@ set_tab_state (GSimpleAction *action,
 
   list = gtk_container_get_children (GTK_CONTAINER (priv->stack));
   nth_child = g_list_nth_data (list, stateval);
-  g_clear_pointer (&list, g_list_free);
+  dzl_clear_pointer (&list, g_list_free);
 
   if (nth_child != NULL)
     {

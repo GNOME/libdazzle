@@ -23,7 +23,8 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-binding-group.h"
+#include "bindings/dzl-binding-group.h"
+#include "util/dzl-macros.h"
 
 /**
  * SECTION:dzlbindinggroup
@@ -248,8 +249,8 @@ lazy_binding_free (gpointer data)
 
   if (lazy_binding->using_closures)
     {
-      g_clear_pointer (&lazy_binding->transform_to, g_closure_unref);
-      g_clear_pointer (&lazy_binding->transform_from, g_closure_unref);
+      dzl_clear_pointer (&lazy_binding->transform_to, g_closure_unref);
+      dzl_clear_pointer (&lazy_binding->transform_from, g_closure_unref);
     }
 
   g_slice_free (LazyBinding, lazy_binding);
@@ -284,7 +285,7 @@ dzl_binding_group_finalize (GObject *object)
   g_assert (self->lazy_bindings != NULL);
   g_assert (self->lazy_bindings->len == 0);
 
-  g_clear_pointer (&self->lazy_bindings, g_ptr_array_unref);
+  dzl_clear_pointer (&self->lazy_bindings, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_binding_group_parent_class)->finalize (object);
 }

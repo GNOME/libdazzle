@@ -18,11 +18,14 @@
 
 #include "config.h"
 
+#define G_LOG_DOMAIN "dzl-graph-column"
+
 #include <glib/gi18n.h>
 #include <gobject/gvaluecollector.h>
 
-#include "dzl-graph-column.h"
-#include "dzl-graph-column-private.h"
+#include "graphing/dzl-graph-column.h"
+#include "graphing/dzl-graph-column-private.h"
+#include "util/dzl-macros.h"
 #include "util/dzl-ring.h"
 
 struct _DzlGraphColumn
@@ -104,7 +107,7 @@ _dzl_graph_view_column_set_n_rows (DzlGraphColumn *self,
 
   ring = dzl_ring_sized_new (sizeof (GValue), n_rows, NULL);
   dzl_ring_foreach (self->values, dzl_graph_view_column_copy_value, ring);
-  g_clear_pointer (&self->values, dzl_ring_unref);
+  dzl_clear_pointer (&self->values, dzl_ring_unref);
   self->values = ring;
 }
 
@@ -222,8 +225,8 @@ dzl_graph_view_column_finalize (GObject *object)
 {
   DzlGraphColumn *self = (DzlGraphColumn *)object;
 
-  g_clear_pointer (&self->name, g_free);
-  g_clear_pointer (&self->values, dzl_ring_unref);
+  dzl_clear_pointer (&self->name, g_free);
+  dzl_clear_pointer (&self->values, dzl_ring_unref);
 
   G_OBJECT_CLASS (dzl_graph_view_column_parent_class)->finalize (object);
 }

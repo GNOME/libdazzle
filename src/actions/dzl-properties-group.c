@@ -20,7 +20,8 @@
 
 #include "config.h"
 
-#include "dzl-properties-group.h"
+#include "actions/dzl-properties-group.h"
+#include "util/dzl-macros.h"
 
 /**
  * SECTION:dzl-properties-group
@@ -149,7 +150,7 @@ get_action_state (GObject       *object,
           if (eval != NULL)
             ret = g_variant_new_string (eval->value_nick);
 
-          g_clear_pointer (&eclass, g_type_class_unref);
+          dzl_clear_pointer (&eclass, g_type_class_unref);
 
           break;
         }
@@ -412,12 +413,12 @@ dzl_properties_group_change_action_state (GActionGroup *group,
                         {
                           g_value_init (&value, mapping->property_type);
                           g_value_set_enum (&value, eval->value);
-                          g_clear_pointer (&eclass, g_type_class_unref);
+                          dzl_clear_pointer (&eclass, g_type_class_unref);
                           break;
                         }
                     }
 
-                  g_clear_pointer (&eclass, g_type_class_unref);
+                  dzl_clear_pointer (&eclass, g_type_class_unref);
                   g_warning ("Failed to transform '%s' to %s",
                              str, g_type_name (mapping->property_type));
                   return;
@@ -681,7 +682,7 @@ dzl_properties_group_finalize (GObject *object)
 
   g_weak_ref_clear (&self->object_ref);
 
-  g_clear_pointer (&self->mappings, g_array_unref);
+  dzl_clear_pointer (&self->mappings, g_array_unref);
 
   G_OBJECT_CLASS (dzl_properties_group_parent_class)->finalize (object);
 }
@@ -866,7 +867,7 @@ dzl_properties_group_add_property_full (DzlPropertiesGroup *self,
   g_action_group_action_added (G_ACTION_GROUP (self), mapping.action_name);
 
 failure:
-  g_clear_pointer (&object_class, g_type_class_unref);
+  dzl_clear_pointer (&object_class, g_type_class_unref);
 }
 
 /**
@@ -979,7 +980,7 @@ dzl_properties_group_add_all_properties (DzlPropertiesGroup *self)
     }
 
 failure:
-  g_clear_pointer (&object_class, g_type_class_unref);
+  dzl_clear_pointer (&object_class, g_type_class_unref);
 }
 
 /**

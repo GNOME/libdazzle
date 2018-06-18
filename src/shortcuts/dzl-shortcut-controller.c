@@ -30,6 +30,7 @@
 #include "shortcuts/dzl-shortcut-controller.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "shortcuts/dzl-shortcut-private.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
@@ -332,7 +333,7 @@ dzl_shortcut_controller_connect (DzlShortcutController *self)
 
   manager = dzl_shortcut_controller_get_manager (self);
 
-  g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
+  dzl_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
   priv->context_name = NULL;
 
   priv->widget_destroy_handler =
@@ -436,8 +437,8 @@ dzl_shortcut_controller_finalize (GObject *object)
       priv->widget = NULL;
     }
 
-  g_clear_pointer (&priv->commands, g_hash_table_unref);
-  g_clear_pointer (&priv->commands_table, dzl_shortcut_chord_table_free);
+  dzl_clear_pointer (&priv->commands, g_hash_table_unref);
+  dzl_clear_pointer (&priv->commands_table, dzl_shortcut_chord_table_free);
   g_clear_object (&priv->root);
 
   while (priv->descendants.length > 0)
@@ -1220,6 +1221,6 @@ _dzl_shortcut_controller_clear (DzlShortcutController *self)
 
   g_return_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self));
 
-  g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
+  dzl_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
 }

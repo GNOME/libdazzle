@@ -22,7 +22,8 @@
 
 #include <string.h>
 
-#include "dzl-widget-action-group.h"
+#include "actions/dzl-widget-action-group.h"
+#include "util/dzl-macros.h"
 
 struct _DzlWidgetActionGroup
 {
@@ -338,7 +339,7 @@ dzl_widget_action_group_finalize (GObject *object)
 {
   DzlWidgetActionGroup *self = (DzlWidgetActionGroup *)object;
 
-  g_clear_pointer (&self->enabled, g_hash_table_unref);
+  dzl_clear_pointer (&self->enabled, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_widget_action_group_parent_class)->finalize (object);
 }

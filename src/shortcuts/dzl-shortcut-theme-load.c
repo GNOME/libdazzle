@@ -25,6 +25,7 @@
 #include "shortcuts/dzl-shortcut-context.h"
 #include "shortcuts/dzl-shortcut-private.h"
 #include "shortcuts/dzl-shortcut-theme.h"
+#include "util/dzl-macros.h"
 
 typedef enum
 {
@@ -80,8 +81,8 @@ static void
 load_state_frame_free (LoadStateFrame *frm)
 {
   g_clear_object (&frm->context);
-  g_clear_pointer (&frm->accelerator, g_free);
-  g_clear_pointer (&frm->signal, g_free);
+  dzl_clear_pointer (&frm->accelerator, g_free);
+  dzl_clear_pointer (&frm->signal, g_free);
 
   g_slist_free_full (frm->params, g_free);
   frm->params = NULL;

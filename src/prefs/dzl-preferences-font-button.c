@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "prefs/dzl-preferences-font-button.h"
+#include "util/dzl-macros.h"
 
 struct _DzlPreferencesFontButton
 {
@@ -104,7 +105,7 @@ dzl_preferences_font_button_changed (DzlPreferencesFontButton *self,
       g_free (font_size);
     }
 
-  g_clear_pointer (&font_desc, pango_font_description_free);
+  dzl_clear_pointer (&font_desc, pango_font_description_free);
   g_free (name);
 }
 
@@ -170,7 +171,7 @@ dzl_preferences_font_button_finalize (GObject *object)
   DzlPreferencesFontButton *self = (DzlPreferencesFontButton *)object;
 
   g_clear_object (&self->settings);
-  g_clear_pointer (&self->key, g_free);
+  dzl_clear_pointer (&self->key, g_free);
 
   G_OBJECT_CLASS (dzl_preferences_font_button_parent_class)->finalize (object);
 }

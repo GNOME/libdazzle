@@ -24,6 +24,7 @@
 
 #include "theming/dzl-css-provider.h"
 #include "theming/dzl-theme-manager.h"
+#include "util/dzl-macros.h"
 
 struct _DzlThemeManager
 {
@@ -38,7 +39,7 @@ dzl_theme_manager_finalize (GObject *object)
 {
   DzlThemeManager *self = (DzlThemeManager *)object;
 
-  g_clear_pointer (&self->providers_by_path, g_hash_table_unref);
+  dzl_clear_pointer (&self->providers_by_path, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_theme_manager_parent_class)->finalize (object);
 }

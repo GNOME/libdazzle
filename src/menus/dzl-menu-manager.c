@@ -80,7 +80,7 @@ dzl_menu_manager_finalize (GObject *object)
 {
   DzlMenuManager *self = (DzlMenuManager *)object;
 
-  g_clear_pointer (&self->models, g_hash_table_unref);
+  dzl_clear_pointer (&self->models, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_menu_manager_parent_class)->finalize (object);
 }

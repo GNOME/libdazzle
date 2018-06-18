@@ -23,6 +23,7 @@
 #include "app/dzl-application-window.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "util/dzl-gtk.h"
+#include "util/dzl-macros.h"
 
 #define DEFAULT_DISMISSAL_SECONDS   3
 #define SHOW_HEADER_WITHIN_DISTANCE 5
@@ -380,22 +381,13 @@ dzl_application_window_destroy (GtkWidget *widget)
       priv->motion_notify_handler = 0;
     }
 
-  g_clear_pointer (&priv->titlebar_container, gtk_widget_destroy);
-  g_clear_pointer (&priv->titlebar_revealer, gtk_widget_destroy);
-  g_clear_pointer (&priv->event_box, gtk_widget_destroy);
-  g_clear_pointer (&priv->overlay, gtk_widget_destroy);
+  dzl_clear_pointer ((GtkWidget **)&priv->titlebar_container, gtk_widget_destroy);
+  dzl_clear_pointer ((GtkWidget **)&priv->titlebar_revealer, gtk_widget_destroy);
+  dzl_clear_pointer ((GtkWidget **)&priv->event_box, gtk_widget_destroy);
+  dzl_clear_pointer ((GtkWidget **)&priv->overlay, gtk_widget_destroy);
 
-  if (priv->fullscreen_source)
-    {
-      g_source_remove (priv->fullscreen_source);
-      priv->fullscreen_source = 0;
-    }
-
-  if (priv->fullscreen_reveal_source)
-    {
-      g_source_remove (priv->fullscreen_reveal_source);
-      priv->fullscreen_reveal_source = 0;
-    }
+  dzl_clear_source (&priv->fullscreen_source);
+  dzl_clear_source (&priv->fullscreen_reveal_source);
 
   GTK_WIDGET_CLASS (dzl_application_window_parent_class)->destroy (widget);
 }

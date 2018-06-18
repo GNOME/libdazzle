@@ -24,6 +24,7 @@
 #include "shortcuts/dzl-shortcuts-section.h"
 #include "shortcuts/dzl-shortcuts-group.h"
 #include "shortcuts/dzl-shortcuts-shortcut-private.h"
+#include "util/dzl-macros.h"
 
 /**
  * SECTION:dzl-shortcuts-window
@@ -632,11 +633,11 @@ dzl_shortcuts_window_finalize (GObject *object)
   DzlShortcutsWindow *self = (DzlShortcutsWindow *)object;
   DzlShortcutsWindowPrivate *priv = dzl_shortcuts_window_get_instance_private (self);
 
-  g_clear_pointer (&priv->keywords, g_hash_table_unref);
-  g_clear_pointer (&priv->initial_section, g_free);
-  g_clear_pointer (&priv->view_name, g_free);
-  g_clear_pointer (&priv->last_section_name, g_free);
-  g_clear_pointer (&priv->search_items_hash, g_hash_table_unref);
+  dzl_clear_pointer (&priv->keywords, g_hash_table_unref);
+  dzl_clear_pointer (&priv->initial_section, g_free);
+  dzl_clear_pointer (&priv->view_name, g_free);
+  dzl_clear_pointer (&priv->last_section_name, g_free);
+  dzl_clear_pointer (&priv->search_items_hash, g_hash_table_unref);
 
   g_clear_object (&priv->search_image_group);
   g_clear_object (&priv->search_text_group);

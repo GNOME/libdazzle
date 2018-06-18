@@ -22,7 +22,8 @@
 
 #include <math.h>
 
-#include "dzl-three-grid.h"
+#include "util/dzl-macros.h"
+#include "widgets/dzl-three-grid.h"
 
 typedef struct
 {
@@ -388,7 +389,7 @@ dzl_three_grid_get_preferred_height_for_width (GtkWidget *widget,
            real_min_height, real_nat_height);
 #endif
 
-  g_clear_pointer (&priv->row_infos, g_hash_table_unref);
+  dzl_clear_pointer (&priv->row_infos, g_hash_table_unref);
   priv->row_infos = g_steal_pointer (&row_infos);
 }
 
@@ -648,8 +649,8 @@ dzl_three_grid_finalize (GObject *object)
   DzlThreeGrid *self = (DzlThreeGrid *)object;
   DzlThreeGridPrivate *priv = dzl_three_grid_get_instance_private (self);
 
-  g_clear_pointer (&priv->row_infos, g_hash_table_unref);
-  g_clear_pointer (&priv->children, g_ptr_array_unref);
+  dzl_clear_pointer (&priv->row_infos, g_hash_table_unref);
+  dzl_clear_pointer (&priv->children, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_three_grid_parent_class)->finalize (object);
 }

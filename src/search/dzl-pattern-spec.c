@@ -25,7 +25,8 @@
 #endif
 #include <string.h>
 
-#include "dzl-pattern-spec.h"
+#include "search/dzl-pattern-spec.h"
+#include "util/dzl-macros.h"
 
 G_DEFINE_BOXED_TYPE (DzlPatternSpec, dzl_pattern_spec, dzl_pattern_spec_ref, dzl_pattern_spec_unref)
 
@@ -118,8 +119,8 @@ dzl_pattern_spec_get_text (DzlPatternSpec *self)
 static void
 dzl_pattern_spec_free (DzlPatternSpec *self)
 {
-  g_clear_pointer (&self->parts, g_strfreev);
-  g_clear_pointer (&self->needle, g_free);
+  dzl_clear_pointer (&self->parts, g_strfreev);
+  dzl_clear_pointer (&self->needle, g_free);
   g_slice_free (DzlPatternSpec, self);
 }
 

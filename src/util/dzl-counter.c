@@ -36,7 +36,8 @@
 # include <sys/mman.h>
 #endif
 
-#include "dzl-counter.h"
+#include "util/dzl-counter.h"
+#include "util/dzl-macros.h"
 
 G_DEFINE_BOXED_TYPE (DzlCounterArena, dzl_counter_arena, dzl_counter_arena_ref, dzl_counter_arena_unref)
 
@@ -422,7 +423,7 @@ _dzl_counter_arena_destroy (DzlCounterArena *arena)
     g_free (arena->cells);
 #endif
 
-  g_clear_pointer (&arena->counters, g_list_free);
+  dzl_clear_pointer (&arena->counters, g_list_free);
 
   arena->cells = NULL;
 

@@ -22,7 +22,8 @@
 
 #include <glib/gi18n.h>
 
-#include "dzl-directory-model.h"
+#include "files/dzl-directory-model.h"
+#include "util/dzl-macros.h"
 
 #define NEXT_FILES_CHUNK_SIZE 25
 
@@ -316,7 +317,7 @@ dzl_directory_model_finalize (GObject *object)
 
   g_clear_object (&self->cancellable);
   g_clear_object (&self->directory);
-  g_clear_pointer (&self->items, g_sequence_free);
+  dzl_clear_pointer (&self->items, g_sequence_free);
 
   if (self->visible_func_destroy)
     self->visible_func_destroy (self->visible_func_data);

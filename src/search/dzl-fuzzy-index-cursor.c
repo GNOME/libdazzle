@@ -25,6 +25,7 @@
 #include "search/dzl-fuzzy-index-cursor.h"
 #include "search/dzl-fuzzy-index-match.h"
 #include "search/dzl-fuzzy-index-private.h"
+#include "util/dzl-macros.h"
 #include "util/dzl-int-pair.h"
 
 struct _DzlFuzzyIndexCursor
@@ -124,9 +125,9 @@ dzl_fuzzy_index_cursor_finalize (GObject *object)
   DzlFuzzyIndexCursor *self = (DzlFuzzyIndexCursor *)object;
 
   g_clear_object (&self->index);
-  g_clear_pointer (&self->query, g_free);
-  g_clear_pointer (&self->matches, g_array_unref);
-  g_clear_pointer (&self->tables, g_variant_dict_unref);
+  dzl_clear_pointer (&self->query, g_free);
+  dzl_clear_pointer (&self->matches, g_array_unref);
+  dzl_clear_pointer (&self->tables, g_variant_dict_unref);
 
   G_OBJECT_CLASS (dzl_fuzzy_index_cursor_parent_class)->finalize (object);
 }

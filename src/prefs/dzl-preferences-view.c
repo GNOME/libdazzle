@@ -144,7 +144,7 @@ dzl_preferences_view_refilter (DzlPreferencesView *self,
                          dzl_preferences_view_refilter_cb,
                          spec);
 
-  g_clear_pointer (&spec, dzl_pattern_spec_unref);
+  dzl_clear_pointer (&spec, dzl_pattern_spec_unref);
 }
 
 static gint
@@ -221,8 +221,8 @@ dzl_preferences_view_finalize (GObject *object)
   DzlPreferencesView *self = (DzlPreferencesView *)object;
   DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
 
-  g_clear_pointer (&priv->pages, g_sequence_free);
-  g_clear_pointer (&priv->widgets, g_hash_table_unref);
+  dzl_clear_pointer (&priv->pages, g_sequence_free);
+  dzl_clear_pointer (&priv->widgets, g_hash_table_unref);
   g_clear_object (&priv->actions);
 
   G_OBJECT_CLASS (dzl_preferences_view_parent_class)->finalize (object);

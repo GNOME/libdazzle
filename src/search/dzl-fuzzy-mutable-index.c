@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "search/dzl-fuzzy-mutable-index.h"
+#include "util/dzl-macros.h"
 
 /**
  * SECTION:dzl-fuzzy-mutable-index
@@ -522,7 +523,7 @@ cleanup:
   g_free (downcase);
   g_free (lookup.state);
   g_free (lookup.tables);
-  g_clear_pointer (&lookup.matches, g_hash_table_unref);
+  dzl_clear_pointer (&lookup.matches, g_hash_table_unref);
 
   return matches;
 }
@@ -538,7 +539,7 @@ dzl_fuzzy_mutable_index_contains (DzlFuzzyMutableIndex *fuzzy,
 
   ar = dzl_fuzzy_mutable_index_match (fuzzy, key, 1);
   ret = (ar != NULL) && (ar->len > 0);
-  g_clear_pointer (&ar, g_array_unref);
+  dzl_clear_pointer (&ar, g_array_unref);
 
   return ret;
 }
@@ -567,7 +568,7 @@ dzl_fuzzy_mutable_index_remove (DzlFuzzyMutableIndex *fuzzy,
         }
     }
 
-  g_clear_pointer (&ar, g_array_unref);
+  dzl_clear_pointer (&ar, g_array_unref);
 }
 
 gchar *

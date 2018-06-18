@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "files/dzl-directory-reaper.h"
+#include "util/dzl-macros.h"
 
 typedef enum
 {
@@ -60,7 +61,7 @@ clear_pattern (gpointer data)
     {
     case PATTERN_GLOB:
       g_clear_object (&p->glob.directory);
-      g_clear_pointer (&p->glob.glob, g_free);
+      dzl_clear_pointer (&p->glob.glob, g_free);
       break;
 
     case PATTERN_FILE:
@@ -77,7 +78,7 @@ dzl_directory_reaper_finalize (GObject *object)
 {
   DzlDirectoryReaper *self = (DzlDirectoryReaper *)object;
 
-  g_clear_pointer (&self->patterns, g_array_unref);
+  dzl_clear_pointer (&self->patterns, g_array_unref);
 
   G_OBJECT_CLASS (dzl_directory_reaper_parent_class)->finalize (object);
 }

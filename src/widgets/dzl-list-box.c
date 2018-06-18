@@ -34,9 +34,10 @@
  * You must subclass DzlListBoxRow for your rows.
  */
 
-#include "dzl-list-box.h"
-#include "dzl-list-box-private.h"
-#include "dzl-list-box-row.h"
+#include "util/dzl-macros.h"
+#include "widgets/dzl-list-box.h"
+#include "widgets/dzl-list-box-private.h"
+#include "widgets/dzl-list-box-row.h"
 
 #define RECYCLE_MAX_DEFAULT 25
 
@@ -160,7 +161,7 @@ dzl_list_box_constructed (GObject *object)
 failure:
   g_warning ("Invalid DzlListBox instantiated, will not work as expected");
   priv->row_type = G_TYPE_INVALID;
-  g_clear_pointer (&priv->property_name, g_free);
+  dzl_clear_pointer (&priv->property_name, g_free);
 }
 
 static void
@@ -193,7 +194,7 @@ dzl_list_box_finalize (GObject *object)
   DzlListBox *self = (DzlListBox *)object;
   DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
 
-  g_clear_pointer (&priv->property_name, g_free);
+  dzl_clear_pointer (&priv->property_name, g_free);
   priv->row_type = G_TYPE_INVALID;
 
   G_OBJECT_CLASS (dzl_list_box_parent_class)->finalize (object);

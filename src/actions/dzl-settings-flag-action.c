@@ -20,7 +20,8 @@
 
 #include "config.h"
 
-#include "dzl-settings-flag-action.h"
+#include "actions/dzl-settings-flag-action.h"
+#include "util/dzl-macros.h"
 
 struct _DzlSettingsFlagAction
 {
@@ -80,9 +81,9 @@ dzl_settings_flag_action_finalize (GObject *object)
 {
   DzlSettingsFlagAction *self = (DzlSettingsFlagAction *)object;
 
-  g_clear_pointer (&self->schema_id, g_free);
-  g_clear_pointer (&self->schema_key, g_free);
-  g_clear_pointer (&self->flag_nick, g_free);
+  dzl_clear_pointer (&self->schema_id, g_free);
+  dzl_clear_pointer (&self->schema_key, g_free);
+  dzl_clear_pointer (&self->flag_nick, g_free);
 
   G_OBJECT_CLASS (dzl_settings_flag_action_parent_class)->finalize (object);
 }

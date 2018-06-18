@@ -20,7 +20,8 @@
 
 #include "config.h"
 
-#include "dzl-counters-window.h"
+#include "util/dzl-macros.h"
+#include "widgets/dzl-counters-window.h"
 
 typedef struct
 {
@@ -119,7 +120,7 @@ dzl_counters_window_finalize (GObject *object)
   DzlCountersWindow *self = (DzlCountersWindow *)object;
   DzlCountersWindowPrivate *priv = dzl_counters_window_get_instance_private (self);
 
-  g_clear_pointer (&priv->arena, dzl_counter_arena_unref);
+  dzl_clear_pointer (&priv->arena, dzl_counter_arena_unref);
   g_clear_object (&priv->tree_store);
 
   G_OBJECT_CLASS (dzl_counters_window_parent_class)->finalize (object);
@@ -225,7 +226,7 @@ dzl_counters_window_set_arena (DzlCountersWindow *self,
 
   if (arena != priv->arena)
     {
-      g_clear_pointer (&priv->arena, dzl_counter_arena_unref);
+      dzl_clear_pointer (&priv->arena, dzl_counter_arena_unref);
       if (arena != NULL)
         priv->arena = dzl_counter_arena_ref (arena);
       dzl_counters_window_reload (self);
