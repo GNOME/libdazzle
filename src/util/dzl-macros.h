@@ -19,7 +19,7 @@
 #ifndef DZL_MACROS_H
 #define DZL_MACROS_H
 
-#include <glib.h>
+#include <glib-object.h>
 #include <string.h>
 
 #ifdef __linux__
@@ -41,6 +41,16 @@ G_BEGIN_DECLS
 /* These were upstreamed into GLib, just use them */
 #define dzl_clear_weak_pointer(ptr) g_clear_weak_pointer(ptr)
 #define dzl_set_weak_pointer(ptr,obj) g_set_weak_pointer(ptr,obj)
+
+/* A more type-correct form of g_clear_pointer(), to help find bugs. */
+#define dzl_clear_pointer(pptr, free_func)                   \
+  G_STMT_START {                                             \
+    G_STATIC_ASSERT (sizeof (*(pptr)) == sizeof (gpointer)); \
+    typeof(*(pptr)) _dzl_tmp_clear = *(pptr);                \
+    *(pptr) = NULL;                                          \
+    if (_dzl_tmp_clear)                                      \
+      free_func (_dzl_tmp_clear);                            \
+  } G_STMT_END
 
 /* strlen() gets hoisted out automatically at -O0 for everything but MSVC */
 #define DZL_LITERAL_LENGTH(s) (strlen(s))
