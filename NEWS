@@ -1,4 +1,21 @@
 ==============
+Version 3.29.3
+==============
+
+Changes in this release:
+
+ • Build reproducibility work
+ • Version and ABI macros were added to enforce symbol visibility
+ • Various fixes due to increased warnings in GCC
+ • Preferences can now optionally use stackswitcher instead of stacksidebar
+ • Animation uses g_signal_connect_object() to simplify lifecycle tracking
+ • CPU graph model now re-uses FDs and parse buffers
+ • Realtime graphs now try harder to detect when the widget is obscured to
+   reduce overhead in that situation.
+ • GCancellable chaining tries harder to release state struct.
+ • A number of improvements to be more defensive.
+
+==============
 Version 3.29.1
 ==============
 
