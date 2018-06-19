@@ -25,11 +25,16 @@
 #include "util/dzl-cancellable.h"
 #include "util/dzl-macros.h"
 
+#define CHAINED_INFO_MAGIC 0x81734637
+
 typedef struct
 {
-  GWeakRef self;
-  GWeakRef other;
-  gulong   other_handler;
+  guint         magic;
+  volatile gint ref_count;
+  GMutex        mutex;
+  GWeakRef      self;
+  GWeakRef      other;
+  gulong        other_handler;
 } ChainedInfo;
 
 static void
@@ -40,6 +45,10 @@ chained_info_free (gpointer data)
   g_autoptr(GCancellable) other = NULL;
 
   g_assert (info != NULL);
+  g_assert (info->magic == CHAINED_INFO_MAGIC);
+  g_assert (info->ref_count == 0);
+
+  info->magic = 0;
 
   self = g_weak_ref_get (&info->self);
   other = g_weak_ref_get (&info->other);
@@ -52,7 +61,35 @@ chained_info_free (gpointer data)
   g_weak_ref_clear (&info->other);
   g_weak_ref_clear (&info->self);
 
+  g_mutex_clear (&info->mutex);
+
   g_slice_free (ChainedInfo, info);
+}
+
+static void
+chained_info_unref (ChainedInfo *info)
+{
+  g_autoptr(GCancellable) other = NULL;
+
+  g_assert (info != NULL);
+  g_assert (info->ref_count > 0);
+  g_assert (info->magic == CHAINED_INFO_MAGIC);
+
+  if ((other = g_weak_ref_get (&info->other)))
+    {
+      gulong handler_id;
+
+      g_mutex_lock (&info->mutex);
+      handler_id = info->other_handler;
+      info->other_handler = 0;
+      g_mutex_unlock (&info->mutex);
+
+      if (handler_id)
+        g_signal_handler_disconnect (other, handler_id);
+    }
+
+  if (g_atomic_int_dec_and_test (&info->ref_count))
+    chained_info_free (info);
 }
 
 static void
@@ -63,6 +100,8 @@ dzl_cancellable_cancelled_cb (GCancellable *other,
 
   g_assert (G_IS_CANCELLABLE (other));
   g_assert (info != NULL);
+  g_assert (info->ref_count > 0);
+  g_assert (info->magic == CHAINED_INFO_MAGIC);
 
   self = g_weak_ref_get (&info->self);
 
@@ -73,6 +112,19 @@ dzl_cancellable_cancelled_cb (GCancellable *other,
     }
 
   dzl_clear_signal_handler (other, &info->other_handler);
+}
+
+static void
+dzl_cancellable_weak_cb (gpointer  data,
+                         GObject  *where_object_was)
+{
+  ChainedInfo *info = data;
+
+  g_assert (info != NULL);
+  g_assert (info->ref_count > 0);
+  g_assert (info->magic == CHAINED_INFO_MAGIC);
+
+  chained_info_unref (info);
 }
 
 /**
@@ -122,12 +174,17 @@ dzl_cancellable_chain (GCancellable *self,
    */
 
   info = g_slice_new0 (ChainedInfo);
+  info->magic = CHAINED_INFO_MAGIC;
+  info->ref_count = 3;
+  g_mutex_init (&info->mutex);
   g_weak_ref_init (&info->self, self);
   g_weak_ref_init (&info->other, other);
+  g_object_weak_ref (G_OBJECT (self), dzl_cancellable_weak_cb, info);
+  g_object_weak_ref (G_OBJECT (other), dzl_cancellable_weak_cb, info);
   info->other_handler = g_cancellable_connect (other,
                                                G_CALLBACK (dzl_cancellable_cancelled_cb),
                                                info,
-                                               chained_info_free);
+                                               (GDestroyNotify)chained_info_unref);
 
   return self;
 }
