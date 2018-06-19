@@ -1,4 +1,16 @@
 ==============
+Version 3.28.3
+==============
+
+Changes in this release:
+
+ • Animation uses g_signal_connect_object() to simplify lifecycle tracking
+ • CPU graph model now re-uses FDs and parse buffers
+ • Realtime graphs now try harder to detect when the widget is obscured to
+   reduce overhead in that situation.
+ • GCancellable chaining tries harder to release state struct.
+
+==============
 Version 3.28.2
 ==============
 
