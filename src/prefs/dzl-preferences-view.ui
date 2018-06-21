@@ -31,15 +31,19 @@
         </child>
         <child>
           <object class="GtkScrolledWindow" id="scroller">
+            <property name="expand">true</property>
             <property name="hscrollbar-policy">never</property>
+            <property name="propagate-natural-width">true</property>
             <property name="visible">true</property>
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
+                <property name="expand">true</property>
                 <property name="visible">true</property>
                 <child>
                   <object class="GtkStackSwitcher" id="top_stack_switcher">
                     <property name="stack">page_stack</property>
+                    <property name="halign">center</property>
                     <property name="visible">false</property>
                   </object>
                 </child>
