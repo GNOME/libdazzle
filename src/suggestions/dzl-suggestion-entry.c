@@ -42,6 +42,8 @@ typedef struct
   DzlSuggestionPositionFunc  func;
   gpointer                   func_data;
   GDestroyNotify             func_data_destroy;
+
+  gint                       in_key_press;
 } DzlSuggestionEntryPrivate;
 
 enum {
@@ -140,8 +142,10 @@ dzl_suggestion_entry_key_press_event (GtkWidget   *widget,
 {
   DzlSuggestionEntry *self = (DzlSuggestionEntry *)widget;
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+  gboolean ret;
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
+  g_assert (priv->in_key_press >= 0);
 
   /*
    * If Tab was pressed, and there is uncommitted suggested text,
@@ -173,7 +177,11 @@ dzl_suggestion_entry_key_press_event (GtkWidget   *widget,
         }
     }
 
-  return GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->key_press_event (widget, key);
+  priv->in_key_press++;
+  ret = GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->key_press_event (widget, key);
+  priv->in_key_press--;
+
+  return ret;
 }
 
 static void
@@ -218,11 +226,17 @@ dzl_suggestion_entry_changed (GtkEditable *editable)
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
 
   /*
-   * If we aren't focused, just ignore everything. One such example might be
-   * updating an URI in a webbrowser.
+   * If we aren't focused, just ignore everything. Additionally, if the text is
+   * being changed outside of a key-press-event, we want to ignore completion
+   * there too (such as calling set_text() while focused).
+   *
+   * One such example might be updating an URI in a webbrowser.
+   *
+   * We should be okay on the a11y/IM front here too, since that should happen
+   * via synthesized events.
    */
-  if (!gtk_widget_has_focus (GTK_WIDGET (editable)))
-    return;
+  if (!priv->in_key_press || !gtk_widget_has_focus (GTK_WIDGET (editable)))
+    goto update;
 
   g_signal_handler_block (self, priv->changed_handler);
 
@@ -251,6 +265,7 @@ finish:
 
   g_signal_handler_unblock (self, priv->changed_handler);
 
+update:
   dzl_suggestion_entry_update_attrs (self);
 
   DZL_EXIT;
