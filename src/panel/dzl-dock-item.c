@@ -161,6 +161,9 @@ dzl_dock_item_default_init (DzlDockItemInterface *iface)
                   G_STRUCT_OFFSET (DzlDockItemInterface, manager_set),
                   NULL, NULL, NULL,
                   G_TYPE_NONE, 1, DZL_TYPE_DOCK_MANAGER);
+  g_signal_set_va_marshaller (signals [MANAGER_SET],
+                              G_TYPE_FROM_INTERFACE (iface),
+                              g_cclosure_marshal_VOID__OBJECTv);
 }
 
 /**
