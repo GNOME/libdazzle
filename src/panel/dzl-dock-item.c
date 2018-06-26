@@ -34,6 +34,7 @@ G_DEFINE_INTERFACE (DzlDockItem, dzl_dock_item, GTK_TYPE_WIDGET)
 
 enum {
   MANAGER_SET,
+  PRESENTED,
   N_SIGNALS
 };
 
@@ -164,6 +165,17 @@ dzl_dock_item_default_init (DzlDockItemInterface *iface)
   g_signal_set_va_marshaller (signals [MANAGER_SET],
                               G_TYPE_FROM_INTERFACE (iface),
                               g_cclosure_marshal_VOID__OBJECTv);
+
+  signals [PRESENTED] =
+    g_signal_new ("presented",
+                  G_TYPE_FROM_INTERFACE (iface),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlDockItemInterface, presented),
+                  NULL, NULL, NULL,
+                  G_TYPE_NONE, 0);
+  g_signal_set_va_marshaller (signals [PRESENTED],
+                              G_TYPE_FROM_INTERFACE (iface),
+                              g_cclosure_marshal_VOID__VOIDv);
 }
 
 /**
@@ -663,4 +675,27 @@ dzl_dock_item_get_can_minimize (DzlDockItem *self)
     }
 
   return FALSE;
+}
+
+/**
+ * dzl_dock_item_emit_presented:
+ * @self: a #DzlDockItem
+ *
+ * Emits the #DzlDockItem::presented signal.
+ *
+ * Containers should emit this when their descendant has been presented as the
+ * current visible child. This allows dock items to do lazy initialization of
+ * content once the widgetry is visible to the user.
+ *
+ * Currently, this is best effort, as there are a number of situations that
+ * make covering all cases problematic.
+ *
+ * Since: 3.30
+ */
+void
+dzl_dock_item_emit_presented (DzlDockItem *self)
+{
+  g_return_if_fail (DZL_IS_DOCK_ITEM (self));
+
+  g_signal_emit (self, signals [PRESENTED], 0);
 }

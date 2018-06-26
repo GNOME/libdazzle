@@ -49,7 +49,12 @@ dzl_dock_paned_add (GtkContainer *container,
   GTK_CONTAINER_CLASS (dzl_dock_paned_parent_class)->add (container, widget);
 
   if (DZL_IS_DOCK_ITEM (widget))
-    dzl_dock_item_adopt (DZL_DOCK_ITEM (self), DZL_DOCK_ITEM (widget));
+    {
+      dzl_dock_item_adopt (DZL_DOCK_ITEM (self), DZL_DOCK_ITEM (widget));
+
+      /* Always available, so emit presented */
+      dzl_dock_item_emit_presented (DZL_DOCK_ITEM (widget));
+    }
 }
 
 static void

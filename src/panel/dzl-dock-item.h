@@ -57,6 +57,7 @@ struct _DzlDockItemInterface
                                          GtkPositionType *position);
   void            (*release)            (DzlDockItem     *self,
                                          DzlDockItem     *child);
+  void            (*presented)          (DzlDockItem     *self);
 };
 
 DZL_AVAILABLE_IN_ALL
@@ -102,6 +103,8 @@ gboolean        dzl_dock_item_minimize          (DzlDockItem     *self,
 DZL_AVAILABLE_IN_ALL
 void            dzl_dock_item_release           (DzlDockItem     *self,
                                                  DzlDockItem     *child);
+DZL_AVAILABLE_IN_3_30
+void            dzl_dock_item_emit_presented    (DzlDockItem     *self);
 void            _dzl_dock_item_printf           (DzlDockItem     *self);
 
 G_END_DECLS

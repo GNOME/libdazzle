@@ -435,6 +435,9 @@ dzl_dock_bin_add (GtkContainer *container,
   child->widget = g_object_ref_sink (widget);
   gtk_widget_set_parent (widget, GTK_WIDGET (self));
 
+  if (DZL_IS_DOCK_ITEM (widget))
+    dzl_dock_item_emit_presented (DZL_DOCK_ITEM (widget));
+
   dzl_dock_bin_update_focus_chain (self);
 
   gtk_widget_queue_resize (GTK_WIDGET (self));

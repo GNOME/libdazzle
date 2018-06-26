@@ -97,6 +97,24 @@ dzl_dock_stack_grab_focus (GtkWidget *widget)
 }
 
 static void
+dzl_dock_stack_notify_visible_child_cb (DzlDockStack *self,
+                                        GParamSpec   *pspec,
+                                        GtkStack     *stack)
+{
+  GtkWidget *visible_child;
+
+  g_assert (DZL_IS_DOCK_STACK (self));
+  g_assert (GTK_IS_STACK (stack));
+
+  if (gtk_widget_in_destruction (GTK_WIDGET (self)) ||
+      gtk_widget_in_destruction (GTK_WIDGET (stack)))
+    return;
+
+  if ((visible_child = gtk_stack_get_visible_child (stack)) && DZL_IS_DOCK_ITEM (visible_child))
+    dzl_dock_item_emit_presented (DZL_DOCK_ITEM (visible_child));
+}
+
+static void
 dzl_dock_stack_get_property (GObject    *object,
                              guint       prop_id,
                              GValue     *value,
@@ -212,6 +230,11 @@ dzl_dock_stack_init (DzlDockStack *self)
                               "homogeneous", FALSE,
                               "visible", TRUE,
                               NULL);
+  g_signal_connect_object (priv->stack,
+                           "notify::visible-child",
+                           G_CALLBACK (dzl_dock_stack_notify_visible_child_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   priv->tab_strip = g_object_new (DZL_TYPE_TAB_STRIP,
                                   "edge", GTK_POS_TOP,
