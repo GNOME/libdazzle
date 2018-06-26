@@ -399,6 +399,7 @@ gboolean
 dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
                                     GtkWidget               *widget)
 {
+  g_autoptr(GtkWidget) hold = NULL;
   gboolean ret = FALSE;
 
   DZL_ENTRY;
@@ -412,6 +413,14 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
       DZL_RETURN (FALSE);
     }
 
+  if (gtk_widget_in_destruction (widget))
+    {
+      g_warning ("Attempt to activate shortcut while in destruction");
+      DZL_RETURN (FALSE);
+    }
+
+  hold = g_object_ref (widget);
+
   chain->executing = TRUE;
 
   switch (chain->type)
@@ -419,7 +428,7 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
     case DZL_SHORTCUT_CLOSURE_ACTION:
       DZL_TRACE_MSG ("executing closure action %s.%s",
                      chain->action.group, chain->action.name);
-      ret |= dzl_gtk_widget_action (widget,
+      ret |= dzl_gtk_widget_action (hold,
                                     chain->action.group,
                                     chain->action.name,
                                     chain->action.params);
@@ -427,18 +436,18 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
 
     case DZL_SHORTCUT_CLOSURE_CALLBACK:
       DZL_TRACE_MSG ("executing closure callback");
-      chain->callback.callback (widget, chain->callback.user_data);
+      chain->callback.callback (hold, chain->callback.user_data);
       ret = TRUE;
       break;
 
     case DZL_SHORTCUT_CLOSURE_SIGNAL:
       DZL_TRACE_MSG ("executing closure signal");
-      ret |= signal_activate (chain, widget);
+      ret |= signal_activate (chain, hold);
       break;
 
     case DZL_SHORTCUT_CLOSURE_COMMAND:
       DZL_TRACE_MSG ("executing closure command \"%s\"", chain->command.name);
-      ret |= command_activate (chain, widget);
+      ret |= command_activate (chain, hold);
       break;
 
     case DZL_SHORTCUT_CLOSURE_LAST:
@@ -448,7 +457,7 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
     }
 
   if (chain->node.next != NULL)
-    ret |= dzl_shortcut_closure_chain_execute (chain->node.next->data, widget);
+    ret |= dzl_shortcut_closure_chain_execute (chain->node.next->data, hold);
 
   chain->executing = FALSE;
 
