@@ -270,11 +270,7 @@ dzl_dock_manager_finalize (GObject *object)
 
   dzl_clear_pointer (&priv->queued_focus_by_toplevel, g_hash_table_unref);
 
-  if (priv->queued_handler)
-    {
-      g_source_remove (priv->queued_handler);
-      priv->queued_handler = 0;
-    }
+  dzl_clear_source (&priv->queued_handler);
 
   while (priv->docks->len > 0)
     {
@@ -397,4 +393,20 @@ dzl_dock_manager_unpause_grabs (DzlDockManager *self)
   g_return_if_fail (priv->pause_count > 0);
 
   priv->pause_count--;
+}
+
+void
+dzl_dock_manager_release_transient_grab (DzlDockManager *self)
+{
+  DzlDockManagerPrivate *priv = dzl_dock_manager_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_DOCK_MANAGER (self));
+
+  if (priv->grab != NULL)
+    {
+      g_autoptr(DzlDockTransientGrab) grab = g_steal_pointer (&priv->grab);
+      dzl_dock_transient_grab_cancel (grab);
+    }
+
+  dzl_clear_source (&priv->queued_handler);
 }

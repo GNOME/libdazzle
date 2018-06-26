@@ -60,6 +60,8 @@ DZL_AVAILABLE_IN_ALL
 void            dzl_dock_manager_pause_grabs     (DzlDockManager *self);
 DZL_AVAILABLE_IN_ALL
 void            dzl_dock_manager_unpause_grabs   (DzlDockManager *self);
+DZL_AVAILABLE_IN_3_30
+void            dzl_dock_manager_release_transient_grab (DzlDockManager *self);
 
 G_END_DECLS
 

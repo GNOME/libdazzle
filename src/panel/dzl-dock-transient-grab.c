@@ -325,3 +325,14 @@ dzl_dock_transient_grab_steal_common_ancestors (DzlDockTransientGrab *self,
         }
     }
 }
+
+void
+dzl_dock_transient_grab_cancel (DzlDockTransientGrab *self)
+{
+  g_return_if_fail (DZL_IS_DOCK_TRANSIENT_GRAB (self));
+
+  dzl_clear_source (&self->timeout);
+  while (self->items->len)
+    dzl_dock_transient_grab_remove_index (self, self->items->len - 1);
+  g_hash_table_remove_all (self->hidden);
+}

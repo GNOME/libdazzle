@@ -60,6 +60,8 @@ gboolean              dzl_dock_transient_grab_is_descendant          (DzlDockTra
 DZL_AVAILABLE_IN_ALL
 void                  dzl_dock_transient_grab_steal_common_ancestors (DzlDockTransientGrab *self,
                                                                       DzlDockTransientGrab *other);
+DZL_AVAILABLE_IN_3_30
+void                  dzl_dock_transient_grab_cancel                 (DzlDockTransientGrab *self);
 
 G_END_DECLS
 

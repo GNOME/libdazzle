@@ -372,8 +372,18 @@ dzl_dock_item_present (DzlDockItem *self)
     {
       if (DZL_IS_DOCK_ITEM (parent))
         {
+          DzlDockManager *manager;
+
           dzl_dock_item_present_child (DZL_DOCK_ITEM (parent), self);
           dzl_dock_item_present (DZL_DOCK_ITEM (parent));
+
+          /* gtk_widget_grab_focus() results in a transient grab,
+           * we want a real grab (that doesn't release the parent)
+           * when we are focused during this code path.
+           */
+          if ((manager = dzl_dock_item_get_manager (self)))
+            dzl_dock_manager_release_transient_grab (manager);
+
           return;
         }
     }
