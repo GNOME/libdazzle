@@ -163,6 +163,7 @@ void
 dzl_bolding_label_set_weight (DzlBoldingLabel *self,
                               PangoWeight      weight)
 {
+  PangoAttrList *filtered;
   PangoAttrList *attrs;
   PangoAttrList *copy;
   PangoAttribute *attr;
@@ -175,10 +176,11 @@ dzl_bolding_label_set_weight (DzlBoldingLabel *self,
   else
     copy = pango_attr_list_new ();
   attr = pango_attr_weight_new (weight);
-  pango_attr_list_filter (copy, remove_weights, attr);
+  filtered = pango_attr_list_filter (copy, remove_weights, attr);
   pango_attr_list_insert (copy, attr);
   gtk_label_set_attributes (GTK_LABEL (self), copy);
   gtk_widget_queue_draw (GTK_WIDGET (self));
+  pango_attr_list_unref (filtered);
   pango_attr_list_unref (copy);
 }
 
