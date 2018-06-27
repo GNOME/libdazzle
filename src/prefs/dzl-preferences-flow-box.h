@@ -30,8 +30,8 @@ G_BEGIN_DECLS
 DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesFlowBox, dzl_preferences_flow_box, DZL, PREFERENCES_FLOW_BOX, DzlColumnLayout)
 
-DZL_AVAILABLE_IN_ALL
-GtkWidget *dzl_preferences_flow_box_new (void);
+DZL_AVAILABLE_IN_3_30
+DzlPreferencesFlowBox *dzl_preferences_flow_box_new (void);
 
 G_END_DECLS
 
