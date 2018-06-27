@@ -310,7 +310,7 @@ dzl_list_box_init (DzlListBox *self)
   g_queue_init (&priv->trashed_rows);
 }
 
-DzlListBox *
+GtkWidget *
 dzl_list_box_new (GType        row_type,
                   const gchar *property_name)
 {

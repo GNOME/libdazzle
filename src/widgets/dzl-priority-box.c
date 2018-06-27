@@ -267,3 +267,9 @@ dzl_priority_box_init (DzlPriorityBox *self)
 
   priv->children = g_array_new (FALSE, FALSE, sizeof (DzlPriorityBoxChild));
 }
+
+GtkWidget *
+dzl_priority_box_new (void)
+{
+  return g_object_new (DZL_TYPE_PRIORITY_BOX, NULL);
+}

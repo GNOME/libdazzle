@@ -39,7 +39,7 @@ struct _DzlListBoxClass
 };
 
 DZL_AVAILABLE_IN_ALL
-DzlListBox  *dzl_list_box_new               (GType        row_type,
+GtkWidget   *dzl_list_box_new               (GType        row_type,
                                              const gchar *property_name);
 DZL_AVAILABLE_IN_ALL
 GType        dzl_list_box_get_row_type      (DzlListBox  *self);

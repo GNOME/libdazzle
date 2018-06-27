@@ -278,6 +278,12 @@ dzl_empty_state_init (DzlEmptyState *self)
                            G_CONNECT_SWAPPED);
 }
 
+GtkWidget *
+dzl_empty_state_new (void)
+{
+  return g_object_new (DZL_TYPE_EMPTY_STATE, NULL);
+}
+
 const gchar *
 dzl_empty_state_get_icon_name (DzlEmptyState *self)
 {

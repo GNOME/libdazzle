@@ -40,7 +40,7 @@ struct _DzlPriorityBoxClass
   gpointer _reserved4;
 };
 
-DZL_AVAILABLE_IN_ALL
+DZL_AVAILABLE_IN_3_30
 GtkWidget *dzl_priority_box_new (void);
 
 G_END_DECLS

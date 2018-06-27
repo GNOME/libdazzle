@@ -35,7 +35,7 @@ struct _DzlBoxClass
   GtkBoxClass parent_class;
 };
 
-DZL_AVAILABLE_IN_ALL
+DZL_AVAILABLE_IN_3_30
 GtkWidget *dzl_box_new                   (void);
 DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_box_get_nth_child         (DzlBox    *self,

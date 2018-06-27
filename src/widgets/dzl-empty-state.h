@@ -35,26 +35,26 @@ struct _DzlEmptyStateClass
   GtkBinClass parent_class;
 };
 
+DZL_AVAILABLE_IN_3_30
+GtkWidget    *dzl_empty_state_new          (void);
 DZL_AVAILABLE_IN_ALL
-GtkWidget   *dzl_empty_state_new           (void);
+const gchar  *dzl_empty_state_get_icon_name (DzlEmptyState *self);
 DZL_AVAILABLE_IN_ALL
-const gchar *dzl_empty_state_get_icon_name (DzlEmptyState *self);
+void          dzl_empty_state_set_icon_name (DzlEmptyState *self,
+                                             const gchar   *icon_name);
 DZL_AVAILABLE_IN_ALL
-void         dzl_empty_state_set_icon_name (DzlEmptyState *self,
-                                            const gchar   *icon_name);
+void          dzl_empty_state_set_resource  (DzlEmptyState *self,
+                                             const gchar   *resource);
 DZL_AVAILABLE_IN_ALL
-void         dzl_empty_state_set_resource  (DzlEmptyState *self,
-                                            const gchar   *resource);
+const gchar  *dzl_empty_state_get_title     (DzlEmptyState *self);
 DZL_AVAILABLE_IN_ALL
-const gchar *dzl_empty_state_get_title     (DzlEmptyState *self);
+void          dzl_empty_state_set_title     (DzlEmptyState *self,
+                                             const gchar   *title);
 DZL_AVAILABLE_IN_ALL
-void         dzl_empty_state_set_title     (DzlEmptyState *self,
-                                            const gchar   *title);
+const gchar  *dzl_empty_state_get_subtitle  (DzlEmptyState *self);
 DZL_AVAILABLE_IN_ALL
-const gchar *dzl_empty_state_get_subtitle  (DzlEmptyState *self);
-DZL_AVAILABLE_IN_ALL
-void         dzl_empty_state_set_subtitle  (DzlEmptyState *self,
-                                            const gchar   *title);
+void          dzl_empty_state_set_subtitle  (DzlEmptyState *self,
+                                             const gchar   *title);
 
 G_END_DECLS
 

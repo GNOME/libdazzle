@@ -33,7 +33,7 @@ struct _DzlListBoxRowClass
   GtkListBoxRowClass parent_class;
 };
 
-DZL_AVAILABLE_IN_ALL
+DZL_AVAILABLE_IN_3_30
 GtkWidget *dzl_list_box_row_new (void);
 
 G_END_DECLS
