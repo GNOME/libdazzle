@@ -40,14 +40,14 @@ struct _DzlFileChooserEntryClass
   gpointer _reserved4;
 };
 
+DZL_AVAILABLE_IN_3_30
+DzlFileChooserEntry *dzl_file_chooser_entry_new      (const gchar          *title,
+                                                      GtkFileChooserAction  action);
 DZL_AVAILABLE_IN_ALL
-GtkWidget *dzl_file_chooser_entry_new      (const gchar          *title,
-                                            GtkFileChooserAction  action);
+GFile               *dzl_file_chooser_entry_get_file (DzlFileChooserEntry *self);
 DZL_AVAILABLE_IN_ALL
-GFile     *dzl_file_chooser_entry_get_file (DzlFileChooserEntry *self);
-DZL_AVAILABLE_IN_ALL
-void       dzl_file_chooser_entry_set_file (DzlFileChooserEntry *self,
-                                            GFile               *file);
+void                 dzl_file_chooser_entry_set_file (DzlFileChooserEntry *self,
+                                                      GFile               *file);
 
 G_END_DECLS
 
