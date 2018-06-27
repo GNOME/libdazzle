@@ -529,3 +529,8 @@ dzl_shortcut_accel_dialog_get_chord (DzlShortcutAccelDialog *self)
 
   return self->chord;
 }
+
+DzlShortcutAccelDialog *
+dzl_shortcut_accel_dialog_new (void) {
+  return g_object_new(DZL_TYPE_SHORTCUT_ACCEL_DIALOG, NULL);
+}

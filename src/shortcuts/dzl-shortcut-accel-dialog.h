@@ -32,8 +32,8 @@ G_BEGIN_DECLS
 DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlShortcutAccelDialog, dzl_shortcut_accel_dialog, DZL, SHORTCUT_ACCEL_DIALOG, GtkDialog)
 
-DZL_AVAILABLE_IN_ALL
-GtkWidget              *dzl_shortcut_accel_dialog_new                (void);
+DZL_AVAILABLE_IN_3_30
+DzlShortcutAccelDialog *dzl_shortcut_accel_dialog_new                (void);
 DZL_AVAILABLE_IN_ALL
 gchar                  *dzl_shortcut_accel_dialog_get_accelerator    (DzlShortcutAccelDialog *self);
 DZL_AVAILABLE_IN_ALL
