@@ -147,3 +147,9 @@ dzl_entry_box_init (DzlEntryBox *self)
   gtk_container_set_reallocate_redraws (GTK_CONTAINER (self), TRUE);
   G_GNUC_END_IGNORE_DEPRECATIONS;
 }
+
+DzlEntryBox *
+dzl_entry_box_new (void)
+{
+  return g_object_new (DZL_TYPE_ENTRY_BOX, NULL);
+}

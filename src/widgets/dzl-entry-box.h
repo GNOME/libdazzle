@@ -30,8 +30,8 @@ G_BEGIN_DECLS
 DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlEntryBox, dzl_entry_box, DZL, ENTRY_BOX, GtkBox)
 
-DZL_AVAILABLE_IN_ALL
-GtkWidget *dzl_entry_box_new (void);
+DZL_AVAILABLE_IN_3_30
+DzlEntryBox *dzl_entry_box_new (void);
 
 G_END_DECLS
 
