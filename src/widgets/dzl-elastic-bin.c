@@ -278,3 +278,9 @@ dzl_elastic_bin_init (DzlElasticBin *self)
                            self,
                            G_CONNECT_SWAPPED);
 }
+
+DzlElasticBin *
+dzl_elastic_bin_new (void)
+{
+  return g_object_new (DZL_TYPE_ELASTIC_BIN, NULL);
+}

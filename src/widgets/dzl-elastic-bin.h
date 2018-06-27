@@ -40,8 +40,8 @@ struct _DzlElasticBinClass
   gpointer _reserved4;
 };
 
-DZL_AVAILABLE_IN_ALL
-GtkWidget *dzl_elastic_bin_new (void);
+DZL_AVAILABLE_IN_3_30
+DzlElasticBin *dzl_elastic_bin_new (void);
 
 G_END_DECLS
 
