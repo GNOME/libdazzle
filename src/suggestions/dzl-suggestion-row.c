@@ -220,3 +220,9 @@ _dzl_suggestion_row_set_ellipsize (DzlSuggestionRow   *self,
   gtk_label_set_ellipsize (priv->title, title);
   gtk_label_set_ellipsize (priv->subtitle, subtitle);
 }
+
+DzlSuggestionRow *
+dzl_suggestion_row_new (void)
+{
+  return g_object_new (DZL_SUGGESTION_ROW, NULL);
+}
