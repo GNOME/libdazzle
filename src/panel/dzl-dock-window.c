@@ -108,7 +108,7 @@ dzl_dock_window_init (DzlDockWindow *self)
 GtkWidget *
 dzl_dock_window_new (void)
 {
-  return g_object_new (DZL_TYPE_DOCK_WINDOW, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_DOCK_WINDOW, NULL));
 }
 
 static void

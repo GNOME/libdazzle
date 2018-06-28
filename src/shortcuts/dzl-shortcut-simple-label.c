@@ -195,7 +195,7 @@ dzl_shortcut_simple_label_init (DzlShortcutSimpleLabel *self)
 GtkWidget *
 dzl_shortcut_simple_label_new (void)
 {
-  return g_object_new (DZL_TYPE_SHORTCUT_SIMPLE_LABEL, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_SHORTCUT_SIMPLE_LABEL, NULL));
 }
 
 const gchar *

@@ -156,8 +156,8 @@ dzl_box_init (DzlBox *self)
   priv->max_width_request = -1;
 }
 
-DzlBox *
+GtkWidget *
 dzl_box_new (void)
 {
-  return g_object_new (DZL_TYPE_BOX, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_BOX, NULL));
 }

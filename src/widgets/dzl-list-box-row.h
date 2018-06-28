@@ -34,7 +34,7 @@ struct _DzlListBoxRowClass
 };
 
 DZL_AVAILABLE_IN_3_30
-DzlListBoxRow *dzl_list_box_row_new (void);
+GtkWidget *dzl_list_box_row_new (void);
 
 G_END_DECLS
 

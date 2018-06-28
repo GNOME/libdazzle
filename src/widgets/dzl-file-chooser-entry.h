@@ -41,7 +41,7 @@ struct _DzlFileChooserEntryClass
 };
 
 DZL_AVAILABLE_IN_3_30
-DzlFileChooserEntry *dzl_file_chooser_entry_new      (const gchar          *title,
+GtkWidget           *dzl_file_chooser_entry_new      (const gchar          *title,
                                                       GtkFileChooserAction  action);
 DZL_AVAILABLE_IN_ALL
 GFile               *dzl_file_chooser_entry_get_file (DzlFileChooserEntry *self);

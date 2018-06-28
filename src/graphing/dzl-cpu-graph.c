@@ -57,7 +57,7 @@ static const gchar *colors[] = {
 GtkWidget *
 dzl_cpu_graph_new (void)
 {
-  return g_object_new (DZL_TYPE_CPU_GRAPH, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_CPU_GRAPH, NULL));
 }
 
 static void

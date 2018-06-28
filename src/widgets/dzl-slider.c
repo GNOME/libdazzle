@@ -865,7 +865,7 @@ dzl_slider_position_get_type (void)
 GtkWidget *
 dzl_slider_new (void)
 {
-  return g_object_new (DZL_TYPE_SLIDER, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_SLIDER, NULL));
 }
 
 DzlSliderPosition

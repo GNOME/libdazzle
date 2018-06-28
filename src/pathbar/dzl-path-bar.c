@@ -56,7 +56,7 @@ static void dzl_path_bar_button_clicked (DzlPathBar     *self,
 GtkWidget *
 dzl_path_bar_new (void)
 {
-  return g_object_new (DZL_TYPE_PATH_BAR, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_PATH_BAR, NULL));
 }
 
 static void

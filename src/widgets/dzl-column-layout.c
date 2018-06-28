@@ -685,7 +685,7 @@ dzl_column_layout_init (DzlColumnLayout *self)
 GtkWidget *
 dzl_column_layout_new (void)
 {
-  return g_object_new (DZL_TYPE_COLUMN_LAYOUT, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_COLUMN_LAYOUT, NULL));
 }
 
 guint

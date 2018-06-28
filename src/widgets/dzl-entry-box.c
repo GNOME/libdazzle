@@ -148,8 +148,8 @@ dzl_entry_box_init (DzlEntryBox *self)
   G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
-DzlEntryBox *
+GtkWidget *
 dzl_entry_box_new (void)
 {
-  return g_object_new (DZL_TYPE_ENTRY_BOX, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_ENTRY_BOX, NULL));
 }

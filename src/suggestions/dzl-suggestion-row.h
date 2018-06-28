@@ -42,7 +42,7 @@ struct _DzlSuggestionRowClass
 };
 
 DZL_AVAILABLE_IN_ALL
-DzlSuggestionRow *dzl_suggestion_row_new            (void);
+GtkWidget        *dzl_suggestion_row_new            (void);
 DZL_AVAILABLE_IN_ALL
 DzlSuggestion    *dzl_suggestion_row_get_suggestion (DzlSuggestionRow *self);
 DZL_AVAILABLE_IN_ALL

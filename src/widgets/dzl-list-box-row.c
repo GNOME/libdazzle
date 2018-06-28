@@ -61,8 +61,8 @@ dzl_list_box_row_init (DzlListBoxRow *self)
 {
 }
 
-DzlListBoxRow *
+GtkWidget *
 dzl_list_box_row_new (void)
 {
-  return g_object_new (DZL_TYPE_LIST_BOX_ROW, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_LIST_BOX_ROW, NULL));
 }

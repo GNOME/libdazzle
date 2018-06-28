@@ -517,7 +517,7 @@ dzl_stack_list_init (DzlStackList *self)
 GtkWidget *
 dzl_stack_list_new (void)
 {
-  return g_object_new (DZL_TYPE_STACK_LIST, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_STACK_LIST, NULL));
 }
 
 void

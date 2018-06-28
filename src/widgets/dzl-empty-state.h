@@ -36,7 +36,7 @@ struct _DzlEmptyStateClass
 };
 
 DZL_AVAILABLE_IN_3_30
-DzlEmptyState *dzl_empty_state_new          (void);
+GtkWidget    *dzl_empty_state_new          (void);
 DZL_AVAILABLE_IN_ALL
 const gchar  *dzl_empty_state_get_icon_name (DzlEmptyState *self);
 DZL_AVAILABLE_IN_ALL

@@ -195,7 +195,7 @@ dzl_counters_window_reload (DzlCountersWindow *self)
 GtkWidget *
 dzl_counters_window_new (void)
 {
-  return g_object_new (DZL_TYPE_COUNTERS_WINDOW, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_COUNTERS_WINDOW, NULL));
 }
 
 /**

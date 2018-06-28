@@ -56,7 +56,7 @@ static GParamSpec *properties [LAST_PROP];
 GtkWidget *
 dzl_centering_bin_new (void)
 {
-  return g_object_new (DZL_TYPE_CENTERING_BIN, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_CENTERING_BIN, NULL));
 }
 
 static void

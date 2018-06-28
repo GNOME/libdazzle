@@ -79,7 +79,7 @@ dzl_dock_paned_init (DzlDockPaned *self)
 GtkWidget *
 dzl_dock_paned_new (void)
 {
-  return g_object_new (DZL_TYPE_DOCK_PANED, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_DOCK_PANED, NULL));
 }
 
 static void

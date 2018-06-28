@@ -1933,7 +1933,7 @@ dzl_dock_bin_init (DzlDockBin *self)
 GtkWidget *
 dzl_dock_bin_new (void)
 {
-  return g_object_new (DZL_TYPE_DOCK_BIN, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_DOCK_BIN, NULL));
 }
 
 /**

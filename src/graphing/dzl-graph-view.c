@@ -48,7 +48,7 @@ static GParamSpec *properties [LAST_PROP];
 GtkWidget *
 dzl_graph_view_new (void)
 {
-  return g_object_new (DZL_TYPE_GRAPH_VIEW, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_GRAPH_VIEW, NULL));
 }
 
 static void

@@ -310,17 +310,17 @@ dzl_list_box_init (DzlListBox *self)
   g_queue_init (&priv->trashed_rows);
 }
 
-DzlListBox *
+GtkWidget *
 dzl_list_box_new (GType        row_type,
                   const gchar *property_name)
 {
   g_return_val_if_fail (g_type_is_a (row_type, GTK_TYPE_LIST_BOX_ROW), NULL);
   g_return_val_if_fail (property_name != NULL, NULL);
 
-  return g_object_new (DZL_TYPE_LIST_BOX,
-                       "property-name", property_name,
-                       "row-type", row_type,
-                       NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_LIST_BOX,
+                                   "property-name", property_name,
+                                   "row-type", row_type,
+                                   NULL));
 }
 
 /**

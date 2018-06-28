@@ -41,7 +41,7 @@ struct _DzlElasticBinClass
 };
 
 DZL_AVAILABLE_IN_3_30
-DzlElasticBin *dzl_elastic_bin_new (void);
+GtkWidget *dzl_elastic_bin_new (void);
 
 G_END_DECLS
 

@@ -320,8 +320,8 @@ GtkWidget *
 dzl_menu_button_section_new (GMenuModel  *model,
                              const gchar *label)
 {
-  return g_object_new (DZL_TYPE_MENU_BUTTON_SECTION,
-                       "model", model,
-                       "label", label,
-                       NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_MENU_BUTTON_SECTION,
+                                   "model", model,
+                                   "label", label,
+                                   NULL));
 }

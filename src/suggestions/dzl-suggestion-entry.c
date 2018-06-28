@@ -523,7 +523,7 @@ dzl_suggestion_entry_init (DzlSuggestionEntry *self)
 GtkWidget *
 dzl_suggestion_entry_new (void)
 {
-  return g_object_new (DZL_TYPE_SUGGESTION_ENTRY, NULL);
+  return GTK_WIDGET (g_object_new (DZL_TYPE_SUGGESTION_ENTRY, NULL));
 }
 
 static GObject *
