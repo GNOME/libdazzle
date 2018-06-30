@@ -262,7 +262,7 @@ dzl_dock_stack_init (DzlDockStack *self)
 GtkWidget *
 dzl_dock_stack_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_DOCK_STACK, NULL));
+  return g_object_new (DZL_TYPE_DOCK_STACK, NULL);
 }
 
 GtkPositionType

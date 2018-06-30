@@ -79,7 +79,7 @@ static GParamSpec *properties [N_PROPS];
 GtkWidget *
 dzl_dock_revealer_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_DOCK_REVEALER, NULL));
+  return g_object_new (DZL_TYPE_DOCK_REVEALER, NULL);
 }
 
 guint

@@ -178,5 +178,5 @@ dzl_bin_init (DzlBin *self)
 GtkWidget *
 dzl_bin_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_BIN, NULL));
+  return g_object_new (DZL_TYPE_BIN, NULL);
 }

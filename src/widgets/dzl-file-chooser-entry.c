@@ -567,8 +567,8 @@ GtkWidget *
 dzl_file_chooser_entry_new (const gchar          *title,
                             GtkFileChooserAction  action)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_FILE_CHOOSER_ENTRY,
-                                   "title", title,
-                                   "action", action,
-                                   NULL));
+  return g_object_new (DZL_TYPE_FILE_CHOOSER_ENTRY,
+                       "title", title,
+                       "action", action,
+                       NULL);
 }

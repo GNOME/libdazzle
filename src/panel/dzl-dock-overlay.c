@@ -983,7 +983,7 @@ dzl_dock_overlay_init_dock_iface (DzlDockInterface *iface)
 GtkWidget *
 dzl_dock_overlay_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_DOCK_OVERLAY, NULL));
+  return g_object_new (DZL_TYPE_DOCK_OVERLAY, NULL);
 }
 
 static void

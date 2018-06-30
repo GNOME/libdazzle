@@ -196,5 +196,5 @@ dzl_progress_button_class_init (DzlProgressButtonClass *klass)
 GtkWidget *
 dzl_progress_button_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_PROGRESS_BUTTON, NULL));
+  return g_object_new (DZL_TYPE_PROGRESS_BUTTON, NULL);
 }

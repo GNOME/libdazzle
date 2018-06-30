@@ -1026,7 +1026,7 @@ dzl_preferences_iface_init (DzlPreferencesInterface *iface)
 GtkWidget *
 dzl_preferences_view_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_PREFERENCES_VIEW, NULL));
+  return g_object_new (DZL_TYPE_PREFERENCES_VIEW, NULL);
 }
 
 gboolean

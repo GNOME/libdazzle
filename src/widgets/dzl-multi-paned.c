@@ -2154,7 +2154,7 @@ dzl_multi_paned_init (DzlMultiPaned *self)
 GtkWidget *
 dzl_multi_paned_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_MULTI_PANED, NULL));
+  return g_object_new (DZL_TYPE_MULTI_PANED, NULL);
 }
 
 guint

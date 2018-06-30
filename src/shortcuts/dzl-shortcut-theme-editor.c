@@ -441,7 +441,7 @@ dzl_shortcut_theme_editor_init (DzlShortcutThemeEditor *self)
 GtkWidget *
 dzl_shortcut_theme_editor_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_SHORTCUT_THEME_EDITOR, NULL));
+  return g_object_new (DZL_TYPE_SHORTCUT_THEME_EDITOR, NULL);
 }
 
 /**

@@ -299,7 +299,9 @@ dzl_simple_label_init (DzlSimpleLabel *self)
 GtkWidget *
 dzl_simple_label_new (const gchar *label)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_SIMPLE_LABEL, NULL));
+  return g_object_new (DZL_TYPE_SIMPLE_LABEL, 
+                       "label", label,
+                       NULL);
 }
 
 const gchar *

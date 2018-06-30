@@ -41,5 +41,5 @@ dzl_preferences_flow_box_init (DzlPreferencesFlowBox *self)
 
 GtkWidget *
 dzl_preferences_flow_box_new (void) {
-  return GTK_WIDGET (g_object_new(DZL_TYPE_PREFERENCES_FLOW_BOX, NULL));
+  return g_object_new(DZL_TYPE_PREFERENCES_FLOW_BOX, NULL);
 }

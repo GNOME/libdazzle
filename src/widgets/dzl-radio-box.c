@@ -352,7 +352,7 @@ dzl_radio_box_get_active_id (DzlRadioBox *self)
 GtkWidget *
 dzl_radio_box_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_RADIO_BOX, NULL));
+  return g_object_new (DZL_TYPE_RADIO_BOX, NULL);
 }
 
 typedef struct

@@ -782,7 +782,7 @@ dzl_three_grid_init (DzlThreeGrid *self)
 GtkWidget *
 dzl_three_grid_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_THREE_GRID, NULL));
+  return g_object_new (DZL_TYPE_THREE_GRID, NULL);
 }
 
 GType

@@ -243,7 +243,7 @@ dzl_dock_widget_init (DzlDockWidget *self)
 GtkWidget *
 dzl_dock_widget_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_DOCK_WIDGET, NULL));
+  return g_object_new (DZL_TYPE_DOCK_WIDGET, NULL);
 }
 
 void

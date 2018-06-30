@@ -413,5 +413,5 @@ dzl_simple_popover_init (DzlSimplePopover *self)
 GtkWidget *
 dzl_simple_popover_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_SIMPLE_POPOVER, NULL));
+  return g_object_new (DZL_TYPE_SIMPLE_POPOVER, NULL);
 }

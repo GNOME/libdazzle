@@ -408,7 +408,7 @@ dzl_search_bar_init (DzlSearchBar *self)
 GtkWidget *
 dzl_search_bar_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_SEARCH_BAR, NULL));
+  return g_object_new (DZL_TYPE_SEARCH_BAR, NULL);
 }
 
 gboolean

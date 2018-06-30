@@ -516,7 +516,7 @@ dzl_tab_strip_stack_remove (DzlTabStrip *self,
 GtkWidget *
 dzl_tab_strip_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_TAB_STRIP, NULL));
+  return g_object_new (DZL_TYPE_TAB_STRIP, NULL);
 }
 
 /**

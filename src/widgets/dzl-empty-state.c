@@ -280,7 +280,7 @@ dzl_empty_state_init (DzlEmptyState *self)
 
 GtkWidget *
 dzl_empty_state_new (void) {
-  return GTK_WIDGET (g_object_new(DZL_TYPE_EMPTY_STATE, NULL));
+  return g_object_new(DZL_TYPE_EMPTY_STATE, NULL);
 }
 
 const gchar *

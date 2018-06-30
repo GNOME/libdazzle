@@ -151,5 +151,5 @@ dzl_entry_box_init (DzlEntryBox *self)
 GtkWidget *
 dzl_entry_box_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_ENTRY_BOX, NULL));
+  return g_object_new (DZL_TYPE_ENTRY_BOX, NULL);
 }

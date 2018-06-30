@@ -684,7 +684,7 @@ dzl_suggestion_popover_init (DzlSuggestionPopover *self)
 GtkWidget *
 dzl_suggestion_popover_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_SUGGESTION_POPOVER, NULL));
+  return g_object_new (DZL_TYPE_SUGGESTION_POPOVER, NULL);
 }
 
 void

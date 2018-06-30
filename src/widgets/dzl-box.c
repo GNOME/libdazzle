@@ -159,5 +159,5 @@ dzl_box_init (DzlBox *self)
 GtkWidget *
 dzl_box_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_BOX, NULL));
+  return g_object_new (DZL_TYPE_BOX, NULL);
 }

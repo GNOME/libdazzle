@@ -282,5 +282,5 @@ dzl_elastic_bin_init (DzlElasticBin *self)
 GtkWidget *
 dzl_elastic_bin_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_ELASTIC_BIN, NULL));
+  return g_object_new (DZL_TYPE_ELASTIC_BIN, NULL);
 }

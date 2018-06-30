@@ -224,5 +224,5 @@ _dzl_suggestion_row_set_ellipsize (DzlSuggestionRow   *self,
 GtkWidget *
 dzl_suggestion_row_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_SUGGESTION_ROW, NULL));
+  return g_object_new (DZL_TYPE_SUGGESTION_ROW, NULL);
 }

@@ -54,7 +54,7 @@ static void dzl_progress_menu_button_begin_theatrics (DzlProgressMenuButton *sel
 GtkWidget *
 dzl_progress_menu_button_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_PROGRESS_MENU_BUTTON, NULL));
+  return g_object_new (DZL_TYPE_PROGRESS_MENU_BUTTON, NULL);
 }
 
 gdouble

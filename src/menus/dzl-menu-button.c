@@ -422,10 +422,10 @@ dzl_menu_button_new_with_model (const gchar *icon_name,
 {
   g_return_val_if_fail (!model || G_IS_MENU_MODEL (model), NULL);
 
-  return GTK_WIDGET (g_object_new (DZL_TYPE_MENU_BUTTON,
-                                   "icon-name", icon_name,
-                                   "model", model,
-                                   NULL));
+  return g_object_new (DZL_TYPE_MENU_BUTTON,
+                       "icon-name", icon_name,
+                       "model", model,
+                       NULL);
 }
 
 gboolean

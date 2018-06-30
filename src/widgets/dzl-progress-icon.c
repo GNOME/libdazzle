@@ -169,7 +169,7 @@ dzl_progress_icon_init (DzlProgressIcon *icon)
 GtkWidget *
 dzl_progress_icon_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_PROGRESS_ICON, NULL));
+  return g_object_new (DZL_TYPE_PROGRESS_ICON, NULL);
 }
 
 gdouble

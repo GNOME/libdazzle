@@ -533,5 +533,5 @@ dzl_shortcut_accel_dialog_get_chord (DzlShortcutAccelDialog *self)
 GtkWidget *
 dzl_shortcut_accel_dialog_new (void)
 {
-  return GTK_WIDGET (g_object_new (DZL_TYPE_SHORTCUT_ACCEL_DIALOG, NULL));
+  return g_object_new (DZL_TYPE_SHORTCUT_ACCEL_DIALOG, NULL);
 }
