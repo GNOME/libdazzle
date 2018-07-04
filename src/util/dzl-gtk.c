@@ -410,7 +410,7 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
                                   const gchar *mux_key)
 {
   const gchar * const *old_prefixes = NULL;
-  g_autofree const gchar **prefixes = NULL;
+  g_auto(GStrv) prefixes = NULL;
 
   g_return_if_fail (GTK_IS_WIDGET (widget));
   g_return_if_fail (!from_widget || GTK_IS_WIDGET (from_widget));
@@ -444,10 +444,12 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
 
   if (from_widget != NULL)
     {
-      prefixes = gtk_widget_list_action_prefixes (from_widget);
+      g_autofree const gchar **tmp = gtk_widget_list_action_prefixes (from_widget);
 
-      if (prefixes != NULL)
+      if (tmp != NULL)
         {
+          prefixes = g_strdupv ((gchar **)tmp);
+
           for (guint i = 0; prefixes [i]; i++)
             {
               GActionGroup *group = gtk_widget_get_action_group (from_widget, prefixes [i]);
@@ -458,14 +460,15 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
               if G_UNLIKELY (group == NULL)
                 continue;
 
-              gtk_widget_insert_action_group (widget, prefixes [i], group);
+              gtk_widget_insert_action_group (widget, prefixes[i], group);
             }
         }
     }
 
   /* Store the set of muxed prefixes so that we can unmux them later. */
-  g_object_set_data_full (G_OBJECT (widget), mux_key,
-                          g_strdupv ((gchar **)prefixes),
+  g_object_set_data_full (G_OBJECT (widget),
+                          mux_key,
+                          g_steal_pointer (&prefixes),
                           (GDestroyNotify) g_strfreev);
 }
 
