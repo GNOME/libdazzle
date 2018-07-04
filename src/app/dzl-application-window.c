@@ -200,7 +200,7 @@ dzl_application_window_complete_fullscreen (DzlApplicationWindow *self)
    * it before performing further (destructive) work.
    */
 
-  g_object_ref (priv->titlebar_revealer);
+  g_object_ref (titlebar);
 
   if (priv->fullscreen)
     {
@@ -229,7 +229,7 @@ dzl_application_window_complete_fullscreen (DzlApplicationWindow *self)
         }
     }
 
-  g_object_unref (priv->titlebar_revealer);
+  g_object_unref (titlebar);
 
   return G_SOURCE_REMOVE;
 }
