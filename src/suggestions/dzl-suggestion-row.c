@@ -61,14 +61,14 @@ static void
 dzl_suggestion_row_connect (DzlSuggestionRow *self)
 {
   DzlSuggestionRowPrivate *priv = dzl_suggestion_row_get_instance_private (self);
-  const gchar *icon_name;
+  g_autoptr(GIcon) icon = NULL;
   const gchar *subtitle;
 
   g_return_if_fail (DZL_IS_SUGGESTION_ROW (self));
   g_return_if_fail (priv->suggestion != NULL);
 
-  icon_name = dzl_suggestion_get_icon_name (priv->suggestion);
-  g_object_set (priv->image, "icon-name", icon_name, NULL);
+  icon = dzl_suggestion_get_icon (priv->suggestion);
+  gtk_image_set_from_gicon (priv->image, icon, GTK_ICON_SIZE_MENU);
 
   gtk_label_set_label (priv->title, dzl_suggestion_get_title (priv->suggestion));
 

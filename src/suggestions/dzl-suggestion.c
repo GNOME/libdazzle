@@ -31,11 +31,14 @@ typedef struct
 
   /* interned string */
   const gchar *icon_name;
+
+  GIcon *icon;
 } DzlSuggestionPrivate;
 
 enum {
   PROP_0,
   PROP_ICON_NAME,
+  PROP_ICON,
   PROP_ID,
   PROP_SUBTITLE,
   PROP_TITLE,
@@ -52,6 +55,19 @@ G_DEFINE_TYPE_WITH_PRIVATE (DzlSuggestion, dzl_suggestion, G_TYPE_OBJECT)
 
 static GParamSpec *properties [N_PROPS];
 static guint signals [N_SIGNALS];
+
+static GIcon *
+dzl_suggestion_real_get_icon (DzlSuggestion *self)
+{
+  DzlSuggestionPrivate *priv = dzl_suggestion_get_instance_private (self);
+
+  g_assert (DZL_IS_SUGGESTION (self));
+
+  if (priv->icon_name != NULL)
+    return g_icon_new_for_string (priv->icon_name, NULL);
+
+  return NULL;
+}
 
 static void
 dzl_suggestion_finalize (GObject *object)
@@ -84,6 +100,10 @@ dzl_suggestion_get_property (GObject    *object,
 
     case PROP_ICON_NAME:
       g_value_set_static_string (value, dzl_suggestion_get_icon_name (self));
+      break;
+
+    case PROP_ICON:
+      g_value_take_object (value, dzl_suggestion_get_icon (self));
       break;
 
     case PROP_TITLE:
@@ -139,12 +159,21 @@ dzl_suggestion_class_init (DzlSuggestionClass *klass)
   object_class->get_property = dzl_suggestion_get_property;
   object_class->set_property = dzl_suggestion_set_property;
 
+  klass->get_icon = dzl_suggestion_real_get_icon;
+
   properties [PROP_ID] =
     g_param_spec_string ("id",
                          "Id",
                          "The suggestion identifier",
                          NULL,
                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_ICON] =
+    g_param_spec_object ("icon",
+                         "Icon",
+                         "The GIcon for the suggestion",
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_ICON_NAME] =
     g_param_spec_string ("icon-name",
@@ -355,4 +384,22 @@ dzl_suggestion_replace_typed_text (DzlSuggestion *self,
   g_signal_emit (self, signals [REPLACE_TYPED_TEXT], 0, typed_text, &ret);
 
   return ret;
+}
+
+/**
+ * dzl_suggestion_get_icon:
+ * @self: a #DzlSuggestion
+ *
+ * Gets the icon for the suggestion, if any.
+ *
+ * Returns: (transfer full) (nullable): a #GIcon or %NULL
+ *
+ * Since: 3.30
+ */
+GIcon *
+dzl_suggestion_get_icon (DzlSuggestion *self)
+{
+  g_return_val_if_fail (DZL_IS_SUGGESTION (self), NULL);
+
+  return DZL_SUGGESTION_GET_CLASS (self)->get_icon (self);
 }

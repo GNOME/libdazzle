@@ -20,7 +20,7 @@
 #ifndef DZL_SUGGESTION_H
 #define DZL_SUGGESTION_H
 
-#include <glib-object.h>
+#include <gio/gio.h>
 
 #include "dzl-version-macros.h"
 
@@ -39,8 +39,8 @@ struct _DzlSuggestionClass
                                 const gchar   *typed_text);
   gchar *(*replace_typed_text) (DzlSuggestion *self,
                                 const gchar   *typed_text);
+  GIcon *(*get_icon)           (DzlSuggestion *self);
 
-  gpointer _reserved1;
   gpointer _reserved2;
   gpointer _reserved3;
   gpointer _reserved4;
@@ -74,6 +74,8 @@ gchar         *dzl_suggestion_suggest_suffix     (DzlSuggestion *self,
 DZL_AVAILABLE_IN_ALL
 gchar         *dzl_suggestion_replace_typed_text (DzlSuggestion *self,
                                                   const gchar   *typed_text);
+DZL_AVAILABLE_IN_3_30
+GIcon         *dzl_suggestion_get_icon           (DzlSuggestion *self);
 
 G_END_DECLS
 
