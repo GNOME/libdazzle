@@ -20,7 +20,7 @@
 #ifndef DZL_SUGGESTION_H
 #define DZL_SUGGESTION_H
 
-#include <gio/gio.h>
+#include <gtk/gtk.h>
 
 #include "dzl-version-macros.h"
 
@@ -35,47 +35,51 @@ struct _DzlSuggestionClass
 {
   GObjectClass parent_class;
 
-  gchar *(*suggest_suffix)     (DzlSuggestion *self,
-                                const gchar   *typed_text);
-  gchar *(*replace_typed_text) (DzlSuggestion *self,
-                                const gchar   *typed_text);
-  GIcon *(*get_icon)           (DzlSuggestion *self);
+  gchar           *(*suggest_suffix)     (DzlSuggestion *self,
+                                          const gchar   *typed_text);
+  gchar           *(*replace_typed_text) (DzlSuggestion *self,
+                                          const gchar   *typed_text);
+  GIcon           *(*get_icon)           (DzlSuggestion *self);
+  cairo_surface_t *(*get_icon_surface)   (DzlSuggestion *self,
+                                          GtkWidget     *widget);
 
-  gpointer _reserved2;
   gpointer _reserved3;
   gpointer _reserved4;
 };
 
 DZL_AVAILABLE_IN_ALL
-DzlSuggestion *dzl_suggestion_new                (void);
+DzlSuggestion   *dzl_suggestion_new                (void);
 DZL_AVAILABLE_IN_ALL
-const gchar   *dzl_suggestion_get_id             (DzlSuggestion *self);
+const gchar     *dzl_suggestion_get_id             (DzlSuggestion *self);
 DZL_AVAILABLE_IN_ALL
-void           dzl_suggestion_set_id             (DzlSuggestion *self,
-                                                  const gchar   *id);
+void             dzl_suggestion_set_id             (DzlSuggestion *self,
+                                                    const gchar   *id);
 DZL_AVAILABLE_IN_ALL
-const gchar   *dzl_suggestion_get_icon_name      (DzlSuggestion *self);
+const gchar     *dzl_suggestion_get_icon_name      (DzlSuggestion *self);
 DZL_AVAILABLE_IN_ALL
-void           dzl_suggestion_set_icon_name      (DzlSuggestion *self,
-                                                  const gchar   *icon_name);
+void             dzl_suggestion_set_icon_name      (DzlSuggestion *self,
+                                                    const gchar   *icon_name);
 DZL_AVAILABLE_IN_ALL
-const gchar   *dzl_suggestion_get_title          (DzlSuggestion *self);
+const gchar     *dzl_suggestion_get_title          (DzlSuggestion *self);
 DZL_AVAILABLE_IN_ALL
-void           dzl_suggestion_set_title          (DzlSuggestion *self,
-                                                  const gchar   *title);
+void             dzl_suggestion_set_title          (DzlSuggestion *self,
+                                                    const gchar   *title);
 DZL_AVAILABLE_IN_ALL
-const gchar   *dzl_suggestion_get_subtitle       (DzlSuggestion *self);
+const gchar     *dzl_suggestion_get_subtitle       (DzlSuggestion *self);
 DZL_AVAILABLE_IN_ALL
-void           dzl_suggestion_set_subtitle       (DzlSuggestion *self,
-                                                  const gchar   *subtitle);
+void             dzl_suggestion_set_subtitle       (DzlSuggestion *self,
+                                                    const gchar   *subtitle);
 DZL_AVAILABLE_IN_ALL
-gchar         *dzl_suggestion_suggest_suffix     (DzlSuggestion *self,
-                                                  const gchar   *typed_text);
+gchar           *dzl_suggestion_suggest_suffix     (DzlSuggestion *self,
+                                                    const gchar   *typed_text);
 DZL_AVAILABLE_IN_ALL
-gchar         *dzl_suggestion_replace_typed_text (DzlSuggestion *self,
-                                                  const gchar   *typed_text);
+gchar           *dzl_suggestion_replace_typed_text (DzlSuggestion *self,
+                                                    const gchar   *typed_text);
 DZL_AVAILABLE_IN_3_30
-GIcon         *dzl_suggestion_get_icon           (DzlSuggestion *self);
+GIcon           *dzl_suggestion_get_icon           (DzlSuggestion *self);
+DZL_AVAILABLE_IN_3_30
+cairo_surface_t *dzl_suggestion_get_icon_surface   (DzlSuggestion *self,
+                                                    GtkWidget     *widget);
 
 G_END_DECLS
 

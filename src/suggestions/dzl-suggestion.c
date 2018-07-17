@@ -403,3 +403,31 @@ dzl_suggestion_get_icon (DzlSuggestion *self)
 
   return DZL_SUGGESTION_GET_CLASS (self)->get_icon (self);
 }
+
+/**
+ * dzl_suggestion_get_icon_surface:
+ * @self: a #DzlSuggestion
+ * @widget: a widget that may contain the surface
+ *
+ * This function allows subclasses to dynamicly generate content for the
+ * suggestion such as may be required when integrating with favicons or
+ * similar.
+ *
+ * @widget is provided so that the implementation may determine scale or
+ * any other style-specific settings from the style context.
+ *
+ * Returns: (transfer full) (nullable): a #cairo_surface_t or %NULL
+ *
+ * Since: 3.30
+ */
+cairo_surface_t *
+dzl_suggestion_get_icon_surface (DzlSuggestion *self,
+                                 GtkWidget     *widget)
+{
+  g_return_val_if_fail (DZL_IS_SUGGESTION (self), NULL);
+
+  if (DZL_SUGGESTION_GET_CLASS (self)->get_icon_surface)
+    return DZL_SUGGESTION_GET_CLASS (self)->get_icon_surface (self, widget);
+
+  return NULL;
+}
