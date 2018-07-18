@@ -1,4 +1,20 @@
 ==============
+Version 3.29.4
+==============
+
+Changes in this release:
+
+ • Add various missing object _new() functions
+ • ApplicationWindow ref count fixes when doing fullscreen transitions
+ • Preferences layout tweaks to allow for stackswitcher use
+ • A new DzlDockItem::presented signal that can be used to track when
+   a dock item has been displayed by its relative container.
+ • Transient grab improvements with dock panels.
+ • A correctness fix in the action muxer.
+ • A leak was fixed in the bolding label's use of pango attributes.
+ • DzlSuggestion gained new API for acquiring GIcon or cairo_surface_t
+
+==============
 Version 3.29.3
 ==============
 
