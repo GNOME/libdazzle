@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlCpuGraph, dzl_cpu_graph, DZL, CPU_GRAPH, DzlGraphView)
 
-DZL_AVAILABLE_IN_ALL
+DZL_AVAILABLE_IN_3_30
 GtkWidget *dzl_cpu_graph_new_full (gint64 timespan,
                                    guint  max_samples);
 
