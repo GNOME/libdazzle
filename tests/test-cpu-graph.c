@@ -17,7 +17,6 @@ main (int argc,
   GOptionContext *context;
   GtkWindow *window;
   GtkBox *box;
-  DzlGraphView *graph;
   GtkCssProvider *provider;
   GError *error = NULL;
 
@@ -56,13 +55,12 @@ main (int argc,
 
   for (int i = 0; i < 3; i++)
     {
-      graph = g_object_new (DZL_TYPE_CPU_GRAPH,
-                            "visible", TRUE,
-                            "vexpand", TRUE,
-                            "timespan", timespan,
-                            "max-samples", max_samples,
-                            NULL);
-      gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (graph));
+      GtkWidget *graph = dzl_cpu_graph_new_full (timespan, max_samples);
+
+      gtk_widget_set_vexpand (graph, TRUE);
+      gtk_widget_set_visible (graph, TRUE);
+
+      gtk_container_add (GTK_CONTAINER (box), graph);
     }
 
   g_signal_connect (window, "delete-event", gtk_main_quit, NULL);

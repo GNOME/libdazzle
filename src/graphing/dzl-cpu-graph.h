@@ -21,7 +21,7 @@
 
 #include "dzl-version-macros.h"
 
-#include "dzl-graph-view.h"
+#include "graphing/dzl-graph-view.h"
 
 G_BEGIN_DECLS
 
@@ -31,7 +31,8 @@ DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlCpuGraph, dzl_cpu_graph, DZL, CPU_GRAPH, DzlGraphView)
 
 DZL_AVAILABLE_IN_ALL
-GtkWidget *dzl_cpu_graph_new (void);
+GtkWidget *dzl_cpu_graph_new_full (gint64 timespan,
+                                   guint  max_samples);
 
 G_END_DECLS
 

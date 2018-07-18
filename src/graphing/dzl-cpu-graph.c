@@ -55,9 +55,19 @@ static const gchar *colors[] = {
 };
 
 GtkWidget *
-dzl_cpu_graph_new (void)
+dzl_cpu_graph_new_full (gint64 timespan,
+                        guint  max_samples)
 {
-  return g_object_new (DZL_TYPE_CPU_GRAPH, NULL);
+  if (timespan <= 0)
+    timespan = 60L * G_USEC_PER_SEC;
+
+  if (max_samples < 1)
+    max_samples = 120;
+
+  return g_object_new (DZL_TYPE_CPU_GRAPH,
+                       "max-samples", max_samples,
+                       "timespan", timespan,
+                       NULL);
 }
 
 static void
@@ -142,7 +152,8 @@ dzl_cpu_graph_set_property (GObject      *object,
       break;
 
     case PROP_TIMESPAN:
-      self->timespan = g_value_get_int64 (value);
+      if (!(self->timespan = g_value_get_int64 (value)))
+        self->timespan = 60L * G_USEC_PER_SEC;
       break;
 
     default:
@@ -164,7 +175,7 @@ dzl_cpu_graph_class_init (DzlCpuGraphClass *klass)
                          "Timespan",
                          "Timespan",
                          0, G_MAXINT64,
-                         0,
+                         60L * G_USEC_PER_SEC,
                          (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_MAX_SAMPLES] =
