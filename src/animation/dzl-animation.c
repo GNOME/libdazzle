@@ -325,10 +325,11 @@ dzl_animation_get_offset (DzlAnimation *animation,
 
   frame_time = CLAMP (frame_time, animation->begin_time, animation->end_time);
 
-  if (frame_time == animation->begin_time)
-    return 0.0;
-  else if (frame_time == animation->end_time)
+  /* Check end_time first in case end_time == begin_time */
+  if (frame_time == animation->end_time)
     return 1.0;
+  else if (frame_time == animation->begin_time)
+    return 0.0;
 
   return (frame_time - animation->begin_time) / (gdouble)(animation->duration_msec * 1000L);
 }
