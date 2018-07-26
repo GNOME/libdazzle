@@ -253,10 +253,19 @@ static void
 dzl_shortcut_controller_widget_destroy (DzlShortcutController *self,
                                         GtkWidget             *widget)
 {
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
   g_assert (GTK_IS_WIDGET (widget));
 
   dzl_shortcut_controller_disconnect (self);
+  g_clear_weak_pointer (&priv->widget);
+
+  if (priv->root != NULL)
+    {
+      dzl_shortcut_controller_remove (priv->root, self);
+      g_clear_object (&priv->root);
+    }
 }
 
 static void
