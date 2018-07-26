@@ -135,6 +135,11 @@ free_node_data (GNode    *node,
 {
   DzlShortcutNodeData *data = node->data;
 
+  g_assert (data != NULL);
+  g_assert (DZL_IS_SHORTCUT_NODE_DATA (data));
+
+  data->magic = 0xAAAAAAAA;
+
   g_slice_free (DzlShortcutNodeData, data);
 
   return FALSE;
@@ -1200,8 +1205,6 @@ dzl_shortcut_manager_find_child (DzlShortcutManager  *self,
                                  DzlShortcutNodeType  type,
                                  const gchar         *name)
 {
-  DzlShortcutNodeData *data;
-
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (parent != NULL);
   g_assert (type != 0);
@@ -1209,7 +1212,9 @@ dzl_shortcut_manager_find_child (DzlShortcutManager  *self,
 
   for (GNode *iter = parent->children; iter != NULL; iter = iter->next)
     {
-      data = iter->data;
+      DzlShortcutNodeData *data = iter->data;
+
+      g_assert (DZL_IS_SHORTCUT_NODE_DATA (data));
 
       if (data->type == type && data->name == name)
         return iter;
@@ -1237,6 +1242,7 @@ dzl_shortcut_manager_get_group (DzlShortcutManager *self,
   if (node == NULL)
     {
       data = g_slice_new0 (DzlShortcutNodeData);
+      data->magic = DZL_SHORTCUT_NODE_DATA_MAGIC;
       data->type = DZL_SHORTCUT_NODE_SECTION;
       data->name = g_intern_string (section);
       data->title = g_intern_string (section);
@@ -1252,6 +1258,7 @@ dzl_shortcut_manager_get_group (DzlShortcutManager *self,
   if (node == NULL)
     {
       data = g_slice_new0 (DzlShortcutNodeData);
+      data->magic = DZL_SHORTCUT_NODE_DATA_MAGIC;
       data->type = DZL_SHORTCUT_NODE_GROUP;
       data->name = g_intern_string (group);
       data->title = g_intern_string (group);
@@ -1261,6 +1268,7 @@ dzl_shortcut_manager_get_group (DzlShortcutManager *self,
     }
 
   g_assert (node != NULL);
+  g_assert (DZL_IS_SHORTCUT_NODE_DATA (node->data));
 
   return node;
 }
@@ -1293,6 +1301,7 @@ dzl_shortcut_manager_add_action (DzlShortcutManager *self,
   g_assert (parent != NULL);
 
   data = g_slice_new0 (DzlShortcutNodeData);
+  data->magic = DZL_SHORTCUT_NODE_DATA_MAGIC;
   data->type = DZL_SHORTCUT_NODE_ACTION;
   data->name = g_intern_string (detailed_action_name);
   data->title = title;
@@ -1331,6 +1340,7 @@ dzl_shortcut_manager_add_command (DzlShortcutManager *self,
   g_assert (parent != NULL);
 
   data = g_slice_new0 (DzlShortcutNodeData);
+  data->magic = DZL_SHORTCUT_NODE_DATA_MAGIC;
   data->type = DZL_SHORTCUT_NODE_COMMAND;
   data->name = g_intern_string (command);
   data->title = title;
@@ -1396,6 +1406,8 @@ dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager *self,
       DzlShortcutNodeData *section_data = sections->data;
       DzlShortcutsSection *section;
 
+      g_assert (DZL_IS_SHORTCUT_NODE_DATA (section_data));
+
       section = g_object_new (DZL_TYPE_SHORTCUTS_SECTION,
                               "title", section_data->title,
                               "section-name", section_data->title,
@@ -1407,6 +1419,8 @@ dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager *self,
           DzlShortcutNodeData *group_data = groups->data;
           DzlShortcutsGroup *group;
 
+          g_assert (DZL_IS_SHORTCUT_NODE_DATA (group_data));
+
           group = g_object_new (DZL_TYPE_SHORTCUTS_GROUP,
                                 "title", group_data->title,
                                 "visible", TRUE,
@@ -1417,6 +1431,8 @@ dzl_shortcut_manager_add_shortcuts_to_window (DzlShortcutManager *self,
               DzlShortcutNodeData *data = iter->data;
               const DzlShortcutChord *chord = NULL;
               DzlShortcutsShortcut *shortcut;
+
+              g_assert (DZL_IS_SHORTCUT_NODE_DATA (data));
 
               if (data->type == DZL_SHORTCUT_NODE_ACTION)
                 chord = dzl_shortcut_theme_get_chord_for_action (theme, data->name);

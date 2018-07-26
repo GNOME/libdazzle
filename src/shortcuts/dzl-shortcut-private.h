@@ -28,6 +28,7 @@
 G_BEGIN_DECLS
 
 #define DZL_SHORTCUT_CLOSURE_CHAIN_MAGIC 0x81236261
+#define DZL_SHORTCUT_NODE_DATA_MAGIC     0x81746332
 
 typedef struct
 {
@@ -46,6 +47,7 @@ typedef enum
 typedef struct
 {
   DzlShortcutNodeType  type;
+  guint                magic;
   const gchar         *name;
   const gchar         *title;
   const gchar         *subtitle;
@@ -153,6 +155,12 @@ static inline gboolean
 DZL_IS_SHORTCUT_CLOSURE_CHAIN (DzlShortcutClosureChain *self)
 {
   return self != NULL && self->magic == DZL_SHORTCUT_CLOSURE_CHAIN_MAGIC;
+}
+
+static inline gboolean
+DZL_IS_SHORTCUT_NODE_DATA (DzlShortcutNodeData *data)
+{
+  return data != NULL && data->magic == DZL_SHORTCUT_NODE_DATA_MAGIC;
 }
 
 G_END_DECLS
