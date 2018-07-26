@@ -1,4 +1,18 @@
 ==============
+Version 3.28.4
+==============
+
+Changes in this release:
+
+ • Fixes for ref counting on titlebar widget
+ • Fix a leak in DzlBoldingLabel of Pango attribute lists
+ • Action muxer is now more defensive about string usage
+ • Menu popover is now more defensive when destroying widgets
+ • A potential, albeit unlikely, leak was plugged in signal dispatching
+   via the shortcut engine.
+ • The shortcut controller is now more defensive during widget destruction.
+
+==============
 Version 3.28.3
 ==============
 
