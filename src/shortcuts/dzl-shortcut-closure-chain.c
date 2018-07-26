@@ -40,6 +40,7 @@ dzl_shortcut_closure_chain_new (DzlShortcutClosureType type)
   g_assert (type < DZL_SHORTCUT_CLOSURE_LAST);
 
   ret = g_slice_new0 (DzlShortcutClosureChain);
+  ret->magic = DZL_SHORTCUT_CLOSURE_CHAIN_MAGIC;
   ret->node.data = ret;
   ret->type = type;
 
@@ -52,14 +53,19 @@ dzl_shortcut_closure_chain_append (DzlShortcutClosureChain *chain,
 {
   DzlShortcutClosureChain *ret;
 
+  g_return_val_if_fail (!chain || DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), NULL);
+  g_return_val_if_fail (!element || DZL_IS_SHORTCUT_CLOSURE_CHAIN (element), NULL);
   g_return_val_if_fail (chain || element, NULL);
 
   if (chain == NULL)
     return element;
 
+  if (element == NULL)
+    return chain;
+
   ret = g_slist_append (&chain->node, &element->node)->data;
 
-  g_return_val_if_fail (ret != NULL, NULL);
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CLOSURE_CHAIN (ret), NULL);
 
   return ret;
 }
@@ -70,14 +76,22 @@ dzl_shortcut_closure_chain_free (DzlShortcutClosureChain *chain)
   if (chain == NULL)
     return;
 
+  g_assert (DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain));
+  g_assert (chain->node.data == (gpointer)chain);
+
   if (chain->executing)
     {
       g_warning ("Attempt to dispose a closure chain while executing, leaking");
       return;
     }
 
+  chain->magic = 0xAAAAAAAA;
+
   if (chain->node.next)
     dzl_shortcut_closure_chain_free (chain->node.next->data);
+
+  chain->node.next = NULL;
+  chain->node.data = NULL;
 
   if (chain->type == DZL_SHORTCUT_CLOSURE_ACTION)
     dzl_clear_pointer (&chain->action.params, g_variant_unref);
@@ -100,6 +114,7 @@ dzl_shortcut_closure_chain_append_callback (DzlShortcutClosureChain *chain,
 {
   DzlShortcutClosureChain *tail;
 
+  g_return_val_if_fail (!chain || DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), NULL);
   g_return_val_if_fail (callback != NULL, NULL);
 
   tail = dzl_shortcut_closure_chain_new (DZL_SHORTCUT_CLOSURE_CALLBACK);
@@ -116,6 +131,7 @@ dzl_shortcut_closure_chain_append_command (DzlShortcutClosureChain *chain,
 {
   DzlShortcutClosureChain *tail;
 
+  g_return_val_if_fail (!chain || DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), NULL);
   g_return_val_if_fail (command != NULL, NULL);
 
   tail = dzl_shortcut_closure_chain_new (DZL_SHORTCUT_CLOSURE_COMMAND);
@@ -132,6 +148,7 @@ dzl_shortcut_closure_chain_append_action (DzlShortcutClosureChain *chain,
 {
   DzlShortcutClosureChain *tail;
 
+  g_return_val_if_fail (!chain || DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), NULL);
   g_return_val_if_fail (group_name != NULL, NULL);
   g_return_val_if_fail (action_name != NULL, NULL);
 
@@ -152,6 +169,7 @@ dzl_shortcut_closure_chain_append_action_string (DzlShortcutClosureChain *chain,
   g_autofree gchar *prefix = NULL;
   g_autofree gchar *name = NULL;
 
+  g_return_val_if_fail (!chain || DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), NULL);
   g_return_val_if_fail (detailed_action_name != NULL, NULL);
 
   if (!dzl_g_action_name_parse_full (detailed_action_name, &prefix, &name, &target_value))
@@ -179,6 +197,7 @@ dzl_shortcut_closure_chain_append_signalv (DzlShortcutClosureChain *chain,
   const gchar *detail_str;
   GQuark detail = 0;
 
+  g_return_val_if_fail (!chain || DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), NULL);
   g_return_val_if_fail (signal_name != NULL, NULL);
 
   if (params != NULL)
@@ -221,6 +240,7 @@ dzl_shortcut_closure_chain_append_signal (DzlShortcutClosureChain *chain,
 {
   g_autoptr(GArray) params = NULL;
 
+  g_return_val_if_fail (!chain || DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), NULL);
   g_return_val_if_fail (signal_name != NULL, NULL);
 
   params = g_array_new (FALSE, FALSE, sizeof (GValue));
@@ -249,10 +269,10 @@ dzl_shortcut_closure_chain_append_signal (DzlShortcutClosureChain *chain,
 }
 
 static gboolean
-find_instance_and_signal (GtkWidget          *widget,
-                          const gchar        *signal_name,
-                          gpointer           *instance,
-                          GSignalQuery       *query)
+find_instance_and_signal (GtkWidget    *widget,
+                          const gchar  *signal_name,
+                          gpointer     *instance,
+                          GSignalQuery *query)
 {
   DzlShortcutController *controller;
 
@@ -319,7 +339,7 @@ signal_activate (DzlShortcutClosureChain *chain,
   GSignalQuery query;
   gpointer instance = NULL;
 
-  g_assert (chain != NULL);
+  g_assert (DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain));
   g_assert (chain->type == DZL_SHORTCUT_CLOSURE_SIGNAL);
   g_assert (GTK_IS_WIDGET (widget));
 
@@ -379,7 +399,7 @@ static gboolean
 command_activate (DzlShortcutClosureChain *chain,
                   GtkWidget               *widget)
 {
-  g_assert (chain != NULL);
+  g_assert (DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain));
   g_assert (GTK_IS_WIDGET (widget));
 
   for (; widget != NULL; widget = gtk_widget_get_parent (widget))
@@ -407,7 +427,7 @@ dzl_shortcut_closure_chain_execute (DzlShortcutClosureChain *chain,
 
   DZL_ENTRY;
 
-  g_return_val_if_fail (chain != NULL, FALSE);
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CLOSURE_CHAIN (chain), FALSE);
   g_return_val_if_fail (GTK_IS_WIDGET (widget), FALSE);
 
   if (chain->executing)

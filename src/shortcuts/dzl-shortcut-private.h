@@ -16,8 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DZL_SHORTCUT_THEME_PRIVATE_H
-#define DZL_SHORTCUT_THEME_PRIVATE_H
+#pragma once
 
 #include "shortcuts/dzl-shortcut-chord.h"
 #include "shortcuts/dzl-shortcut-closure-chain.h"
@@ -27,6 +26,8 @@
 #include "shortcuts/dzl-shortcut-theme.h"
 
 G_BEGIN_DECLS
+
+#define DZL_SHORTCUT_CLOSURE_CHAIN_MAGIC 0x81236261
 
 typedef struct
 {
@@ -73,6 +74,8 @@ typedef enum
 struct _DzlShortcutClosureChain
 {
   GSList node;
+
+  guint magic;
 
   DzlShortcutClosureType type : 3;
   DzlShortcutPhase phase : 3;
@@ -146,6 +149,10 @@ gboolean               _dzl_shortcut_chord_table_iter_next          (DzlShortcut
                                                                      gpointer                   *value);
 void                   _dzl_shortcut_chord_table_iter_steal         (DzlShortcutChordTableIter  *iter);
 
-G_END_DECLS
+static inline gboolean
+DZL_IS_SHORTCUT_CLOSURE_CHAIN (DzlShortcutClosureChain *self)
+{
+  return self != NULL && self->magic == DZL_SHORTCUT_CLOSURE_CHAIN_MAGIC;
+}
 
-#endif /* DZL_SHORTCUT_THEME_PRIVATE_H */
+G_END_DECLS
