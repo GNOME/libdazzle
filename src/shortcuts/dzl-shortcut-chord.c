@@ -28,6 +28,7 @@
 #include "util/dzl-macros.h"
 
 #define MAX_CHORD_SIZE 4
+#define CHORD_MAGIC    0x83316672
 
 G_DEFINE_BOXED_TYPE (DzlShortcutChord, dzl_shortcut_chord,
                      dzl_shortcut_chord_copy, dzl_shortcut_chord_free)
@@ -42,6 +43,7 @@ typedef struct
 struct _DzlShortcutChord
 {
   DzlShortcutKey keys[MAX_CHORD_SIZE];
+  guint magic;
 };
 
 typedef struct
@@ -58,6 +60,12 @@ struct _DzlShortcutChordTable
   guint                       size;
 };
 
+static inline gboolean
+IS_SHORTCUT_CHORD (const DzlShortcutChord *chord)
+{
+  return chord != NULL && chord->magic == CHORD_MAGIC;
+}
+
 static GdkModifierType
 sanitize_modifier_mask (GdkModifierType mods)
 {
@@ -71,13 +79,16 @@ static gint
 dzl_shortcut_chord_compare (const DzlShortcutChord *a,
                             const DzlShortcutChord *b)
 {
+  g_assert (IS_SHORTCUT_CHORD (a));
+  g_assert (IS_SHORTCUT_CHORD (b));
+
   return memcmp (a, b, sizeof *a);
 }
 
 static gboolean
 dzl_shortcut_chord_is_valid (DzlShortcutChord *self)
 {
-  g_assert (self != NULL);
+  g_assert (IS_SHORTCUT_CHORD (self));
 
   /* Ensure we got a valid first key at least */
   if (self->keys[0].keyval == 0)
@@ -98,6 +109,7 @@ dzl_shortcut_chord_new_from_event (const GdkEventKey *key)
     return NULL;
 
   self = g_slice_new0 (DzlShortcutChord);
+  self->magic = CHORD_MAGIC;
 
   self->keys[0].keyval = gdk_keyval_to_lower (key->keyval);
   self->keys[0].modifier = sanitize_modifier_mask (key->state);
@@ -128,6 +140,7 @@ dzl_shortcut_chord_new_from_string (const gchar *accelerator)
     return NULL;
 
   self = g_slice_new0 (DzlShortcutChord);
+  self->magic = CHORD_MAGIC;
 
   /* Parse each section from the accelerator */
   for (guint i = 0; parts[i]; i++)
@@ -146,7 +159,7 @@ dzl_shortcut_chord_append_event (DzlShortcutChord  *self,
 {
   guint i;
 
-  g_return_val_if_fail (self != NULL, FALSE);
+  g_return_val_if_fail (IS_SHORTCUT_CHORD (self), FALSE);
   g_return_val_if_fail (key != NULL, FALSE);
 
   for (i = 0; i < G_N_ELEMENTS (self->keys); i++)
@@ -172,6 +185,8 @@ dzl_shortcut_chord_count_keys (const DzlShortcutChord *self)
 {
   guint count = 0;
 
+  g_assert (IS_SHORTCUT_CHORD (self));
+
   for (guint i = 0; i < G_N_ELEMENTS (self->keys); i++)
     {
       if (self->keys[i].keyval != 0)
@@ -190,7 +205,7 @@ dzl_shortcut_chord_match (const DzlShortcutChord *self,
   guint self_count = 0;
   guint other_count = 0;
 
-  g_return_val_if_fail (self != NULL, DZL_SHORTCUT_MATCH_NONE);
+  g_return_val_if_fail (IS_SHORTCUT_CHORD (self), DZL_SHORTCUT_MATCH_NONE);
   g_return_val_if_fail (other != NULL, DZL_SHORTCUT_MATCH_NONE);
 
   self_count = dzl_shortcut_chord_count_keys (self);
@@ -209,6 +224,8 @@ gchar *
 dzl_shortcut_chord_to_string (const DzlShortcutChord *self)
 {
   GString *str;
+
+  g_assert (IS_SHORTCUT_CHORD (self));
 
   if (self == NULL || self->keys[0].keyval == 0)
     return NULL;
@@ -242,6 +259,8 @@ dzl_shortcut_chord_get_label (const DzlShortcutChord *self)
   if (self == NULL || self->keys[0].keyval == 0)
     return NULL;
 
+  g_return_val_if_fail (IS_SHORTCUT_CHORD (self), NULL);
+
   str = g_string_new (NULL);
 
   for (guint i = 0; i < G_N_ELEMENTS (self->keys); i++)
@@ -266,15 +285,10 @@ dzl_shortcut_chord_get_label (const DzlShortcutChord *self)
 DzlShortcutChord *
 dzl_shortcut_chord_copy (const DzlShortcutChord *self)
 {
-  DzlShortcutChord *copy;
-
   if (self == NULL)
     return NULL;
 
-  copy = g_slice_new (DzlShortcutChord);
-  memcpy (copy, self, sizeof *copy);
-
-  return copy;
+  return g_slice_dup (DzlShortcutChord, self);
 }
 
 guint
@@ -282,6 +296,8 @@ dzl_shortcut_chord_hash (gconstpointer data)
 {
   const DzlShortcutChord *self = data;
   guint hash = 0;
+
+  g_assert (IS_SHORTCUT_CHORD (self));
 
   for (guint i = 0; i < G_N_ELEMENTS (self->keys); i++)
     {
@@ -311,8 +327,13 @@ dzl_shortcut_chord_equal (gconstpointer data1,
 void
 dzl_shortcut_chord_free (DzlShortcutChord *self)
 {
+  g_assert (!self || IS_SHORTCUT_CHORD (self));
+
   if (self != NULL)
-    g_slice_free (DzlShortcutChord, self);
+    {
+      self->magic = 0xAAAAAAAA;
+      g_slice_free (DzlShortcutChord, self);
+    }
 }
 
 GType
@@ -341,6 +362,9 @@ dzl_shortcut_chord_table_sort (gconstpointer a,
 {
   const DzlShortcutChordTableEntry *keya = a;
   const DzlShortcutChordTableEntry *keyb = b;
+
+  g_assert (IS_SHORTCUT_CHORD (a));
+  g_assert (IS_SHORTCUT_CHORD (b));
 
   return dzl_shortcut_chord_compare (&keya->chord, &keyb->chord);
 }
@@ -406,14 +430,14 @@ static void
 dzl_shortcut_chord_table_remove_index (DzlShortcutChordTable *self,
                                        guint                  position)
 {
-  const DzlShortcutChordTableEntry *entry;
+  DzlShortcutChordTableEntry *entry;
   gpointer data;
 
   g_assert (self != NULL);
   g_assert (position < self->len);
 
   entry = &self->entries[position];
-  data = entry->data;
+  data = g_steal_pointer (&entry->data);
 
   if (position + 1 < self->len)
     memmove ((gpointer)entry,
