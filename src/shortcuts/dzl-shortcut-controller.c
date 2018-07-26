@@ -371,14 +371,12 @@ dzl_shortcut_controller_set_widget (DzlShortcutController *self,
       if (priv->widget != NULL)
         {
           dzl_shortcut_controller_disconnect (self);
-          g_object_remove_weak_pointer (G_OBJECT (priv->widget), (gpointer *)&priv->widget);
-          priv->widget = NULL;
+          g_clear_weak_pointer (&priv->widget);
         }
 
       if (widget != NULL && widget != priv->widget)
         {
-          priv->widget = widget;
-          g_object_add_weak_pointer (G_OBJECT (priv->widget), (gpointer *)&priv->widget);
+          g_set_weak_pointer (&priv->widget, widget);
           dzl_shortcut_controller_connect (self);
         }
 
