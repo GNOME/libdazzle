@@ -358,6 +358,9 @@ signal_activate (DzlShortcutClosureChain *chain,
     g_value_unset (&params[i]);
   g_free (params);
 
+  if (query.return_type != G_TYPE_NONE)
+    g_value_unset (&return_value);
+
   return GDK_EVENT_STOP;
 
 parameter_mismatch:
