@@ -722,7 +722,11 @@ dzl_tree_node_finalize (GObject *object)
   DzlTreeNode *self = DZL_TREE_NODE (object);
 
   g_clear_object (&self->item);
+  g_clear_object (&self->gicon);
   g_clear_pointer (&self->text, g_free);
+
+  g_list_free_full (self->emblems, g_free);
+  self->emblems = NULL;
 
   dzl_clear_weak_pointer (&self->tree);
   dzl_clear_weak_pointer (&self->parent);
