@@ -76,13 +76,13 @@ get_object_id (GObject *object)
 }
 
 static void
-dzl_menu_manager_finalize (GObject *object)
+dzl_menu_manager_dispose (GObject *object)
 {
   DzlMenuManager *self = (DzlMenuManager *)object;
 
   g_clear_pointer (&self->models, g_hash_table_unref);
 
-  G_OBJECT_CLASS (dzl_menu_manager_parent_class)->finalize (object);
+  G_OBJECT_CLASS (dzl_menu_manager_parent_class)->dispose (object);
 }
 
 static void
@@ -90,7 +90,7 @@ dzl_menu_manager_class_init (DzlMenuManagerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = dzl_menu_manager_finalize;
+  object_class->dispose = dzl_menu_manager_dispose;
 }
 
 static void
