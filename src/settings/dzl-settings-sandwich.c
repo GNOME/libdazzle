@@ -68,7 +68,7 @@ dzl_settings_sandwich_cache_key (DzlSettingsSandwich *self,
                                  const gchar         *key)
 {
   GSettings *settings;
-  GVariant *value;
+  g_autoptr(GVariant) value = NULL;
   gsize i;
 
   g_assert (DZL_IS_SETTINGS_SANDWICH (self));
