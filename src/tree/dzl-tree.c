@@ -875,7 +875,7 @@ dzl_tree_real_action (DzlTree     *self,
                       const gchar *action_name,
                       const gchar *param)
 {
-  GVariant *variant = NULL;
+  g_autoptr(GVariant) variant = NULL;
   g_autofree gchar *name = NULL;
 
   g_return_if_fail (DZL_IS_TREE (self));
