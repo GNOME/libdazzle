@@ -281,6 +281,9 @@ test_state_machine_basic (void)
   g_assert (machine == NULL);
 
   g_clear_object (&action);
+  g_clear_object (&obj1);
+  g_clear_object (&obj2);
+  g_clear_object (&dummy);
 }
 
 #define assert_final_ref(o) \
