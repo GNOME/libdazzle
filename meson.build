@@ -60,7 +60,7 @@ test_c_args = [
   ['-Werror=format-security', '-Werror=format=2' ],
   '-Werror=empty-body',
   '-Werror=implicit-function-declaration',
-  '-Werror=incompatible-pointer-types',
+  #'-Werror=incompatible-pointer-types',
   '-Werror=pointer-arith',
   '-Werror=init-self',
   '-Werror=int-conversion',
