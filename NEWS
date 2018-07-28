@@ -1,4 +1,26 @@
 ==============
+Version 3.28.5
+==============
+
+An issue was introduced in menu merging in 3.28.4 and this release fixes
+that and many other issues discovered with ASAN.
+
+Changes in this release:
+
+ • Fuzzy indexes now properly release metadata variant
+ • Various fixes to g_variant_parse() usage and floating references
+ • Menu merging has been fixed in DzlMenuButton
+ • A leak in DzlRing was fixed
+ • Shortcut closure chains now properly concat GSList links
+ • A leak in GDateTime usage was fixed
+ • DzlTreeNode no longer leaks emblem names or GIcon instances
+ • DockManager now releases it's final transient grab
+ • DzlStateMachine now properly cleans up property stack items
+ • Multi-paned and dock-bin now properly unregister GdkWindows
+
+We recommend all distributions upgrade to this release.
+
+==============
 Version 3.28.4
 ==============
 
