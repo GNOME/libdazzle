@@ -154,7 +154,7 @@ model_copy_attributes_to_item (GMenuModel *model,
                                gint        item_index,
                                GMenuItem  *item)
 {
-  GMenuAttributeIter *iter;
+  g_autoptr(GMenuAttributeIter) iter = NULL;
   const gchar *attr_name;
   GVariant *attr_value;
 
@@ -162,10 +162,14 @@ model_copy_attributes_to_item (GMenuModel *model,
   g_assert (item_index >= 0);
   g_assert (G_IS_MENU_ITEM (item));
 
-  iter = g_menu_model_iterate_item_attributes (model, item_index);
+  if (!(iter = g_menu_model_iterate_item_attributes (model, item_index)))
+    return;
+
   while (g_menu_attribute_iter_get_next (iter, &attr_name, &attr_value))
-    g_menu_item_set_attribute_value (item, attr_name, attr_value);
-  g_object_unref (iter);
+    {
+      g_menu_item_set_attribute_value (item, attr_name, attr_value);
+      g_variant_unref (attr_value);
+    }
 }
 
 static void
