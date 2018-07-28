@@ -108,6 +108,8 @@ dzl_dock_manager_do_set_focus (DzlDockManager *self,
       g_clear_object (&priv->grab);
     }
 
+  g_assert (priv->grab == NULL);
+
   /* Start the grab process */
   if (grab != NULL)
     {
@@ -267,6 +269,8 @@ dzl_dock_manager_finalize (GObject *object)
 {
   DzlDockManager *self = (DzlDockManager *)object;
   DzlDockManagerPrivate *priv = dzl_dock_manager_get_instance_private (self);
+
+  g_clear_object (&priv->grab);
 
   g_clear_pointer (&priv->queued_focus_by_toplevel, g_hash_table_unref);
 
