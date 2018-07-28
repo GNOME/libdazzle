@@ -126,7 +126,7 @@ dzl_menu_button_items_changed (DzlMenuButton *self,
 
   for (guint i = 0; i < removed; i++)
     {
-      GtkWidget *child = dzl_box_get_nth_child (priv->popover_box, position);
+      GtkWidget *child = dzl_box_get_nth_child (priv->popover_box, position + i);
       children = g_list_prepend (children, g_object_ref (child));
     }
 
