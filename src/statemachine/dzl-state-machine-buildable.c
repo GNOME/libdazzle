@@ -73,6 +73,7 @@ stack_item_free (StackItem *item)
     case STACK_ITEM_OBJECT:
       g_free (item->u.object.id);
       g_slist_free_full (item->u.object.classes, g_free);
+      g_slist_free_full (item->u.object.properties, (GDestroyNotify)stack_item_free);
       break;
 
     case STACK_ITEM_STATE:
