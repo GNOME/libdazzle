@@ -573,8 +573,6 @@ dzl_preferences_view_add_radio (DzlPreferences *preferences,
 
       if (variant == NULL)
         g_warning ("%s", error->message);
-      else
-        g_variant_ref_sink (variant);
     }
 
   widget = g_object_new (DZL_TYPE_PREFERENCES_SWITCH,
@@ -651,8 +649,6 @@ dzl_preferences_view_add_switch (DzlPreferences *preferences,
 
       if (variant == NULL)
         g_warning ("%s", error->message);
-      else
-        g_variant_ref_sink (variant);
     }
 
   widget = g_object_new (DZL_TYPE_PREFERENCES_SWITCH,

@@ -90,7 +90,7 @@ dzl_gtk_widget_action_with_string (GtkWidget   *widget,
                                    const gchar *name,
                                    const gchar *param)
 {
-  GVariant *variant = NULL;
+  g_autoptr(GVariant) variant = NULL;
   gboolean ret;
 
   g_return_val_if_fail (GTK_IS_WIDGET (widget), FALSE);

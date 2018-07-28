@@ -86,8 +86,8 @@ _##prefix##_get_action_info (GActionGroup *group,                               
           if (g_strcmp0 (prefix##_actions[i].name, name) == 0)                    \
             {                                                                     \
               if (prefix##_actions[i].state != NULL)                              \
-                info->state = g_variant_take_ref (g_variant_parse (               \
-                  NULL, prefix##_actions[i].state, NULL, NULL, NULL));            \
+                info->state = g_variant_parse (                                   \
+                  NULL, prefix##_actions[i].state, NULL, NULL, NULL);             \
               break;                                                              \
             }                                                                     \
         }                                                                         \
