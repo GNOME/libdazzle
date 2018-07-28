@@ -63,7 +63,7 @@ dzl_shortcut_closure_chain_append (DzlShortcutClosureChain *chain,
   if (element == NULL)
     return chain;
 
-  ret = g_slist_append (&chain->node, &element->node)->data;
+  ret = g_slist_concat (&chain->node, &element->node)->data;
 
   g_return_val_if_fail (DZL_IS_SHORTCUT_CLOSURE_CHAIN (ret), NULL);
 
