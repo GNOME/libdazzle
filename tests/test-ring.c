@@ -162,9 +162,9 @@ static void
 test_DzlRing_with_array (void)
 {
   DzlRing *ring;
-  GArray *ar0;
-  GArray *ar1;
-  GArray *ar2;
+  GArray *ar0 = NULL;
+  GArray *ar1 = NULL;
+  GArray *ar2 = NULL;
   gpointer tmp;
 
   ring = dzl_ring_sized_new (sizeof (GArray*), 2, test_DzlRing_with_array_cb);

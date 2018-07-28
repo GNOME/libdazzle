@@ -162,6 +162,9 @@ dzl_ring_destroy (DzlRing *ring)
   g_return_if_fail (ring != NULL);
   g_return_if_fail (ring_impl->ref_count == 0);
 
+  if (ring_impl->destroy != NULL)
+    dzl_ring_foreach (ring, (GFunc)ring_impl->destroy, NULL);
+
   g_free (ring_impl->data);
 
   g_slice_free (DzlRingImpl, ring_impl);
