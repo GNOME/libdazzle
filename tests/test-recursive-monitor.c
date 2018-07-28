@@ -196,6 +196,8 @@ test_basic (void)
   g_clear_pointer (&state.main_loop, g_main_loop_unref);
   g_clear_pointer (&state.created, g_hash_table_unref);
   g_clear_pointer (&state.deleted, g_hash_table_unref);
+  g_queue_foreach (&state.dirs, (GFunc)g_object_unref, NULL);
+  g_queue_clear (&state.dirs);
   g_clear_object (&state.monitor);
 }
 
