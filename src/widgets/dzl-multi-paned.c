@@ -383,6 +383,7 @@ dzl_multi_paned_destroy_child_handle (DzlMultiPaned      *self,
 
   if (child->handle != NULL)
     {
+      gtk_widget_unregister_window (GTK_WIDGET (self), child->handle);
       gdk_window_destroy (child->handle);
       child->handle = NULL;
     }
