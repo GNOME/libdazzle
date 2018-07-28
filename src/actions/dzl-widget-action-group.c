@@ -148,7 +148,8 @@ create_variant_type (const GType *types,
               break;
             }
 
-          return FALSE;
+          g_string_free (str, TRUE);
+          return NULL;
         }
     }
 
@@ -171,6 +172,8 @@ create_variant_type (const GType *types,
       g_hash_table_insert (cached_types, type_str, type_str);
       ret = (const GVariantType *)type_str;
     }
+  else
+    g_string_free (str, TRUE);
 
   return ret;
 }
