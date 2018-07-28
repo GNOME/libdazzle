@@ -35,7 +35,7 @@
 gchar *
 dzl_g_date_time_format_for_display (GDateTime *self)
 {
-  GDateTime *now;
+  g_autoptr(GDateTime) now = NULL;
   GTimeSpan diff;
   gint years;
 
