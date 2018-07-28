@@ -56,6 +56,8 @@ test_menu_manager (void)
   assert_item_at_index (merged, 3, "item1");
   assert_item_at_index (merged, 4, "item5");
   assert_item_at_index (merged, 5, "item6");
+
+  g_object_run_dispose (G_OBJECT (manager));
 }
 
 gint
