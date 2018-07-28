@@ -141,6 +141,7 @@ dzl_fuzzy_index_builder_finalize (GObject *object)
   g_clear_pointer (&self->kv_pairs, g_array_unref);
   g_clear_pointer (&self->metadata, g_hash_table_unref);
   g_clear_pointer (&self->key_ids, g_hash_table_unref);
+  g_clear_pointer (&self->keys, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_fuzzy_index_builder_parent_class)->finalize (object);
 }
@@ -231,8 +232,7 @@ dzl_fuzzy_index_builder_new (void)
  * If a matching document (checked by hashing @document) has already
  * been inserted, only a single instance of the document will be stored.
  *
- * If @document is floating, it's floating reference will be sunk using
- * g_variant_ref_sink().
+ * If @document is floating, it will be consumed.
  *
  * @priority may be used to group results by priority. Priority must be
  * less than 256.
@@ -245,6 +245,7 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
                                 GVariant             *document,
                                 guint                 priority)
 {
+  g_autoptr(GVariant) sunk_variant = NULL;
   GVariant *real_document = NULL;
   gpointer document_id = NULL;
   gpointer key_id = NULL;
@@ -254,6 +255,9 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
   g_return_val_if_fail (key != NULL, 0L);
   g_return_val_if_fail (document != NULL, 0L);
   g_return_val_if_fail (priority <= 0xFF, 0L);
+
+  if (g_variant_is_floating (document))
+    sunk_variant = g_variant_ref_sink (document);
 
   /* move the priority bits into the proper area */
   priority = (priority & 0xFF) << 24;
@@ -277,7 +281,7 @@ dzl_fuzzy_index_builder_insert (DzlFuzzyIndexBuilder *self,
                                      &document_id))
     {
       document_id = GUINT_TO_POINTER (self->documents->len);
-      real_document = g_variant_ref_sink (document);
+      real_document = g_variant_ref (document);
       g_ptr_array_add (self->documents, real_document);
       g_hash_table_insert (self->documents_hash, real_document, document_id);
     }
