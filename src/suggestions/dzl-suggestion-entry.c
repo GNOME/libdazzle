@@ -282,9 +282,9 @@ dzl_suggestion_entry_suggestion_activated (DzlSuggestionEntry   *self,
   g_assert (DZL_IS_SUGGESTION (suggestion));
   g_assert (DZL_IS_SUGGESTION_POPOVER (popover));
 
+  gtk_entry_set_text (GTK_ENTRY (self), "");
   g_signal_emit (self, signals [SUGGESTION_ACTIVATED], 0, suggestion);
   g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
-  gtk_entry_set_text (GTK_ENTRY (self), "");
 
   DZL_EXIT;
 }
