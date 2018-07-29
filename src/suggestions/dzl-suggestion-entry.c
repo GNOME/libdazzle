@@ -284,7 +284,6 @@ dzl_suggestion_entry_suggestion_activated (DzlSuggestionEntry   *self,
 
   g_signal_emit (self, signals [SUGGESTION_ACTIVATED], 0, suggestion);
   g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
-  gtk_entry_set_text (GTK_ENTRY (self), "");
 
   DZL_EXIT;
 }
