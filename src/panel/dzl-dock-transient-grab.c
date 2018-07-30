@@ -259,23 +259,42 @@ dzl_dock_transient_grab_acquire (DzlDockTransientGrab *self)
 void
 dzl_dock_transient_grab_release (DzlDockTransientGrab *self)
 {
-  guint i;
+  g_autoptr(GPtrArray) matches = NULL;
 
   g_return_if_fail (DZL_IS_DOCK_TRANSIENT_GRAB (self));
   g_return_if_fail (self->acquired == TRUE);
+  g_return_if_fail (self->items != NULL);
 
-  for (i = 0; i < self->items->len; i++)
+  g_object_ref (self);
+
+  matches = g_ptr_array_new_full (self->items->len, g_object_unref);
+
+  /* Collect our matches and increment their reference count so that
+   * we can ensure they stick around while we notify our matches in
+   * the followup iteration.
+   */
+  for (guint i = 0; i < self->items->len; i++)
     {
       DzlDockItem *item = g_ptr_array_index (self->items, i);
 
       if (g_hash_table_contains (self->hidden, item))
-        {
-          DzlDockItem *parent = dzl_dock_item_get_parent (item);
-
-          if (parent != NULL)
-            dzl_dock_item_set_child_visible (parent, item, FALSE);
-        }
+        g_ptr_array_add (matches, g_object_ref (item));
     }
+
+  /*
+   * Notify in reverse order to increase chances we don't collide with
+   * any state changing as we propagate.
+   */
+  for (guint i = matches->len; i > 0; i--)
+    {
+      DzlDockItem *item = g_ptr_array_index (matches, i - 1);
+      DzlDockItem *parent = dzl_dock_item_get_parent (item);
+
+      if (parent != NULL)
+        dzl_dock_item_set_child_visible (parent, item, FALSE);
+    }
+
+  g_object_unref (self);
 }
 
 gboolean
