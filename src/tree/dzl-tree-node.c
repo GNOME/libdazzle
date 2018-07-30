@@ -723,7 +723,7 @@ dzl_tree_node_finalize (GObject *object)
 
   g_clear_object (&self->item);
   g_clear_object (&self->gicon);
-  dzl_clear_pointer (&self->text, g_free);
+  g_clear_pointer (&self->text, g_free);
 
   g_list_free_full (self->emblems, g_free);
   self->emblems = NULL;
@@ -1086,7 +1086,7 @@ dzl_tree_node_show_popover (DzlTreeNode *self,
 
       path = dzl_tree_node_get_path (self);
       gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (tree), path, NULL, FALSE, 0, 0);
-      dzl_clear_pointer (&path, gtk_tree_path_free);
+      g_clear_pointer (&path, gtk_tree_path_free);
 
       /*
        * FIXME: Time period comes from gtk animation duration.

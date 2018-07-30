@@ -50,8 +50,8 @@ dzl_fuzzy_index_match_finalize (GObject *object)
 {
   DzlFuzzyIndexMatch *self = (DzlFuzzyIndexMatch *)object;
 
-  dzl_clear_pointer (&self->document, g_variant_unref);
-  dzl_clear_pointer (&self->key, g_free);
+  g_clear_pointer (&self->document, g_variant_unref);
+  g_clear_pointer (&self->key, g_free);
 
   G_OBJECT_CLASS (dzl_fuzzy_index_match_parent_class)->finalize (object);
 }

@@ -119,8 +119,8 @@ dzl_pattern_spec_get_text (DzlPatternSpec *self)
 static void
 dzl_pattern_spec_free (DzlPatternSpec *self)
 {
-  dzl_clear_pointer (&self->parts, g_strfreev);
-  dzl_clear_pointer (&self->needle, g_free);
+  g_clear_pointer (&self->parts, g_strfreev);
+  g_clear_pointer (&self->needle, g_free);
   g_slice_free (DzlPatternSpec, self);
 }
 

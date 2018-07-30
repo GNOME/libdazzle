@@ -161,7 +161,7 @@ dzl_list_box_constructed (GObject *object)
 failure:
   g_warning ("Invalid DzlListBox instantiated, will not work as expected");
   priv->row_type = G_TYPE_INVALID;
-  dzl_clear_pointer (&priv->property_name, g_free);
+  g_clear_pointer (&priv->property_name, g_free);
 }
 
 static void
@@ -194,7 +194,7 @@ dzl_list_box_finalize (GObject *object)
   DzlListBox *self = (DzlListBox *)object;
   DzlListBoxPrivate *priv = dzl_list_box_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->property_name, g_free);
+  g_clear_pointer (&priv->property_name, g_free);
   priv->row_type = G_TYPE_INVALID;
 
   G_OBJECT_CLASS (dzl_list_box_parent_class)->finalize (object);

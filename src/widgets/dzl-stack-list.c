@@ -375,7 +375,7 @@ dzl_stack_list_finalize (GObject *object)
   DzlStackList *self = (DzlStackList *)object;
   DzlStackListPrivate *priv = dzl_stack_list_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->models, g_ptr_array_unref);
+  g_clear_pointer (&priv->models, g_ptr_array_unref);
   g_clear_object (&priv->animating_rect);
   g_clear_object (&priv->animation);
 

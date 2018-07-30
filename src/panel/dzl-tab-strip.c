@@ -74,7 +74,7 @@ set_tab_state (GSimpleAction *action,
 
   list = gtk_container_get_children (GTK_CONTAINER (priv->stack));
   nth_child = g_list_nth_data (list, stateval);
-  dzl_clear_pointer (&list, g_list_free);
+  g_clear_pointer (&list, g_list_free);
 
   if (nth_child != NULL)
     {

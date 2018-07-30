@@ -136,13 +136,13 @@ dzl_fuzzy_index_builder_finalize (GObject *object)
 {
   DzlFuzzyIndexBuilder *self = (DzlFuzzyIndexBuilder *)object;
 
-  dzl_clear_pointer (&self->documents_hash, g_hash_table_unref);
-  dzl_clear_pointer (&self->documents, g_ptr_array_unref);
-  dzl_clear_pointer (&self->strings, g_string_chunk_free);
-  dzl_clear_pointer (&self->kv_pairs, g_array_unref);
-  dzl_clear_pointer (&self->metadata, g_hash_table_unref);
-  dzl_clear_pointer (&self->key_ids, g_hash_table_unref);
-  dzl_clear_pointer (&self->keys, g_ptr_array_unref);
+  g_clear_pointer (&self->documents_hash, g_hash_table_unref);
+  g_clear_pointer (&self->documents, g_ptr_array_unref);
+  g_clear_pointer (&self->strings, g_string_chunk_free);
+  g_clear_pointer (&self->kv_pairs, g_array_unref);
+  g_clear_pointer (&self->metadata, g_hash_table_unref);
+  g_clear_pointer (&self->key_ids, g_hash_table_unref);
+  g_clear_pointer (&self->keys, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_fuzzy_index_builder_parent_class)->finalize (object);
 }

@@ -378,8 +378,8 @@ dzl_state_machine_finalize (GObject *object)
         }
     }
 
-  dzl_clear_pointer (&priv->states, g_hash_table_unref);
-  dzl_clear_pointer (&priv->state, g_free);
+  g_clear_pointer (&priv->states, g_hash_table_unref);
+  g_clear_pointer (&priv->state, g_free);
 
   G_OBJECT_CLASS (dzl_state_machine_parent_class)->finalize (object);
 }

@@ -225,9 +225,9 @@ dzl_shortcuts_section_finalize (GObject *object)
 {
   DzlShortcutsSection *self = (DzlShortcutsSection *)object;
 
-  dzl_clear_pointer (&self->name, g_free);
-  dzl_clear_pointer (&self->title, g_free);
-  dzl_clear_pointer (&self->view_name, g_free);
+  g_clear_pointer (&self->name, g_free);
+  g_clear_pointer (&self->title, g_free);
+  g_clear_pointer (&self->view_name, g_free);
   g_clear_object (&self->pan_gesture);
 
   G_OBJECT_CLASS (dzl_shortcuts_section_parent_class)->finalize (object);

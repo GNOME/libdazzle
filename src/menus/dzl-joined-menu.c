@@ -175,7 +175,7 @@ dzl_joined_menu_finalize (GObject *object)
 {
   DzlJoinedMenu *self = (DzlJoinedMenu *)object;
 
-  dzl_clear_pointer (&self->menus, g_array_unref);
+  g_clear_pointer (&self->menus, g_array_unref);
 
   G_OBJECT_CLASS (dzl_joined_menu_parent_class)->finalize (object);
 }

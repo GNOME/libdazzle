@@ -423,7 +423,7 @@ _dzl_counter_arena_destroy (DzlCounterArena *arena)
     g_free (arena->cells);
 #endif
 
-  dzl_clear_pointer (&arena->counters, g_list_free);
+  g_clear_pointer (&arena->counters, g_list_free);
 
   arena->cells = NULL;
 

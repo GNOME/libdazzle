@@ -94,14 +94,14 @@ dzl_shortcut_closure_chain_free (DzlShortcutClosureChain *chain)
   chain->node.data = NULL;
 
   if (chain->type == DZL_SHORTCUT_CLOSURE_ACTION)
-    dzl_clear_pointer (&chain->action.params, g_variant_unref);
+    g_clear_pointer (&chain->action.params, g_variant_unref);
   else if (chain->type == DZL_SHORTCUT_CLOSURE_CALLBACK)
     {
       if (chain->callback.notify)
-        dzl_clear_pointer (&chain->callback.user_data, chain->callback.notify);
+        g_clear_pointer (&chain->callback.user_data, chain->callback.notify);
     }
   else if (chain->type == DZL_SHORTCUT_CLOSURE_SIGNAL)
-    dzl_clear_pointer (&chain->signal.params, g_array_unref);
+    g_clear_pointer (&chain->signal.params, g_array_unref);
 
   g_slice_free (DzlShortcutClosureChain, chain);
 }

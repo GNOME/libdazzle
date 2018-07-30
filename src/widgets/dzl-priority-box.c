@@ -190,7 +190,7 @@ dzl_priority_box_finalize (GObject *object)
   DzlPriorityBox *self = (DzlPriorityBox *)object;
   DzlPriorityBoxPrivate *priv = dzl_priority_box_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->children, g_array_unref);
+  g_clear_pointer (&priv->children, g_array_unref);
 
   G_OBJECT_CLASS (dzl_priority_box_parent_class)->finalize (object);
 }

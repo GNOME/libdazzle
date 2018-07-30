@@ -1985,7 +1985,7 @@ dzl_multi_paned_finalize (GObject *object)
 
   g_assert (priv->children->len == 0);
 
-  dzl_clear_pointer (&priv->children, g_array_unref);
+  g_clear_pointer (&priv->children, g_array_unref);
   g_clear_object (&priv->gesture);
 
   G_OBJECT_CLASS (dzl_multi_paned_parent_class)->finalize (object);

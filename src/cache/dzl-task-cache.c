@@ -157,7 +157,7 @@ evict_source_finalize (GSource *source)
 {
   EvictSource *ev = (EvictSource *)source;
 
-  dzl_clear_pointer (&ev->heap, dzl_heap_unref);
+  g_clear_pointer (&ev->heap, dzl_heap_unref);
 }
 
 static GSourceFuncs evict_source_funcs = {
@@ -172,8 +172,8 @@ cache_item_free (gpointer data)
 {
   CacheItem *item = data;
 
-  dzl_clear_pointer (&item->key, item->self->key_destroy_func);
-  dzl_clear_pointer (&item->value, item->self->value_destroy_func);
+  g_clear_pointer (&item->key, item->self->key_destroy_func);
+  g_clear_pointer (&item->value, item->self->value_destroy_func);
   item->self = NULL;
   item->evict_at = 0;
 
@@ -228,7 +228,7 @@ cancelled_data_free (gpointer data)
 {
   CancelledData *cancelled = data;
 
-  dzl_clear_pointer (&cancelled->key, cancelled->self->key_destroy_func);
+  g_clear_pointer (&cancelled->key, cancelled->self->key_destroy_func);
 
   g_cancellable_disconnect (cancelled->cancellable, cancelled->cancelled_id);
   cancelled->cancelled_id = 0;
@@ -776,24 +776,24 @@ dzl_task_cache_dispose (GObject *object)
       self->evict_source = NULL;
     }
 
-  dzl_clear_pointer (&self->evict_heap, dzl_heap_unref);
+  g_clear_pointer (&self->evict_heap, dzl_heap_unref);
 
   if (self->cache != NULL)
     {
       gint64 count;
 
       count = g_hash_table_size (self->cache);
-      dzl_clear_pointer (&self->cache, g_hash_table_unref);
+      g_clear_pointer (&self->cache, g_hash_table_unref);
 
       g_debug ("Evicted cache of %"G_GINT64_FORMAT" items from %s",
                count, self->name ?: "unnamed cache");
     }
 
   if (self->queued != NULL)
-    dzl_clear_pointer (&self->queued, g_hash_table_unref);
+    g_clear_pointer (&self->queued, g_hash_table_unref);
 
   if (self->in_flight != NULL)
-    dzl_clear_pointer (&self->in_flight, g_hash_table_unref);
+    g_clear_pointer (&self->in_flight, g_hash_table_unref);
 
   if (self->populate_callback_data)
     {
@@ -809,7 +809,7 @@ dzl_task_cache_finalize (GObject *object)
 {
   DzlTaskCache *self = (DzlTaskCache *)object;
 
-  dzl_clear_pointer (&self->name, g_free);
+  g_clear_pointer (&self->name, g_free);
 
   G_OBJECT_CLASS (dzl_task_cache_parent_class)->finalize (object);
 }

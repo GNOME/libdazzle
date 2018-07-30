@@ -591,7 +591,7 @@ dzl_column_layout_finalize (GObject *object)
   DzlColumnLayout *self = (DzlColumnLayout *)object;
   DzlColumnLayoutPrivate *priv = dzl_column_layout_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->children, g_array_unref);
+  g_clear_pointer (&priv->children, g_array_unref);
 
   G_OBJECT_CLASS (dzl_column_layout_parent_class)->finalize (object);
 }

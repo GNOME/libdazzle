@@ -105,7 +105,7 @@ dzl_preferences_font_button_changed (DzlPreferencesFontButton *self,
       g_free (font_size);
     }
 
-  dzl_clear_pointer (&font_desc, pango_font_description_free);
+  g_clear_pointer (&font_desc, pango_font_description_free);
   g_free (name);
 }
 
@@ -171,7 +171,7 @@ dzl_preferences_font_button_finalize (GObject *object)
   DzlPreferencesFontButton *self = (DzlPreferencesFontButton *)object;
 
   g_clear_object (&self->settings);
-  dzl_clear_pointer (&self->key, g_free);
+  g_clear_pointer (&self->key, g_free);
 
   G_OBJECT_CLASS (dzl_preferences_font_button_parent_class)->finalize (object);
 }

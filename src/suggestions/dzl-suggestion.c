@@ -77,9 +77,9 @@ dzl_suggestion_finalize (GObject *object)
 
   priv->icon_name = NULL;
 
-  dzl_clear_pointer (&priv->title, g_free);
-  dzl_clear_pointer (&priv->subtitle, g_free);
-  dzl_clear_pointer (&priv->id, g_free);
+  g_clear_pointer (&priv->title, g_free);
+  g_clear_pointer (&priv->subtitle, g_free);
+  g_clear_pointer (&priv->id, g_free);
 
   G_OBJECT_CLASS (dzl_suggestion_parent_class)->finalize (object);
 }

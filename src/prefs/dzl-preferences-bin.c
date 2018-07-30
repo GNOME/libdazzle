@@ -170,16 +170,16 @@ dzl_preferences_bin_get_settings (DzlPreferencesBin *self)
               dzl_preferences_bin_cache_settings (hash_key, priv->settings);
             }
 
-          dzl_clear_pointer (&schema, g_settings_schema_unref);
+          g_clear_pointer (&schema, g_settings_schema_unref);
         }
       else
         {
           priv->settings = g_object_ref (g_hash_table_lookup (settings_cache, hash_key));
         }
 
-      dzl_clear_pointer (&hash_key, g_free);
-      dzl_clear_pointer (&resolved_schema_id, g_free);
-      dzl_clear_pointer (&resolved_path, g_free);
+      g_clear_pointer (&hash_key, g_free);
+      g_clear_pointer (&resolved_schema_id, g_free);
+      g_clear_pointer (&resolved_path, g_free);
     }
 
   return (priv->settings != NULL) ? g_object_ref (priv->settings) : NULL;
@@ -273,10 +273,10 @@ dzl_preferences_bin_finalize (GObject *object)
   DzlPreferencesBin *self = (DzlPreferencesBin *)object;
   DzlPreferencesBinPrivate *priv = dzl_preferences_bin_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->schema_id, g_free);
-  dzl_clear_pointer (&priv->path, g_free);
-  dzl_clear_pointer (&priv->keywords, g_free);
-  dzl_clear_pointer (&priv->map, g_hash_table_unref);
+  g_clear_pointer (&priv->schema_id, g_free);
+  g_clear_pointer (&priv->path, g_free);
+  g_clear_pointer (&priv->keywords, g_free);
+  g_clear_pointer (&priv->map, g_hash_table_unref);
   g_clear_object (&priv->settings);
 
   G_OBJECT_CLASS (dzl_preferences_bin_parent_class)->finalize (object);
@@ -418,7 +418,7 @@ _dzl_preferences_bin_set_map (DzlPreferencesBin *self,
 
   if (map != priv->map)
     {
-      dzl_clear_pointer (&priv->map, g_hash_table_unref);
+      g_clear_pointer (&priv->map, g_hash_table_unref);
       priv->map = map ? g_hash_table_ref (map) : NULL;
       dzl_preferences_bin_reload (self);
     }

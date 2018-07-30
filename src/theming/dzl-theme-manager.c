@@ -39,7 +39,7 @@ dzl_theme_manager_finalize (GObject *object)
 {
   DzlThemeManager *self = (DzlThemeManager *)object;
 
-  dzl_clear_pointer (&self->providers_by_path, g_hash_table_unref);
+  g_clear_pointer (&self->providers_by_path, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_theme_manager_parent_class)->finalize (object);
 }

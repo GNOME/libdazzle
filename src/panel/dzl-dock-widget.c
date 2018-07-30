@@ -120,8 +120,8 @@ dzl_dock_widget_finalize (GObject *object)
   DzlDockWidget *self = (DzlDockWidget *)object;
   DzlDockWidgetPrivate *priv = dzl_dock_widget_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->title, g_free);
-  dzl_clear_pointer (&priv->icon_name, g_free);
+  g_clear_pointer (&priv->title, g_free);
+  g_clear_pointer (&priv->icon_name, g_free);
 
   G_OBJECT_CLASS (dzl_dock_widget_parent_class)->finalize (object);
 }

@@ -342,7 +342,7 @@ dzl_widget_action_group_finalize (GObject *object)
 {
   DzlWidgetActionGroup *self = (DzlWidgetActionGroup *)object;
 
-  dzl_clear_pointer (&self->enabled, g_hash_table_unref);
+  g_clear_pointer (&self->enabled, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_widget_action_group_parent_class)->finalize (object);
 }

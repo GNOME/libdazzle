@@ -523,7 +523,7 @@ cleanup:
   g_free (downcase);
   g_free (lookup.state);
   g_free (lookup.tables);
-  dzl_clear_pointer (&lookup.matches, g_hash_table_unref);
+  g_clear_pointer (&lookup.matches, g_hash_table_unref);
 
   return matches;
 }
@@ -539,7 +539,7 @@ dzl_fuzzy_mutable_index_contains (DzlFuzzyMutableIndex *fuzzy,
 
   ar = dzl_fuzzy_mutable_index_match (fuzzy, key, 1);
   ret = (ar != NULL) && (ar->len > 0);
-  dzl_clear_pointer (&ar, g_array_unref);
+  g_clear_pointer (&ar, g_array_unref);
 
   return ret;
 }
@@ -568,7 +568,7 @@ dzl_fuzzy_mutable_index_remove (DzlFuzzyMutableIndex *fuzzy,
         }
     }
 
-  dzl_clear_pointer (&ar, g_array_unref);
+  g_clear_pointer (&ar, g_array_unref);
 }
 
 gchar *

@@ -115,8 +115,8 @@ dzl_radio_box_finalize (GObject *object)
   DzlRadioBox *self = (DzlRadioBox *)object;
   DzlRadioBoxPrivate *priv = dzl_radio_box_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->items, g_array_unref);
-  dzl_clear_pointer (&priv->active_id, g_free);
+  g_clear_pointer (&priv->items, g_array_unref);
+  g_clear_pointer (&priv->active_id, g_free);
 
   G_OBJECT_CLASS (dzl_radio_box_parent_class)->finalize (object);
 }
@@ -382,7 +382,7 @@ item_parser_start_element (GMarkupParseContext  *context,
     {
       const gchar *translatable = NULL;
 
-      dzl_clear_pointer (&parser_data->id, g_free);
+      g_clear_pointer (&parser_data->id, g_free);
       g_string_truncate (parser_data->text, 0);
 
       if (!g_markup_collect_attributes (element_name, attribute_names, attribute_values, error,

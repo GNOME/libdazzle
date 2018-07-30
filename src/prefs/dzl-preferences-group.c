@@ -135,7 +135,7 @@ dzl_preferences_group_finalize (GObject *object)
 {
   DzlPreferencesGroup *self = (DzlPreferencesGroup *)object;
 
-  dzl_clear_pointer (&self->widgets, g_ptr_array_unref);
+  g_clear_pointer (&self->widgets, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_preferences_group_parent_class)->finalize (object);
 }

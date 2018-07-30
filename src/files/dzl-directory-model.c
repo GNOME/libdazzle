@@ -317,7 +317,7 @@ dzl_directory_model_finalize (GObject *object)
 
   g_clear_object (&self->cancellable);
   g_clear_object (&self->directory);
-  dzl_clear_pointer (&self->items, g_sequence_free);
+  g_clear_pointer (&self->items, g_sequence_free);
 
   if (self->visible_func_destroy)
     self->visible_func_destroy (self->visible_func_data);

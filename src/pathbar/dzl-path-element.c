@@ -72,9 +72,9 @@ dzl_path_element_finalize (GObject *object)
 {
   DzlPathElement *self = (DzlPathElement *)object;
 
-  dzl_clear_pointer (&self->icon_name, g_free);
-  dzl_clear_pointer (&self->id, g_free);
-  dzl_clear_pointer (&self->title, g_free);
+  g_clear_pointer (&self->icon_name, g_free);
+  g_clear_pointer (&self->id, g_free);
+  g_clear_pointer (&self->title, g_free);
 
   G_OBJECT_CLASS (dzl_path_element_parent_class)->finalize (object);
 }

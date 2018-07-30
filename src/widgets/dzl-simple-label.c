@@ -183,7 +183,7 @@ dzl_simple_label_destroy (GtkWidget *widget)
 {
   DzlSimpleLabel *self = (DzlSimpleLabel *)widget;
 
-  dzl_clear_pointer (&self->label, g_free);
+  g_clear_pointer (&self->label, g_free);
   g_clear_object (&self->cached_layout);
 
   GTK_WIDGET_CLASS (dzl_simple_label_parent_class)->destroy (widget);

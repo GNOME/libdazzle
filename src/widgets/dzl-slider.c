@@ -708,7 +708,7 @@ dzl_slider_finalize (GObject *object)
 
   g_clear_object (&priv->h_adj);
   g_clear_object (&priv->v_adj);
-  dzl_clear_pointer (&priv->children, g_ptr_array_unref);
+  g_clear_pointer (&priv->children, g_ptr_array_unref);
 
   dzl_clear_weak_pointer (&priv->h_anim);
   dzl_clear_weak_pointer (&priv->v_anim);

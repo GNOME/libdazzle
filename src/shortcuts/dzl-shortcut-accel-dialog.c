@@ -341,8 +341,8 @@ dzl_shortcut_accel_dialog_finalize (GObject *object)
 {
   DzlShortcutAccelDialog *self = (DzlShortcutAccelDialog *)object;
 
-  dzl_clear_pointer (&self->shortcut_title, g_free);
-  dzl_clear_pointer (&self->chord, dzl_shortcut_chord_free);
+  g_clear_pointer (&self->shortcut_title, g_free);
+  g_clear_pointer (&self->chord, dzl_shortcut_chord_free);
 
   G_OBJECT_CLASS (dzl_shortcut_accel_dialog_parent_class)->finalize (object);
 }

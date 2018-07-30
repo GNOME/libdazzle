@@ -200,8 +200,8 @@ dzl_tab_destroy (GtkWidget *widget)
     }
 
   dzl_clear_weak_pointer (&priv->widget);
-  dzl_clear_pointer (&priv->action_name, g_free);
-  dzl_clear_pointer (&priv->action_target_value, g_variant_unref);
+  g_clear_pointer (&priv->action_name, g_free);
+  g_clear_pointer (&priv->action_target_value, g_variant_unref);
 
   GTK_WIDGET_CLASS (dzl_tab_parent_class)->destroy (widget);
 }
@@ -700,7 +700,7 @@ dzl_tab_set_property (GObject      *object,
       break;
 
     case PROP_ACTION_TARGET:
-      dzl_clear_pointer (&priv->action_target_value, g_variant_unref);
+      g_clear_pointer (&priv->action_target_value, g_variant_unref);
       priv->action_target_value = g_value_get_variant (value);
       if (priv->action_target_value != NULL)
         g_variant_ref_sink (priv->action_target_value);
@@ -1102,7 +1102,7 @@ dzl_tab_set_action_target_value (GtkActionable *actionable,
 
   if (priv->action_target_value != variant)
     {
-      dzl_clear_pointer (&priv->action_target_value, g_variant_unref);
+      g_clear_pointer (&priv->action_target_value, g_variant_unref);
       if (variant != NULL)
         priv->action_target_value = g_variant_ref_sink (variant);
       g_object_notify (G_OBJECT (self), "action-target");

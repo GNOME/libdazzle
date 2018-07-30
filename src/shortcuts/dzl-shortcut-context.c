@@ -73,7 +73,7 @@ dzl_shortcut_context_finalize (GObject *object)
   DzlShortcutContext *self = (DzlShortcutContext *)object;
   DzlShortcutContextPrivate *priv = dzl_shortcut_context_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->table, dzl_shortcut_chord_table_free);
+  g_clear_pointer (&priv->table, dzl_shortcut_chord_table_free);
 
   G_OBJECT_CLASS (dzl_shortcut_context_parent_class)->finalize (object);
 }

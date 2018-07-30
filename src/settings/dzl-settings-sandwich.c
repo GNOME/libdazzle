@@ -153,9 +153,9 @@ dzl_settings_sandwich_finalize (GObject *object)
 {
   DzlSettingsSandwich *self = (DzlSettingsSandwich *)object;
 
-  dzl_clear_pointer (&self->settings, g_ptr_array_unref);
-  dzl_clear_pointer (&self->schema_id, g_free);
-  dzl_clear_pointer (&self->path, g_free);
+  g_clear_pointer (&self->settings, g_ptr_array_unref);
+  g_clear_pointer (&self->schema_id, g_free);
+  g_clear_pointer (&self->path, g_free);
   g_clear_object (&self->memory_backend);
 
   G_OBJECT_CLASS (dzl_settings_sandwich_parent_class)->finalize (object);

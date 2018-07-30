@@ -215,7 +215,7 @@ dzl_application_startup (GApplication *app)
       const gchar *path = g_ptr_array_index (priv->deferred_resources, i);
       DZL_APPLICATION_GET_CLASS (self)->add_resources (self, path);
     }
-  dzl_clear_pointer (&priv->deferred_resources, g_ptr_array_unref);
+  g_clear_pointer (&priv->deferred_resources, g_ptr_array_unref);
 
   /*
    * Now force reload the keyboard shortcuts without defering to the main
@@ -230,8 +230,8 @@ dzl_application_finalize (GObject *object)
   DzlApplication *self = (DzlApplication *)object;
   DzlApplicationPrivate *priv = dzl_application_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->deferred_resources, g_ptr_array_unref);
-  dzl_clear_pointer (&priv->menu_merge_ids, g_hash_table_unref);
+  g_clear_pointer (&priv->deferred_resources, g_ptr_array_unref);
+  g_clear_pointer (&priv->menu_merge_ids, g_hash_table_unref);
   g_clear_object (&priv->theme_manager);
   g_clear_object (&priv->menu_manager);
   g_clear_object (&priv->shortcut_manager);

@@ -447,7 +447,7 @@ dzl_graph_view_model_finalize (GObject *object)
   DzlGraphModel *self = (DzlGraphModel *)object;
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->columns, g_ptr_array_unref);
+  g_clear_pointer (&priv->columns, g_ptr_array_unref);
   g_clear_object (&priv->timestamps);
 
   G_OBJECT_CLASS (dzl_graph_view_model_parent_class)->finalize (object);

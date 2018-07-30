@@ -80,7 +80,7 @@ dzl_menu_manager_dispose (GObject *object)
 {
   DzlMenuManager *self = (DzlMenuManager *)object;
 
-  dzl_clear_pointer (&self->models, g_hash_table_unref);
+  g_clear_pointer (&self->models, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_menu_manager_parent_class)->dispose (object);
 }

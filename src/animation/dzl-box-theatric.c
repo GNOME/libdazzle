@@ -216,7 +216,7 @@ dzl_box_theatric_dispose (GObject *object)
       self->target = NULL;
     }
 
-  dzl_clear_pointer (&self->icon_surface, cairo_surface_destroy);
+  g_clear_pointer (&self->icon_surface, cairo_surface_destroy);
   g_clear_object (&self->icon);
 
   G_OBJECT_CLASS (dzl_box_theatric_parent_class)->dispose (object);
@@ -307,14 +307,14 @@ dzl_box_theatric_set_property (GObject      *object,
       break;
 
     case PROP_ICON:
-      dzl_clear_pointer (&theatric->icon_surface, cairo_surface_destroy);
+      g_clear_pointer (&theatric->icon_surface, cairo_surface_destroy);
       g_clear_object (&theatric->icon);
       theatric->icon = g_value_dup_object (value);
       theatric->pixbuf_failed = FALSE;
       break;
 
     case PROP_SURFACE:
-      dzl_clear_pointer (&theatric->icon_surface, cairo_surface_destroy);
+      g_clear_pointer (&theatric->icon_surface, cairo_surface_destroy);
       theatric->icon_surface = g_value_get_pointer (value);
       if (theatric->icon_surface != NULL)
         cairo_surface_reference (theatric->icon_surface);

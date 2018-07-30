@@ -381,10 +381,10 @@ dzl_application_window_destroy (GtkWidget *widget)
       priv->motion_notify_handler = 0;
     }
 
-  dzl_clear_pointer ((GtkWidget **)&priv->titlebar_container, gtk_widget_destroy);
-  dzl_clear_pointer ((GtkWidget **)&priv->titlebar_revealer, gtk_widget_destroy);
-  dzl_clear_pointer ((GtkWidget **)&priv->event_box, gtk_widget_destroy);
-  dzl_clear_pointer ((GtkWidget **)&priv->overlay, gtk_widget_destroy);
+  g_clear_pointer ((GtkWidget **)&priv->titlebar_container, gtk_widget_destroy);
+  g_clear_pointer ((GtkWidget **)&priv->titlebar_revealer, gtk_widget_destroy);
+  g_clear_pointer ((GtkWidget **)&priv->event_box, gtk_widget_destroy);
+  g_clear_pointer ((GtkWidget **)&priv->overlay, gtk_widget_destroy);
 
   dzl_clear_source (&priv->fullscreen_source);
   dzl_clear_source (&priv->fullscreen_reveal_source);

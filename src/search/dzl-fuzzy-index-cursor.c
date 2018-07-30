@@ -125,9 +125,9 @@ dzl_fuzzy_index_cursor_finalize (GObject *object)
   DzlFuzzyIndexCursor *self = (DzlFuzzyIndexCursor *)object;
 
   g_clear_object (&self->index);
-  dzl_clear_pointer (&self->query, g_free);
-  dzl_clear_pointer (&self->matches, g_array_unref);
-  dzl_clear_pointer (&self->tables, g_variant_dict_unref);
+  g_clear_pointer (&self->query, g_free);
+  g_clear_pointer (&self->matches, g_array_unref);
+  g_clear_pointer (&self->tables, g_variant_dict_unref);
 
   G_OBJECT_CLASS (dzl_fuzzy_index_cursor_parent_class)->finalize (object);
 }

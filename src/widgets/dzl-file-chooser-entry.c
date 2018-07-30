@@ -246,7 +246,7 @@ dzl_file_chooser_entry_finalize (GObject *object)
 
   g_clear_object (&priv->file);
   g_clear_object (&priv->filter);
-  dzl_clear_pointer (&priv->title, g_free);
+  g_clear_pointer (&priv->title, g_free);
 
   G_OBJECT_CLASS (dzl_file_chooser_entry_parent_class)->finalize (object);
 }

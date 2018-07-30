@@ -43,7 +43,7 @@ dzl_preferences_page_finalize (GObject *object)
 {
   DzlPreferencesPage *self = (DzlPreferencesPage *)object;
 
-  dzl_clear_pointer (&self->groups_by_name, g_hash_table_unref);
+  g_clear_pointer (&self->groups_by_name, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_preferences_page_parent_class)->finalize (object);
 }

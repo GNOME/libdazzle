@@ -288,7 +288,7 @@ dzl_graph_view_size_allocate (GtkWidget     *widget,
   gtk_widget_get_allocation (widget, &old_alloc);
 
   if ((old_alloc.width != alloc->width) || (old_alloc.height != alloc->height))
-    dzl_clear_pointer (&priv->surface, cairo_surface_destroy);
+    g_clear_pointer (&priv->surface, cairo_surface_destroy);
 
   GTK_WIDGET_CLASS (dzl_graph_view_parent_class)->size_allocate (widget, alloc);
 }
@@ -333,7 +333,7 @@ dzl_graph_view_destroy (GtkWidget *widget)
       priv->tick_handler = 0;
     }
 
-  dzl_clear_pointer (&priv->surface, cairo_surface_destroy);
+  g_clear_pointer (&priv->surface, cairo_surface_destroy);
 
   GTK_WIDGET_CLASS (dzl_graph_view_parent_class)->destroy (widget);
 }
@@ -346,7 +346,7 @@ dzl_graph_view_finalize (GObject *object)
 
   g_clear_object (&priv->model);
   g_clear_object (&priv->model_signals);
-  dzl_clear_pointer (&priv->renderers, g_ptr_array_unref);
+  g_clear_pointer (&priv->renderers, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_graph_view_parent_class)->finalize (object);
 }

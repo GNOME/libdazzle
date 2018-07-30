@@ -97,14 +97,14 @@ dzl_shortcut_theme_finalize (GObject *object)
   DzlShortcutTheme *self = (DzlShortcutTheme *)object;
   DzlShortcutThemePrivate *priv = dzl_shortcut_theme_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->name, g_free);
-  dzl_clear_pointer (&priv->parent_name, g_free);
-  dzl_clear_pointer (&priv->title, g_free);
-  dzl_clear_pointer (&priv->subtitle, g_free);
-  dzl_clear_pointer (&priv->contexts, g_hash_table_unref);
-  dzl_clear_pointer (&priv->chains, g_hash_table_unref);
-  dzl_clear_pointer (&priv->actions_table, dzl_shortcut_chord_table_free);
-  dzl_clear_pointer (&priv->commands_table, dzl_shortcut_chord_table_free);
+  g_clear_pointer (&priv->name, g_free);
+  g_clear_pointer (&priv->parent_name, g_free);
+  g_clear_pointer (&priv->title, g_free);
+  g_clear_pointer (&priv->subtitle, g_free);
+  g_clear_pointer (&priv->contexts, g_hash_table_unref);
+  g_clear_pointer (&priv->chains, g_hash_table_unref);
+  g_clear_pointer (&priv->actions_table, dzl_shortcut_chord_table_free);
+  g_clear_pointer (&priv->commands_table, dzl_shortcut_chord_table_free);
 
   G_OBJECT_CLASS (dzl_shortcut_theme_parent_class)->finalize (object);
 }

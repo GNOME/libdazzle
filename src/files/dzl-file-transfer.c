@@ -96,7 +96,7 @@ dzl_file_transfer_finalize (GObject *object)
   DzlFileTransfer *self = (DzlFileTransfer *)object;
   DzlFileTransferPrivate *priv = dzl_file_transfer_get_instance_private (self);
 
-  dzl_clear_pointer (&priv->opers, g_ptr_array_unref);
+  g_clear_pointer (&priv->opers, g_ptr_array_unref);
 
   G_OBJECT_CLASS (dzl_file_transfer_parent_class)->finalize (object);
 }
