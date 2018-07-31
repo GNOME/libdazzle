@@ -20,11 +20,14 @@
 
 #include "config.h"
 
-#include "dzl-suggestion-row.h"
+#include "suggestions/dzl-suggestion-row.h"
+#include "util/dzl-macros.h"
 
 typedef struct
 {
   DzlSuggestion *suggestion;
+
+  gulong         notify_icon_handler;
 
   GtkImage      *image;
   GtkLabel      *title;
@@ -52,31 +55,53 @@ dzl_suggestion_row_disconnect (DzlSuggestionRow *self)
   if (priv->suggestion == NULL)
     return;
 
+  dzl_clear_signal_handler (priv->suggestion, &priv->notify_icon_handler);
+
   g_object_set (priv->image, "icon-name", NULL, NULL);
   gtk_label_set_label (priv->title, NULL);
   gtk_label_set_label (priv->subtitle, NULL);
 }
 
 static void
-dzl_suggestion_row_connect (DzlSuggestionRow *self)
+on_notify_icon_cb (DzlSuggestionRow *self,
+                   GParamSpec       *pspec,
+                   DzlSuggestion    *suggestion)
 {
   DzlSuggestionRowPrivate *priv = dzl_suggestion_row_get_instance_private (self);
   cairo_surface_t *surface;
-  const gchar *subtitle;
 
-  g_return_if_fail (DZL_IS_SUGGESTION_ROW (self));
-  g_return_if_fail (priv->suggestion != NULL);
+  g_assert (DZL_IS_SUGGESTION_ROW (self));
+  g_assert (DZL_IS_SUGGESTION (suggestion));
 
-  if ((surface = dzl_suggestion_get_icon_surface (priv->suggestion, GTK_WIDGET (priv->image))))
+  if ((surface = dzl_suggestion_get_icon_surface (suggestion, GTK_WIDGET (priv->image))))
     {
       gtk_image_set_from_surface (priv->image, surface);
       cairo_surface_destroy (surface);
     }
   else
     {
-      g_autoptr(GIcon) icon = dzl_suggestion_get_icon (priv->suggestion);
+      g_autoptr(GIcon) icon = dzl_suggestion_get_icon (suggestion);
       gtk_image_set_from_gicon (priv->image, icon, GTK_ICON_SIZE_MENU);
     }
+}
+
+static void
+dzl_suggestion_row_connect (DzlSuggestionRow *self)
+{
+  DzlSuggestionRowPrivate *priv = dzl_suggestion_row_get_instance_private (self);
+  const gchar *subtitle;
+
+  g_return_if_fail (DZL_IS_SUGGESTION_ROW (self));
+  g_return_if_fail (priv->suggestion != NULL);
+
+  priv->notify_icon_handler =
+    g_signal_connect_object (priv->suggestion,
+                             "notify::icon",
+                             G_CALLBACK (on_notify_icon_cb),
+                             self,
+                             G_CONNECT_SWAPPED);
+
+  on_notify_icon_cb (self, NULL, priv->suggestion);
 
   gtk_label_set_label (priv->title, dzl_suggestion_get_title (priv->suggestion));
 
@@ -86,14 +111,18 @@ dzl_suggestion_row_connect (DzlSuggestionRow *self)
 }
 
 static void
-dzl_suggestion_row_finalize (GObject *object)
+dzl_suggestion_row_dispose (GObject *object)
 {
   DzlSuggestionRow *self = (DzlSuggestionRow *)object;
   DzlSuggestionRowPrivate *priv = dzl_suggestion_row_get_instance_private (self);
 
-  g_clear_object (&priv->suggestion);
+  if (priv->suggestion != NULL)
+    {
+      dzl_suggestion_row_disconnect (self);
+      g_clear_object (&priv->suggestion);
+    }
 
-  G_OBJECT_CLASS (dzl_suggestion_row_parent_class)->finalize (object);
+  G_OBJECT_CLASS (dzl_suggestion_row_parent_class)->dispose (object);
 }
 
 static void
@@ -140,7 +169,7 @@ dzl_suggestion_row_class_init (DzlSuggestionRowClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-  object_class->finalize = dzl_suggestion_row_finalize;
+  object_class->dispose = dzl_suggestion_row_dispose;
   object_class->get_property = dzl_suggestion_row_get_property;
   object_class->set_property = dzl_suggestion_row_set_property;
 
