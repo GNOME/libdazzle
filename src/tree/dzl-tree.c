@@ -1086,9 +1086,16 @@ dzl_tree_destroy (GtkWidget *widget)
 
   g_assert (DZL_IS_TREE (self));
 
+  gtk_tree_view_set_model (GTK_TREE_VIEW (self), NULL);
+
+  if (priv->store != NULL)
+    {
+      gtk_tree_store_clear (GTK_TREE_STORE (priv->store));
+      g_clear_object (&priv->store);
+    }
+
   g_clear_pointer (&priv->last_drop_path, gtk_tree_path_free);
   g_clear_pointer (&priv->builders, g_ptr_array_unref);
-  g_clear_object (&priv->store);
   g_clear_object (&priv->root);
   g_clear_object (&priv->context_menu);
 
