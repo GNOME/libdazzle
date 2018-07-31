@@ -229,7 +229,7 @@ main (gint   argc,
   g_signal_connect (builder, "node-droppable", G_CALLBACK (node_droppable_cb), NULL);
   dzl_tree_add_builder (DZL_TREE (tree), builder);
 
-  root = dzl_tree_node_new ();
+  root = g_object_ref_sink (dzl_tree_node_new ());
   dzl_tree_node_set_item (root, G_OBJECT (home));
   dzl_tree_set_root (DZL_TREE (tree), root);
 
