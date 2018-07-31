@@ -208,6 +208,8 @@ search_changed (DzlSuggestionEntry *entry,
     model = create_search_results (text, str->str);
 
   dzl_suggestion_entry_set_model (entry, model);
+
+  g_string_free (str, TRUE);
 }
 
 static void
