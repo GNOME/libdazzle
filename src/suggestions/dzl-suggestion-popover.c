@@ -56,6 +56,8 @@ struct _DzlSuggestionPopover
   gulong              items_changed_handler;
   gulong              destroy_handler;
 
+  gboolean            popup_requested;
+
   PangoEllipsizeMode  subtitle_ellipsize;
   PangoEllipsizeMode  title_ellipsize;
 };
@@ -695,8 +697,11 @@ dzl_suggestion_popover_popup (DzlSuggestionPopover *self)
 
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
 
-  if (self->model == NULL || 0 == (n_items = g_list_model_get_n_items (self->model)))
+
+  if (self->model == NULL || 0 == (n_items = g_list_model_get_n_items (self->model))) {
+    self->popup_requested = TRUE;
     return;
+  }
 
   if (self->relative_to != NULL)
     {
@@ -734,6 +739,8 @@ dzl_suggestion_popover_popdown (DzlSuggestionPopover *self)
 
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
 
+  self->popup_requested = FALSE;
+
   if (!gtk_widget_get_realized (GTK_WIDGET (self)))
     return;
 
@@ -762,6 +769,13 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
   if (g_list_model_get_n_items (model) == 0)
     {
       dzl_suggestion_popover_popdown (self);
+      return;
+    }
+
+  if (self->popup_requested)
+    {
+      dzl_suggestion_popover_popup (self);
+      self->popup_requested = FALSE;
       return;
     }
 
