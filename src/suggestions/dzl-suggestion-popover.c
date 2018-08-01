@@ -56,10 +56,10 @@ struct _DzlSuggestionPopover
   gulong              items_changed_handler;
   gulong              destroy_handler;
 
-  gboolean            popup_requested;
-
   PangoEllipsizeMode  subtitle_ellipsize;
   PangoEllipsizeMode  title_ellipsize;
+
+  guint               popup_requested : 1;
 };
 
 enum {
@@ -697,11 +697,11 @@ dzl_suggestion_popover_popup (DzlSuggestionPopover *self)
 
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
 
-
-  if (self->model == NULL || 0 == (n_items = g_list_model_get_n_items (self->model))) {
-    self->popup_requested = TRUE;
-    return;
-  }
+  if (self->model == NULL || 0 == (n_items = g_list_model_get_n_items (self->model)))
+    {
+      self->popup_requested = TRUE;
+      return;
+    }
 
   if (self->relative_to != NULL)
     {
@@ -809,7 +809,7 @@ dzl_suggestion_popover_connect (DzlSuggestionPopover *self)
                              "items-changed",
                              G_CALLBACK (dzl_suggestion_popover_items_changed),
                              self,
-                             G_CONNECT_SWAPPED);
+                             G_CONNECT_AFTER | G_CONNECT_SWAPPED);
 
   if (g_list_model_get_n_items (self->model) == 0)
     {
@@ -864,7 +864,12 @@ dzl_suggestion_popover_set_model (DzlSuggestionPopover *self,
         {
           self->model = g_object_ref (model);
           dzl_suggestion_popover_connect (self);
+
+          if (self->popup_requested)
+            dzl_suggestion_popover_popup (self);
         }
+
+      self->popup_requested = FALSE;
 
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_MODEL]);
     }
