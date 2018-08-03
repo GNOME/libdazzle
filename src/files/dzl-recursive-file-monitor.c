@@ -288,7 +288,7 @@ dzl_recursive_file_monitor_changed (DzlRecursiveFileMonitor *self,
     }
   else if (event == G_FILE_MONITOR_EVENT_CREATED)
     {
-      if (g_file_query_file_type (file, 0, NULL) == G_FILE_TYPE_DIRECTORY)
+      if (g_file_query_file_type (file, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL) == G_FILE_TYPE_DIRECTORY)
         {
           g_autoptr(GPtrArray) dirs = NULL;
 
