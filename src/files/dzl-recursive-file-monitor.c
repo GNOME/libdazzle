@@ -465,6 +465,9 @@ dzl_recursive_file_monitor_dispose (GObject *object)
   g_cancellable_cancel (self->cancellable);
   dzl_recursive_file_monitor_set_ignore_func (self, NULL, NULL, NULL);
 
+  g_hash_table_remove_all (self->files_by_monitor);
+  g_hash_table_remove_all (self->monitors_by_file);
+
   G_OBJECT_CLASS (dzl_recursive_file_monitor_parent_class)->dispose (object);
 }
 
