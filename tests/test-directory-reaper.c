@@ -48,6 +48,12 @@ test_reaper_basic (void)
     { "a/d/e/h", "" },
   };
 
+  /* make a special out-of-tree file so that we know we never
+   * followed a symlink to delete out of tree.
+   */
+  g_assert_cmpint (0, ==, g_mkdir_with_parents ("out-of-tree", 0750));
+  g_assert_true (g_file_set_contents ("out-of-tree/delete-check", "", 0, NULL));
+
   /*
    * Start out by creating some directories and files so that we can
    * test that they've been reaped correctly.
@@ -78,14 +84,29 @@ test_reaper_basic (void)
       g_error ("Failed to create symlink");
   }
 
+  /* also create link to out-of-tree to ensure we don't follow
+   * symlinks and delete files there.
+   */
+  g_assert_cmpint (0, ==, symlink ("out-of-tree", "reaper/symlink-check"));
+  g_assert_true (g_file_test ("reaper/symlink-check", G_FILE_TEST_IS_SYMLINK));
+  g_assert_true (g_file_test ("out-of-tree/delete-check", G_FILE_TEST_IS_REGULAR));
+
   dzl_directory_reaper_add_directory (reaper, file, 0);
 
   r = dzl_directory_reaper_execute (reaper, NULL, &error);
   g_assert_no_error (error);
   g_assert_cmpint (r, ==, TRUE);
 
+  g_assert_true (g_file_test ("out-of-tree", G_FILE_TEST_IS_DIR));
+  g_assert_true (g_file_test ("out-of-tree/delete-check", G_FILE_TEST_IS_REGULAR));
+
+  /* make sure reaper dir is empty */
   if (g_rmdir ("reaper") != 0)
     g_error ("Failed to remove 'reaper': %s", g_strerror (errno));
+
+  /* now remove our delete check dir */
+  g_assert_cmpint (0, ==, g_unlink ("out-of-tree/delete-check"));
+  g_assert_cmpint (0, ==, g_rmdir ("out-of-tree"));
 }
 
 gint
