@@ -548,7 +548,7 @@ handle_removal (DzlFileTransfer *self,
       if (oper->error != NULL)
         return;
 
-      if (g_file_query_file_type (oper->src, 0, NULL) == G_FILE_TYPE_DIRECTORY)
+      if (g_file_query_file_type (oper->src, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL) == G_FILE_TYPE_DIRECTORY)
         dzl_directory_reaper_add_directory (reaper, oper->src, 0);
 
       dzl_directory_reaper_add_file (reaper, oper->src, 0);
