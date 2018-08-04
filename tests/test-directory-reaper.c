@@ -87,9 +87,14 @@ test_reaper_basic (void)
   /* also create link to out-of-tree to ensure we don't follow
    * symlinks and delete files there.
    */
-  g_assert_cmpint (0, ==, symlink ("out-of-tree", "reaper/symlink-check"));
+  g_assert_cmpint (0, ==, symlink ("../out-of-tree", "reaper/symlink-check"));
   g_assert_true (g_file_test ("reaper/symlink-check", G_FILE_TEST_IS_SYMLINK));
+  g_assert_true (g_file_test ("reaper/symlink-check", G_FILE_TEST_EXISTS));
   g_assert_true (g_file_test ("out-of-tree/delete-check", G_FILE_TEST_IS_REGULAR));
+
+  g_assert_cmpint (0, ==, symlink ("../../../out-of-tree", "reaper/a/b/d"));
+  g_assert_true (g_file_test ("reaper/a/b/d", G_FILE_TEST_IS_SYMLINK));
+  g_assert_true (g_file_test ("reaper/a/b/d", G_FILE_TEST_EXISTS));
 
   dzl_directory_reaper_add_directory (reaper, file, 0);
 
