@@ -372,35 +372,99 @@ dzl_dock_bin_get_child (DzlDockBin *self,
   return NULL;
 }
 
-static void
-dzl_dock_bin_update_focus_chain (DzlDockBin *self)
+static gboolean
+dzl_dock_bin_focus (GtkWidget        *widget,
+                    GtkDirectionType  dir)
 {
+  DzlDockBin *self = (DzlDockBin *)widget;
   DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
-  DzlDockBinChild *child;
-  GList *focus_chain = NULL;
-  guint i;
+  DzlDockBinChild *next_child = NULL;
+  DzlDockBinChild *child = NULL;
+  GtkWidget *focus_child;
 
   g_assert (DZL_IS_DOCK_BIN (self));
 
-  for (i = G_N_ELEMENTS (priv->children); i > 0; i--)
-    {
-      child = &priv->children [i - 1];
+  if (!gtk_widget_get_can_focus (widget))
+    return GTK_WIDGET_CLASS (dzl_dock_bin_parent_class)->focus (widget, dir);
 
-      if ((child->widget != NULL) &&
-          (child->type != DZL_DOCK_BIN_CHILD_CENTER))
-        focus_chain = g_list_prepend (focus_chain, child->widget);
+  if (!(focus_child = gtk_container_get_focus_child (GTK_CONTAINER (self))))
+    {
+      child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+
+      g_assert (child != NULL);
+
+      if (child->widget != NULL)
+        {
+          if (gtk_widget_child_focus (child->widget, dir))
+            return TRUE;
+        }
+
+      return FALSE;
     }
 
-  child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
-
-  if (child->widget != NULL)
-    focus_chain = g_list_prepend (focus_chain, child->widget);
-
-  if (focus_chain != NULL)
+  for (guint i = 0; i < DZL_DOCK_BIN_CHILD_CENTER; i++)
     {
-      gtk_container_set_focus_chain (GTK_CONTAINER (self), focus_chain);
-      g_list_free (focus_chain);
+      if (priv->children[i].widget == focus_child)
+        {
+          child = &priv->children[i];
+          break;
+        }
     }
+
+  if (child != NULL)
+    {
+      switch (dir)
+        {
+        case GTK_DIR_TAB_FORWARD:
+        case GTK_DIR_LEFT:
+          if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_LEFT);
+          else if (child->type == DZL_DOCK_BIN_CHILD_RIGHT)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+          break;
+
+        case GTK_DIR_TAB_BACKWARD:
+        case GTK_DIR_RIGHT:
+          if (child->type == DZL_DOCK_BIN_CHILD_LEFT)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+          else if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_RIGHT);
+          break;
+
+        case GTK_DIR_UP:
+          if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_TOP);
+          else if (child->type == DZL_DOCK_BIN_CHILD_BOTTOM)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+          break;
+
+        case GTK_DIR_DOWN:
+          if (child->type == DZL_DOCK_BIN_CHILD_TOP)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
+          else if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
+            next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_BOTTOM);
+          break;
+
+        default:
+          break;
+        }
+    }
+
+  if (next_child == NULL || next_child->widget == NULL)
+    {
+      if (dir == GTK_DIR_UP || dir == GTK_DIR_DOWN || dir == GTK_DIR_LEFT || dir == GTK_DIR_RIGHT)
+        {
+          if (gtk_widget_keynav_failed (GTK_WIDGET (self), dir))
+            return TRUE;
+        }
+
+      return FALSE;
+    }
+
+  g_assert (next_child != NULL);
+  g_assert (next_child->widget != NULL);
+
+  return gtk_widget_child_focus (next_child->widget, dir);
 }
 
 static void
@@ -437,8 +501,6 @@ dzl_dock_bin_add (GtkContainer *container,
 
   if (DZL_IS_DOCK_ITEM (widget))
     dzl_dock_item_emit_presented (DZL_DOCK_ITEM (widget));
-
-  dzl_dock_bin_update_focus_chain (self);
 
   gtk_widget_queue_resize (GTK_WIDGET (self));
 }
@@ -1822,6 +1884,7 @@ dzl_dock_bin_class_init (DzlDockBinClass *klass)
   widget_class->destroy = dzl_dock_bin_destroy;
   widget_class->drag_leave = dzl_dock_bin_drag_leave;
   widget_class->drag_motion = dzl_dock_bin_drag_motion;
+  widget_class->focus = dzl_dock_bin_focus;
   widget_class->get_preferred_height = dzl_dock_bin_get_preferred_height;
   widget_class->get_preferred_width = dzl_dock_bin_get_preferred_width;
   widget_class->grab_focus = dzl_dock_bin_grab_focus;
