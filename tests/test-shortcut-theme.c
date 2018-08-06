@@ -83,7 +83,8 @@ test_shortcut_theme_manager (void)
   window = gtk_offscreen_window_new ();
   label = gtk_label_new (NULL);
   gtk_container_add (GTK_CONTAINER (window), label);
-  gtk_widget_show_all (window);
+  gtk_widget_show (label);
+  gtk_widget_show (window);
   controller = dzl_shortcut_controller_find (label);
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (controller));
   dzl_shortcut_controller_add_command_callback (controller, "useless.command.here", "<Control>a", DZL_SHORTCUT_PHASE_GLOBAL, key_callback, &did_cb, NULL);
