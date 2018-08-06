@@ -151,7 +151,7 @@ dzl_suggestion_entry_key_press_event (GtkWidget   *widget,
    * If Tab was pressed, and there is uncommitted suggested text,
    * commit it and stop propagation of the key press.
    */
-  if (key->keyval == GDK_KEY_Tab && (key->state & GDK_MODIFIER_MASK) == 0)
+  if (key->keyval == GDK_KEY_Tab && (key->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == 0)
     {
       const gchar *typed_text;
       DzlSuggestion *suggestion;
