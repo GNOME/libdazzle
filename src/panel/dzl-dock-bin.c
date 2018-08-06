@@ -415,7 +415,7 @@ dzl_dock_bin_focus (GtkWidget        *widget,
     {
       switch (dir)
         {
-        case GTK_DIR_TAB_FORWARD:
+        case GTK_DIR_TAB_BACKWARD:
         case GTK_DIR_LEFT:
           if (child->type == DZL_DOCK_BIN_CHILD_CENTER)
             next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_LEFT);
@@ -423,7 +423,7 @@ dzl_dock_bin_focus (GtkWidget        *widget,
             next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
           break;
 
-        case GTK_DIR_TAB_BACKWARD:
+        case GTK_DIR_TAB_FORWARD:
         case GTK_DIR_RIGHT:
           if (child->type == DZL_DOCK_BIN_CHILD_LEFT)
             next_child = dzl_dock_bin_get_child_typed (self, DZL_DOCK_BIN_CHILD_CENTER);
