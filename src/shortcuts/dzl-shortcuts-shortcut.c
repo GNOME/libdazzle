@@ -265,12 +265,19 @@ update_visible_from_direction (DzlShortcutsShortcut *self)
       self->direction == gtk_widget_get_direction (GTK_WIDGET (self)))
     {
       gtk_widget_set_visible (GTK_WIDGET (self), TRUE);
+      /* When porting to gtk4, we'll have to update all this
+       * code anyway, so fine to disable warnings.
+       */
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
       gtk_widget_set_no_show_all (GTK_WIDGET (self), FALSE);
+      G_GNUC_END_IGNORE_DEPRECATIONS;
     }
   else
     {
       gtk_widget_set_visible (GTK_WIDGET (self), FALSE);
+      G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
       gtk_widget_set_no_show_all (GTK_WIDGET (self), TRUE);
+      G_GNUC_END_IGNORE_DEPRECATIONS;
     }
 }
 

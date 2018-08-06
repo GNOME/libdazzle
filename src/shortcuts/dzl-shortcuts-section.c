@@ -435,7 +435,12 @@ dzl_shortcuts_section_init (DzlShortcutsSection *self)
   gtk_style_context_remove_class (gtk_widget_get_style_context (GTK_WIDGET (self->switcher)), GTK_STYLE_CLASS_LINKED);
 
   self->show_all = gtk_button_new_with_mnemonic (_("_Show All"));
+  /* We'll update this with gtk4 in the future, so fine
+   * to ignore deprecations.
+   */
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   gtk_widget_set_no_show_all (self->show_all, TRUE);
+  G_GNUC_END_IGNORE_DEPRECATIONS;
   g_signal_connect_swapped (self->show_all, "clicked",
                             G_CALLBACK (dzl_shortcuts_section_show_all), self);
 
