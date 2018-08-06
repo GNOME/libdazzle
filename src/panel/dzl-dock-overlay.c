@@ -77,36 +77,6 @@ static GParamSpec *child_properties [N_CHILD_PROPS];
 static guint signals [N_SIGNALS];
 
 static void
-dzl_dock_overlay_update_focus_chain (DzlDockOverlay *self)
-{
-  DzlDockOverlayPrivate *priv = dzl_dock_overlay_get_instance_private (self);
-  GList *focus_chain = NULL;
-  GtkWidget *child;
-  guint i;
-
-  g_assert (DZL_IS_DOCK_OVERLAY (self));
-
-  for (i = G_N_ELEMENTS (priv->edges); i > 0; i--)
-    {
-      DzlDockOverlayEdge *edge = priv->edges [i - 1];
-
-      if (edge != NULL)
-        focus_chain = g_list_prepend (focus_chain, edge);
-    }
-
-  child = gtk_bin_get_child (GTK_BIN (self));
-
-  if (child != NULL)
-    focus_chain = g_list_prepend (focus_chain, child);
-
-  if (focus_chain != NULL)
-    {
-      gtk_container_set_focus_chain (GTK_CONTAINER (self), focus_chain);
-      g_list_free (focus_chain);
-    }
-}
-
-static void
 dzl_dock_overlay_get_edge_position (DzlDockOverlay     *self,
                                     DzlDockOverlayEdge *edge,
                                     GtkAllocation      *allocation)
@@ -206,6 +176,104 @@ dzl_dock_overlay_get_child_position (DzlDockOverlay *self,
   return FALSE;
 }
 
+static gboolean
+dzl_dock_overlay_focus (GtkWidget        *widget,
+                        GtkDirectionType  dir)
+{
+  DzlDockOverlay *self = (DzlDockOverlay *)widget;
+  DzlDockOverlayPrivate *priv = dzl_dock_overlay_get_instance_private (self);
+  GtkWidget *focus_child;
+  GtkWidget *next_child = NULL;
+  GtkWidget *child;
+  gint pos = -1;
+
+  g_assert (DZL_IS_DOCK_OVERLAY (self));
+
+  if (!gtk_widget_get_can_focus (widget))
+    return GTK_WIDGET_CLASS (dzl_dock_overlay_parent_class)->focus (widget, dir);
+
+  child = gtk_bin_get_child (GTK_BIN (self));
+
+  if (!(focus_child = gtk_container_get_focus_child (GTK_CONTAINER (self))))
+    {
+      if (child != NULL)
+        {
+          if (gtk_widget_child_focus (child, dir))
+            return TRUE;
+        }
+
+      return FALSE;
+    }
+
+  g_assert (focus_child != NULL);
+  g_assert (GTK_IS_WIDGET (focus_child));
+
+  for (guint i = 0; i < G_N_ELEMENTS (priv->edges); i++)
+    {
+      if ((GtkWidget *)priv->edges[i] == focus_child)
+        {
+          child = GTK_WIDGET (priv->edges[i]);
+          pos = (GtkPositionType)i;
+          break;
+        }
+    }
+
+  if (child != NULL)
+    {
+      switch (dir)
+        {
+        case GTK_DIR_TAB_FORWARD:
+        case GTK_DIR_RIGHT:
+          if (pos == -1)
+            next_child = GTK_WIDGET (priv->edges[GTK_POS_BOTTOM]);
+          else if (pos < G_N_ELEMENTS (priv->edges))
+            next_child = GTK_WIDGET (priv->edges[pos + 1]);
+          break;
+
+        case GTK_DIR_TAB_BACKWARD:
+        case GTK_DIR_LEFT:
+          if (pos == -1)
+            next_child = GTK_WIDGET (priv->edges[GTK_POS_LEFT]);
+          else if (pos > 0)
+            next_child = GTK_WIDGET (priv->edges[pos - 1]);
+          break;
+
+        case GTK_DIR_UP:
+          if (pos == -1)
+            next_child = GTK_WIDGET (priv->edges[GTK_POS_TOP]);
+          else if (pos == GTK_POS_BOTTOM)
+            next_child = gtk_bin_get_child (GTK_BIN (self));
+          break;
+
+        case GTK_DIR_DOWN:
+          if (pos == -1)
+            next_child = GTK_WIDGET (priv->edges[GTK_POS_BOTTOM]);
+          else if (pos == GTK_POS_TOP)
+            next_child = gtk_bin_get_child (GTK_BIN (self));
+          break;
+
+        default:
+          break;
+        }
+    }
+
+  if (next_child == NULL)
+    {
+      if (dir == GTK_DIR_UP || dir == GTK_DIR_DOWN || dir == GTK_DIR_LEFT || dir == GTK_DIR_RIGHT)
+        {
+          if (gtk_widget_keynav_failed (GTK_WIDGET (self), dir))
+            return TRUE;
+        }
+
+      return FALSE;
+    }
+
+  g_assert (next_child != NULL);
+  g_assert (GTK_IS_WIDGET (next_child));
+
+  return gtk_widget_child_focus (next_child, dir);
+}
+
 static void
 dzl_dock_overlay_add (GtkContainer *container,
                       GtkWidget    *widget)
@@ -217,8 +285,6 @@ dzl_dock_overlay_add (GtkContainer *container,
   g_assert (GTK_IS_WIDGET (widget));
 
   gtk_container_add (GTK_CONTAINER (priv->overlay), widget);
-
-  dzl_dock_overlay_update_focus_chain (self);
 
   if (DZL_IS_DOCK_ITEM (widget))
     {
@@ -869,6 +935,7 @@ dzl_dock_overlay_class_init (DzlDockOverlayClass *klass)
   object_class->set_property = dzl_dock_overlay_set_property;
 
   widget_class->destroy = dzl_dock_overlay_destroy;
+  widget_class->focus = dzl_dock_overlay_focus;
   widget_class->hierarchy_changed = dzl_dock_overlay_hierarchy_changed;
   widget_class->motion_notify_event = dzl_dock_overlay_motion_notify_event;
   widget_class->size_allocate = dzl_dock_overlay_size_allocate;
