@@ -106,6 +106,7 @@ libdazzle = shared_library(
          dependencies: libdazzle_deps,
   include_directories: [ root_inc, src_inc ],
               install: true,
+          install_dir: libdir
 )
 
 libdazzle_dep = declare_dependency(
