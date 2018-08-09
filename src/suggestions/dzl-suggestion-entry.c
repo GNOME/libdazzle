@@ -529,6 +529,9 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (DzlSuggestionEntryClass, suggestion_activated),
                   NULL, NULL, NULL, G_TYPE_NONE, 1, DZL_TYPE_SUGGESTION);
+  g_signal_set_va_marshaller (signals [SUGGESTION_ACTIVATED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 
   /**
    * DzlSuggestionEntry::suggestion-selected:
