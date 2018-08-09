@@ -44,6 +44,9 @@ struct _DzlSuggestionPopover
   DzlListBox         *list_box;
   GtkBox             *top_box;
 
+  /* Used for listbox workaround with selection ordering */
+  DzlSuggestionRow   *tmp_selected_row;
+
   DzlAnimation       *scroll_anim;
 
   GListModel         *model;
@@ -429,7 +432,13 @@ dzl_suggestion_popover_list_box_row_selected (DzlSuggestionPopover *self,
   g_assert (!row || DZL_IS_SUGGESTION_ROW (row));
   g_assert (GTK_IS_LIST_BOX (list_box));
 
+  /* GtkListBox doesn't necessarily give us @row back when we call
+   * gtk_list_box_get_selected_row(), so this workaround allows us
+   * to continue using that API after checking for this pointer.
+   */
+  self->tmp_selected_row = DZL_SUGGESTION_ROW (row);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SELECTED]);
+  self->tmp_selected_row = NULL;
 }
 
 static void
@@ -1015,7 +1024,12 @@ dzl_suggestion_popover_get_selected (DzlSuggestionPopover *self)
 
   g_return_val_if_fail (DZL_IS_SUGGESTION_POPOVER (self), NULL);
 
-  row = DZL_SUGGESTION_ROW (gtk_list_box_get_selected_row (GTK_LIST_BOX (self->list_box)));
+  /* Work around row selection wonkiness in GtkListBox */
+  if (self->tmp_selected_row)
+    row = self->tmp_selected_row;
+  else
+    row = DZL_SUGGESTION_ROW (gtk_list_box_get_selected_row (GTK_LIST_BOX (self->list_box)));
+
   if (row != NULL)
     return dzl_suggestion_row_get_suggestion (row);
 
