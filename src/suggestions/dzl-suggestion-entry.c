@@ -347,9 +347,9 @@ dzl_suggestion_entry_notify_selected_cb (DzlSuggestionEntry   *self,
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
   g_assert (DZL_IS_SUGGESTION_POPOVER (popover));
 
-  if (priv->in_move_by > 0)
+  if (priv->in_key_press == 0 || priv->in_move_by > 0)
     {
-      DzlSuggestion *suggestion = dzl_suggestion_entry_get_suggestion (self);
+      DzlSuggestion *suggestion = dzl_suggestion_popover_get_selected (priv->popover);
 
       if (suggestion != NULL)
         g_signal_emit (self, signals [SUGGESTION_SELECTED], 0, suggestion);
