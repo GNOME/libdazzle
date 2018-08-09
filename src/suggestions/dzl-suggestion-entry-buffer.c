@@ -415,7 +415,7 @@ dzl_suggestion_entry_buffer_clear (DzlSuggestionEntryBuffer *self)
 {
   DzlSuggestionEntryBufferPrivate *priv = dzl_suggestion_entry_buffer_get_instance_private (self);
 
-  g_return_val_if_fail (DZL_IS_SUGGESTION_ENTRY_BUFFER (self), NULL);
+  g_return_if_fail (DZL_IS_SUGGESTION_ENTRY_BUFFER (self));
 
   g_clear_pointer (&priv->text, g_free);
   g_clear_pointer (&priv->suffix, g_free);
