@@ -55,6 +55,8 @@ DZL_AVAILABLE_IN_ALL
 guint                     dzl_suggestion_entry_buffer_get_typed_length (DzlSuggestionEntryBuffer *self);
 DZL_AVAILABLE_IN_ALL
 void                      dzl_suggestion_entry_buffer_commit           (DzlSuggestionEntryBuffer *self);
+DZL_AVAILABLE_IN_ALL
+void                      dzl_suggestion_entry_buffer_clear            (DzlSuggestionEntryBuffer *self);
 
 G_END_DECLS
 

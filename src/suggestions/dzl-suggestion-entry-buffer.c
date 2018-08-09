@@ -409,3 +409,16 @@ dzl_suggestion_entry_buffer_commit (DzlSuggestionEntryBuffer *self)
                                                                                       g_utf8_strlen (suffix, -1));
     }
 }
+
+void
+dzl_suggestion_entry_buffer_clear (DzlSuggestionEntryBuffer *self)
+{
+  DzlSuggestionEntryBufferPrivate *priv = dzl_suggestion_entry_buffer_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SUGGESTION_ENTRY_BUFFER (self), NULL);
+
+  g_clear_pointer (&priv->text, g_free);
+  g_clear_pointer (&priv->suffix, g_free);
+  g_clear_object (&priv->suggestion);
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SUGGESTION]);
+}
