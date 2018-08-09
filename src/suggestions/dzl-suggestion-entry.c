@@ -44,6 +44,7 @@ typedef struct
   GDestroyNotify             func_data_destroy;
 
   gint                       in_key_press;
+  gint                       in_move_by;
 } DzlSuggestionEntryPrivate;
 
 enum {
@@ -60,6 +61,7 @@ enum {
   MOVE_SUGGESTION,
   SHOW_SUGGESTIONS,
   SUGGESTION_ACTIVATED,
+  SUGGESTION_SELECTED,
   N_SIGNALS
 };
 
@@ -314,7 +316,11 @@ dzl_suggestion_entry_move_suggestion (DzlSuggestionEntry *self,
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
 
+  priv->in_move_by++;
+
   dzl_suggestion_popover_move_by (priv->popover, amount);
+
+  priv->in_move_by--;
 }
 
 static void
@@ -336,8 +342,18 @@ dzl_suggestion_entry_notify_selected_cb (DzlSuggestionEntry   *self,
                                          GParamSpec           *pspec,
                                          DzlSuggestionPopover *popover)
 {
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
   g_assert (DZL_IS_SUGGESTION_POPOVER (popover));
+
+  if (priv->in_move_by > 0)
+    {
+      DzlSuggestion *suggestion = dzl_suggestion_entry_get_suggestion (self);
+
+      if (suggestion != NULL)
+        g_signal_emit (self, signals [SUGGESTION_SELECTED], 0, suggestion);
+    }
 
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SUGGESTION]);
 }
@@ -513,6 +529,29 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (DzlSuggestionEntryClass, suggestion_activated),
                   NULL, NULL, NULL, G_TYPE_NONE, 1, DZL_TYPE_SUGGESTION);
+
+  /**
+   * DzlSuggestionEntry::suggestion-selected:
+   * @self: a #DzlSuggestionEntry
+   * @suggestion: a #DzlSuggestion
+   *
+   * This signal is emitted when a selection has been specifically selected
+   * by the user, such as by clicking on the row or moving to the row with
+   * keyboard, such as with #DzlSuggestionEntry::move-suggestion
+   *
+   * Since: 3.30
+   */
+  signals [SUGGESTION_SELECTED] =
+    g_signal_new ("suggestion-selected",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlSuggestionEntryClass, suggestion_selected),
+                  NULL, NULL,
+                  g_cclosure_marshal_VOID__OBJECT,
+                  G_TYPE_NONE, 1, DZL_TYPE_SUGGESTION);
+  g_signal_set_va_marshaller (signals [SUGGESTION_SELECTED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 
   widget_class->activate_signal = signals [ACTIVATE_SUGGESTION] =
     g_signal_new_class_handler ("activate-suggestion",

@@ -61,9 +61,11 @@ struct _DzlSuggestionEntryClass
                                 gint                amount);
   void (*suggestion_activated) (DzlSuggestionEntry *self,
                                 DzlSuggestion      *suggestion);
+  void (*suggestion_selected)  (DzlSuggestionEntry *self,
+                                DzlSuggestion      *suggestion);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 DZL_AVAILABLE_IN_ALL
