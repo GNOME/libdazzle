@@ -235,6 +235,25 @@ load_css (void)
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 }
 
+static void
+notify_suggestion_cb (DzlSuggestionEntry *entry,
+                      GParamSpec         *pspec,
+                      gpointer            unused)
+{
+  DzlSuggestion *suggestion;
+
+  g_assert (DZL_IS_SUGGESTION_ENTRY (entry));
+
+  if ((suggestion = dzl_suggestion_entry_get_suggestion (entry)))
+    {
+      g_print  ("Suggestion changed to %s\n", dzl_suggestion_get_id (suggestion));
+    }
+  else
+    {
+      g_print ("Suggestion cleared\n");
+    }
+}
+
 int
 main (gint   argc,
       gchar *argv[])
@@ -291,6 +310,7 @@ main (gint   argc,
                         "visible", TRUE,
                         "width-chars", 30,
                         NULL);
+  g_signal_connect (entry, "notify::suggestion", G_CALLBACK (notify_suggestion_cb), NULL);
   dzl_suggestion_entry_set_position_func (DZL_SUGGESTION_ENTRY (entry),
                                           dzl_suggestion_entry_window_position_func,
                                           NULL, NULL);

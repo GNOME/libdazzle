@@ -50,6 +50,7 @@ enum {
   PROP_0,
   PROP_MODEL,
   PROP_TYPED_TEXT,
+  PROP_SUGGESTION,
   N_PROPS
 };
 
@@ -315,6 +316,17 @@ dzl_suggestion_entry_activate_suggestion (DzlSuggestionEntry *self)
 }
 
 static void
+dzl_suggestion_entry_notify_selected_cb (DzlSuggestionEntry   *self,
+                                         GParamSpec           *pspec,
+                                         DzlSuggestionPopover *popover)
+{
+  g_assert (DZL_IS_SUGGESTION_ENTRY (self));
+  g_assert (DZL_IS_SUGGESTION_POPOVER (popover));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SUGGESTION]);
+}
+
+static void
 dzl_suggestion_entry_constructed (GObject *object)
 {
   DzlSuggestionEntry *self = (DzlSuggestionEntry *)object;
@@ -363,6 +375,10 @@ dzl_suggestion_entry_get_property (GObject    *object,
       g_value_set_object (value, dzl_suggestion_entry_get_model (self));
       break;
 
+    case PROP_SUGGESTION:
+      g_value_set_object (value, dzl_suggestion_entry_get_suggestion (self));
+      break;
+
     case PROP_TYPED_TEXT:
       g_value_set_string (value, dzl_suggestion_entry_get_typed_text (self));
       break;
@@ -384,6 +400,10 @@ dzl_suggestion_entry_set_property (GObject      *object,
     {
     case PROP_MODEL:
       dzl_suggestion_entry_set_model (self, g_value_get_object (value));
+      break;
+
+    case PROP_SUGGESTION:
+      dzl_suggestion_entry_set_suggestion (self, g_value_get_object (value));
       break;
 
     default:
@@ -424,6 +444,20 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
                          "Typed text into the entry, does not include suggested text",
                          NULL,
                          (G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  /**
+   * DzlSuggestionEntry:suggestion:
+   *
+   * The "suggestion" property is the currently selected suggestion, if any.
+   *
+   * Since: 3.30
+   */
+  properties [PROP_SUGGESTION] =
+    g_param_spec_object ("suggestion",
+                         "Suggestion",
+                         "The currently selected suggestion",
+                         DZL_TYPE_SUGGESTION,
+                         (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
@@ -505,6 +539,11 @@ dzl_suggestion_entry_init (DzlSuggestionEntry *self)
                                 "relative-to", self,
                                 "type", GTK_WINDOW_POPUP,
                                 NULL);
+  g_signal_connect_object (priv->popover,
+                           "notify::selected",
+                           G_CALLBACK (dzl_suggestion_entry_notify_selected_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
   g_signal_connect_object (priv->popover,
                            "suggestion-activated",
                            G_CALLBACK (dzl_suggestion_entry_suggestion_activated),
