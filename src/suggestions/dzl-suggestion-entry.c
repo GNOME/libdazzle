@@ -273,6 +273,24 @@ update:
 }
 
 static void
+dzl_suggestion_entry_real_suggestion_activated (DzlSuggestionEntry *self,
+                                                DzlSuggestion      *suggestion)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  DZL_ENTRY;
+
+  g_assert (DZL_IS_SUGGESTION_ENTRY (self));
+  g_assert (DZL_IS_SUGGESTION (suggestion));
+
+  gtk_entry_set_text (GTK_ENTRY (self), "");
+  dzl_suggestion_entry_buffer_clear (priv->buffer);
+  g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
+
+  DZL_EXIT;
+}
+
+static void
 dzl_suggestion_entry_suggestion_activated (DzlSuggestionEntry   *self,
                                            DzlSuggestion        *suggestion,
                                            DzlSuggestionPopover *popover)
@@ -283,9 +301,7 @@ dzl_suggestion_entry_suggestion_activated (DzlSuggestionEntry   *self,
   g_assert (DZL_IS_SUGGESTION (suggestion));
   g_assert (DZL_IS_SUGGESTION_POPOVER (popover));
 
-  gtk_entry_set_text (GTK_ENTRY (self), "");
   g_signal_emit (self, signals [SUGGESTION_ACTIVATED], 0, suggestion);
-  g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
 
   DZL_EXIT;
 }
@@ -430,6 +446,7 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
   klass->hide_suggestions = dzl_suggestion_entry_hide_suggestions;
   klass->show_suggestions = dzl_suggestion_entry_show_suggestions;
   klass->move_suggestion = dzl_suggestion_entry_move_suggestion;
+  klass->suggestion_activated = dzl_suggestion_entry_real_suggestion_activated;
 
   properties [PROP_MODEL] =
     g_param_spec_object ("model",
