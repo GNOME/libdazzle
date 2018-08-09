@@ -34,6 +34,7 @@ typedef struct
 } DemoData;
 
 static DzlFuzzyMutableIndex *search_index;
+static gulong notify_suggestion_handler;
 static const DemoData demo_data[] = {
   { "web-browser-symbolic", "https://twitter.com", "Twitter", "twitter.com" },
   { "web-browser-symbolic", "https://facebook.com", "Facebook", "facebook.com" },
@@ -207,7 +208,12 @@ search_changed (DzlSuggestionEntry *entry,
   if (str->len)
     model = create_search_results (text, str->str);
 
+  /* Update the model, but ignore selection events while
+   * that happens so that we don't update the entry box.
+   */
+  g_signal_handler_block (entry, notify_suggestion_handler);
   dzl_suggestion_entry_set_model (entry, model);
+  g_signal_handler_unblock (entry, notify_suggestion_handler);
 
   g_string_free (str, TRUE);
 }
@@ -219,9 +225,22 @@ suggestion_activated (DzlSuggestionEntry *entry,
 {
   const gchar *uri = dzl_suggestion_get_id (suggestion);
 
-  g_print ("Activated suggestion: %s\n", uri);
+  g_print ("Activated selection: %s\n", uri);
+}
 
+static void
+suggestion_selected (DzlSuggestionEntry *entry,
+                     DzlSuggestion      *suggestion,
+                     gpointer            user_data)
+{
+  const gchar *uri = dzl_suggestion_get_id (suggestion);
+
+  g_print ("Selected suggestion: %s\n", uri);
+
+  g_signal_handlers_block_by_func (entry, G_CALLBACK (search_changed), NULL);
   gtk_entry_set_text (GTK_ENTRY (entry), uri);
+  gtk_editable_set_position (GTK_EDITABLE (entry), -1);
+  g_signal_handlers_unblock_by_func (entry, G_CALLBACK (search_changed), NULL);
 }
 
 static void
@@ -310,13 +329,18 @@ main (gint   argc,
                         "visible", TRUE,
                         "width-chars", 30,
                         NULL);
-  g_signal_connect (entry, "notify::suggestion", G_CALLBACK (notify_suggestion_cb), NULL);
+  notify_suggestion_handler =
+    g_signal_connect (entry,
+                      "notify::suggestion",
+                      G_CALLBACK (notify_suggestion_cb),
+                      NULL);
   dzl_suggestion_entry_set_position_func (DZL_SUGGESTION_ENTRY (entry),
                                           dzl_suggestion_entry_window_position_func,
                                           NULL, NULL);
   gtk_box_set_center_widget (GTK_BOX (box), entry);
   g_signal_connect (entry, "changed", G_CALLBACK (search_changed), NULL);
   g_signal_connect (entry, "suggestion-activated", G_CALLBACK (suggestion_activated), NULL);
+  g_signal_connect (entry, "suggestion-selected", G_CALLBACK (suggestion_selected), NULL);
 
   button = g_object_new (GTK_TYPE_BUTTON,
                          "halign", GTK_ALIGN_START,
