@@ -118,6 +118,9 @@ dzl_suggestion_entry_buffer_get_text (GtkEntryBuffer *buffer,
       priv->text = g_string_free (str, FALSE);
     }
 
+  if (n_bytes != NULL)
+    *n_bytes = strlen (priv->text);
+
   return priv->text;
 }
 
