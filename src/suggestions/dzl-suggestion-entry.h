@@ -69,24 +69,24 @@ struct _DzlSuggestionEntryClass
 };
 
 DZL_AVAILABLE_IN_ALL
-GtkWidget     *dzl_suggestion_entry_new               (void);
+GtkWidget     *dzl_suggestion_entry_new                          (void);
 DZL_AVAILABLE_IN_ALL
-void           dzl_suggestion_entry_set_model         (DzlSuggestionEntry        *self,
-                                                       GListModel                *model);
+void           dzl_suggestion_entry_set_model                    (DzlSuggestionEntry        *self,
+                                                                  GListModel                *model);
 DZL_AVAILABLE_IN_ALL
-GListModel    *dzl_suggestion_entry_get_model         (DzlSuggestionEntry        *self);
+GListModel    *dzl_suggestion_entry_get_model                    (DzlSuggestionEntry        *self);
 DZL_AVAILABLE_IN_ALL
-const gchar   *dzl_suggestion_entry_get_typed_text    (DzlSuggestionEntry        *self);
+const gchar   *dzl_suggestion_entry_get_typed_text               (DzlSuggestionEntry        *self);
 DZL_AVAILABLE_IN_ALL
-DzlSuggestion *dzl_suggestion_entry_get_suggestion    (DzlSuggestionEntry        *self);
+DzlSuggestion *dzl_suggestion_entry_get_suggestion               (DzlSuggestionEntry        *self);
 DZL_AVAILABLE_IN_ALL
-void           dzl_suggestion_entry_set_suggestion    (DzlSuggestionEntry        *self,
-                                                       DzlSuggestion             *suggestion);
+void           dzl_suggestion_entry_set_suggestion               (DzlSuggestionEntry        *self,
+                                                                  DzlSuggestion             *suggestion);
 DZL_AVAILABLE_IN_ALL
-void           dzl_suggestion_entry_set_position_func (DzlSuggestionEntry        *self,
-                                                       DzlSuggestionPositionFunc  func,
-                                                       gpointer                   func_data,
-                                                       GDestroyNotify             func_data_destroy);
+void           dzl_suggestion_entry_set_position_func            (DzlSuggestionEntry        *self,
+                                                                  DzlSuggestionPositionFunc  func,
+                                                                  gpointer                   func_data,
+                                                                  GDestroyNotify             func_data_destroy);
 DZL_AVAILABLE_IN_3_30
 gboolean       dzl_suggestion_entry_get_activate_on_single_click (DzlSuggestionEntry        *self);
 DZL_AVAILABLE_IN_3_30
