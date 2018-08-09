@@ -323,6 +323,7 @@ main (gint   argc,
   gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (box)), "linked");
 
   entry = g_object_new (DZL_TYPE_SUGGESTION_ENTRY,
+                        "activate-on-single-click", FALSE,
                         "halign", GTK_ALIGN_CENTER,
                         "hexpand", FALSE,
                         "max-width-chars", 55,

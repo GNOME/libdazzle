@@ -87,6 +87,11 @@ void           dzl_suggestion_entry_set_position_func (DzlSuggestionEntry       
                                                        DzlSuggestionPositionFunc  func,
                                                        gpointer                   func_data,
                                                        GDestroyNotify             func_data_destroy);
+DZL_AVAILABLE_IN_3_30
+gboolean       dzl_suggestion_entry_get_activate_on_single_click (DzlSuggestionEntry        *self);
+DZL_AVAILABLE_IN_3_30
+void           dzl_suggestion_entry_set_activate_on_single_click (DzlSuggestionEntry        *self,
+                                                                  gboolean                   activate_on_single_click);
 
 DZL_AVAILABLE_IN_ALL
 void dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,

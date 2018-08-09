@@ -43,12 +43,15 @@ typedef struct
   gpointer                   func_data;
   GDestroyNotify             func_data_destroy;
 
+  guint                      activate_on_single_click : 1;
+
   gint                       in_key_press;
   gint                       in_move_by;
 } DzlSuggestionEntryPrivate;
 
 enum {
   PROP_0,
+  PROP_ACTIVATE_ON_SINGLE_CLICK,
   PROP_MODEL,
   PROP_TYPED_TEXT,
   PROP_SUGGESTION,
@@ -77,6 +80,34 @@ static GParamSpec *properties [N_PROPS];
 static guint signals [N_SIGNALS];
 static guint changed_signal_id;
 static GtkEditableInterface *editable_parent_iface;
+
+void
+dzl_suggestion_entry_set_activate_on_single_click (DzlSuggestionEntry *self,
+                                                   gboolean            activate_on_single_click)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  g_assert (DZL_IS_SUGGESTION_ENTRY (self));
+
+  activate_on_single_click = !!activate_on_single_click;
+
+  if (activate_on_single_click != priv->activate_on_single_click)
+    {
+      priv->activate_on_single_click = activate_on_single_click;
+      _dzl_suggestion_popover_set_click_mode (priv->popover, activate_on_single_click);
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ACTIVATE_ON_SINGLE_CLICK]);
+    }
+}
+
+gboolean
+dzl_suggestion_entry_get_activate_on_single_click (DzlSuggestionEntry *self)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SUGGESTION_ENTRY (self), FALSE);
+
+  return priv->activate_on_single_click;
+}
 
 static void
 dzl_suggestion_entry_show_suggestions (DzlSuggestionEntry *self)
@@ -403,6 +434,10 @@ dzl_suggestion_entry_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ACTIVATE_ON_SINGLE_CLICK:
+      g_value_set_boolean (value, dzl_suggestion_entry_get_activate_on_single_click (self));
+      break;
+
     case PROP_MODEL:
       g_value_set_object (value, dzl_suggestion_entry_get_model (self));
       break;
@@ -430,6 +465,10 @@ dzl_suggestion_entry_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_ACTIVATE_ON_SINGLE_CLICK:
+      dzl_suggestion_entry_set_activate_on_single_click (self, g_value_get_boolean (value));
+      break;
+
     case PROP_MODEL:
       dzl_suggestion_entry_set_model (self, g_value_get_object (value));
       break;
@@ -463,6 +502,22 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
   klass->show_suggestions = dzl_suggestion_entry_show_suggestions;
   klass->move_suggestion = dzl_suggestion_entry_move_suggestion;
   klass->suggestion_activated = dzl_suggestion_entry_real_suggestion_activated;
+
+  /**
+   * DzlSuggestionEntry:activate-on-single-click:
+   *
+   * The "activate-on-single-click" property denotes if results should be
+   * activated simply by clicking on them. You may want to set this to
+   * %FALSE if you want the behavior to only select the item.
+   *
+   * Since: 3.30
+   */
+  properties [PROP_ACTIVATE_ON_SINGLE_CLICK] =
+    g_param_spec_boolean ("activate-on-single-click",
+                          "Activate on Single Click",
+                          "If entries should be activated upon a single click",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_MODEL] =
     g_param_spec_object ("model",
@@ -584,6 +639,7 @@ dzl_suggestion_entry_init (DzlSuggestionEntry *self)
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
 
+  priv->activate_on_single_click = TRUE;
   priv->func = dzl_suggestion_entry_default_position_func;
 
   priv->changed_handler =

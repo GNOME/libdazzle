@@ -30,6 +30,8 @@ void _dzl_suggestion_popover_set_max_height (DzlSuggestionPopover *popover,
                                              gint                  max_height);
 void _dzl_suggestion_popover_adjust_margin  (DzlSuggestionPopover *popover,
                                              GdkRectangle         *area);
+void _dzl_suggestion_popover_set_click_mode (DzlSuggestionPopover *popover,
+                                             gboolean              single_click);
 void _dzl_suggestion_row_set_ellipsize      (DzlSuggestionRow     *self,
                                              PangoEllipsizeMode    title,
                                              PangoEllipsizeMode    subtitle);

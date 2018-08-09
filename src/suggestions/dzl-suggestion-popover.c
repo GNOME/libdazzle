@@ -1093,3 +1093,11 @@ _dzl_suggestion_popover_adjust_margin (DzlSuggestionPopover *self,
   area->height += margin.top + margin.bottom;
 }
 
+void
+_dzl_suggestion_popover_set_click_mode (DzlSuggestionPopover *self,
+                                        gboolean              single_click)
+{
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+
+  gtk_list_box_set_activate_on_single_click (GTK_LIST_BOX (self->list_box), single_click);
+}
