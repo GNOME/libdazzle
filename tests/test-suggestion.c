@@ -232,6 +232,8 @@ suggestion_activated (DzlSuggestionEntry *entry,
   g_signal_handlers_unblock_by_func (entry, G_CALLBACK (search_changed), NULL);
 
   g_signal_stop_emission_by_name (entry, "suggestion-activated");
+
+  dzl_suggestion_entry_hide_suggestions (entry);
 }
 
 static void
