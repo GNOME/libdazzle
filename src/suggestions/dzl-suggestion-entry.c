@@ -260,19 +260,6 @@ dzl_suggestion_entry_changed (GtkEditable *editable)
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
 
-  /*
-   * If we aren't focused, just ignore everything. Additionally, if the text is
-   * being changed outside of a key-press-event, we want to ignore completion
-   * there too (such as calling set_text() while focused).
-   *
-   * One such example might be updating an URI in a webbrowser.
-   *
-   * We should be okay on the a11y/IM front here too, since that should happen
-   * via synthesized events.
-   */
-  if (!priv->in_key_press || !gtk_widget_has_focus (GTK_WIDGET (editable)))
-    goto update;
-
   g_signal_handler_block (self, priv->changed_handler);
 
   text = dzl_suggestion_entry_buffer_get_typed_text (priv->buffer);
@@ -300,7 +287,6 @@ finish:
 
   g_signal_handler_unblock (self, priv->changed_handler);
 
-update:
   dzl_suggestion_entry_update_attrs (self);
 
   DZL_EXIT;
@@ -379,7 +365,7 @@ dzl_suggestion_entry_notify_selected_cb (DzlSuggestionEntry   *self,
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
   g_assert (DZL_IS_SUGGESTION_POPOVER (popover));
 
-  if (priv->in_key_press == 0 || priv->in_move_by > 0)
+  if (priv->in_move_by > 0)
     {
       DzlSuggestion *suggestion = dzl_suggestion_popover_get_selected (priv->popover);
 
