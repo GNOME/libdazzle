@@ -226,6 +226,12 @@ suggestion_activated (DzlSuggestionEntry *entry,
   const gchar *uri = dzl_suggestion_get_id (suggestion);
 
   g_print ("Activated selection: %s\n", uri);
+
+  g_signal_handlers_block_by_func (entry, G_CALLBACK (search_changed), NULL);
+  gtk_entry_set_text (GTK_ENTRY (entry), uri);
+  g_signal_handlers_unblock_by_func (entry, G_CALLBACK (search_changed), NULL);
+
+  g_signal_stop_emission_by_name (entry, "suggestion-activated");
 }
 
 static void
