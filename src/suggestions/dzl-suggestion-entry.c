@@ -124,7 +124,7 @@ dzl_suggestion_entry_show_suggestions (DzlSuggestionEntry *self)
   DZL_EXIT;
 }
 
-static void
+void
 dzl_suggestion_entry_hide_suggestions (DzlSuggestionEntry *self)
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
@@ -133,7 +133,8 @@ dzl_suggestion_entry_hide_suggestions (DzlSuggestionEntry *self)
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
 
-  dzl_suggestion_popover_popdown (priv->popover);
+  if (priv->popover != NULL)
+    dzl_suggestion_popover_popdown (priv->popover);
 
   DZL_EXIT;
 }
