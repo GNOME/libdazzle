@@ -267,7 +267,7 @@ dzl_suggestion_entry_changed (GtkEditable *editable)
   if (text == NULL || *text == '\0')
     {
       dzl_suggestion_entry_buffer_set_suggestion (priv->buffer, NULL);
-      g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
+      dzl_suggestion_entry_hide_suggestions (self);
       DZL_GOTO (finish);
     }
 
