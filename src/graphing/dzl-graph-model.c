@@ -566,6 +566,9 @@ dzl_graph_view_model_class_init (DzlGraphModelClass *klass)
                                      NULL, NULL, NULL,
                                      G_TYPE_NONE,
                                      0);
+  g_signal_set_va_marshaller (signals [CHANGED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__VOIDv);
 }
 
 static void
