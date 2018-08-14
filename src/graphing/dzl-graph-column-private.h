@@ -26,23 +26,23 @@
 G_BEGIN_DECLS
 
 void  _dzl_graph_view_column_get_value  (DzlGraphColumn *self,
-                                    guint     index,
-                                    GValue   *value);
+                                         guint           index,
+                                         GValue         *value);
 void  _dzl_graph_view_column_collect    (DzlGraphColumn *self,
-                                    guint     index,
-                                    va_list   args);
+                                         guint           index,
+                                         va_list         args);
 void  _dzl_graph_view_column_lcopy      (DzlGraphColumn *self,
-                                    guint     index,
-                                    va_list   args);
+                                         guint           index,
+                                         va_list         args);
 void  _dzl_graph_view_column_get        (DzlGraphColumn *column,
-                                    guint     index,
-                                    ...);
+                                         guint           index,
+                                         ...);
 void  _dzl_graph_view_column_set        (DzlGraphColumn *column,
-                                    guint     index,
-                                    ...);
+                                         guint           index,
+                                         ...);
 guint _dzl_graph_view_column_push       (DzlGraphColumn *column);
 void  _dzl_graph_view_column_set_n_rows (DzlGraphColumn *column,
-                                    guint     n_rows);
+                                         guint           n_rows);
 
 G_END_DECLS
 

@@ -49,7 +49,7 @@ static GParamSpec *properties [LAST_PROP];
 
 DzlGraphColumn *
 dzl_graph_view_column_new (const gchar *name,
-               GType        value_type)
+                           GType        value_type)
 {
   return g_object_new (DZL_TYPE_GRAPH_COLUMN,
                        "name", name,
@@ -66,8 +66,8 @@ dzl_graph_view_column_get_name (DzlGraphColumn *self)
 }
 
 void
-dzl_graph_view_column_set_name (DzlGraphColumn    *self,
-                    const gchar *name)
+dzl_graph_view_column_set_name (DzlGraphColumn *self,
+                                const gchar    *name)
 {
   g_return_if_fail (DZL_IS_GRAPH_COLUMN (self));
 
@@ -81,7 +81,7 @@ dzl_graph_view_column_set_name (DzlGraphColumn    *self,
 
 static void
 dzl_graph_view_column_copy_value (gpointer data,
-                      gpointer user_data)
+                                  gpointer user_data)
 {
   const GValue *src_value = data;
   DzlRing *ring = user_data;
@@ -98,7 +98,7 @@ dzl_graph_view_column_copy_value (gpointer data,
 
 void
 _dzl_graph_view_column_set_n_rows (DzlGraphColumn *self,
-                       guint     n_rows)
+                                   guint           n_rows)
 {
   DzlRing *ring;
 
@@ -127,8 +127,8 @@ _dzl_graph_view_column_push (DzlGraphColumn *self)
 
 void
 _dzl_graph_view_column_get_value (DzlGraphColumn *self,
-                      guint     index,
-                      GValue   *value)
+                                  guint           index,
+                                  GValue         *value)
 {
   const GValue *src_value;
 
@@ -145,8 +145,8 @@ _dzl_graph_view_column_get_value (DzlGraphColumn *self,
 
 void
 _dzl_graph_view_column_collect (DzlGraphColumn *self,
-                    guint     index,
-                    va_list   args)
+                                guint           index,
+                                va_list         args)
 {
   GValue *value;
   gchar *errmsg = NULL;
@@ -167,8 +167,8 @@ _dzl_graph_view_column_collect (DzlGraphColumn *self,
 
 void
 _dzl_graph_view_column_set (DzlGraphColumn *self,
-                guint     index,
-                ...)
+                            guint           index,
+                            ...)
 {
   va_list args;
 
@@ -182,8 +182,8 @@ _dzl_graph_view_column_set (DzlGraphColumn *self,
 
 void
 _dzl_graph_view_column_get (DzlGraphColumn *self,
-                guint     index,
-                ...)
+                            guint           index,
+                            ...)
 {
   va_list args;
 
@@ -197,8 +197,8 @@ _dzl_graph_view_column_get (DzlGraphColumn *self,
 
 void
 _dzl_graph_view_column_lcopy (DzlGraphColumn *self,
-                  guint     index,
-                  va_list   args)
+                              guint           index,
+                              va_list         args)
 {
   const GValue *value;
   gchar *errmsg = NULL;
@@ -233,9 +233,9 @@ dzl_graph_view_column_finalize (GObject *object)
 
 static void
 dzl_graph_view_column_get_property (GObject    *object,
-                        guint       prop_id,
-                        GValue     *value,
-                        GParamSpec *pspec)
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
   DzlGraphColumn *self = DZL_GRAPH_COLUMN (object);
 
@@ -256,9 +256,9 @@ dzl_graph_view_column_get_property (GObject    *object,
 
 static void
 dzl_graph_view_column_set_property (GObject      *object,
-                        guint         prop_id,
-                        const GValue *value,
-                        GParamSpec   *pspec)
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
 {
   DzlGraphColumn *self = DZL_GRAPH_COLUMN (object);
 
