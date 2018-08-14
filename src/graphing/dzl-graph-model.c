@@ -28,22 +28,22 @@
 
 typedef struct
 {
-  GPtrArray *columns;
+  GPtrArray       *columns;
   DzlGraphColumn  *timestamps;
 
-  guint      last_index;
+  guint            last_index;
 
-  guint      max_samples;
-  GTimeSpan  timespan;
-  gdouble    value_max;
-  gdouble    value_min;
+  guint            max_samples;
+  GTimeSpan        timespan;
+  gdouble          value_max;
+  gdouble          value_min;
 } DzlGraphModelPrivate;
 
 typedef struct
 {
   DzlGraphModel *table;
-  gint64   timestamp;
-  guint    index;
+  gint64         timestamp;
+  guint          index;
 } DzlGraphModelIterImpl;
 
 enum {
@@ -76,8 +76,8 @@ dzl_graph_view_model_get_timespan (DzlGraphModel *self)
 }
 
 void
-dzl_graph_view_model_set_timespan (DzlGraphModel   *self,
-                       GTimeSpan  timespan)
+dzl_graph_view_model_set_timespan (DzlGraphModel *self,
+                                   GTimeSpan      timespan)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
 
@@ -92,7 +92,7 @@ dzl_graph_view_model_set_timespan (DzlGraphModel   *self,
 
 static void
 dzl_graph_view_model_set_value_max (DzlGraphModel *self,
-                        gdouble  value_max)
+                                    gdouble        value_max)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
 
@@ -107,7 +107,7 @@ dzl_graph_view_model_set_value_max (DzlGraphModel *self,
 
 static void
 dzl_graph_view_model_set_value_min (DzlGraphModel *self,
-                        gdouble  value_min)
+                                    gdouble        value_min)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
 
@@ -128,7 +128,7 @@ dzl_graph_view_model_new (void)
 
 guint
 dzl_graph_view_model_add_column (DzlGraphModel  *self,
-                     DzlGraphColumn *column)
+                                 DzlGraphColumn *column)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
 
@@ -164,7 +164,7 @@ dzl_graph_view_model_get_max_samples (DzlGraphModel *self)
 
 void
 dzl_graph_view_model_set_max_samples (DzlGraphModel *self,
-                          guint    max_samples)
+                                      guint          max_samples)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
   gsize i;
@@ -198,8 +198,8 @@ dzl_graph_view_model_set_max_samples (DzlGraphModel *self,
  */
 void
 dzl_graph_view_model_push (DzlGraphModel     *self,
-               DzlGraphModelIter *iter,
-               gint64       timestamp)
+                           DzlGraphModelIter *iter,
+                           gint64             timestamp)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
   DzlGraphModelIterImpl *impl = (DzlGraphModelIterImpl *)iter;
@@ -232,7 +232,7 @@ dzl_graph_view_model_push (DzlGraphModel     *self,
 
 gboolean
 dzl_graph_view_model_get_iter_last (DzlGraphModel     *self,
-                        DzlGraphModelIter *iter)
+                                    DzlGraphModelIter *iter)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
   DzlGraphModelIterImpl *impl = (DzlGraphModelIterImpl *)iter;
@@ -265,7 +265,7 @@ dzl_graph_view_model_get_end_time (DzlGraphModel *self)
 
 gboolean
 dzl_graph_view_model_get_iter_first (DzlGraphModel     *self,
-                         DzlGraphModelIter *iter)
+                                     DzlGraphModelIter *iter)
 {
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
   DzlGraphModelIterImpl *impl = (DzlGraphModelIterImpl *)iter;
@@ -340,8 +340,8 @@ dzl_graph_view_model_iter_get_timestamp (DzlGraphModelIter *iter)
 
 void
 dzl_graph_view_model_iter_set (DzlGraphModelIter *iter,
-                   gint         first_column,
-                   ...)
+                               gint               first_column,
+                               ...)
 {
   DzlGraphModelIterImpl *impl = (DzlGraphModelIterImpl *)iter;
   DzlGraphModelPrivate *priv;
@@ -382,8 +382,8 @@ cleanup:
 
 void
 dzl_graph_view_model_iter_get (DzlGraphModelIter *iter,
-                   gint         first_column,
-                   ...)
+                               gint               first_column,
+                               ...)
 {
   DzlGraphModelIterImpl *impl = (DzlGraphModelIterImpl *)iter;
   DzlGraphModelPrivate *priv;
@@ -424,8 +424,8 @@ cleanup:
 
 void
 dzl_graph_view_model_iter_get_value (DzlGraphModelIter *iter,
-                         guint        column,
-                         GValue      *value)
+                                     guint              column,
+                                     GValue            *value)
 {
   DzlGraphModelIterImpl *impl = (DzlGraphModelIterImpl *)iter;
   DzlGraphModelPrivate *priv;
@@ -455,9 +455,9 @@ dzl_graph_view_model_finalize (GObject *object)
 
 static void
 dzl_graph_view_model_get_property (GObject    *object,
-                       guint       prop_id,
-                       GValue     *value,
-                       GParamSpec *pspec)
+                                   guint       prop_id,
+                                   GValue     *value,
+                                   GParamSpec *pspec)
 {
   DzlGraphModel *self = (DzlGraphModel *)object;
   DzlGraphModelPrivate *priv = dzl_graph_view_model_get_instance_private (self);
@@ -487,9 +487,9 @@ dzl_graph_view_model_get_property (GObject    *object,
 
 static void
 dzl_graph_view_model_set_property (GObject      *object,
-                       guint         prop_id,
-                       const GValue *value,
-                       GParamSpec   *pspec)
+                                   guint         prop_id,
+                                   const GValue *value,
+                                   GParamSpec   *pspec)
 {
   DzlGraphModel *self = (DzlGraphModel *)object;
 
