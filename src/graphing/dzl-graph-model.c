@@ -441,6 +441,38 @@ dzl_graph_view_model_iter_get_value (DzlGraphModelIter *iter,
   _dzl_graph_view_column_get_value (col, impl->index, value);
 }
 
+/**
+ * dzl_graph_view_model_iter_set_value: (rename-to dzl_graph_view_model_iter_set)
+ * @iter: the iter to set
+ * @column: the column to set
+ * @value: the new value for the column
+ *
+ * Sets an individual value within a specific column.
+ *
+ * Since: 3.30
+ */
+void
+dzl_graph_view_model_iter_set_value (DzlGraphModelIter *iter,
+                                     guint              column,
+                                     const GValue      *value)
+{
+  DzlGraphModelIterImpl *impl = (DzlGraphModelIterImpl *)iter;
+  DzlGraphModelPrivate *priv;
+  DzlGraphColumn *col;
+
+  g_return_if_fail (iter != NULL);
+  g_return_if_fail (impl != NULL);
+  g_return_if_fail (DZL_IS_GRAPH_MODEL (impl->table));
+  priv = dzl_graph_view_model_get_instance_private (impl->table);
+  g_return_if_fail (column < priv->columns->len);
+
+  col = g_ptr_array_index (priv->columns, column);
+
+  g_assert (col != NULL);
+
+  _dzl_graph_view_column_set_value (col, impl->index, value);
+}
+
 static void
 dzl_graph_view_model_finalize (GObject *object)
 {

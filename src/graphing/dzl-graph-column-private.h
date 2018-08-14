@@ -28,6 +28,9 @@ G_BEGIN_DECLS
 void  _dzl_graph_view_column_get_value  (DzlGraphColumn *self,
                                          guint           index,
                                          GValue         *value);
+void  _dzl_graph_view_column_set_value  (DzlGraphColumn *self,
+                                         guint           index,
+                                         const GValue   *value);
 void  _dzl_graph_view_column_collect    (DzlGraphColumn *self,
                                          guint           index,
                                          va_list         args);

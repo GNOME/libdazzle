@@ -32,7 +32,7 @@ struct _DzlGraphColumn
 {
   GObject  parent_instance;
   gchar   *name;
-  DzlRing  *values;
+  DzlRing *values;
   GType    value_type;
 };
 
@@ -141,6 +141,27 @@ _dzl_graph_view_column_get_value (DzlGraphColumn *self,
   g_value_init (value, self->value_type);
   if (G_IS_VALUE (src_value))
     g_value_copy (src_value, value);
+}
+
+void
+_dzl_graph_view_column_set_value (DzlGraphColumn *self,
+                                  guint           index,
+                                  const GValue   *value)
+{
+  GValue *dst_value;
+
+  g_return_if_fail (DZL_IS_GRAPH_COLUMN (self));
+  g_return_if_fail (value != NULL);
+  g_return_if_fail (index < self->values->len);
+  g_return_if_fail (G_VALUE_TYPE (value) == self->value_type);
+
+  dst_value = &((GValue *)(gpointer)self->values->data)[index];
+
+  if (G_VALUE_TYPE (dst_value) != G_TYPE_INVALID)
+    g_value_unset (dst_value);
+
+  g_value_init (dst_value, G_VALUE_TYPE (value));
+  g_value_copy (value, dst_value);
 }
 
 void

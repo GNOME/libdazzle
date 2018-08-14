@@ -87,6 +87,10 @@ DZL_AVAILABLE_IN_ALL
 void           dzl_graph_view_model_iter_set           (DzlGraphModelIter *iter,
                                                         gint               first_column,
                                                         ...);
+DZL_AVAILABLE_IN_3_30
+void           dzl_graph_view_model_iter_set_value     (DzlGraphModelIter *iter,
+                                                        guint              column,
+                                                        const GValue      *value);
 
 G_END_DECLS
 

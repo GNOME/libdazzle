@@ -370,4 +370,11 @@ test_cancellable = executable('test-cancellable', 'test-cancellable.c',
 )
 test('test-cancellable', test_cancellable, env: test_env)
 
+test_graph_model = executable('test-graph-model', 'test-graph-model.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-graph-model', test_graph_model, env: test_env)
+
 endif
