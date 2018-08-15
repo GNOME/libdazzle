@@ -797,9 +797,15 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
       !gtk_revealer_get_child_revealed (self->revealer) &&
       (removed || added))
     {
+      g_signal_handlers_block_by_func (self->revealer,
+                                       G_CALLBACK (dzl_suggestion_popover_notify_child_revealed),
+                                       self);
       gtk_revealer_set_transition_duration (self->revealer, 0);
       gtk_revealer_set_reveal_child (self->revealer, FALSE);
       gtk_revealer_set_reveal_child (self->revealer, TRUE);
+      g_signal_handlers_unblock_by_func (self->revealer,
+                                         G_CALLBACK (dzl_suggestion_popover_notify_child_revealed),
+                                         self);
     }
 }
 
