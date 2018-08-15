@@ -1,3 +1,22 @@
+===============
+Version 3.29.91
+===============
+
+Changes in this release:
+
+ • Build system improvements for subproject usage.
+ • Many improvements to DzlSuggestionEntry to allow for more flexible usage
+   that originally designed. You can now use cairo_surface_t for icons as well
+   as GIcon. You can also now have more control over selection changes and
+   activation of items from click or touch events.
+ • DzlDockBin and DzlDockOverlay gained improved control over focus events.
+ • Many leaks have been fixed, including those in unit tests.
+ • You can run unit tests under ASAN so long as you have a minimal suppression
+   file for some Gio module leaks.
+ • Some memory safety improvements and safe-guards across the library.
+ • Animations of zero-length have been improved. This fixes some long-standing
+   issues for systems where shell/gtk animations were disabled.
+
 ==============
 Version 3.29.4
 ==============
