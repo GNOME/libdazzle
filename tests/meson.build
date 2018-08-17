@@ -377,4 +377,11 @@ test_graph_model = executable('test-graph-model', 'test-graph-model.c',
 )
 test('test-graph-model', test_graph_model, env: test_env)
 
+test_read_only_list_model = executable('test-read-only-list-model', 'test-read-only-list-model.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-read-only-list-model', test_read_only_list_model, env: test_env)
+
 endif

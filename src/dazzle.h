@@ -140,6 +140,7 @@ G_BEGIN_DECLS
 #include "util/dzl-int-pair.h"
 #include "util/dzl-macros.h"
 #include "util/dzl-pango.h"
+#include "util/dzl-read-only-list-model.h"
 #include "util/dzl-rgba.h"
 #include "util/dzl-ring.h"
 #include "util/dzl-variant.h"
