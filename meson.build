@@ -134,11 +134,11 @@ libdir = join_paths(get_option('libdir'), package_subdir)
 girdir = join_paths(get_option('datadir'), package_subdir, 'gir-1.0')
 typelibdir = join_paths(get_option('libdir'), package_subdir, 'girepository-1.0')
 if package_subdir != ''
-  bindir = get_option('bindir')
-  vapidir = join_paths(get_option('datadir'), package_subdir, 'vapi')
-else
   # Use libexecdir to avoid subdirectories under bindir
   bindir = join_paths(get_option('libexecdir'), package_subdir)
+  vapidir = join_paths(get_option('datadir'), package_subdir, 'vapi')
+else
+  bindir = get_option('bindir')
   vapidir = join_paths(get_option('datadir'), 'vala', 'vapi')
 endif
 
