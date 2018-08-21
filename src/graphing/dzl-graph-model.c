@@ -365,7 +365,7 @@ dzl_graph_view_model_iter_set (DzlGraphModelIter *iter,
 
       column = g_ptr_array_index (priv->columns, column_id);
 
-      _dzl_graph_view_column_collect (column, impl->index, args);
+      _dzl_graph_view_column_collect (column, impl->index, &args);
 
       column_id = va_arg (args, gint);
     }
@@ -407,7 +407,7 @@ dzl_graph_view_model_iter_get (DzlGraphModelIter *iter,
 
       column = g_ptr_array_index (priv->columns, column_id);
 
-      _dzl_graph_view_column_lcopy (column, impl->index, args);
+      _dzl_graph_view_column_lcopy (column, impl->index, &args);
 
       column_id = va_arg (args, gint);
     }
