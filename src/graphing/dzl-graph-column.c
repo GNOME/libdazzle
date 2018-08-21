@@ -167,7 +167,7 @@ _dzl_graph_view_column_set_value (DzlGraphColumn *self,
 void
 _dzl_graph_view_column_collect (DzlGraphColumn *self,
                                 guint           index,
-                                va_list         args)
+                                va_list        *args)
 {
   GValue *value;
   gchar *errmsg = NULL;
@@ -177,7 +177,7 @@ _dzl_graph_view_column_collect (DzlGraphColumn *self,
 
   value = &((GValue *)(gpointer)self->values->data)[index];
 
-  G_VALUE_COLLECT (value, args, 0, &errmsg);
+  G_VALUE_COLLECT (value, *args, 0, &errmsg);
 
   if (G_UNLIKELY (errmsg != NULL))
     {
@@ -197,7 +197,7 @@ _dzl_graph_view_column_set (DzlGraphColumn *self,
   g_return_if_fail (index < self->values->len);
 
   va_start (args, index);
-  _dzl_graph_view_column_collect (self, index, args);
+  _dzl_graph_view_column_collect (self, index, &args);
   va_end (args);
 }
 
@@ -212,27 +212,28 @@ _dzl_graph_view_column_get (DzlGraphColumn *self,
   g_return_if_fail (index < self->values->len);
 
   va_start (args, index);
-  _dzl_graph_view_column_lcopy (self, index, args);
+  _dzl_graph_view_column_lcopy (self, index, &args);
   va_end (args);
 }
 
 void
 _dzl_graph_view_column_lcopy (DzlGraphColumn *self,
                               guint           index,
-                              va_list         args)
+                              va_list        *args)
 {
   const GValue *value;
   gchar *errmsg = NULL;
 
   g_return_if_fail (DZL_IS_GRAPH_COLUMN (self));
   g_return_if_fail (index < self->values->len);
+  g_return_if_fail (args != NULL);
 
   value = &((GValue *)(gpointer)self->values->data)[index];
 
   if (!G_IS_VALUE (value))
     return;
 
-  G_VALUE_LCOPY (value, args, 0, &errmsg);
+  G_VALUE_LCOPY (value, *args, 0, &errmsg);
 
   if (G_UNLIKELY (errmsg != NULL))
     {

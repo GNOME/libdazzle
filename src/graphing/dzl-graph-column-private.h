@@ -33,10 +33,10 @@ void  _dzl_graph_view_column_set_value  (DzlGraphColumn *self,
                                          const GValue   *value);
 void  _dzl_graph_view_column_collect    (DzlGraphColumn *self,
                                          guint           index,
-                                         va_list         args);
+                                         va_list        *args);
 void  _dzl_graph_view_column_lcopy      (DzlGraphColumn *self,
                                          guint           index,
-                                         va_list         args);
+                                         va_list        *args);
 void  _dzl_graph_view_column_get        (DzlGraphColumn *column,
                                          guint           index,
                                          ...);
