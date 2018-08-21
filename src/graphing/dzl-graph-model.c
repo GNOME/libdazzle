@@ -371,7 +371,7 @@ dzl_graph_view_model_iter_set (DzlGraphModelIter *iter,
     }
 
   if (column_id != -1)
-    g_critical ("Invalid column sentinal: %d", column_id);
+    g_critical ("Invalid column sentinel: %d", column_id);
 
 cleanup:
   va_end (args);
@@ -413,7 +413,7 @@ dzl_graph_view_model_iter_get (DzlGraphModelIter *iter,
     }
 
   if (column_id != -1)
-    g_critical ("Invalid column sentinal: %d", column_id);
+    g_critical ("Invalid column sentinel: %d", column_id);
 
 cleanup:
   va_end (args);
