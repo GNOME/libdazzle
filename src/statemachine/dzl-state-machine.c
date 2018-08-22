@@ -187,11 +187,11 @@ dzl_state_free (gpointer data)
 {
   DzlState *state = data;
 
-  g_free (state->name);
-  g_hash_table_unref (state->signals);
-  g_hash_table_unref (state->bindings);
-  g_ptr_array_unref (state->properties);
-  g_ptr_array_unref (state->styles);
+  g_clear_pointer (&state->name, g_free);
+  g_clear_pointer (&state->signals, g_hash_table_unref);
+  g_clear_pointer (&state->bindings, g_hash_table_unref);
+  g_clear_pointer (&state->properties, g_ptr_array_unref);
+  g_clear_pointer (&state->styles, g_ptr_array_unref);
   g_slice_free (DzlState, state);
 }
 
@@ -208,8 +208,11 @@ dzl_state_property_free (gpointer data)
       prop->object = NULL;
     }
 
-  g_free (prop->property);
-  g_value_unset (&prop->value);
+  g_clear_pointer (&prop->property, g_free);
+
+  if (G_IS_VALUE (&prop->value))
+    g_value_unset (&prop->value);
+
   g_slice_free (DzlStateProperty, prop);
 }
 
@@ -226,7 +229,7 @@ dzl_state_style_free (gpointer data)
       style->widget = NULL;
     }
 
-  g_free (style->name);
+  g_clear_pointer (&style->name, g_free);
   g_slice_free (DzlStateStyle, style);
 }
 
@@ -237,7 +240,6 @@ dzl_state_apply (DzlStateMachine *self,
   GHashTableIter iter;
   gpointer key;
   gpointer value;
-  gsize i;
 
   g_assert (DZL_IS_STATE_MACHINE (self));
   g_assert (state != NULL);
@@ -250,7 +252,7 @@ dzl_state_apply (DzlStateMachine *self,
   while (g_hash_table_iter_next (&iter, &key, &value))
     dzl_signal_group_set_target (value, key);
 
-  for (i = 0; i < state->properties->len; i++)
+  for (guint i = 0; i < state->properties->len; i++)
     {
       DzlStateProperty *prop;
 
@@ -258,7 +260,7 @@ dzl_state_apply (DzlStateMachine *self,
       g_object_set_property (prop->object, prop->property, &prop->value);
     }
 
-  for (i = 0; i < state->styles->len; i++)
+  for (guint i = 0; i < state->styles->len; i++)
     {
       DzlStateStyle *style;
       GtkStyleContext *style_context;
@@ -276,7 +278,6 @@ dzl_state_unapply (DzlStateMachine *self,
   GHashTableIter iter;
   gpointer key;
   gpointer value;
-  gsize i;
 
   g_assert (DZL_IS_STATE_MACHINE (self));
   g_assert (state != NULL);
@@ -289,7 +290,7 @@ dzl_state_unapply (DzlStateMachine *self,
   while (g_hash_table_iter_next (&iter, &key, &value))
     dzl_signal_group_set_target (value, NULL);
 
-  for (i = 0; i < state->styles->len; i++)
+  for (guint i = 0; i < state->styles->len; i++)
     {
       DzlStateStyle *style;
       GtkStyleContext *style_context;
