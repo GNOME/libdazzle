@@ -212,7 +212,7 @@ dzl_application_window_complete_fullscreen (DzlApplicationWindow *self)
           revealer_set_reveal_child_now (priv->titlebar_revealer, FALSE);
           gtk_container_remove (GTK_CONTAINER (priv->titlebar_container), titlebar);
           gtk_container_add (GTK_CONTAINER (priv->titlebar_revealer), titlebar);
-          gtk_revealer_set_reveal_child (priv->titlebar_revealer, TRUE);
+          revealer_set_reveal_child_now (priv->titlebar_revealer, TRUE);
           dzl_application_window_queue_dismissal (self);
         }
     }
