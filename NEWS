@@ -1,4 +1,18 @@
 ===============
+Version 3.29.92
+===============
+
+Changes in this release:
+
+ • Fixes to the DzlGraphModel for va_list usage on various architectures.
+ • State machine is a bit more defensive against improper input.
+ • Fullscreen transitions now change the headerbar to be immediately
+   visible after the transition.
+ • A new DzlReadOnlyListModel wrapper has been added which allows
+   developers to create an opaque wrapper around a GListModel.
+ • bindir fixes when used as a subproject
+
+===============
 Version 3.29.91
 ===============
 
