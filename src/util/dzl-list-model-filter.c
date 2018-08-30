@@ -347,10 +347,10 @@ dzl_list_model_filter_get_item (GListModel *model,
   guint child_position;
 
   g_assert (DZL_IS_LIST_MODEL_FILTER (self));
-  g_assert (position < (guint)g_sequence_get_length (priv->filter_seq));
 
   iter = g_sequence_get_iter_at_pos (priv->filter_seq, position);
-  g_assert (!g_sequence_iter_is_end (iter));
+  if (g_sequence_iter_is_end (iter))
+    return NULL;
 
   item = g_sequence_get (iter);
   g_assert (item != NULL);

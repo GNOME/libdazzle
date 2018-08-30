@@ -61,12 +61,19 @@ test_basic (void)
   filter = dzl_list_model_filter_new (G_LIST_MODEL (model));
   g_assert (filter);
 
+  /* Test requesting past boundary */
+  g_assert_null (g_list_model_get_item (G_LIST_MODEL (filter), 0));
+  g_assert_null (g_list_model_get_item (G_LIST_MODEL (filter), 1));
+
   for (i = 0; i < 1000; i++)
     {
       g_autoptr(TestItem) val = test_item_new (i);
 
       g_list_store_append (model, val);
     }
+
+  /* Test requesting past boundary */
+  g_assert_null (g_list_model_get_item (G_LIST_MODEL (filter), 1000));
 
   g_assert_cmpint (1000, ==, g_list_model_get_n_items (G_LIST_MODEL (model)));
   g_assert_cmpint (1000, ==, g_list_model_get_n_items (G_LIST_MODEL (filter)));
@@ -79,6 +86,7 @@ test_basic (void)
     {
       g_autoptr(TestItem) ele = g_list_model_get_item (G_LIST_MODEL (filter), i);
 
+      g_assert_nonnull (ele);
       g_assert (TEST_IS_ITEM (ele));
       g_assert (filter_func1 (G_OBJECT (ele), NULL));
     }
