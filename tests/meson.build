@@ -384,4 +384,11 @@ test_read_only_list_model = executable('test-read-only-list-model', 'test-read-o
 )
 test('test-read-only-list-model', test_read_only_list_model, env: test_env)
 
+test_model_filter = executable('test-model-filter', 'test-model-filter.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-model-filter', test_model_filter, env: test_env)
+
 endif
