@@ -171,6 +171,28 @@ dzl_application_real_remove_resources (DzlApplication *self,
 }
 
 static void
+dzl_application_app_menu_items_changed (DzlApplication *self,
+                                        guint           position,
+                                        guint           removed,
+                                        guint           added,
+                                        GMenuModel     *model)
+{
+  g_assert (DZL_IS_APPLICATION (self));
+  g_assert (G_IS_MENU_MODEL (model));
+
+  /* Handle initial/spurious case up-front */
+  if (removed == 0 && added == 0)
+    return;
+
+  /* If we are doing our initial add of items, then we should register this
+   * model with the GtkApplication. We do this in a delayed fashion to avoid
+   * setting it before it is necessary.
+   */
+  if (removed == 0 && added == g_menu_model_get_n_items (model))
+    gtk_application_set_app_menu (GTK_APPLICATION (self), model);
+}
+
+static void
 dzl_application_startup (GApplication *app)
 {
   DzlApplication *self = (DzlApplication *)app;
@@ -203,9 +225,19 @@ dzl_application_startup (GApplication *app)
    * assign it to the application. If we used the base GtkApplication for
    * menus, this would be done for us. But since we are doing menu merging,
    * we need to do it manually.
+   *
+   * This is done via a signal callback so that we can avoid setting the
+   * menu in cases where it is empty.
    */
   app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
-  gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
+  g_signal_connect_object (app_menu,
+                           "items-changed",
+                           G_CALLBACK (dzl_application_app_menu_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
+  dzl_application_app_menu_items_changed (self, 0, 0,
+                                          g_menu_model_get_n_items (G_MENU_MODEL (app_menu)),
+                                          G_MENU_MODEL (app_menu));
 
   /*
    * Now apply our deferred resources.
