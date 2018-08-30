@@ -690,7 +690,9 @@ dzl_animation_stop (DzlAnimation *animation)
     return;
 
   g_return_if_fail (DZL_IS_ANIMATION (animation));
-  g_return_if_fail (animation->stop_called == FALSE);
+
+  if (animation->stop_called)
+    return;
 
   animation->stop_called = TRUE;
 
