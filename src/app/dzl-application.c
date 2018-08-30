@@ -205,7 +205,8 @@ dzl_application_startup (GApplication *app)
    * we need to do it manually.
    */
   app_menu = dzl_menu_manager_get_menu_by_id (priv->menu_manager, "app-menu");
-  gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
+  if (g_menu_model_get_n_items (G_MENU_MODEL (app_menu)) > 0)
+    gtk_application_set_app_menu (GTK_APPLICATION (self), G_MENU_MODEL (app_menu));
 
   /*
    * Now apply our deferred resources.
