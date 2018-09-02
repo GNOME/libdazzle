@@ -114,6 +114,10 @@ dzl_shortcut_chord_new_from_event (const GdkEventKey *key)
   self->keys[0].keyval = gdk_keyval_to_lower (key->keyval);
   self->keys[0].modifier = sanitize_modifier_mask (key->state);
 
+  if ((key->state & GDK_SHIFT_MASK) != 0 &&
+      self->keys[0].keyval == key->keyval)
+    self->keys[0].modifier &= ~GDK_SHIFT_MASK;
+
   if ((key->state & GDK_LOCK_MASK) == 0 &&
       self->keys[0].keyval != key->keyval)
     self->keys[0].modifier |= GDK_SHIFT_MASK;
