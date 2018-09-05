@@ -1,3 +1,16 @@
+==============
+Version 3.30.0
+==============
+
+Changes in this release:
+
+ • Fix for shift-modifier in keybindings, fixes some issues on
+   AZERTY keyboards.
+ • Added DzlListModelFilter for filtering GListModel using a wrapper
+   model. This has been used in Sysprof for a while now.
+ • DzlApplication will avoid setting the application app menu unless
+   it has been set by the application/plugins.
+
 ===============
 Version 3.29.92
 ===============
