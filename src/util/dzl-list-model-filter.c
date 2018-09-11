@@ -159,10 +159,16 @@ dzl_list_model_filter_child_model_items_changed (DzlListModelFilter *self,
       /* Small shortcut when all items are removed */
       if (n_removed == (guint)g_sequence_get_length (priv->child_seq))
         {
+          guint n_filter_removed = g_sequence_get_length (priv->filter_seq);
+
           g_sequence_remove_range (g_sequence_get_begin_iter (priv->child_seq),
                                    g_sequence_get_end_iter (priv->child_seq));
           g_assert (g_sequence_is_empty (priv->child_seq));
           g_assert (g_sequence_is_empty (priv->filter_seq));
+
+          if (unblocked)
+            g_list_model_items_changed (G_LIST_MODEL (self), 0, n_filter_removed, 0);
+
           goto add_new_items;
         }
 

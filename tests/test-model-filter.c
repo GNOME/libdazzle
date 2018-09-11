@@ -194,6 +194,61 @@ test_items_changed (void)
   g_clear_object (&filter);
 }
 
+
+static guint items_to_remove = 0;
+static gboolean items_changed_emitted = FALSE;
+
+static void
+filter_items_removed_cb (DzlListModelFilter *filter,
+                         guint               position,
+                         guint               n_removed,
+                         guint               n_added,
+                         GListModel         *model)
+{
+  items_changed_emitted = TRUE;
+
+  g_assert_cmpint (n_removed, ==, items_to_remove);
+}
+
+static void
+test_remove_all (void)
+{
+  DzlListModelFilter *filter;
+  GListStore *model;
+  guint i;
+
+  model = g_list_store_new (TEST_TYPE_ITEM);
+  g_assert (model);
+
+  filter = dzl_list_model_filter_new (G_LIST_MODEL (model));
+  g_assert (filter);
+
+  /* The filter model is not filtered, so it must mirror whatever
+   * the child model does. In this case, test if the position of
+   * items-changed match.
+   */
+  for (i = 0; i < 100; i++)
+    {
+      g_autoptr (TestItem) val = test_item_new (i);
+
+      g_list_store_append (model, val);
+
+      items_to_remove++;
+    }
+
+  g_assert_cmpint (100, ==, g_list_model_get_n_items (G_LIST_MODEL (model)));
+  g_assert_cmpint (100, ==, g_list_model_get_n_items (G_LIST_MODEL (filter)));
+
+  g_signal_connect_after (filter, "items-changed", G_CALLBACK (filter_items_removed_cb), model);
+
+  g_list_store_remove_all (model);
+
+  g_assert_true (items_changed_emitted);
+
+  g_clear_object (&model);
+  g_clear_object (&filter);
+}
+
 gint
 main (gint argc,
       gchar *argv[])
@@ -201,5 +256,6 @@ main (gint argc,
   g_test_init (&argc, &argv, NULL);
   g_test_add_func ("/Dazzle/ListModelFilter/basic", test_basic);
   g_test_add_func ("/Dazzle/ListModelFilter/items-changed", test_items_changed);
+  g_test_add_func ("/Dazzle/ListModelFilter/remove-all", test_remove_all);
   return g_test_run ();
 }
