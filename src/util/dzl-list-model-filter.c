@@ -18,7 +18,7 @@
 
 #include "config.h"
 
-#define G_LOG_DOMAIN "dzl-list-model-filter.h"
+#define G_LOG_DOMAIN "dzl-list-model-filter"
 
 #include "util/dzl-list-model-filter.h"
 
