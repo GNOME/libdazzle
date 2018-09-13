@@ -25,6 +25,32 @@ add_preferences (DzlPreferences *prefs)
   dzl_preferences_add_group (prefs, "appearance", "basic", NULL, 0);
   dzl_preferences_add_switch (prefs, "appearance", "basic", "com.example", "foo", NULL, NULL, "Global Dark Theme", "Applications need to be restarted for this change to take place", "dark theme", 0);
   dzl_preferences_add_switch (prefs, "appearance", "basic", "com.example", "foo", NULL, NULL, "Animations", NULL, "animations", 1);
+  dzl_preferences_add_table_row (prefs, "appearance", "basic",
+                                 g_object_new (GTK_TYPE_LABEL,
+                                               "label", "Key",
+                                               "visible", TRUE,
+                                               "width-chars", 15,
+                                               "xalign", 0.0f,
+                                               NULL),
+                                 g_object_new (GTK_TYPE_LABEL,
+                                               "hexpand", TRUE,
+                                               "xalign", 0.0f,
+                                               "label", "Value",
+                                               "visible", TRUE,
+                                               NULL),
+                                 NULL);
+  dzl_preferences_add_table_row (prefs, "appearance", "basic",
+                                 g_object_new (GTK_TYPE_LABEL,
+                                               "label", "Key 2",
+                                               "visible", TRUE,
+                                               "xalign", 0.0f,
+                                               NULL),
+                                 g_object_new (GTK_TYPE_LABEL,
+                                               "xalign", 0.0f,
+                                               "label", "Value 2",
+                                               "visible", TRUE,
+                                               NULL),
+                                 NULL);
 
   dzl_preferences_add_list_group (prefs, "appearance", "themes", "Themes", GTK_SELECTION_NONE, 10);
 

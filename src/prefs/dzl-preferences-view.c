@@ -1002,6 +1002,78 @@ dzl_preferences_view_get_widget (DzlPreferences *preferences,
   return tracked ? tracked->widget : NULL;
 }
 
+static guint
+dzl_preferences_view_add_table_row_va (DzlPreferences *preferences,
+                                       const gchar    *page_name,
+                                       const gchar    *group_name,
+                                       GtkWidget      *first_widget,
+                                       va_list         args)
+{
+  DzlPreferencesView *self = (DzlPreferencesView *)preferences;
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+  DzlPreferencesGroup *group;
+  GtkWidget *page;
+  GtkWidget *column = first_widget;
+  GtkListBoxRow *row;
+  GtkBox *box;
+  guint column_id = 0;
+  guint widget_id;
+
+  g_assert (DZL_IS_PREFERENCES_VIEW (self));
+  g_assert (page_name != NULL);
+  g_assert (group_name != NULL);
+  g_assert (GTK_IS_WIDGET (column));
+
+  page = dzl_preferences_view_get_page (self, page_name);
+
+  if (page == NULL)
+    {
+      g_warning ("No page named \"%s\" could be found.", page_name);
+      return 0;
+    }
+
+  group = dzl_preferences_page_get_group (DZL_PREFERENCES_PAGE (page), group_name);
+
+  if (group == NULL)
+    {
+      g_warning ("No such preferences group \"%s\" in page \"%s\"",
+                 group_name, page_name);
+      return 0;
+    }
+
+  row = g_object_new (DZL_TYPE_PREFERENCES_BIN,
+                      "visible", TRUE,
+                      NULL);
+  box = g_object_new (GTK_TYPE_BOX,
+                      "orientation", GTK_ORIENTATION_HORIZONTAL,
+                      "visible", TRUE,
+                      NULL);
+  gtk_container_add (GTK_CONTAINER (row), GTK_WIDGET (box));
+
+  do
+    {
+      GtkSizeGroup *size_group;
+
+      if ((size_group = dzl_preferences_group_get_size_group (group, column_id)))
+        gtk_size_group_add_widget (size_group, column);
+
+      gtk_container_add_with_properties (GTK_CONTAINER (box), column,
+                                         "expand", FALSE,
+                                         NULL);
+
+      column = va_arg (args, GtkWidget*);
+      column_id++;
+    }
+  while (column != NULL);
+
+  dzl_preferences_group_add (group, GTK_WIDGET (row));
+
+  widget_id = ++priv->last_widget_id;
+  dzl_preferences_view_track (self, widget_id, GTK_WIDGET (row));
+
+  return widget_id;
+}
+
 static void
 dzl_preferences_iface_init (DzlPreferencesInterface *iface)
 {
@@ -1017,6 +1089,7 @@ dzl_preferences_iface_init (DzlPreferencesInterface *iface)
   iface->set_page = dzl_preferences_view_set_page;
   iface->remove_id = dzl_preferences_view_remove_id;
   iface->get_widget = dzl_preferences_view_get_widget;
+  iface->add_table_row_va = dzl_preferences_view_add_table_row_va;
 }
 
 GtkWidget *

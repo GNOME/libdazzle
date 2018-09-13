@@ -40,6 +40,8 @@ struct _DzlPreferencesGroup
 
   GtkListBoxRow *last_focused;
   guint          last_focused_tab_backward : 1;
+
+  GHashTable    *size_groups;
 };
 
 G_END_DECLS

@@ -113,6 +113,11 @@ struct _DzlPreferencesInterface
                                              guint                 widget_id);
   GtkWidget *(*get_widget)                  (DzlPreferences       *self,
                                              guint                 widget_id);
+  guint      (*add_table_row_va)            (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             GtkWidget            *first_widget,
+                                             va_list               args);
 };
 
 DZL_AVAILABLE_IN_ALL
@@ -206,6 +211,12 @@ void       dzl_preferences_set_page         (DzlPreferences       *self,
 DZL_AVAILABLE_IN_ALL
 GtkWidget *dzl_preferences_get_widget       (DzlPreferences       *self,
                                              guint                 widget_id);
+DZL_AVAILABLE_IN_3_32
+guint      dzl_preferences_add_table_row    (DzlPreferences       *self,
+                                             const gchar          *page_name,
+                                             const gchar          *group_name,
+                                             GtkWidget            *first_widget,
+                                             ...) G_GNUC_NULL_TERMINATED;
 
 G_END_DECLS
 

@@ -33,18 +33,21 @@ DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlPreferencesGroup, dzl_preferences_group, DZL, PREFERENCES_GROUP, GtkBin)
 
 DZL_AVAILABLE_IN_ALL
-void         dzl_preferences_group_add          (DzlPreferencesGroup *self,
-                                                 GtkWidget           *widget);
+void         dzl_preferences_group_add            (DzlPreferencesGroup *self,
+                                                   GtkWidget           *widget);
 DZL_AVAILABLE_IN_ALL
-const gchar *dzl_preferences_group_get_title    (DzlPreferencesGroup *self);
+const gchar  *dzl_preferences_group_get_title      (DzlPreferencesGroup *self);
 DZL_AVAILABLE_IN_ALL
-gint         dzl_preferences_group_get_priority (DzlPreferencesGroup *self);
+gint          dzl_preferences_group_get_priority   (DzlPreferencesGroup *self);
 DZL_AVAILABLE_IN_ALL
-void         dzl_preferences_group_set_map      (DzlPreferencesGroup *self,
-                                                 GHashTable          *map);
+void          dzl_preferences_group_set_map        (DzlPreferencesGroup *self,
+                                                    GHashTable          *map);
 DZL_AVAILABLE_IN_ALL
-guint        dzl_preferences_group_refilter     (DzlPreferencesGroup *self,
-                                                 DzlPatternSpec      *spec);
+guint         dzl_preferences_group_refilter       (DzlPreferencesGroup *self,
+                                                    DzlPatternSpec      *spec);
+DZL_AVAILABLE_IN_3_32
+GtkSizeGroup *dzl_preferences_group_get_size_group (DzlPreferencesGroup *self,
+                                                    guint                column);
 
 
 G_END_DECLS

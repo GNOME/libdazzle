@@ -136,6 +136,7 @@ dzl_preferences_group_finalize (GObject *object)
   DzlPreferencesGroup *self = (DzlPreferencesGroup *)object;
 
   g_clear_pointer (&self->widgets, g_ptr_array_unref);
+  g_clear_pointer (&self->size_groups, g_hash_table_unref);
 
   G_OBJECT_CLASS (dzl_preferences_group_parent_class)->finalize (object);
 }
@@ -445,4 +446,36 @@ dzl_preferences_group_refilter (DzlPreferencesGroup *self,
   gtk_widget_set_visible (GTK_WIDGET (self), lookup.matches > 0);
 
   return lookup.matches;
+}
+
+/**
+ * dzl_preferences_group_get_size_group:
+ * @self: a #DzlPreferencesGroup
+ *
+ * Gets a size group that can be used to organize items in
+ * a group based on columns.
+ *
+ * Returns: (not nullable) (transfer none): a #GtkSizeGroup
+ */
+GtkSizeGroup *
+dzl_preferences_group_get_size_group (DzlPreferencesGroup *self,
+                                      guint                column)
+{
+  GtkSizeGroup *ret;
+
+  g_return_val_if_fail (DZL_IS_PREFERENCES_GROUP (self), NULL);
+
+  if (self->size_groups == NULL)
+    self->size_groups = g_hash_table_new_full (g_direct_hash,
+                                               g_direct_equal,
+                                               NULL,
+                                               g_object_unref);
+
+  if (!(ret = g_hash_table_lookup (self->size_groups, GUINT_TO_POINTER (column))))
+    {
+      ret = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
+      g_hash_table_insert (self->size_groups, GUINT_TO_POINTER (column), ret);
+    }
+
+  return ret;
 }

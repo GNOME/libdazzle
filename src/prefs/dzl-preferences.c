@@ -262,3 +262,25 @@ dzl_preferences_get_widget (DzlPreferences *self,
 
   return DZL_PREFERENCES_GET_IFACE (self)->get_widget (self, widget_id);
 }
+
+guint
+dzl_preferences_add_table_row (DzlPreferences *self,
+                               const gchar    *page_name,
+                               const gchar    *group_name,
+                               GtkWidget      *first_widget,
+                               ...)
+{
+  va_list args;
+  gint ret;
+
+  g_return_val_if_fail (DZL_IS_PREFERENCES (self), 0);
+  g_return_val_if_fail (page_name != NULL, 0);
+  g_return_val_if_fail (group_name != NULL, 0);
+  g_return_val_if_fail (GTK_IS_WIDGET (first_widget), 0);
+
+  va_start (args, first_widget);
+  ret = DZL_PREFERENCES_GET_IFACE (self)->add_table_row_va (self, page_name, group_name, first_widget, args);
+  va_end (args);
+
+  return ret;
+}
