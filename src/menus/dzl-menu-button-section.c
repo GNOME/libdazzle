@@ -37,6 +37,7 @@ struct _DzlMenuButtonSection
   /* Template references */
   GtkLabel       *label;
   DzlBox         *items_box;
+  GtkSeparator   *separator;
 
   guint           show_accels : 1;
   guint           show_icons : 1;
@@ -152,6 +153,11 @@ dzl_menu_button_section_items_changed (DzlMenuButtonSection *self,
                                          "position", i,
                                          NULL);
     }
+
+  if (added || g_menu_model_get_n_items (menu))
+    gtk_widget_show (GTK_WIDGET (self->separator));
+  else
+    gtk_widget_hide (GTK_WIDGET (self->separator));
 }
 
 static void
@@ -287,6 +293,7 @@ dzl_menu_button_section_class_init (DzlMenuButtonSectionClass *klass)
                                                "/org/gnome/dazzle/ui/dzl-menu-button-section.ui");
   gtk_widget_class_bind_template_child (widget_class, DzlMenuButtonSection, label);
   gtk_widget_class_bind_template_child (widget_class, DzlMenuButtonSection, items_box);
+  gtk_widget_class_bind_template_child (widget_class, DzlMenuButtonSection, separator);
 }
 
 static void
