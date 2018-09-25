@@ -48,10 +48,10 @@ typedef struct
 {
   GtkStack    *titlebar_container;
   GtkRevealer *titlebar_revealer;
-  GtkEventBox *event_box;
   GtkOverlay  *overlay;
 
-  gulong       motion_notify_handler;
+  GtkEventController *motion_controller;
+  gulong              motion_controller_handler;
 
   guint        fullscreen_source;
   guint        fullscreen_reveal_source;
@@ -128,20 +128,17 @@ revealer_set_reveal_child_now (GtkRevealer *revealer,
   gtk_revealer_set_transition_type (revealer, GTK_REVEALER_TRANSITION_TYPE_SLIDE_DOWN);
 }
 
-static gboolean
-dzl_application_window_event_box_motion (DzlApplicationWindow *self,
-                                         GdkEventMotion       *motion,
-                                         GtkEventBox          *event_box)
+static void
+dzl_application_window_motion_cb (DzlApplicationWindow     *self,
+                                  gdouble                   x,
+                                  gdouble                   y,
+                                  GtkEventControllerMotion *controller)
 {
   DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
-  GtkWidget *widget = NULL;
   GtkWidget *focus;
-  gint x = 0;
-  gint y = 0;
 
   g_assert (DZL_IS_APPLICATION_WINDOW (self));
-  g_assert (motion != NULL);
-  g_assert (GTK_IS_EVENT_BOX (event_box));
+  g_assert (GTK_IS_EVENT_CONTROLLER_MOTION (controller));
 
   /*
    * If we are focused in the revealer, ignore this.  We will have already
@@ -150,28 +147,17 @@ dzl_application_window_event_box_motion (DzlApplicationWindow *self,
   focus = gtk_window_get_focus (GTK_WINDOW (self));
   if (focus != NULL &&
       dzl_gtk_widget_is_ancestor_or_relative (focus, GTK_WIDGET (priv->titlebar_revealer)))
-    return GDK_EVENT_PROPAGATE;
-
-  /* The widget is stored in GdkWindow user_data */
-  gdk_window_get_user_data (motion->window, (gpointer *)&widget);
-  if (widget == NULL)
-    return GDK_EVENT_PROPAGATE;
+    return;
 
   /* If the headerbar is underneath the pointer or we are within a
    * small distance of the edge of the window (and monitor), ensure
    * that the titlebar is displayed and queue our next dismissal.
    */
-  if (dzl_gtk_widget_is_ancestor_or_relative (widget, GTK_WIDGET (priv->titlebar_revealer)) ||
-      gtk_widget_translate_coordinates (widget, GTK_WIDGET (self), motion->x, motion->y, &x, &y))
+  if (y <= SHOW_HEADER_WITHIN_DISTANCE)
     {
-      if (y < SHOW_HEADER_WITHIN_DISTANCE)
-        {
-          gtk_revealer_set_reveal_child (priv->titlebar_revealer, TRUE);
-          dzl_application_window_queue_dismissal (self);
-        }
+      gtk_revealer_set_reveal_child (priv->titlebar_revealer, TRUE);
+      dzl_application_window_queue_dismissal (self);
     }
-
-  return GDK_EVENT_PROPAGATE;
 }
 
 static gboolean
@@ -205,7 +191,7 @@ dzl_application_window_complete_fullscreen (DzlApplicationWindow *self)
   if (priv->fullscreen)
     {
       /* Only listen for motion notify events while in fullscreen mode. */
-      g_signal_handler_unblock (priv->event_box, priv->motion_notify_handler);
+      gtk_event_controller_set_propagation_phase (priv->motion_controller, GTK_PHASE_CAPTURE);
 
       if (titlebar && gtk_widget_is_ancestor (titlebar, GTK_WIDGET (priv->titlebar_container)))
         {
@@ -219,7 +205,7 @@ dzl_application_window_complete_fullscreen (DzlApplicationWindow *self)
   else
     {
       /* Motion events are no longer needed */
-      g_signal_handler_block (priv->event_box, priv->motion_notify_handler);
+      gtk_event_controller_set_propagation_phase (priv->motion_controller, GTK_PHASE_NONE);
 
       if (gtk_widget_is_ancestor (titlebar, GTK_WIDGET (priv->titlebar_revealer)))
         {
@@ -330,7 +316,7 @@ dzl_application_window_add (GtkContainer *container,
   g_assert (DZL_IS_APPLICATION_WINDOW (self));
   g_assert (GTK_IS_WIDGET (widget));
 
-  gtk_container_add (GTK_CONTAINER (priv->event_box), widget);
+  gtk_container_add (GTK_CONTAINER (priv->overlay), widget);
 }
 
 static gboolean
@@ -363,12 +349,10 @@ dzl_application_window_destroy (GtkWidget *widget)
 
   g_assert (DZL_IS_APPLICATION_WINDOW (self));
 
-  if (priv->event_box != NULL)
-    dzl_clear_signal_handler (priv->event_box, &priv->motion_notify_handler);
+  g_clear_object (&priv->motion_controller);
 
   g_clear_pointer ((GtkWidget **)&priv->titlebar_container, gtk_widget_destroy);
   g_clear_pointer ((GtkWidget **)&priv->titlebar_revealer, gtk_widget_destroy);
-  g_clear_pointer ((GtkWidget **)&priv->event_box, gtk_widget_destroy);
   g_clear_pointer ((GtkWidget **)&priv->overlay, gtk_widget_destroy);
 
   dzl_clear_source (&priv->fullscreen_source);
@@ -475,6 +459,7 @@ dzl_application_window_init (DzlApplicationWindow *self)
   priv->overlay = g_object_new (GTK_TYPE_OVERLAY,
                                 "visible", TRUE,
                                 NULL);
+  gtk_widget_set_events (GTK_WIDGET (priv->overlay), GDK_POINTER_MOTION_MASK);
   g_signal_connect (priv->overlay,
                     "destroy",
                     G_CALLBACK (gtk_widget_destroyed),
@@ -482,23 +467,13 @@ dzl_application_window_init (DzlApplicationWindow *self)
   GTK_CONTAINER_CLASS (dzl_application_window_parent_class)->add (GTK_CONTAINER (self),
                                                                   GTK_WIDGET (priv->overlay));
 
-  priv->event_box = g_object_new (GTK_TYPE_EVENT_BOX,
-                                  "above-child", FALSE,
-                                  "visible", TRUE,
-                                  "visible-window", TRUE,
-                                  NULL);
-  gtk_widget_set_events (GTK_WIDGET (priv->event_box), GDK_POINTER_MOTION_MASK);
-  g_signal_connect (priv->event_box,
-                    "destroy",
-                    G_CALLBACK (gtk_widget_destroyed),
-                    &priv->event_box);
-  priv->motion_notify_handler =
-    g_signal_connect_swapped (priv->event_box,
-                              "motion-notify-event",
-                              G_CALLBACK (dzl_application_window_event_box_motion),
+  priv->motion_controller = gtk_event_controller_motion_new (GTK_WIDGET (priv->overlay));
+  priv->motion_controller_handler =
+    g_signal_connect_swapped (priv->motion_controller,
+                              "motion",
+                              G_CALLBACK (dzl_application_window_motion_cb),
                               self);
-  g_signal_handler_block (priv->event_box, priv->motion_notify_handler);
-  gtk_container_add (GTK_CONTAINER (priv->overlay), GTK_WIDGET (priv->event_box));
+  gtk_event_controller_set_propagation_phase (priv->motion_controller, GTK_PHASE_NONE);
 
   priv->titlebar_revealer = g_object_new (GTK_TYPE_REVEALER,
                                           "valign", GTK_ALIGN_START,
