@@ -364,10 +364,7 @@ dzl_application_window_destroy (GtkWidget *widget)
   g_assert (DZL_IS_APPLICATION_WINDOW (self));
 
   if (priv->event_box != NULL)
-    {
-      g_signal_handler_disconnect (priv->event_box, priv->motion_notify_handler);
-      priv->motion_notify_handler = 0;
-    }
+    dzl_clear_signal_handler (priv->event_box, &priv->motion_notify_handler);
 
   g_clear_pointer ((GtkWidget **)&priv->titlebar_container, gtk_widget_destroy);
   g_clear_pointer ((GtkWidget **)&priv->titlebar_revealer, gtk_widget_destroy);
