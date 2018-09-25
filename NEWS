@@ -1,4 +1,13 @@
 ==============
+Version 3.30.1
+==============
+
+Changes in this release:
+
+ • Correctness fixes to DzlListModelFilter
+ • DzlMenuButton now properly hides empty menu sections
+
+==============
 Version 3.30.0
 ==============
 
