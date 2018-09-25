@@ -341,6 +341,29 @@ dzl_application_window_key_press_event (GtkWidget   *widget,
   return ret;
 }
 
+static gboolean
+dzl_application_window_window_state_event (GtkWidget           *widget,
+                                           GdkEventWindowState *event)
+{
+  DzlApplicationWindow *self = (DzlApplicationWindow *)widget;
+  DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
+  gboolean ret;
+
+  g_assert (DZL_IS_APPLICATION_WINDOW (self));
+  g_assert (event != NULL);
+
+  ret = GTK_WIDGET_CLASS (dzl_application_window_parent_class)->window_state_event (widget, event);
+
+  /* Clear our fullscreen state if the window-manager un-fullscreened us.
+   * This fixes an issue on gnome 3.30 (and other window managers) that can
+   * clear the fullscreen state out from under the app.
+   */
+  if (priv->fullscreen && (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN) == 0)
+    dzl_application_window_set_fullscreen (self, FALSE);
+
+  return ret;
+}
+
 static void
 dzl_application_window_destroy (GtkWidget *widget)
 {
@@ -412,6 +435,7 @@ dzl_application_window_class_init (DzlApplicationWindowClass *klass)
 
   widget_class->destroy = dzl_application_window_destroy;
   widget_class->key_press_event = dzl_application_window_key_press_event;
+  widget_class->window_state_event = dzl_application_window_window_state_event;
 
   container_class->add = dzl_application_window_add;
 
