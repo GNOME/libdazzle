@@ -245,11 +245,7 @@ dzl_application_window_real_set_fullscreen (DzlApplicationWindow *self,
 
   priv->fullscreen = fullscreen;
 
-  if (priv->fullscreen_source != 0)
-    {
-      g_source_remove (priv->fullscreen_source);
-      priv->fullscreen_source = 0;
-    }
+  dzl_clear_source (&priv->fullscreen_source);
 
   if (priv->fullscreen)
     {
@@ -308,11 +304,7 @@ dzl_application_window_set_focus (GtkWindow *window,
       if (dzl_gtk_widget_is_ancestor_or_relative (widget, GTK_WIDGET (priv->titlebar_revealer)))
         {
           /* Disable transition while the revealer is focused */
-          if (priv->fullscreen_reveal_source != 0)
-            {
-              g_source_remove (priv->fullscreen_reveal_source);
-              priv->fullscreen_reveal_source = 0;
-            }
+          dzl_clear_source (&priv->fullscreen_reveal_source);
 
           /* If this was just focused, we might need to make it visible */
           gtk_revealer_set_reveal_child (priv->titlebar_revealer, TRUE);
@@ -323,11 +315,7 @@ dzl_application_window_set_focus (GtkWindow *window,
            * the titlebar immediately to get out of the users way.
            */
           gtk_revealer_set_reveal_child (priv->titlebar_revealer, FALSE);
-          if (priv->fullscreen_reveal_source != 0)
-            {
-              g_source_remove (priv->fullscreen_reveal_source);
-              priv->fullscreen_reveal_source = 0;
-            }
+          dzl_clear_source (&priv->fullscreen_reveal_source);
         }
     }
 }
