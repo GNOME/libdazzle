@@ -180,10 +180,10 @@ dzl_shortcut_simple_label_init (DzlShortcutSimpleLabel *self)
 
   self->accel_label = g_object_new (GTK_TYPE_LABEL,
                                     "hexpand", TRUE,
-                                    "halign", GTK_ALIGN_START,
+                                    "halign", GTK_ALIGN_END,
                                     "margin-start", 12,
                                     "visible", TRUE,
-                                    "xalign", 0.0f,
+                                    "xalign", 1.0f,
                                     NULL);
   dzl_gtk_widget_add_style_class (GTK_WIDGET (self->accel_label), "dim-label");
   gtk_container_add_with_properties (GTK_CONTAINER (self), GTK_WIDGET (self->accel_label),
