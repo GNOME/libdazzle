@@ -325,7 +325,7 @@ dzl_application_window_key_press_event (GtkWidget   *widget,
 {
   DzlApplicationWindow *self = (DzlApplicationWindow *)widget;
   DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
-  gboolean ret;
+  gboolean stop;
 
   g_assert (DZL_IS_APPLICATION_WINDOW (self));
   g_assert (event != NULL);
@@ -335,10 +335,10 @@ dzl_application_window_key_press_event (GtkWidget   *widget,
     return GTK_WIDGET_CLASS (dzl_application_window_parent_class)->key_press_event (widget, event);
 
   priv->in_key_press = TRUE;
-  ret = dzl_shortcut_manager_handle_event (NULL, event, widget);
+  stop = dzl_shortcut_manager_handle_event (NULL, event, widget);
   priv->in_key_press = FALSE;
 
-  return ret;
+  return stop || GTK_WIDGET_CLASS (dzl_application_window_parent_class)->key_press_event (widget, event);
 }
 
 static gboolean
