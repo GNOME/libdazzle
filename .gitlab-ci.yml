@@ -29,6 +29,7 @@ bst:
   script:
     - cd gnome-build-meta/
     - ${BST} track core-deps/libdazzle.bst
+    - ${BST} build --track-all core-deps/libdazzle.bst
     - ${BST} workspace open -f core-deps/libdazzle.bst ../
     - ${BST} build --track-all core-deps/libdazzle.bst
   after_script:
