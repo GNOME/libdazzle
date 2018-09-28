@@ -1,0 +1,48 @@
+variables:
+  ELEMENT: "core-deps/libdazzle.bst"
+
+stages:
+  - "build"
+
+bst:
+  image: "buildstream/buildstream-fedora:master-118-dae842fd"
+  stage: "build"
+  variables:
+    # Store all the bst stuff under the "${CI_PROJECT_DIR}" directory.
+    # Note that GitLab CI will only cache stuff inside the "${CI_PROJECT_DIR}" folder.
+    XDG_CACHE_HOME: "${CI_PROJECT_DIR}/cache"
+    GET_SOURCES_ATTEMPTS: 3
+    BST: "bst --no-strict --config build.conf --log-file ../logs/build.log --colors"
+
+  before_script:
+    # Clone the GNOME moduleset
+    - git clone --depth=1 https://gitlab.gnome.org/GNOME/gnome-build-meta.git
+
+    # Ensure the log directory exists
+    - mkdir -p logs
+  script:
+    - cd gnome-build-meta/
+    - ${BST} track --deps=all ${ELEMENT}
+    - ${BST} pull --deps=all ${ELEMENT}
+    - ${BST} fetch ${ELEMENT}
+    - ${BST} workspace open --no-checkout --track -f ${ELEMENT} ../
+    - ${BST} build --track-all ${ELEMENT}
+  after_script:
+    - cd gnome-build-meta/
+    - bst workspace close ${ELEMENT}
+
+  # Store all the downloaded git and ostree repos in the cache.
+  # This saves us fetching them on every build
+  cache:
+    key: "bst"
+    paths:
+      - "${XDG_CACHE_HOME}/buildstream/sources/"
+
+  # Store artifacts so we can inspect build failures
+  artifacts:
+    when: "always"
+    paths:
+      - "logs"
+      - "project.refs"
+
+
