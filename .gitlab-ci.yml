@@ -31,9 +31,7 @@ bst:
     - mkdir -p logs
   script:
     - cd gnome-build-meta/
-    - ${BST} track ${ELEMENT}
-    - ${BST} build --track-all ${ELEMENT}
-    - ${BST} workspace open -f ${ELEMENT} ../
+    - ${BST} workspace open --no-checkout --track -f ${ELEMENT} ../
     - ${BST} build --track-all ${ELEMENT}
   after_script:
     - bst workspace close ${ELEMENT}
