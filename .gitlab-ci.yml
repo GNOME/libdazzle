@@ -1,17 +1,20 @@
+variables:
+  ELEMENT: "core-deps/libdazzle.bst"
+
 stages:
   - "build"
-
-variables:
-  # Store all the bst stuff under the "${CI_PROJECT_DIR}" directory.
-  # Note that GitLab CI will only cache stuff inside the "${CI_PROJECT_DIR}" folder.
-  XDG_CACHE_HOME: "${CI_PROJECT_DIR}/cache"
-  GET_SOURCES_ATTEMPTS: 3
-  BST: "bst --config build.conf --log-file ../logs/build.log --colors"
-  BST_SHA: "d423cdc761a808960ea21302f89b5383fa9558b4" #  1.2.2
 
 bst:
   image: "buildstream/buildstream-fedora:master-118-7babd55c"
   stage: "build"
+  variables:
+    # Store all the bst stuff under the "${CI_PROJECT_DIR}" directory.
+    # Note that GitLab CI will only cache stuff inside the "${CI_PROJECT_DIR}" folder.
+    XDG_CACHE_HOME: "${CI_PROJECT_DIR}/cache"
+    GET_SOURCES_ATTEMPTS: 3
+    BST: "bst --config build.conf --log-file ../logs/build.log --colors"
+    BST_SHA: "d423cdc761a808960ea21302f89b5383fa9558b4" #  1.2.2
+
   before_script:
     # Remove any installed buildstream binary
     - pip3 uninstall -y buildstream
@@ -28,12 +31,12 @@ bst:
     - mkdir -p logs
   script:
     - cd gnome-build-meta/
-    - ${BST} track core-deps/libdazzle.bst
-    - ${BST} build --track-all core-deps/libdazzle.bst
-    - ${BST} workspace open -f core-deps/libdazzle.bst ../
-    - ${BST} build --track-all core-deps/libdazzle.bst
+    - ${BST} track ${ELEMENT}
+    - ${BST} build --track-all ${ELEMENT}
+    - ${BST} workspace open -f ${ELEMENT} ../
+    - ${BST} build --track-all ${ELEMENT}
   after_script:
-    - bst workspace close core-deps/libdazzle.bst
+    - bst workspace close ${ELEMENT}
 
   # Store all the downloaded git and ostree repos in the cache.
   # This saves us fetching them on every build
