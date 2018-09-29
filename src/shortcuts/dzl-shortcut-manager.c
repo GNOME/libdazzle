@@ -829,6 +829,15 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
 
       dzl_shortcut_chord_get_nth_key (chord, 0, &keyval, &state);
 
+      /* Special case shift-tab, which is shown as ISO_Left_Tab when
+       * we converted into a Dazzle chord.
+       */
+      if (keyval == GDK_KEY_ISO_Left_Tab && state == 0)
+        {
+          if (gtk_bindings_activate (G_OBJECT (toplevel), keyval, GDK_SHIFT_MASK))
+            DZL_RETURN (TRUE);
+        }
+
       /* See if the toplevel activates this, like Tab, etc */
       if (gtk_bindings_activate (G_OBJECT (toplevel), keyval, state))
         DZL_RETURN (TRUE);
