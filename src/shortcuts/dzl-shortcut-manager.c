@@ -813,6 +813,8 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_SHORTCUT_MANAGER (self));
   g_assert (GTK_IS_WIDGET (widget));
   g_assert (GTK_IS_WIDGET (toplevel));
@@ -829,12 +831,12 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
 
       /* See if the toplevel activates this, like Tab, etc */
       if (gtk_bindings_activate (G_OBJECT (toplevel), keyval, state))
-        return TRUE;
+        DZL_RETURN (TRUE);
 
       /* See if there is a mnemonic active that should be activated */
       if (GTK_IS_WINDOW (toplevel) &&
           gtk_window_mnemonic_activate (GTK_WINDOW (toplevel), keyval, state))
-        return TRUE;
+        DZL_RETURN (TRUE);
 
       /*
        * See if we have something defined for this theme that
@@ -851,7 +853,7 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
           dzl_g_action_name_parse_full (action, &prefix, &name, &target);
 
           if (dzl_gtk_widget_action (toplevel, prefix, name, target))
-            return TRUE;
+            DZL_RETURN (TRUE);
         }
 
       /*
@@ -883,13 +885,13 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
                     }
 
                   if (dzl_gtk_widget_action (widget, prefix, name, param))
-                    return TRUE;
+                    DZL_RETURN (TRUE);
                 }
             }
         }
     }
 
-  return FALSE;
+  DZL_RETURN (FALSE);
 }
 
 /**
