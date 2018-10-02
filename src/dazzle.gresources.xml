@@ -49,6 +49,10 @@
     <file compressed="true" alias="Adwaita/Adwaita-searchbar.css">../data/themes/Adwaita/Adwaita-searchbar.css</file>
     <file compressed="true" alias="Adwaita/Adwaita-dark-graphs.css">../data/themes/Adwaita/Adwaita-dark-graphs.css</file>
     <file compressed="true" alias="Adwaita/Adwaita-dark-searchbar.css">../data/themes/Adwaita/Adwaita-dark-searchbar.css</file>
+    
+    <!-- elementary CSS theme -->
+    <file compressed="true" alias="elementary.css">../data/themes/elementary.css</file>
+    <file compressed="true" alias="elementary/elementary-suggestions.css">../data/themes/elementary/elementary-suggestions.css</file>
 
     <!-- Default and Fallback Theme -->
     <file compressed="true" alias="shared.css">../data/themes/shared.css</file>
