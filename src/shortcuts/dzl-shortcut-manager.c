@@ -1371,8 +1371,6 @@ dzl_shortcut_manager_add_command (DzlShortcutManager *self,
 
   g_node_append_data (parent, data);
 
-  g_print ("Inserting %s %p\n", data->name, data);
-
   g_hash_table_insert (priv->command_id_to_node_data, (gpointer)data->name, data);
 
   g_signal_emit (self, signals [CHANGED], 0);
