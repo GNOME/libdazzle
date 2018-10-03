@@ -98,8 +98,8 @@ dzl_shortcut_tooltip_query_cb (DzlShortcutTooltip *self,
 {
   DzlShortcutController *controller;
   const DzlShortcutChord *chord;
-  DzlShortcutManager *manager;
-  DzlShortcutTheme *theme;
+  DzlShortcutManager *manager = NULL;
+  DzlShortcutTheme *theme = NULL;
   DzlShortcutSimpleLabel *label;
   g_autofree gchar *accel = NULL;
   const gchar *title = NULL;
@@ -110,20 +110,22 @@ dzl_shortcut_tooltip_query_cb (DzlShortcutTooltip *self,
   g_assert (GTK_IS_WIDGET (widget));
   g_assert (widget == self->widget);
 
-  if (self->command_id == NULL ||
-      !(controller = dzl_shortcut_controller_try_find (widget)) ||
-      !(manager = dzl_shortcut_controller_get_manager (controller)) ||
-      !(theme = dzl_shortcut_manager_get_theme (manager)))
-    return FALSE;
+  if ((controller = dzl_shortcut_controller_try_find (widget)) &&
+      (manager = dzl_shortcut_controller_get_manager (controller)))
+    theme = dzl_shortcut_manager_get_theme (manager);
 
-  if (!(title = self->title))
+  title = self->title;
+
+  if (title == NULL && self->command_id != NULL)
     _dzl_shortcut_manager_get_command_info (manager, self->command_id, &title, &subtitle);
+
   if (title == NULL)
     return FALSE;
 
   if (!(accel = g_strdup (self->accel)))
     {
-      if ((chord = dzl_shortcut_theme_get_chord_for_command (theme, self->command_id)))
+      if (self->command_id != NULL && theme != NULL &&
+          (chord = dzl_shortcut_theme_get_chord_for_command (theme, self->command_id)))
         accel = dzl_shortcut_chord_to_string (chord);
       if (accel == NULL)
         return FALSE;
@@ -433,7 +435,7 @@ dzl_shortcut_tooltip_set_widget (DzlShortcutTooltip *self,
                                      "query-tooltip",
                                      G_CALLBACK (dzl_shortcut_tooltip_query_cb),
                                      self,
-                                     G_CONNECT_SWAPPED);
+                                     G_CONNECT_SWAPPED | G_CONNECT_AFTER);
           self->destroy_handler =
             g_signal_connect (self->widget,
                               "destroy",
