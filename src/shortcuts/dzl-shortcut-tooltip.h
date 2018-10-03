@@ -34,6 +34,11 @@ G_DECLARE_FINAL_TYPE (DzlShortcutTooltip, dzl_shortcut_tooltip, DZL, SHORTCUT_TO
 DZL_AVAILABLE_IN_3_32
 DzlShortcutTooltip *dzl_shortcut_tooltip_new            (void);
 DZL_AVAILABLE_IN_3_32
+const gchar        *dzl_shortcut_tooltip_get_accel      (DzlShortcutTooltip *self);
+DZL_AVAILABLE_IN_3_32
+void                dzl_shortcut_tooltip_set_accel      (DzlShortcutTooltip *self,
+                                                         const gchar        *accel);
+DZL_AVAILABLE_IN_3_32
 GtkWidget          *dzl_shortcut_tooltip_get_widget     (DzlShortcutTooltip *self);
 DZL_AVAILABLE_IN_3_32
 void                dzl_shortcut_tooltip_set_widget     (DzlShortcutTooltip *self,

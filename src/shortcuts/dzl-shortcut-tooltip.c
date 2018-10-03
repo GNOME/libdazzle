@@ -60,6 +60,11 @@ struct _DzlShortcutTooltip
    */
   gchar *title;
 
+  /* If no command-id is set, the accelerator can be specified
+   * directly to avoid looking up by command-id.
+   */
+  gchar *accel;
+
   /* The widget that we are watching the ::query-tooltip for. */
   GtkWidget *widget;
 
@@ -74,6 +79,7 @@ G_DEFINE_TYPE (DzlShortcutTooltip, dzl_shortcut_tooltip, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
+  PROP_ACCEL,
   PROP_COMMAND_ID,
   PROP_TITLE,
   PROP_WIDGET,
@@ -94,6 +100,8 @@ dzl_shortcut_tooltip_query_cb (DzlShortcutTooltip *self,
   const DzlShortcutChord *chord;
   DzlShortcutManager *manager;
   DzlShortcutTheme *theme;
+  DzlShortcutSimpleLabel *label;
+  g_autofree gchar *accel = NULL;
   const gchar *title = NULL;
   const gchar *subtitle = NULL;
 
@@ -108,31 +116,32 @@ dzl_shortcut_tooltip_query_cb (DzlShortcutTooltip *self,
       !(theme = dzl_shortcut_manager_get_theme (manager)))
     return FALSE;
 
-  /* If we find a matching chord for the command-id, display it to the user */
-  if ((chord = dzl_shortcut_theme_get_chord_for_command (theme, self->command_id)) &&
-      (self->title != NULL ||
-       _dzl_shortcut_manager_get_command_info (manager, self->command_id, &title, &subtitle)))
+  if (!(title = self->title))
+    _dzl_shortcut_manager_get_command_info (manager, self->command_id, &title, &subtitle);
+  if (title == NULL)
+    return FALSE;
+
+  if (!(accel = g_strdup (self->accel)))
     {
-      g_autofree gchar *accel = dzl_shortcut_chord_to_string (chord);
-      DzlShortcutSimpleLabel *label;
-
-      label = DZL_SHORTCUT_SIMPLE_LABEL (dzl_shortcut_simple_label_new ());
-      dzl_shortcut_simple_label_set_command (label, self->command_id);
-      dzl_shortcut_simple_label_set_accel (label, accel);
-
-      if (self->title != NULL)
-        dzl_shortcut_simple_label_set_title (label, self->title);
-      else
-        dzl_shortcut_simple_label_set_title (label, title);
-
-      gtk_widget_show (GTK_WIDGET (label));
-
-      gtk_tooltip_set_custom (tooltip, GTK_WIDGET (label));
-
-      return TRUE;
+      if ((chord = dzl_shortcut_theme_get_chord_for_command (theme, self->command_id)))
+        accel = dzl_shortcut_chord_to_string (chord);
+      if (accel == NULL)
+        return FALSE;
     }
 
-  return FALSE;
+  g_assert (accel != NULL);
+  g_assert (title != NULL);
+
+  label = DZL_SHORTCUT_SIMPLE_LABEL (dzl_shortcut_simple_label_new ());
+  if (self->command_id != NULL)
+    dzl_shortcut_simple_label_set_command (label, self->command_id);
+  dzl_shortcut_simple_label_set_accel (label, accel);
+  dzl_shortcut_simple_label_set_title (label, title);
+  gtk_widget_show (GTK_WIDGET (label));
+
+  gtk_tooltip_set_custom (tooltip, GTK_WIDGET (label));
+
+  return TRUE;
 }
 
 /**
@@ -163,6 +172,9 @@ dzl_shortcut_tooltip_finalize (GObject *object)
 
   self->widget = NULL;
 
+  g_clear_pointer (&self->title, g_free);
+  g_clear_pointer (&self->accel, g_free);
+
   G_OBJECT_CLASS (dzl_shortcut_tooltip_parent_class)->finalize (object);
 }
 
@@ -176,6 +188,10 @@ dzl_shortcut_tooltip_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ACCEL:
+      g_value_set_string (value, dzl_shortcut_tooltip_get_accel (self));
+      break;
+
     case PROP_WIDGET:
       g_value_set_object (value, dzl_shortcut_tooltip_get_widget (self));
       break;
@@ -203,6 +219,10 @@ dzl_shortcut_tooltip_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_ACCEL:
+      dzl_shortcut_tooltip_set_accel (self, g_value_get_object (value));
+      break;
+
     case PROP_WIDGET:
       dzl_shortcut_tooltip_set_widget (self, g_value_get_object (value));
       break;
@@ -228,6 +248,13 @@ dzl_shortcut_tooltip_class_init (DzlShortcutTooltipClass *klass)
   object_class->finalize = dzl_shortcut_tooltip_finalize;
   object_class->get_property = dzl_shortcut_tooltip_get_property;
   object_class->set_property = dzl_shortcut_tooltip_set_property;
+
+  properties [PROP_ACCEL] =
+    g_param_spec_string ("accel",
+                         "Accel",
+                         "The accel for the label, if overriding the discovered accel",
+                         NULL,
+                         (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_COMMAND_ID] =
     g_param_spec_string ("command-id",
@@ -415,5 +442,48 @@ dzl_shortcut_tooltip_set_widget (DzlShortcutTooltip *self,
         }
 
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_WIDGET]);
+    }
+}
+
+/**
+ * dzl_shortcut_tooltip_get_accel:
+ * @self: a #DzlShortcutTooltip
+ *
+ * Gets the #DzlShortcutTooltip:accel property, which can be used to override
+ * the commands accel.
+ *
+ * Returns: (nullable): an override accel, or %NULL
+ *
+ * Since: 3.320
+ */
+const gchar *
+dzl_shortcut_tooltip_get_accel (DzlShortcutTooltip *self)
+{
+  g_return_val_if_fail (DZL_IS_SHORTCUT_TOOLTIP (self), NULL);
+
+  return self->accel;
+}
+
+/**
+ * dzl_shortcut_tooltip_set_accel:
+ * @self: #DzlShortcutTooltip
+ * @accel: (nullable): Sets the accelerator to use, or %NULL to unset
+ *   and use the default
+ *
+ * Allows overriding the accel that is used.
+ *
+ * Since: 3.32
+ */
+void
+dzl_shortcut_tooltip_set_accel (DzlShortcutTooltip *self,
+                                const gchar        *accel)
+{
+  g_return_if_fail (DZL_IS_SHORTCUT_TOOLTIP (self));
+
+  if (!dzl_str_equal0 (self->accel, accel))
+    {
+      g_free (self->accel);
+      self->accel = g_strdup (accel);
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ACCEL]);
     }
 }

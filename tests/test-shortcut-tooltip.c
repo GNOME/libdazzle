@@ -40,6 +40,7 @@ button_clicked_cb (GtkButton          *button,
 
   count++;
 
+  dzl_shortcut_tooltip_set_accel (tooltip, count % 2 ? "<Shift>F11" : "F11");
   dzl_shortcut_tooltip_set_title (tooltip, count % 2 ? "Unfullscreen window" : "Fullscreen window");
 }
 
