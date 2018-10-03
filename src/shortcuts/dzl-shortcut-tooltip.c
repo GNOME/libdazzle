@@ -88,6 +88,30 @@ enum {
 
 static GParamSpec *properties [N_PROPS];
 
+static DzlShortcutManager *
+find_manager (GtkWidget *widget)
+{
+  DzlShortcutController *controller;
+  DzlShortcutManager *manager = NULL;
+
+  if (widget == NULL)
+    return NULL;
+
+  if (!(controller = dzl_shortcut_controller_try_find (widget)))
+    {
+      widget = gtk_widget_get_ancestor (widget, GTK_TYPE_WINDOW);
+      controller = dzl_shortcut_controller_try_find (widget);
+    }
+
+  if (controller != NULL)
+    manager = dzl_shortcut_controller_get_manager (controller);
+
+  if (manager == NULL)
+    manager = dzl_shortcut_manager_get_default ();
+
+  return manager;
+}
+
 static gboolean
 dzl_shortcut_tooltip_query_cb (DzlShortcutTooltip *self,
                                gint                x,
@@ -96,7 +120,6 @@ dzl_shortcut_tooltip_query_cb (DzlShortcutTooltip *self,
                                GtkTooltip         *tooltip,
                                GtkWidget          *widget)
 {
-  DzlShortcutController *controller;
   const DzlShortcutChord *chord;
   DzlShortcutManager *manager = NULL;
   DzlShortcutTheme *theme = NULL;
@@ -110,9 +133,8 @@ dzl_shortcut_tooltip_query_cb (DzlShortcutTooltip *self,
   g_assert (GTK_IS_WIDGET (widget));
   g_assert (widget == self->widget);
 
-  if ((controller = dzl_shortcut_controller_try_find (widget)) &&
-      (manager = dzl_shortcut_controller_get_manager (controller)))
-    theme = dzl_shortcut_manager_get_theme (manager);
+  manager = find_manager (widget);
+  theme = dzl_shortcut_manager_get_theme (manager);
 
   title = self->title;
 
