@@ -1301,6 +1301,7 @@ dzl_shortcut_manager_add_action (DzlShortcutManager *self,
                                  const gchar        *title,
                                  const gchar        *subtitle)
 {
+  DzlShortcutManagerPrivate *priv;
   DzlShortcutNodeData *data;
   GNode *parent;
 
@@ -1310,6 +1311,8 @@ dzl_shortcut_manager_add_action (DzlShortcutManager *self,
 
   if (self == NULL)
     self = dzl_shortcut_manager_get_default ();
+
+  priv = dzl_shortcut_manager_get_instance_private (self);
 
   section = g_intern_string (section);
   group = g_intern_string (group);
@@ -1328,6 +1331,8 @@ dzl_shortcut_manager_add_action (DzlShortcutManager *self,
   data->subtitle = subtitle;
 
   g_node_append_data (parent, data);
+
+  g_hash_table_insert (priv->command_id_to_node_data, (gpointer)data->name, data);
 
   g_signal_emit (self, signals [CHANGED], 0);
 }
