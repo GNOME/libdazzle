@@ -83,6 +83,12 @@ typedef struct
   GNode *root;
 
   /*
+   * GHashTable to match command/action to a nodedata, useful to generate
+   * a tooltip-text string for a given widget.
+   */
+  GHashTable *command_id_to_node_data;
+
+  /*
    * We keep track of the search paths for loading themes here. Each element is
    * a string containing the path to the file-system resource. If the path
    * starts with 'resource://" it is assumed a resource embedded in the current
@@ -302,6 +308,8 @@ dzl_shortcut_manager_finalize (GObject *object)
   DzlShortcutManager *self = (DzlShortcutManager *)object;
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
+  g_clear_pointer (&priv->command_id_to_node_data, g_hash_table_unref);
+
   if (priv->root != NULL)
     {
       g_node_traverse (priv->root, G_IN_ORDER, G_TRAVERSE_ALL, -1, free_node_data, NULL);
@@ -449,6 +457,7 @@ dzl_shortcut_manager_init (DzlShortcutManager *self)
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
 
+  priv->command_id_to_node_data = g_hash_table_new (g_str_hash, g_str_equal);
   priv->seen_entries = g_hash_table_new (shortcut_entry_hash, NULL);
   priv->themes = g_ptr_array_new_with_free_func (destroy_theme);
   priv->root = g_node_new (NULL);
@@ -1331,6 +1340,7 @@ dzl_shortcut_manager_add_command (DzlShortcutManager *self,
                                   const gchar        *title,
                                   const gchar        *subtitle)
 {
+  DzlShortcutManagerPrivate *priv;
   DzlShortcutNodeData *data;
   GNode *parent;
 
@@ -1340,6 +1350,8 @@ dzl_shortcut_manager_add_command (DzlShortcutManager *self,
 
   if (self == NULL)
     self = dzl_shortcut_manager_get_default ();
+
+  priv = dzl_shortcut_manager_get_instance_private (self);
 
   section = g_intern_string (section);
   group = g_intern_string (group);
@@ -1358,6 +1370,10 @@ dzl_shortcut_manager_add_command (DzlShortcutManager *self,
   data->subtitle = subtitle;
 
   g_node_append_data (parent, data);
+
+  g_print ("Inserting %s %p\n", data->name, data);
+
+  g_hash_table_insert (priv->command_id_to_node_data, (gpointer)data->name, data);
 
   g_signal_emit (self, signals [CHANGED], 0);
 }
@@ -1648,4 +1664,47 @@ dzl_shortcut_manager_merge (DzlShortcutManager *self,
   _dzl_shortcut_theme_merge (base_layer, theme);
 
   DZL_EXIT;
+}
+
+/**
+ * _dzl_shortcut_manager_get_command_info:
+ * @self: a #DzlShortcutManager
+ * @command_id: the command-id
+ * @title: (out) (optional): a location for the title
+ * @subtitle: (out) (optional): a location for the subtitle
+ *
+ * Gets command information about command-id
+ *
+ * Returns: %TRUE if the command-id was found and out parameters were set.
+ *
+ * Since: 3.32
+ */
+gboolean
+_dzl_shortcut_manager_get_command_info (DzlShortcutManager  *self,
+                                        const gchar         *command_id,
+                                        const gchar        **title,
+                                        const gchar        **subtitle)
+{
+  DzlShortcutManagerPrivate *priv;
+  DzlShortcutNodeData *node;
+
+  if (self == NULL)
+    self = dzl_shortcut_manager_get_default ();
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_MANAGER (self), FALSE);
+
+  priv = dzl_shortcut_manager_get_instance_private (self);
+
+  if ((node = g_hash_table_lookup (priv->command_id_to_node_data, command_id)))
+    {
+      if (title != NULL)
+        *title = node->title;
+
+      if (subtitle != NULL)
+        *subtitle = node->subtitle;
+
+      return TRUE;
+    }
+
+  return FALSE;
 }

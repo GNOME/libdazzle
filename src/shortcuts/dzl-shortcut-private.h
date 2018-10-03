@@ -150,6 +150,10 @@ gboolean               _dzl_shortcut_chord_table_iter_next          (DzlShortcut
                                                                      const DzlShortcutChord    **chord,
                                                                      gpointer                   *value);
 void                   _dzl_shortcut_chord_table_iter_steal         (DzlShortcutChordTableIter  *iter);
+gboolean               _dzl_shortcut_manager_get_command_info       (DzlShortcutManager         *self,
+                                                                     const gchar                *command_id,
+                                                                     const gchar               **title,
+                                                                     const gchar               **subtitle);
 
 static inline gboolean
 DZL_IS_SHORTCUT_CLOSURE_CHAIN (DzlShortcutClosureChain *self)

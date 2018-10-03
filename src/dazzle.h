@@ -110,6 +110,7 @@ G_BEGIN_DECLS
 #include "shortcuts/dzl-shortcut-simple-label.h"
 #include "shortcuts/dzl-shortcut-theme-editor.h"
 #include "shortcuts/dzl-shortcut-theme.h"
+#include "shortcuts/dzl-shortcut-tooltip.h"
 #include "shortcuts/dzl-shortcuts-group.h"
 #include "shortcuts/dzl-shortcuts-section.h"
 #include "shortcuts/dzl-shortcuts-shortcut.h"

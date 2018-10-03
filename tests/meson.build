@@ -391,4 +391,10 @@ test_model_filter = executable('test-model-filter', 'test-model-filter.c',
 )
 test('test-model-filter', test_model_filter, env: test_env)
 
+test_shortcut_tooltip = executable('test-shortcut-tooltip', 'test-shortcut-tooltip.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+
 endif
