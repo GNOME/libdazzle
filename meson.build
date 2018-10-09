@@ -128,6 +128,28 @@ endif
 
 add_project_arguments(global_c_args, language: 'c')
 
+release_args = []
+global_link_args = []
+test_link_args = [
+  '-Wl,-z,relro',
+  '-Wl,-z,now',
+]
+if not get_option('buildtype').startswith('debug')
+  # TODO: Maybe reuse 'b_ndebug' option
+  add_global_arguments(['-DG_DISABLE_CAST_CHECKS'], language: 'c')
+  release_args += [ '-DG_DISABLE_ASSERT' ]
+  test_link_args += [
+    '-Wl,-Bsymbolic',
+    '-fno-plt',
+  ]
+endif
+foreach link_arg: test_link_args
+  if cc.links('int main () { return 0; }', name: link_arg, args: link_arg)
+    global_link_args += link_arg
+  endif
+endforeach
+add_project_link_arguments(global_link_args, language: 'c')
+
 # Setup various paths that subdirectory meson.build files need
 package_subdir = get_option('package_subdir') # When used as subproject
 libdir = join_paths(get_option('libdir'), package_subdir)
