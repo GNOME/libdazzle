@@ -1,4 +1,20 @@
 ==============
+Version 3.31.1
+==============
+
+Changes in the release:
+
+ • DzlPrefernces gained API to do simplified table layouts.
+ • DzlMenuButton hides separators that are not needed.
+ • Build requires gtk+-3.0 3.24.0.
+ • Handle changes to fullscreen state by the window-manager.
+ • Fixes for mouse tracking on fullscreen windows.
+ • Align menu shortcuts to the right.
+ • Fixes for shift-tab to move between widgets.
+ • Add helper for shortcut tooltips.
+ • Correctness fixes for listmodel filter.
+
+==============
 Version 3.30.0
 ==============
 
