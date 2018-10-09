@@ -102,7 +102,7 @@ libdazzle = shared_library(
   libdazzle_sources,
 
             soversion: 0,
-               c_args: libdazzle_args,
+               c_args: libdazzle_args + release_args,
          dependencies: libdazzle_deps,
   include_directories: [ root_inc, src_inc ],
               install: true,
