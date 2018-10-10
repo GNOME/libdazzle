@@ -218,10 +218,13 @@ dzl_tree_popup (DzlTree        *self,
 {
   DzlTreePrivate *priv = dzl_tree_get_instance_private (self);
   gboolean at_least_one_visible = FALSE;
+  GtkTextDirection dir;
   GtkWidget *menu_widget;
 
   g_return_if_fail (DZL_IS_TREE (self));
   g_return_if_fail (DZL_IS_TREE_NODE (node));
+
+  dir = gtk_widget_get_direction (GTK_WIDGET (self));
 
   if (priv->context_menu != NULL)
     {
@@ -234,17 +237,36 @@ dzl_tree_popup (DzlTree        *self,
     }
 
   if (priv->context_menu != NULL)
-    menu_widget = gtk_menu_new_from_model (G_MENU_MODEL (priv->context_menu));
+    {
+      const GdkRectangle area = { target_x, target_y, 0, 0 };
+
+      menu_widget = gtk_popover_new_from_model (GTK_WIDGET (self),
+                                                G_MENU_MODEL (priv->context_menu));
+      gtk_popover_set_pointing_to (GTK_POPOVER (menu_widget), &area);
+      gtk_popover_set_position (GTK_POPOVER (menu_widget),
+                                dir == GTK_TEXT_DIR_LTR ? GTK_POS_RIGHT : GTK_POS_LEFT);
+    }
   else
-    menu_widget = gtk_menu_new ();
+    {
+      menu_widget = gtk_menu_new ();
+    }
 
   g_signal_emit (self, signals [POPULATE_POPUP], 0, menu_widget);
 
-  gtk_container_foreach (GTK_CONTAINER (menu_widget),
-                         check_visible_foreach,
-                         &at_least_one_visible);
+  if (GTK_IS_MENU (menu_widget))
+    gtk_container_foreach (GTK_CONTAINER (menu_widget),
+                           check_visible_foreach,
+                           &at_least_one_visible);
+  else
+    at_least_one_visible = TRUE;
 
-  if (at_least_one_visible)
+  if (!at_least_one_visible)
+    {
+      gtk_widget_destroy (menu_widget);
+      return;
+    }
+
+  if (GTK_IS_MENU (menu_widget))
     {
       gtk_menu_attach_to_widget (GTK_MENU (menu_widget),
                                  GTK_WIDGET (self),
@@ -253,7 +275,6 @@ dzl_tree_popup (DzlTree        *self,
                               "selection-done",
                               G_CALLBACK (gtk_widget_destroy),
                               NULL);
-
       g_object_set (G_OBJECT (menu_widget),
                     "rect-anchor-dx", target_x - 12,
                     "rect-anchor-dy", target_y - 3,
@@ -266,7 +287,7 @@ dzl_tree_popup (DzlTree        *self,
     }
   else
     {
-      gtk_widget_destroy (menu_widget);
+      dzl_tree_node_show_popover (node, GTK_POPOVER (menu_widget));
     }
 }
 
