@@ -821,6 +821,7 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
                                     const DzlShortcutChord *chord)
 {
   DzlShortcutManagerPrivate *priv = dzl_shortcut_manager_get_instance_private (self);
+  static DzlShortcutChord *inspector_chord;
 
   DZL_ENTRY;
 
@@ -872,6 +873,23 @@ dzl_shortcut_manager_run_fallbacks (DzlShortcutManager     *self,
 
           if (dzl_gtk_widget_action (toplevel, prefix, name, target))
             DZL_RETURN (TRUE);
+        }
+
+      /*
+       * If we this is the ctrl+shift+d keybinding to activate the inspector,
+       * then try to see if we should handle that manually.
+       */
+      if G_UNLIKELY (inspector_chord == NULL)
+        inspector_chord = dzl_shortcut_chord_new_from_string ("<ctrl><shift>d");
+      if (dzl_shortcut_chord_equal (chord, inspector_chord))
+        {
+          g_autoptr(GSettings) settings = g_settings_new ("org.gtk.Settings.Debug");
+
+          if (g_settings_get_boolean (settings, "enable-inspector-keybinding"))
+            {
+              gtk_window_set_interactive_debugging (TRUE);
+              DZL_RETURN (TRUE);
+            }
         }
 
       /*
