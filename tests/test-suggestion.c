@@ -108,11 +108,27 @@ replace_typed_text (DzlSuggestion  *suggestion,
   return g_strdup (data->url);
 }
 
-static GListModel *
-create_search_results (const gchar *full_query,
-                       const gchar *query)
+typedef struct
 {
-  GListStore *store = g_list_store_new (DZL_TYPE_SUGGESTION);
+  GListStore *store;
+  gchar      *full_query;
+  gchar      *query;
+} AddSearchResults;
+
+static void
+add_search_results_free (AddSearchResults *r)
+{
+  g_clear_object (&r->store);
+  g_clear_pointer (&r->query, g_free);
+  g_clear_pointer (&r->full_query, g_free);
+  g_slice_free (AddSearchResults, r);
+}
+
+static GListModel *
+add_search_results (GListStore  *store,
+                    const gchar *full_query,
+                    const gchar *query)
+{
   g_autoptr(GArray) matches = NULL;
   g_autofree gchar *search_url = NULL;
   g_autofree gchar *with_slashes = g_strdup_printf ("://%s", query);
@@ -185,12 +201,21 @@ key_press (GtkWidget   *widget,
   return FALSE;
 }
 
+static gboolean
+do_add_search_results (gpointer data)
+{
+  AddSearchResults *r = data;
+  add_search_results (r->store, r->full_query, r->query);
+  return G_SOURCE_REMOVE;
+}
+
 static void
 search_changed (DzlSuggestionEntry *entry,
                 gpointer            user_data)
 {
   g_autoptr(GListModel) model = NULL;
   GString *str = g_string_new (NULL);
+  AddSearchResults *res = NULL;
   const gchar *text;
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (entry));
@@ -206,7 +231,14 @@ search_changed (DzlSuggestionEntry *entry,
     }
 
   if (str->len)
-    model = create_search_results (text, str->str);
+    {
+      model = G_LIST_MODEL (g_list_store_new (DZL_TYPE_SUGGESTION));
+
+      res = g_slice_new0 (AddSearchResults);
+      res->store = g_object_ref (G_LIST_STORE (model));
+      res->full_query = g_strdup (text);
+      res->query = g_strdup (str->str);
+    }
 
   /* Update the model, but ignore selection events while
    * that happens so that we don't update the entry box.
@@ -214,6 +246,14 @@ search_changed (DzlSuggestionEntry *entry,
   g_signal_handler_block (entry, notify_suggestion_handler);
   dzl_suggestion_entry_set_model (entry, model);
   g_signal_handler_unblock (entry, notify_suggestion_handler);
+
+  /* Update the model asynchonrously to ensure we test that use case */
+  if (res != NULL)
+    g_timeout_add_full (G_PRIORITY_HIGH,
+                        1,
+                        do_add_search_results,
+                        res,
+                        (GDestroyNotify)add_search_results_free);
 
   g_string_free (str, TRUE);
 }
