@@ -22,6 +22,8 @@
 
 #include <glib/gi18n.h>
 
+#include "dzl-debug.h"
+
 #include "animation/dzl-animation.h"
 #include "suggestions/dzl-suggestion.h"
 #include "suggestions/dzl-suggestion-entry.h"
@@ -775,9 +777,13 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
   g_assert (G_IS_LIST_MODEL (model));
 
+  DZL_ENTRY;
+  DZL_TRACE_MSG ("removed = %d, added = %d, requested = %d", removed, added, self->popup_requested);
+
   if (g_list_model_get_n_items (model) == 0)
     {
       dzl_suggestion_popover_popdown (self);
+      DZL_EXIT;
       return;
     }
 
@@ -806,7 +812,12 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
       g_signal_handlers_unblock_by_func (self->revealer,
                                          G_CALLBACK (dzl_suggestion_popover_notify_child_revealed),
                                          self);
+    } else {
+      dzl_suggestion_popover_popup (self);
+      self->popup_requested = FALSE;
     }
+
+  DZL_EXIT;
 }
 
 static void
