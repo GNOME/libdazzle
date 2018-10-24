@@ -205,6 +205,7 @@ static gboolean
 do_add_search_results (gpointer data)
 {
   AddSearchResults *r = data;
+  g_list_store_remove_all (r->store);
   add_search_results (r->store, r->full_query, r->query);
   return G_SOURCE_REMOVE;
 }
@@ -232,20 +233,27 @@ search_changed (DzlSuggestionEntry *entry,
 
   if (str->len)
     {
-      model = G_LIST_MODEL (g_list_store_new (DZL_TYPE_SUGGESTION));
+      GListModel *old_model = dzl_suggestion_entry_get_model (entry);
+
+      if (old_model == NULL)
+        {
+          model = G_LIST_MODEL (g_list_store_new (DZL_TYPE_SUGGESTION));
+
+          /* Update the model, but ignore selection events while
+           * that happens so that we don't update the entry box.
+           */
+          g_signal_handler_block (entry, notify_suggestion_handler);
+          dzl_suggestion_entry_set_model (entry, model);
+          g_signal_handler_unblock (entry, notify_suggestion_handler);
+
+          old_model = G_LIST_MODEL (model);
+        }
 
       res = g_slice_new0 (AddSearchResults);
-      res->store = g_object_ref (G_LIST_STORE (model));
+      res->store = g_object_ref (G_LIST_STORE (old_model));
       res->full_query = g_strdup (text);
       res->query = g_strdup (str->str);
     }
-
-  /* Update the model, but ignore selection events while
-   * that happens so that we don't update the entry box.
-   */
-  g_signal_handler_block (entry, notify_suggestion_handler);
-  dzl_suggestion_entry_set_model (entry, model);
-  g_signal_handler_unblock (entry, notify_suggestion_handler);
 
   /* Update the model asynchonrously to ensure we test that use case */
   if (res != NULL)
@@ -383,9 +391,11 @@ main (gint   argc,
                       "notify::suggestion",
                       G_CALLBACK (notify_suggestion_cb),
                       NULL);
+#if 0
   dzl_suggestion_entry_set_position_func (DZL_SUGGESTION_ENTRY (entry),
                                           dzl_suggestion_entry_window_position_func,
                                           NULL, NULL);
+#endif
   gtk_box_set_center_widget (GTK_BOX (box), entry);
   g_signal_connect (entry, "changed", G_CALLBACK (search_changed), NULL);
   g_signal_connect (entry, "suggestion-activated", G_CALLBACK (suggestion_activated), NULL);
