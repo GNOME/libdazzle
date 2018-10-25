@@ -9,3 +9,8 @@ StackList
 StackListCreateWidgetFunc skip=false
   .item type="GLib.Object"
 
+GraphModel
+  .get_iter_first.iter out
+  .get_iter_last.iter out
+  .iter_get_value.value out
+  .iter_next.iter ref
