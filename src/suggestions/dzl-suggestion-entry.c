@@ -271,8 +271,6 @@ dzl_suggestion_entry_changed (GtkEditable *editable)
       DZL_GOTO (finish);
     }
 
-  g_signal_emit (self, signals [SHOW_SUGGESTIONS], 0);
-
   suggestion = dzl_suggestion_popover_get_selected (priv->popover);
 
   if (suggestion != NULL)
@@ -755,6 +753,8 @@ dzl_suggestion_entry_set_model (DzlSuggestionEntry *self,
       dzl_suggestion_popover_set_model (priv->popover, model);
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_MODEL]);
       dzl_suggestion_entry_update_attrs (self);
+
+      g_signal_emit (self, signals [SHOW_SUGGESTIONS], 0);
     }
 
   DZL_EXIT;
