@@ -1,4 +1,19 @@
 ==============
+Version 3.30.2
+==============
+
+Changes in this release:
+
+ • Fix build dependency to properly check for gtk+ >= 3.24. This was already
+   necessary at runtime, as subtle bugs would have occurred with older
+   releases.
+ • app-window now uses GtkEventControllerMotion to provide improved tracking
+   of the app window fullscreen toolbar.
+ • Shortcut placement was tweaked in menu popover
+ • Fixes for shift+tab and ctrl+shift+d keyboard shortcuts
+ • Various build fixes for -Bsymbolic and assertions
+
+==============
 Version 3.30.1
 ==============
 
