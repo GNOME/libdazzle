@@ -28,6 +28,8 @@
 typedef struct
 {
   GtkMenuButton    parent_instance;
+  GtkStack        *stack;
+  GtkImage        *image;
   DzlProgressIcon *icon;
   const gchar     *theatric_icon_name;
   gdouble          progress;
@@ -41,6 +43,7 @@ G_DEFINE_TYPE_WITH_PRIVATE (DzlProgressMenuButton, dzl_progress_menu_button, GTK
 enum {
   PROP_0,
   PROP_PROGRESS,
+  PROP_SHOW_PROGRESS,
   PROP_SHOW_THEATRIC,
   PROP_THEATRIC_ICON_NAME,
   PROP_TRANSITION_DURATION,
@@ -200,6 +203,10 @@ dzl_progress_menu_button_get_property (GObject    *object,
       g_value_set_double (value, priv->progress);
       break;
 
+    case PROP_SHOW_PROGRESS:
+      g_value_set_boolean (value, dzl_progress_menu_button_get_show_progress (self));
+      break;
+
     case PROP_SHOW_THEATRIC:
       g_value_set_boolean (value, priv->show_theatric);
       break;
@@ -230,6 +237,10 @@ dzl_progress_menu_button_set_property (GObject      *object,
     {
     case PROP_PROGRESS:
       dzl_progress_menu_button_set_progress (self, g_value_get_double (value));
+      break;
+
+    case PROP_SHOW_PROGRESS:
+      dzl_progress_menu_button_set_show_progress (self, g_value_get_boolean (value));
       break;
 
     case PROP_SHOW_THEATRIC:
@@ -263,6 +274,13 @@ dzl_progress_menu_button_class_init (DzlProgressMenuButtonClass *klass)
                          "Progress",
                          0.0, 1.0, 0.0,
                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_SHOW_PROGRESS] =
+    g_param_spec_boolean ("show-progress",
+                          "Show Progress",
+                          "Show progress instead of image",
+                          TRUE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_SHOW_THEATRIC] =
     g_param_spec_boolean ("show-theatric",
@@ -299,6 +317,16 @@ dzl_progress_menu_button_init (DzlProgressMenuButton *self)
   priv->show_theatric = TRUE;
   priv->transition_duration = 750;
 
+  priv->stack = g_object_new (GTK_TYPE_STACK,
+                              "homogeneous", FALSE,
+                              "visible", TRUE,
+                              NULL);
+  g_signal_connect (priv->stack,
+                    "destroy",
+                    G_CALLBACK (gtk_widget_destroyed),
+                    &priv->stack);
+  gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->stack));
+
   priv->icon = g_object_new (DZL_TYPE_PROGRESS_ICON,
                              "visible", TRUE,
                              NULL);
@@ -306,7 +334,17 @@ dzl_progress_menu_button_init (DzlProgressMenuButton *self)
                     "destroy",
                     G_CALLBACK (gtk_widget_destroyed),
                     &priv->icon);
-  gtk_container_add (GTK_CONTAINER (self), GTK_WIDGET (priv->icon));
+  gtk_container_add (GTK_CONTAINER (priv->stack), GTK_WIDGET (priv->icon));
+
+  priv->image = g_object_new (GTK_TYPE_IMAGE,
+                              "icon-name", "content-loading-symbolic",
+                              "visible", TRUE,
+                              NULL);
+  g_signal_connect (priv->image,
+                    "destroy",
+                    G_CALLBACK (gtk_widget_destroyed),
+                    &priv->image);
+  gtk_container_add (GTK_CONTAINER (priv->stack), GTK_WIDGET (priv->image));
 }
 
 /**
@@ -328,4 +366,32 @@ dzl_progress_menu_button_reset_theatrics (DzlProgressMenuButton *self)
   g_return_if_fail (DZL_IS_PROGRESS_MENU_BUTTON (self));
 
   priv->suppress_theatric = FALSE;
+}
+
+gboolean
+dzl_progress_menu_button_get_show_progress (DzlProgressMenuButton *self)
+{
+  DzlProgressMenuButtonPrivate *priv = dzl_progress_menu_button_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_PROGRESS_MENU_BUTTON (self), FALSE);
+
+  return gtk_stack_get_visible_child (priv->stack) == GTK_WIDGET (priv->icon);
+}
+
+void
+dzl_progress_menu_button_set_show_progress (DzlProgressMenuButton *self,
+                                            gboolean               show_progress)
+{
+  DzlProgressMenuButtonPrivate *priv = dzl_progress_menu_button_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_PROGRESS_MENU_BUTTON (self));
+
+  if (show_progress != dzl_progress_menu_button_get_show_progress (self))
+    {
+      if (show_progress)
+        gtk_stack_set_visible_child (priv->stack, GTK_WIDGET (priv->icon));
+      else
+        gtk_stack_set_visible_child (priv->stack, GTK_WIDGET (priv->image));
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SHOW_PROGRESS]);
+    }
 }
