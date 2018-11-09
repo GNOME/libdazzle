@@ -21,11 +21,20 @@
 
 #include <glib.h>
 
+#include "dzl-version-macros.h"
+
 G_BEGIN_DECLS
 
-guint dzl_frame_source_add (guint       frames_per_sec,
-                            GSourceFunc callback,
-                            gpointer    user_data);
+DZL_AVAILABLE_IN_3_32
+guint dzl_frame_source_add      (guint       frames_per_sec,
+                                 GSourceFunc callback,
+                                 gpointer    user_data);
+DZL_AVAILABLE_IN_3_32
+guint dzl_frame_source_add_full (gint           priority,
+                                 guint          frames_per_sec,
+                                 GSourceFunc    callback,
+                                 gpointer       user_data,
+                                 GDestroyNotify notify);
 
 G_END_DECLS
 

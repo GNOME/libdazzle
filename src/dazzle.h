@@ -41,6 +41,7 @@ G_BEGIN_DECLS
 #include "actions/dzl-widget-action-group.h"
 #include "animation/dzl-animation.h"
 #include "animation/dzl-box-theatric.h"
+#include "animation/dzl-frame-source.h"
 #include "app/dzl-application.h"
 #include "app/dzl-application-window.h"
 #include "bindings/dzl-binding-group.h"

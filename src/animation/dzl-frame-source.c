@@ -22,6 +22,21 @@
 
 #include "dzl-frame-source.h"
 
+/**
+ * SECTION:dzl-frame-source
+ * @title: DzlFrameSource
+ * @short_description: a frame source for objects without frame clocks
+ *
+ * If you are working with something that is not a #GtkWidget, getting
+ * access to a frame-clock is sometimes not possible. This can be used
+ * as a suitable fallback that approximates a frame-rate.
+ *
+ * If you have access to a #GdkFrameClock, in most cases you'll want that
+ * instead of using this.
+ *
+ * Since: 3.32
+ */
+
 typedef struct
 {
    GSource parent;
@@ -117,18 +132,44 @@ dzl_frame_source_add (guint       frames_per_sec,
    guint ret;
 
    g_return_val_if_fail (frames_per_sec > 0, 0);
-   g_return_val_if_fail (frames_per_sec <= 120, 0);
 
-   source = g_source_new(&source_funcs, sizeof(DzlFrameSource));
+   source = g_source_new (&source_funcs, sizeof (DzlFrameSource));
    fsource = (DzlFrameSource *)(gpointer)source;
    fsource->fps = frames_per_sec;
    fsource->frame_count = 0;
-   fsource->start_time = g_get_monotonic_time() / 1000;
-   g_source_set_callback(source, callback, user_data, NULL);
-   g_source_set_name(source, "DzlFrameSource");
+   fsource->start_time = g_get_monotonic_time () / 1000L;
+   g_source_set_callback (source, callback, user_data, NULL);
+   g_source_set_name (source, "DzlFrameSource");
 
-   ret = g_source_attach(source, NULL);
-   g_source_unref(source);
+   ret = g_source_attach (source, NULL);
+   g_source_unref (source);
+
+   return ret;
+}
+
+guint
+dzl_frame_source_add_full (gint           priority,
+                           guint          frames_per_sec,
+                           GSourceFunc    callback,
+                           gpointer       user_data,
+                           GDestroyNotify notify)
+{
+   DzlFrameSource *fsource;
+   GSource *source;
+   guint ret;
+
+   g_return_val_if_fail (frames_per_sec > 0, 0);
+
+   source = g_source_new (&source_funcs, sizeof (DzlFrameSource));
+   fsource = (DzlFrameSource *)(gpointer)source;
+   fsource->fps = frames_per_sec;
+   fsource->frame_count = 0;
+   fsource->start_time = g_get_monotonic_time () / 1000L;
+   g_source_set_callback (source, callback, user_data, notify);
+   g_source_set_name (source, "DzlFrameSource");
+
+   ret = g_source_attach (source, NULL);
+   g_source_unref (source);
 
    return ret;
 }
