@@ -219,8 +219,8 @@ dzl_three_grid_get_preferred_width (GtkWidget *widget,
 
   border_width = gtk_container_get_border_width (GTK_CONTAINER (self));
 
-  *min_width = MAX (min_widths[0], min_widths[2]) * 2 + min_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2);
-  *nat_width = MAX (nat_widths[0], nat_widths[2]) * 2 + nat_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2);
+  *min_width = MAX (min_widths[0], min_widths[2]) * 2 + min_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2) + 1;
+  *nat_width = MAX (nat_widths[0], nat_widths[2]) * 2 + nat_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2) + 1;
 }
 
 static void
@@ -300,7 +300,10 @@ dzl_three_grid_get_preferred_height_for_width (GtkWidget *widget,
   DzlThreeGridPrivate *priv = dzl_three_grid_get_instance_private (self);
   g_autoptr(GHashTable) row_infos = NULL;
   DzlThreeGridRowInfo *row_info;
+  GtkStyleContext *style_context;
   GHashTableIter iter;
+  GtkStateFlags state;
+  GtkBorder margin;
   gint real_min_height = 0;
   gint real_nat_height = 0;
   gint column_min_widths[3];
@@ -317,11 +320,16 @@ dzl_three_grid_get_preferred_height_for_width (GtkWidget *widget,
   width -= border_width * 2;
   width -= priv->column_spacing * 2;
 
+  style_context = gtk_widget_get_style_context (widget);
+  state = gtk_style_context_get_state (style_context);
+  gtk_style_context_get_margin (style_context, state, &margin);
+  width -= margin.left + margin.right;
+
   dzl_three_grid_get_column_width (self, DZL_THREE_GRID_COLUMN_LEFT, &column_min_widths[0], &column_nat_widths[0]);
   dzl_three_grid_get_column_width (self, DZL_THREE_GRID_COLUMN_CENTER, &column_min_widths[1], &column_nat_widths[1]);
   dzl_three_grid_get_column_width (self, DZL_THREE_GRID_COLUMN_RIGHT, &column_min_widths[2], &column_nat_widths[2]);
 
-  if ((MAX (column_min_widths[0], column_min_widths[2]) * 2 + column_nat_widths[1]) >= width)
+  if ((MAX (column_min_widths[0], column_min_widths[2]) * 2 + column_nat_widths[1]) > width)
     {
       widths[0] = column_min_widths[0];
       widths[2] = column_min_widths[2];
@@ -372,6 +380,9 @@ dzl_three_grid_get_preferred_height_for_width (GtkWidget *widget,
 
   real_min_height += border_width * 2;
   real_nat_height += border_width * 2;
+
+  real_min_height += margin.top + margin.bottom;
+  real_nat_height += margin.top + margin.bottom;
 
   n_rows = g_hash_table_size (row_infos);
 
@@ -437,9 +448,12 @@ dzl_three_grid_size_allocate (GtkWidget     *widget,
   DzlThreeGridPrivate *priv = dzl_three_grid_get_instance_private (self);
   g_autofree GtkRequestedSize *rows = NULL;
   const GList *iter;
+  GtkStyleContext *style_context;
   GtkAllocation area;
   GtkTextDirection dir;
   GList *values;
+  GtkStateFlags state;
+  GtkBorder margin;
   guint i;
   guint n_rows;
   gint min_height;
@@ -481,6 +495,15 @@ dzl_three_grid_size_allocate (GtkWidget     *widget,
   area.y += border_width;
   area.width -= border_width * 2;
   area.height -= border_width * 2;
+
+  style_context = gtk_widget_get_style_context (widget);
+  state = gtk_style_context_get_state (style_context);
+  gtk_style_context_get_margin (style_context, state, &margin);
+
+  area.x += margin.left;
+  area.width -= margin.left + margin.right;
+  area.y += margin.top;
+  area.height -= margin.top + margin.bottom;
 
   dzl_three_grid_get_column_width (self, DZL_THREE_GRID_COLUMN_LEFT, &left_min_width, &left_nat_width);
   dzl_three_grid_get_column_width (self, DZL_THREE_GRID_COLUMN_CENTER, &center_min_width, &center_nat_width);
@@ -539,7 +562,7 @@ dzl_three_grid_size_allocate (GtkWidget     *widget,
       GtkAllocation child_alloc;
       gint baseline;
 
-      if (row_info->nat_above_baseline + row_info->nat_below_baseline <= size->minimum_size)
+      if (row_info->nat_above_baseline + row_info->nat_below_baseline < size->minimum_size)
         baseline = row_info->nat_above_baseline;
       else
         baseline = row_info->min_above_baseline;
