@@ -472,9 +472,26 @@ dzl_three_grid_size_allocate (GtkWidget     *widget,
   g_assert (DZL_IS_THREE_GRID (self));
   g_assert (allocation != NULL);
 
-  dir = gtk_widget_get_direction (widget);
+  area = *allocation;
 
-  gtk_widget_set_allocation (widget, allocation);
+  style_context = gtk_widget_get_style_context (widget);
+  state = gtk_style_context_get_state (style_context);
+  gtk_style_context_get_margin (style_context, state, &margin);
+  border_width = gtk_container_get_border_width (GTK_CONTAINER (self));
+
+  area.x += border_width;
+  area.y += border_width;
+  area.width -= border_width * 2;
+  area.height -= border_width * 2;
+
+  area.x += margin.left;
+  area.width -= margin.right + margin.left;
+  area.y += margin.top;
+  area.height -= margin.top + margin.bottom;
+
+  gtk_widget_set_allocation (widget, &area);
+
+  dir = gtk_widget_get_direction (widget);
 
   dzl_three_grid_get_preferred_height_for_width (widget, allocation->width, &min_height, &nat_height);
 
@@ -487,23 +504,6 @@ dzl_three_grid_size_allocate (GtkWidget     *widget,
 
   values = g_hash_table_get_values (priv->row_infos);
   values = g_list_sort (values, sort_by_row);
-
-  area = *allocation;
-  border_width = gtk_container_get_border_width (GTK_CONTAINER (self));
-
-  area.x += border_width;
-  area.y += border_width;
-  area.width -= border_width * 2;
-  area.height -= border_width * 2;
-
-  style_context = gtk_widget_get_style_context (widget);
-  state = gtk_style_context_get_state (style_context);
-  gtk_style_context_get_margin (style_context, state, &margin);
-
-  area.x += margin.left;
-  area.width -= margin.left + margin.right;
-  area.y += margin.top;
-  area.height -= margin.top + margin.bottom;
 
   dzl_three_grid_get_column_width (self, DZL_THREE_GRID_COLUMN_LEFT, &left_min_width, &left_nat_width);
   dzl_three_grid_get_column_width (self, DZL_THREE_GRID_COLUMN_CENTER, &center_min_width, &center_nat_width);
@@ -527,12 +527,11 @@ dzl_three_grid_size_allocate (GtkWidget     *widget,
    * We can handle #1 and #2 with the same logic though.
    */
 
-  if ((MAX (left_min_width, right_min_width) * 2 + center_nat_width) >= (area.width - (gint)(priv->column_spacing * 2)))
+  if ((MAX (left_min_width, right_min_width) * 2 + center_nat_width + 2 * priv->column_spacing) > area.width)
     {
       /* Handle #3 */
-      left = left_min_width;
-      right = right_min_width;
-      center = area.width - left - right;
+      left = right = MAX (left_min_width, right_min_width);
+      center = area.width - left - right - 2 * priv->column_spacing;
     }
   else
     {
