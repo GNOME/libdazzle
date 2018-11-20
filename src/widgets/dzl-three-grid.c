@@ -199,26 +199,28 @@ dzl_three_grid_get_preferred_width (GtkWidget *widget,
 {
   DzlThreeGrid *self = (DzlThreeGrid *)widget;
   DzlThreeGridPrivate *priv = dzl_three_grid_get_instance_private (self);
-  gint total_min_width = 0;
-  gint total_nat_width = 0;
+  GtkStyleContext *style_context;
+  GtkBorder margin;
   gint min_widths[3];
   gint nat_widths[3];
   gint border_width;
+  GtkStateFlags state;
 
   g_assert (DZL_IS_THREE_GRID (self));
   g_assert (min_width != NULL);
   g_assert (nat_width != NULL);
 
+  style_context = gtk_widget_get_style_context (widget);
+  state = gtk_style_context_get_state (style_context);
+  gtk_style_context_get_margin (style_context, state, &margin);
+
   for (guint i = 0; i < 3; i++)
     dzl_three_grid_get_column_width (self, i, &min_widths[i], &nat_widths[i]);
 
-  total_min_width = MAX (min_widths[0], min_widths[2]) * 2 + min_widths[1];
-  total_nat_width = MAX (nat_widths[0], nat_widths[2]) * 2 + nat_widths[1];
-
   border_width = gtk_container_get_border_width (GTK_CONTAINER (self));
 
-  *min_width = total_min_width + (border_width * 2) + (priv->column_spacing * 2);
-  *nat_width = total_nat_width + (border_width * 2) + (priv->column_spacing * 2);
+  *min_width = MAX (min_widths[0], min_widths[2]) * 2 + min_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2);
+  *nat_width = MAX (nat_widths[0], nat_widths[2]) * 2 + nat_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2);
 }
 
 static void
