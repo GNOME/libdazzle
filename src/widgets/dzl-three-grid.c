@@ -219,8 +219,8 @@ dzl_three_grid_get_preferred_width (GtkWidget *widget,
 
   border_width = gtk_container_get_border_width (GTK_CONTAINER (self));
 
-  *min_width = MAX (min_widths[0], min_widths[2]) * 2 + min_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2) + 1;
-  *nat_width = MAX (nat_widths[0], nat_widths[2]) * 2 + nat_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2) + 1;
+  *min_width = MAX (min_widths[0], min_widths[2]) * 2 + min_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2);
+  *nat_width = MAX (nat_widths[0], nat_widths[2]) * 2 + nat_widths[1] + margin.left + margin.right + (border_width * 2) + (priv->column_spacing * 2);
 }
 
 static void
