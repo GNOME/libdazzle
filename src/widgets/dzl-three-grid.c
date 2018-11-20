@@ -569,6 +569,8 @@ dzl_three_grid_size_allocate (GtkWidget     *widget,
       area.y += child_alloc.height + priv->row_spacing;
       area.height -= child_alloc.height + priv->row_spacing;
     }
+
+  g_list_free (values);
 }
 
 static void
