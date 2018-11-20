@@ -259,6 +259,31 @@ dzl_radio_box_init (DzlRadioBox *self)
 }
 
 void
+dzl_radio_box_remove_item (DzlRadioBox *self,
+                           const gchar *id)
+{
+  DzlRadioBoxPrivate *priv = dzl_radio_box_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_RADIO_BOX (self));
+  g_return_if_fail (id != NULL);
+
+  for (guint i = 0; i < priv->items->len; i++)
+    {
+      DzlRadioBoxItem *item = &g_array_index (priv->items, DzlRadioBoxItem, i);
+
+      if (g_strcmp0 (id, item->id) == 0)
+        {
+          GtkToggleButton *button = item->button;
+
+          g_array_remove_index_fast (priv->items, i);
+          gtk_widget_destroy (GTK_WIDGET (button));
+
+          break;
+        }
+    }
+}
+
+void
 dzl_radio_box_add_item (DzlRadioBox *self,
                         const gchar *id,
                         const gchar *text)
