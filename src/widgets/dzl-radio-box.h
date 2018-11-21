@@ -46,7 +46,7 @@ DZL_AVAILABLE_IN_ALL
 void         dzl_radio_box_add_item      (DzlRadioBox *self,
                                           const gchar *id,
                                           const gchar *text);
-DZL_AVAILABLE_IN_ALL
+DZL_AVAILABLE_IN_3_32
 void         dzl_radio_box_remove_item   (DzlRadioBox *self,
                                           const gchar *id);
 DZL_AVAILABLE_IN_ALL
