@@ -572,3 +572,23 @@ dzl_file_chooser_entry_new (const gchar          *title,
                        "action", action,
                        NULL);
 }
+
+/**
+ * dzl_file_chooser_entry_get_entry:
+ * @self: a #DzlFileChooserEntry
+ *
+ * Gets the entry used by the #GtkEntry.
+ *
+ * Returns: (transfer none): a #GtkEntry
+ *
+ * Since: 3.32
+ */
+GtkEntry *
+dzl_file_chooser_entry_get_entry (DzlFileChooserEntry *self)
+{
+  DzlFileChooserEntryPrivate *priv = dzl_file_chooser_entry_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_FILE_CHOOSER_ENTRY (self), NULL);
+
+  return priv->entry;
+}
