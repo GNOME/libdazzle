@@ -52,6 +52,51 @@ struct _DzlDirectoryReaper
 
 G_DEFINE_TYPE (DzlDirectoryReaper, dzl_directory_reaper, G_TYPE_OBJECT)
 
+enum {
+  REMOVE_FILE,
+  N_SIGNALS
+};
+
+static guint signals [N_SIGNALS];
+
+static gboolean
+emit_remove_file_from_main_cb (gpointer data)
+{
+  gpointer *pair = data;
+
+  g_signal_emit (pair[0], signals [REMOVE_FILE], 0, pair[1]);
+  g_object_unref (pair[0]);
+  g_object_unref (pair[1]);
+  g_slice_free1 (sizeof (gpointer) * 2, pair);
+
+  return G_SOURCE_REMOVE;
+}
+
+static gboolean
+file_delete (DzlDirectoryReaper  *self,
+             GFile               *file,
+             GCancellable        *cancellable,
+             GError             **error)
+{
+  gpointer *data = g_slice_alloc (sizeof (gpointer) * 2);
+
+  data[0] = g_object_ref (self);
+  data[1] = g_object_ref (file);
+
+  /* XXX:
+   *
+   * It would be awesome if we didn't round-trip to the main
+   * thread for every one of these files. At least group some
+   * together occasionally.
+   */
+
+  g_idle_add_full (G_PRIORITY_LOW + 1000,
+                   emit_remove_file_from_main_cb,
+                   data, NULL);
+
+  return g_file_delete (file, cancellable, error);
+}
+
 static void
 clear_pattern (gpointer data)
 {
@@ -89,6 +134,29 @@ dzl_directory_reaper_class_init (DzlDirectoryReaperClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = dzl_directory_reaper_finalize;
+
+  /**
+   * DzlDirectoryReaper::remove-file:
+   * @self: a #DzlDirectoryReaper
+   * @file: a #GFile
+   *
+   * The "remove-file" signal is emitted for each file that is removed by the
+   * #DzlDirectoryReaper instance. This may be useful if you want to show the
+   * user what was processed by the reaper.
+   *
+   * Since: 3.32
+   */
+  signals [REMOVE_FILE] =
+    g_signal_new_class_handler ("remove-file",
+                                G_TYPE_FROM_CLASS (klass),
+                                G_SIGNAL_RUN_LAST,
+                                NULL,
+                                NULL, NULL,
+                                g_cclosure_marshal_VOID__OBJECT,
+                                G_TYPE_NONE, 1, G_TYPE_FILE);
+  g_signal_set_va_marshaller (signals [REMOVE_FILE],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__OBJECTv);
 }
 
 static void
@@ -155,9 +223,10 @@ dzl_directory_reaper_new (void)
 }
 
 static gboolean
-remove_directory_with_children (GFile         *file,
-                                GCancellable  *cancellable,
-                                GError       **error)
+remove_directory_with_children (DzlDirectoryReaper  *self,
+                                GFile               *file,
+                                GCancellable        *cancellable,
+                                GError             **error)
 {
   g_autoptr(GFileEnumerator) enumerator = NULL;
   g_autoptr(GError) enum_error = NULL;
@@ -198,11 +267,11 @@ remove_directory_with_children (GFile         *file,
 
       if (!g_file_info_get_is_symlink (info) && file_type == G_FILE_TYPE_DIRECTORY)
         {
-          if (!remove_directory_with_children (child, cancellable, error))
+          if (!remove_directory_with_children (self, child, cancellable, error))
             return FALSE;
         }
 
-      if (!g_file_delete (child, cancellable, error))
+      if (!file_delete (self, child, cancellable, error))
         return FALSE;
     }
 
@@ -224,6 +293,7 @@ dzl_directory_reaper_execute_worker (GTask        *task,
                                      gpointer      task_data,
                                      GCancellable *cancellable)
 {
+  DzlDirectoryReaper *self;
   GArray *patterns = task_data;
   gint64 now = g_get_real_time ();
 
@@ -231,6 +301,8 @@ dzl_directory_reaper_execute_worker (GTask        *task,
   g_assert (DZL_IS_DIRECTORY_REAPER (source_object));
   g_assert (patterns != NULL);
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+  self = g_task_get_source_object (task);
 
   for (guint i = 0; i < patterns->len; i++)
     {
@@ -266,7 +338,7 @@ dzl_directory_reaper_execute_worker (GTask        *task,
 
           if (v64 < now - p->min_age)
             {
-              if (!g_file_delete (p->file.file, cancellable, &error))
+              if (!file_delete (self, p->file.file, cancellable, &error))
                 g_warning ("%s", error->message);
             }
 
@@ -331,7 +403,7 @@ dzl_directory_reaper_execute_worker (GTask        *task,
 
                   if (g_file_info_get_is_symlink (info) || file_type != G_FILE_TYPE_DIRECTORY)
                     {
-                      if (!g_file_delete (file, cancellable, &error))
+                      if (!file_delete (self, file, cancellable, &error))
                         {
                           g_warning ("%s", error->message);
                           g_clear_error (&error);
@@ -341,8 +413,8 @@ dzl_directory_reaper_execute_worker (GTask        *task,
                     {
                       g_assert (file_type == G_FILE_TYPE_DIRECTORY);
 
-                      if (!remove_directory_with_children (file, cancellable, &error) ||
-                          !g_file_delete (file, cancellable, &error))
+                      if (!remove_directory_with_children (self, file, cancellable, &error) ||
+                          !file_delete (self, file, cancellable, &error))
                         {
                           g_warning ("%s", error->message);
                           g_clear_error (&error);
@@ -416,6 +488,7 @@ dzl_directory_reaper_execute_async (DzlDirectoryReaper  *self,
   task = g_task_new (self, cancellable, callback, user_data);
   g_task_set_source_tag (task, dzl_directory_reaper_execute_async);
   g_task_set_task_data (task, g_steal_pointer (&copy), (GDestroyNotify)g_array_unref);
+  g_task_set_priority (task, G_PRIORITY_LOW + 1000);
   g_task_run_in_thread (task, dzl_directory_reaper_execute_worker);
 }
 
