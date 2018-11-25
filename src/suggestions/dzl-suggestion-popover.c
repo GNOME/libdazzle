@@ -788,38 +788,8 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
       DZL_EXIT;
     }
 
-  if (self->popup_requested)
-    {
-      dzl_suggestion_popover_popup (self);
-      self->popup_requested = FALSE;
-      DZL_EXIT;
-    }
-
-  /*
-   * If we are currently animating in the initial view of the popover,
-   * then we might need to cancel that animation and rely on the elastic
-   * bin for smooth resizing.
-   */
-  if (gtk_revealer_get_reveal_child (self->revealer) &&
-      !gtk_revealer_get_child_revealed (self->revealer) &&
-      (removed || added))
-    {
-      g_signal_handlers_block_by_func (self->revealer,
-                                       G_CALLBACK (dzl_suggestion_popover_notify_child_revealed),
-                                       self);
-      gtk_revealer_set_transition_duration (self->revealer, 0);
-      gtk_revealer_set_reveal_child (self->revealer, FALSE);
-      gtk_revealer_set_reveal_child (self->revealer, TRUE);
-      g_signal_handlers_unblock_by_func (self->revealer,
-                                         G_CALLBACK (dzl_suggestion_popover_notify_child_revealed),
-                                         self);
-    }
-  else
-    {
-      dzl_suggestion_popover_popup (self);
-      self->popup_requested = FALSE;
-    }
-
+  dzl_suggestion_popover_popup (self);
+  self->popup_requested = FALSE;
   DZL_EXIT;
 }
 
