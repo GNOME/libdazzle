@@ -145,12 +145,14 @@ dzl_suggestion_entry_focus_out_event (GtkWidget     *widget,
 {
   DzlSuggestionEntry *self = (DzlSuggestionEntry *)widget;
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
   g_assert (event != NULL);
 
   g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
 
-  return GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->focus_out_event (widget, event);
+  DZL_RETURN (GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->focus_out_event (widget, event));
 }
 
 static void
