@@ -811,7 +811,10 @@ dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,
                                             gboolean           *is_absolute,
                                             gpointer            user_data)
 {
+  GtkStyleContext *style_context;
   GtkAllocation alloc;
+  GtkStateFlags state;
+  GtkBorder margin;
 
   g_return_if_fail (DZL_IS_SUGGESTION_ENTRY (self));
   g_return_if_fail (area != NULL);
@@ -823,6 +826,15 @@ dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,
 
   area->y += alloc.height;
   area->height = 300;
+
+  /* Adjust for bottom margin */
+  style_context = gtk_widget_get_style_context (GTK_WIDGET (self));
+  state = gtk_style_context_get_state (style_context);
+  gtk_style_context_get_margin (style_context, state, &margin);
+
+  area->y -= margin.bottom;
+  area->x += margin.left;
+  area->width -= margin.left + margin.right;
 }
 
 /**
