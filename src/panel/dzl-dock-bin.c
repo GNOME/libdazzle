@@ -1736,6 +1736,31 @@ dzl_dock_bin_init_child (DzlDockBin          *self,
   child->pre_anim_pinned = TRUE;
 }
 
+static gboolean
+dzl_dock_bin_draw (GtkWidget *widget,
+                   cairo_t   *cr)
+{
+  DzlDockBin *self = (DzlDockBin *)widget;
+  DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_BIN (self));
+  g_assert (cr != NULL);
+
+  for (guint i = 0; i < LAST_DZL_DOCK_BIN_CHILD; i++)
+    {
+      const DzlDockBinChild *child = &priv->children[i];
+
+      if (!GTK_IS_WIDGET (child->widget) ||
+          !gtk_widget_get_visible (child->widget) ||
+          !gtk_widget_get_child_visible (child->widget))
+        continue;
+
+      gtk_container_propagate_draw (GTK_CONTAINER (self), child->widget, cr);
+    }
+
+  return FALSE;
+}
+
 static void
 dzl_dock_bin_destroy (GtkWidget *widget)
 {
@@ -1884,6 +1909,7 @@ dzl_dock_bin_class_init (DzlDockBinClass *klass)
   widget_class->destroy = dzl_dock_bin_destroy;
   widget_class->drag_leave = dzl_dock_bin_drag_leave;
   widget_class->drag_motion = dzl_dock_bin_drag_motion;
+  widget_class->draw = dzl_dock_bin_draw;
   widget_class->focus = dzl_dock_bin_focus;
   widget_class->get_preferred_height = dzl_dock_bin_get_preferred_height;
   widget_class->get_preferred_width = dzl_dock_bin_get_preferred_width;
