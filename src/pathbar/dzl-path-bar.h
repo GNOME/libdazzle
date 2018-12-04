@@ -38,7 +38,7 @@ DZL_AVAILABLE_IN_ALL
 DzlPath   *dzl_path_bar_get_path           (DzlPathBar *self);
 DZL_AVAILABLE_IN_ALL
 void       dzl_path_bar_set_path           (DzlPathBar *self,
-                                            DzlPath   *path);
+                                            DzlPath    *path);
 DZL_AVAILABLE_IN_ALL
 void       dzl_path_bar_set_selected_index (DzlPathBar *self,
                                             guint       index);
