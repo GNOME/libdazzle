@@ -1742,15 +1742,36 @@ dzl_dock_bin_draw (GtkWidget *widget,
 {
   DzlDockBin *self = (DzlDockBin *)widget;
   DzlDockBinPrivate *priv = dzl_dock_bin_get_instance_private (self);
+  const guint draw_order[] = { DZL_DOCK_BIN_CHILD_CENTER,
+                               DZL_DOCK_BIN_CHILD_LEFT,
+                               DZL_DOCK_BIN_CHILD_RIGHT,
+                               DZL_DOCK_BIN_CHILD_TOP,
+                               DZL_DOCK_BIN_CHILD_BOTTOM };
 
   g_assert (DZL_IS_DOCK_BIN (self));
   g_assert (cr != NULL);
 
-  for (guint i = 0; i < LAST_DZL_DOCK_BIN_CHILD; i++)
+  /* All pinned children, in proper draw order */
+  for (guint i = 0; i < G_N_ELEMENTS (draw_order); i++)
     {
-      const DzlDockBinChild *child = &priv->children[i];
+      const DzlDockBinChild *child = &priv->children[draw_order[i]];
 
-      if (!GTK_IS_WIDGET (child->widget) ||
+      if (!child->pinned ||
+          !GTK_IS_WIDGET (child->widget) ||
+          !gtk_widget_get_visible (child->widget) ||
+          !gtk_widget_get_child_visible (child->widget))
+        continue;
+
+      gtk_container_propagate_draw (GTK_CONTAINER (self), child->widget, cr);
+    }
+
+  /* All unpinned children, in proper draw order */
+  for (guint i = 1; i < G_N_ELEMENTS (draw_order); i++)
+    {
+      const DzlDockBinChild *child = &priv->children[draw_order[i]];
+
+      if (child->pinned ||
+          !GTK_IS_WIDGET (child->widget) ||
           !gtk_widget_get_visible (child->widget) ||
           !gtk_widget_get_child_visible (child->widget))
         continue;
