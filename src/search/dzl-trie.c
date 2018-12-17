@@ -26,7 +26,7 @@
 #include "util/dzl-macros.h"
 
 /**
- * SECTION:trie
+ * SECTION:dzl-trie
  * @title: DzlTrie
  * @short_description: A generic prefix tree.
  *
