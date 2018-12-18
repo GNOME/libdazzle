@@ -491,6 +491,7 @@ dzl_stack_list_init (DzlStackList *self)
 
   priv->scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
                                  "shadow-type", GTK_SHADOW_NONE,
+                                 "propagate-natural-height", TRUE,
                                  "vexpand", TRUE,
                                  "visible", TRUE,
                                  NULL);
