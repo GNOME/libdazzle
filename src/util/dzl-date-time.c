@@ -23,11 +23,20 @@
 #include "dzl-date-time.h"
 
 /**
+ * SECTION:dzl-date-time
+ * @title: Date and Time Functions
+ * @short_description: Date/time helper functions
+ *
+ * This section provides a few functions to help with displaying dates and times in an
+ * easily readable way.
+ */
+
+/**
  * dzl_g_date_time_format_for_display:
  * @self: A #GDateTime
  *
- * Helper function to "humanize" a #GDateTime into a relative time
- * relationship string.
+ * Helper function to create a human-friendly string describing approximately
+ * how long ago a #GDateTime is.
  *
  * Returns: (transfer full): A newly allocated string describing the
  *   date and time imprecisely such as "Yesterday".
@@ -71,6 +80,16 @@ dzl_g_date_time_format_for_display (GDateTime *self)
   return g_strdup_printf (ngettext ("About %u year ago", "About %u years ago", years), years);
 }
 
+/**
+ * dzl_g_time_span_to_label:
+ * @span: the span of time
+ *
+ * Creates a string describing the time span in hours, minutes, and seconds.
+ * For example, a time span of three and a half minutes would be "3:30".
+ * 2 days, 3 hours, 6 minutes, and 20 seconds would be "51:06:20".
+ *
+ * Returns: (transfer full): A newly allocated string describing the time span.
+ */
 gchar *
 dzl_g_time_span_to_label (GTimeSpan span)
 {
@@ -95,6 +114,12 @@ dzl_g_time_span_to_label (GTimeSpan span)
                             hours, minutes, seconds);
 }
 
+/**
+ * dzl_g_time_span_to_label_mapping:
+ *
+ * A #GBindingTransformFunc to transform a time span into a string label using
+ * dzl_g_time_span_to_label().
+ */
 gboolean
 dzl_g_time_span_to_label_mapping (GBinding     *binding,
                                   const GValue *from_value,

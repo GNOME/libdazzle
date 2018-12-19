@@ -22,6 +22,23 @@
 
 #include "dzl-cairo.h"
 
+/**
+ * SECTION:dzl-cairo
+ * @title: Cairo Utilities
+ * @short_description: Some utility functions to use with the Cairo graphics library
+ *
+ * [Cairo](https://cairographics.org) is the graphics library that GTK uses to draw widgets.
+ * This section contains functions for commonly used calculations with Cairo objects.
+ */
+
+/**
+ * dzl_cairo_region_create_from_clip_extents:
+ * @cr a cairo context
+ *
+ * Creates a region from the extents of the context's current clip area.
+ *
+ * Returns: (transfer full): A #CairoRegion.
+ */
 cairo_region_t *
 dzl_cairo_region_create_from_clip_extents (cairo_t *cr)
 {
@@ -39,6 +56,15 @@ dzl_cairo_region_create_from_clip_extents (cairo_t *cr)
   return cairo_region_create_rectangle (&crect);
 }
 
+/**
+ * dzl_cairo_rounded_rectangle:
+ * @cr: a cairo context
+ * @rect: a #GdkRectangle to draw
+ * @x_radius: the radius of the corners on the X axis
+ * @y_radius: the radius of the corners on the Y axis
+ *
+ * Adds a rounded rectangle to @cr's current path.
+ */
 void
 dzl_cairo_rounded_rectangle (cairo_t            *cr,
                             const GdkRectangle *rect,
