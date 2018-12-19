@@ -38,6 +38,8 @@ void            dzl_cairo_rounded_rectangle               (cairo_t            *c
  * @rect: the cairo rectangle to find the right side of
  *
  * Finds the X coordinate of the right side of a rectangle.
+ *
+ * Returns: The X coordinate as an integer
  */
 static inline gint
 dzl_cairo_rectangle_x2 (const cairo_rectangle_int_t *rect)
@@ -50,6 +52,8 @@ dzl_cairo_rectangle_x2 (const cairo_rectangle_int_t *rect)
  * @rect: the cairo rectangle to find the bottom of
  *
  * Finds the Y coordinate of the bottom of a rectangle.
+ *
+ * Returns: The Y coordinate as an integer
  */
 static inline gint
 dzl_cairo_rectangle_y2 (const cairo_rectangle_int_t *rect)
@@ -62,6 +66,8 @@ dzl_cairo_rectangle_y2 (const cairo_rectangle_int_t *rect)
  * @rect: the cairo rectangle to find the center of
  *
  * Finds the X coordinate of the center of a rectangle.
+ *
+ * Returns: The X coordinate as an integer
  */
 static inline gint
 dzl_cairo_rectangle_center (const cairo_rectangle_int_t *rect)
@@ -74,6 +80,8 @@ dzl_cairo_rectangle_center (const cairo_rectangle_int_t *rect)
  * @rect: the cairo rectangle to find the center of
  *
  * Finds the Y coordinate of the center of a rectangle.
+ *
+ * Returns: The Y coordinate as an integer
  */
 static inline gint
 dzl_cairo_rectangle_middle (const cairo_rectangle_int_t *rect)
@@ -88,6 +96,8 @@ dzl_cairo_rectangle_middle (const cairo_rectangle_int_t *rect)
  *
  * Determines whether rectangle @a completely contains rectangle @b.
  * @b may share edges with @a and still be considered contained.
+ *
+ * Returns: Whether @a contains @b
  */
 static inline cairo_bool_t
 dzl_cairo_rectangle_contains_rectangle (const cairo_rectangle_int_t *a,

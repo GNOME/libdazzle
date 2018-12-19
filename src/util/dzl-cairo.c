@@ -36,6 +36,8 @@
  * @cr a cairo context
  *
  * Creates a region from the extents of the context's current clip area.
+ *
+ * Returns: (transfer full): A #CairoRegion.
  */
 cairo_region_t *
 dzl_cairo_region_create_from_clip_extents (cairo_t *cr)
