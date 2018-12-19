@@ -33,25 +33,25 @@ void            dzl_cairo_rounded_rectangle               (cairo_t            *c
                                                            gint                x_radius,
                                                            gint                y_radius);
 
-static inline gboolean
+static inline gint
 dzl_cairo_rectangle_x2 (const cairo_rectangle_int_t *rect)
 {
   return rect->x + rect->width;
 }
 
-static inline gboolean
+static inline gint
 dzl_cairo_rectangle_y2 (const cairo_rectangle_int_t *rect)
 {
   return rect->y + rect->height;
 }
 
-static inline gboolean
+static inline gint
 dzl_cairo_rectangle_center (const cairo_rectangle_int_t *rect)
 {
   return rect->x + (rect->width/2);
 }
 
-static inline gboolean
+static inline gint
 dzl_cairo_rectangle_middle (const cairo_rectangle_int_t *rect)
 {
   return rect->y + (rect->height/2);
