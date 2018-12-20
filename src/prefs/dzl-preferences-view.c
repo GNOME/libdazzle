@@ -1014,7 +1014,7 @@ dzl_preferences_view_add_table_row_va (DzlPreferences *preferences,
   DzlPreferencesGroup *group;
   GtkWidget *page;
   GtkWidget *column = first_widget;
-  GtkListBoxRow *row;
+  GtkWidget *row;
   GtkBox *box;
   guint column_id = 0;
   guint widget_id;
@@ -1070,6 +1070,9 @@ dzl_preferences_view_add_table_row_va (DzlPreferences *preferences,
 
   widget_id = ++priv->last_widget_id;
   dzl_preferences_view_track (self, widget_id, GTK_WIDGET (row));
+
+  if ((row = gtk_widget_get_ancestor (row, GTK_TYPE_LIST_BOX_ROW)))
+    gtk_widget_set_can_focus (row, FALSE);
 
   return widget_id;
 }
