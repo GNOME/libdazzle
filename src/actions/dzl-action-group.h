@@ -168,6 +168,11 @@ _##prefix##_query_action (GActionGroup *group,                                  
                           GVariant **state_hint,                                  \
                           GVariant **state)                                       \
 {                                                                                 \
+  if (enabled) *enabled = FALSE;                                                  \
+  if (parameter_type) *parameter_type = NULL ;                                    \
+  if (state_type) *state_type = NULL ;                                            \
+  if (state_hint) *state_hint = NULL ;                                            \
+  if (state) *state = NULL ;                                                      \
   for (guint i = 0; i < G_N_ELEMENTS(prefix##_actions); i++)                      \
     {                                                                             \
       if (g_strcmp0 (name, prefix##_actions[i].name) == 0)                        \
