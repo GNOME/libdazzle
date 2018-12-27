@@ -33,6 +33,12 @@
 #define FONT_SIZE    "font-size"
 
 /**
+ * SECTION:dzl-pango
+ * @title: Pango Utilities
+ * @short_description: Utilities to use with the Pango text layout library
+ */
+
+/**
  * dzl_pango_font_description_to_css:
  *
  * This function will generate CSS suitable for Gtk's CSS engine
