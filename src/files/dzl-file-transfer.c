@@ -589,6 +589,19 @@ handle_removal (DzlFileTransfer *self,
 
   DZL_EXIT;
 }
+
+static gboolean
+dzl_file_transfer_do_notify_progress (gpointer data)
+{
+  DzlFileTransfer *self = data;
+
+  DZL_ENTRY;
+
+  g_assert (DZL_IS_FILE_TRANSFER (self));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_PROGRESS]);
+
+  DZL_RETURN (G_SOURCE_CONTINUE);
 }
 
 static void
@@ -600,6 +613,7 @@ dzl_file_transfer_worker (GTask        *task,
   DzlFileTransfer *self = source_object;
   DzlFileTransferPrivate *priv = dzl_file_transfer_get_instance_private (self);
   GPtrArray *opers = task_data;
+  guint notify_source;
 
   DZL_ENTRY;
 
@@ -608,7 +622,11 @@ dzl_file_transfer_worker (GTask        *task,
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
   g_assert (opers != NULL);
 
-  /* TODO: Start GSource for notifies */
+  notify_source = g_timeout_add_full (G_PRIORITY_LOW,
+                                      1000 / 4, /* 4x a second */
+                                      dzl_file_transfer_do_notify_progress,
+                                      g_object_ref (self),
+                                      g_object_unref);
 
   for (guint i = 0; i < opers->len; i++)
     {
@@ -631,13 +649,14 @@ dzl_file_transfer_worker (GTask        *task,
       if (oper->error != NULL)
         {
           g_task_return_error (task, g_steal_pointer (&oper->error));
-          DZL_EXIT;
+          DZL_GOTO (cleanup);
         }
     }
 
   g_task_return_boolean (task, TRUE);
 
-  /* TODO: Stop GSource for notifies */
+cleanup:
+  g_source_remove (notify_source);
 
   DZL_EXIT;
 }
