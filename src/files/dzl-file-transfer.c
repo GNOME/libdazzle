@@ -314,9 +314,10 @@ file_walk_full (GFile            *parent,
         {
           gpointer infoptr;
 
-          while (NULL != (infoptr = g_file_enumerator_next_file (enumerator, cancellable, NULL)))
+          while ((infoptr = g_file_enumerator_next_file (enumerator, cancellable, NULL)))
             {
               g_autoptr(GFileInfo) grandchild_info = infoptr;
+
               file_walk_full (child, grandchild_info, cancellable, callback, user_data);
             }
 
