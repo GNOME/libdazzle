@@ -244,12 +244,14 @@ dzl_file_transfer_set_flags (DzlFileTransfer      *self,
 {
   DzlFileTransferPrivate *priv = dzl_file_transfer_get_instance_private (self);
 
+  DZL_ENTRY;
+
   g_return_if_fail (DZL_IS_FILE_TRANSFER (self));
 
   if (priv->executed)
     {
       g_warning ("Cannot set flags after executing transfer");
-      return;
+      DZL_EXIT;
     }
 
   if (priv->flags != flags)
@@ -257,6 +259,8 @@ dzl_file_transfer_set_flags (DzlFileTransfer      *self,
       priv->flags = flags;
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_FLAGS]);
     }
+
+  DZL_EXIT;
 }
 
 gdouble
@@ -279,18 +283,20 @@ file_walk_full (GFile            *parent,
                 FileWalkCallback  callback,
                 gpointer          user_data)
 {
+  DZL_ENTRY;
+
   g_assert (!parent || G_IS_FILE (parent));
   g_assert (G_IS_FILE_INFO (info));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
   g_assert (callback != NULL);
 
   if (g_cancellable_is_cancelled (cancellable))
-    return;
+    DZL_EXIT;
 
   callback (parent, info, user_data);
 
   if (g_file_info_get_is_symlink (info))
-    return;
+    DZL_EXIT;
 
   if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
     {
@@ -299,7 +305,7 @@ file_walk_full (GFile            *parent,
       const gchar *name = g_file_info_get_name (info);
 
       if (name == NULL)
-        return;
+        DZL_EXIT;
 
       child = g_file_get_child (parent, name);
       enumerator = g_file_enumerate_children (child, QUERY_ATTRS, QUERY_FLAGS, cancellable, NULL);
@@ -317,6 +323,8 @@ file_walk_full (GFile            *parent,
           g_file_enumerator_close (enumerator, cancellable, NULL);
         }
     }
+
+  DZL_EXIT;
 }
 
 static void
@@ -328,6 +336,8 @@ file_walk (GFile            *root,
   g_autoptr(GFile) parent = NULL;
   g_autoptr(GFileInfo) info = NULL;
 
+  DZL_ENTRY;
+
   g_assert (G_IS_FILE (root));
   g_assert (callback != NULL);
 
@@ -338,6 +348,8 @@ file_walk (GFile            *root,
   info = g_file_query_info (root, QUERY_ATTRS, QUERY_FLAGS, cancellable, NULL);
   if (info != NULL)
     file_walk_full (parent, info, cancellable, callback, user_data);
+
+  DZL_EXIT;
 }
 
 static void
@@ -347,6 +359,8 @@ handle_preflight_cb (GFile     *file,
 {
   DzlFileTransferStat *stat_buf = user_data;
   GFileType file_type;
+
+  DZL_ENTRY;
 
   g_assert (G_IS_FILE (file));
   g_assert (G_IS_FILE_INFO (child_info));
@@ -363,6 +377,8 @@ handle_preflight_cb (GFile     *file,
       stat_buf->n_files_total++;
       stat_buf->n_bytes_total += g_file_info_get_size (child_info);
     }
+
+  DZL_EXIT;
 }
 
 static void
@@ -372,11 +388,13 @@ handle_preflight (DzlFileTransfer     *self,
 {
   DzlFileTransferPrivate *priv = dzl_file_transfer_get_instance_private (self);
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_FILE_TRANSFER (self));
   g_assert (opers != NULL);
 
   if (g_cancellable_is_cancelled (cancellable))
-    return;
+    DZL_EXIT;
 
   for (guint i = 0; i < opers->len; i++)
     {
@@ -392,6 +410,8 @@ handle_preflight (DzlFileTransfer     *self,
       if (oper->error != NULL)
         break;
     }
+
+  DZL_EXIT;
 }
 
 static void
@@ -417,6 +437,8 @@ handle_copy_cb (GFile     *file,
   Oper *oper = user_data;
   GFileType file_type;
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_FILE_TRANSFER (oper->self));
   g_assert (G_IS_FILE (oper->src));
   g_assert (G_IS_FILE (oper->dst));
@@ -424,10 +446,10 @@ handle_copy_cb (GFile     *file,
   g_assert (G_IS_FILE_INFO (child_info));
 
   if (oper->error != NULL)
-    return;
+    DZL_EXIT;
 
   if (g_cancellable_is_cancelled (oper->cancellable))
-    return;
+    DZL_EXIT;
 
   priv = dzl_file_transfer_get_instance_private (oper->self);
 
@@ -435,7 +457,7 @@ handle_copy_cb (GFile     *file,
   name = g_file_info_get_name (child_info);
 
   if (name == NULL)
-    return;
+    DZL_EXIT;
 
   src = g_file_get_child (file, name);
 
@@ -485,6 +507,8 @@ handle_copy_cb (GFile     *file,
     default:
       break;
     }
+
+  DZL_EXIT;
 }
 
 static void
@@ -492,12 +516,14 @@ handle_copy (DzlFileTransfer *self,
              GPtrArray       *opers,
              GCancellable    *cancellable)
 {
+  DZL_ENTRY;
+
   g_assert (DZL_IS_FILE_TRANSFER (self));
   g_assert (opers != NULL);
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
   if (g_cancellable_is_cancelled (cancellable))
-    return;
+    DZL_EXIT;
 
   for (guint i = 0; i < opers->len; i++)
     {
@@ -518,6 +544,8 @@ handle_copy (DzlFileTransfer *self,
             break;
         }
     }
+
+  DZL_EXIT;
 }
 
 static void
@@ -527,12 +555,14 @@ handle_removal (DzlFileTransfer *self,
 {
   g_autoptr(DzlDirectoryReaper) reaper = NULL;
 
+  DZL_ENTRY;
+
   g_assert (DZL_IS_FILE_TRANSFER (self));
   g_assert (opers != NULL);
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
   if (g_cancellable_is_cancelled (cancellable))
-    return;
+    DZL_EXIT;
 
   reaper = dzl_directory_reaper_new ();
 
@@ -546,7 +576,7 @@ handle_removal (DzlFileTransfer *self,
 
       /* Don't delete anything if there was a failure */
       if (oper->error != NULL)
-        return;
+        DZL_EXIT;
 
       if (g_file_query_file_type (oper->src, G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL) == G_FILE_TYPE_DIRECTORY)
         dzl_directory_reaper_add_directory (reaper, oper->src, 0);
@@ -555,6 +585,9 @@ handle_removal (DzlFileTransfer *self,
     }
 
   dzl_directory_reaper_execute (reaper, cancellable, NULL);
+
+  DZL_EXIT;
+}
 }
 
 static void
