@@ -681,10 +681,19 @@ dzl_file_transfer_execute (DzlFileTransfer  *self,
 
   if (priv->executed)
     {
-      g_task_return_new_error (task,
-                               G_IO_ERROR,
-                               G_IO_ERROR_INVAL,
-                               "Transfer can only be executed once.");
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVAL,
+                   "Transfer can only be executed once.");
+      DZL_RETURN (FALSE);
+    }
+
+  if (priv->opers->len == 0)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVAL,
+                   "Transfer can only be executed once.");
       DZL_RETURN (FALSE);
     }
 
@@ -727,6 +736,15 @@ dzl_file_transfer_execute_async (DzlFileTransfer     *self,
     }
 
   priv->executed = TRUE;
+
+  if (priv->opers->len == 0)
+    {
+      g_task_return_new_error (task,
+                               G_IO_ERROR,
+                               G_IO_ERROR_INVAL,
+                               "No transfers were provided to execute");
+      DZL_EXIT;
+    }
 
   g_task_set_check_cancellable (task, TRUE);
   g_task_set_return_on_cancel (task, TRUE);
