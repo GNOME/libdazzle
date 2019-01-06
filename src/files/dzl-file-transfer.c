@@ -714,7 +714,7 @@ dzl_file_transfer_execute_async (DzlFileTransfer     *self,
   g_return_if_fail (DZL_IS_FILE_TRANSFER (self));
   g_return_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable));
 
-  task = g_task_new (self, cancellable, NULL, NULL);
+  task = g_task_new (self, cancellable, callback, user_data);
   g_task_set_source_tag (task, dzl_file_transfer_execute);
 
   if (priv->executed)
