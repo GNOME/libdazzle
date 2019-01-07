@@ -23,6 +23,12 @@
 #include "dzl-dnd.h"
 
 /**
+ * SECTION:dzl-dnd
+ * @title: Drag-and-Drop Utilities
+ * @short_description: Helper functions to use with GTK's drag-and-drop system
+ */
+
+/**
  * dzl_dnd_get_uri_list:
  * @selection_data: the #GtkSelectionData from drag_data_received
  *
@@ -31,6 +37,8 @@
  * Returns: (transfer full): a string array which will hold the uris or
  *   %NULL if there were no valid uris. g_strfreev should be used when
  *   the string array is no longer used
+ *
+ * Deprecated: Use gtk_selection_data_get_uris() instead; it is exactly the same.
  */
 gchar **
 dzl_dnd_get_uri_list (GtkSelectionData *selection_data)

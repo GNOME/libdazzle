@@ -49,6 +49,12 @@
  */
 
 
+/**
+ * SECTION:dzl-rgba
+ * @title: Color Utilities
+ * @short_description: Basic utilities for working with colors
+ */
+
 static void
 rgb_to_hls (gdouble *r,
             gdouble *g,
@@ -183,6 +189,17 @@ hls_to_rgb (gdouble *h,
     }
 }
 
+/**
+ * dzl_rgba_shade:
+ * @rgba: a #GdkRGBA to shade
+ * @dst: (out): the resulting shade
+ * @k: the factor by which to shade the input color
+ *
+ * Creates a shade of the color @rgba by multiplying its saturation and lightness by @k.
+ *
+ * Values of @k greater than 1 will make the color brighter, while values less than 1 will make it
+ * darker. The alpha value will remain the same.
+ */
 void
 dzl_rgba_shade (const GdkRGBA *rgba,
                 GdkRGBA       *dst,
