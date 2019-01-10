@@ -1,4 +1,24 @@
 ==============
+Version 3.31.4
+==============
+
+Changes in the release:
+
+ • Improvements to documentation
+ • Improvements to suggestion entry resiliency
+ • GIR fixes for DzlGraphModel
+ • Fixes for ctrl+shift+d
+ • Use GtkPopover for GMenuModel
+ • Animation improvements
+ • Various memory leaks were plugged
+ • Additional Radio API was added
+ • A new remove-file signal was added to the directory reaper. This is not
+   efficient as it passes state to the main thread from a worker thread.
+   It may be optimized in the future
+ • Various performance improvements
+ • File transfer progress callback improvements
+
+==============
 Version 3.31.1
 ==============
 
