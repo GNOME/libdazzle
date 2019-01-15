@@ -19,16 +19,20 @@
 #ifndef DZL_DEBUG_H
 #define DZL_DEBUG_H
 
-#include <glib.h>
-
-G_BEGIN_DECLS
-
 #ifndef DZL_ENABLE_TRACE
 # define DZL_ENABLE_TRACE @ENABLE_TRACING@
 #endif
 #if DZL_ENABLE_TRACE != 1
 # undef DZL_ENABLE_TRACE
 #endif
+
+#include <glib.h>
+
+#ifdef DZL_ENABLE_TRACE
+# include <execinfo.h>
+#endif
+
+G_BEGIN_DECLS
 
 /**
  * DZL_LOG_LEVEL_TRACE: (skip)
@@ -68,6 +72,17 @@ G_BEGIN_DECLS
             G_STRFUNC, __LINE__);                                        \
       return _r;                                                         \
    } G_STMT_END
+# define DZL_BACKTRACE                                                   \
+  G_STMT_START {                                                         \
+    gpointer btbuf[64];                                                  \
+    int btbuflen = backtrace (btbuf, G_N_ELEMENTS (btbuf));              \
+    char **symnames = backtrace_symbols (btbuf, btbuflen);               \
+    for (guint _i = 0; _i < btbuflen; _i++) {                            \
+      g_log(G_LOG_DOMAIN, DZL_LOG_LEVEL_TRACE, "TRACE: [%-2d]: %s",      \
+            _i, symnames[_i]);                                           \
+    }                                                                    \
+    free (symnames);                                                     \
+  } G_STMT_END
 #else
 # define DZL_TODO(_msg)
 # define DZL_PROBE
@@ -76,6 +91,7 @@ G_BEGIN_DECLS
 # define DZL_GOTO(_l)   goto _l
 # define DZL_EXIT       return
 # define DZL_RETURN(_r) return _r
+# define DZL_BACKTRACE  G_STMT_START { } G_STMT_END
 #endif
 
 G_END_DECLS
