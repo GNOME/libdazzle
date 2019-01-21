@@ -949,11 +949,19 @@ dzl_suggestion_popover_move_by (DzlSuggestionPopover *self,
 
   g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
 
-  if (NULL == (row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (self->list_box), 0)))
+  if (!(row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (self->list_box), 0)))
     return;
 
-  if (NULL == gtk_list_box_get_selected_row (GTK_LIST_BOX (self->list_box)))
+  if (!gtk_list_box_get_selected_row (GTK_LIST_BOX (self->list_box)))
     {
+      if (amount < 0)
+        {
+          guint n_items = g_list_model_get_n_items (self->model);
+
+          if (n_items > 0)
+            row = gtk_list_box_get_row_at_index (GTK_LIST_BOX (self->list_box), n_items - 1);
+        }
+
       dzl_suggestion_popover_select_row (self, row);
       return;
     }
