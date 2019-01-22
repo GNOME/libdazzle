@@ -638,6 +638,7 @@ dzl_suggestion_entry_init (DzlSuggestionEntry *self)
                                 "modal", FALSE,
                                 "relative-to", self,
                                 "type", GTK_WINDOW_POPUP,
+                                "type-hint", GDK_WINDOW_TYPE_HINT_COMBO,
                                 NULL);
   g_signal_connect_object (priv->popover,
                            "notify::selected",
