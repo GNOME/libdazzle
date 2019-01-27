@@ -26,6 +26,8 @@
 
 void _dzl_suggestion_entry_reposition       (DzlSuggestionEntry   *entry,
                                              DzlSuggestionPopover *popover);
+void _dzl_suggestion_popover_set_focused    (DzlSuggestionPopover *self,
+                                             gboolean              entry_focused);
 void _dzl_suggestion_popover_set_max_height (DzlSuggestionPopover *popover,
                                              gint                  max_height);
 void _dzl_suggestion_popover_adjust_margin  (DzlSuggestionPopover *popover,

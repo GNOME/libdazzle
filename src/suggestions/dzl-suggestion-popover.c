@@ -65,6 +65,7 @@ struct _DzlSuggestionPopover
   PangoEllipsizeMode  title_ellipsize;
 
   guint               popup_requested : 1;
+  guint               entry_focused : 1;
 };
 
 enum {
@@ -1142,4 +1143,15 @@ _dzl_suggestion_popover_set_click_mode (DzlSuggestionPopover *self,
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
 
   gtk_list_box_set_activate_on_single_click (GTK_LIST_BOX (self->list_box), single_click);
+}
+
+void
+_dzl_suggestion_popover_set_focused (DzlSuggestionPopover *self,
+                                     gboolean              entry_focused)
+{
+  g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
+
+  self->entry_focused = !!entry_focused;
+  if (!entry_focused)
+    self->popup_requested = FALSE;
 }

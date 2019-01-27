@@ -140,13 +140,33 @@ dzl_suggestion_entry_hide_suggestions (DzlSuggestionEntry *self)
 }
 
 static gboolean
+dzl_suggestion_entry_focus_in_event (GtkWidget     *widget,
+                                     GdkEventFocus *event)
+{
+  DzlSuggestionEntry *self = (DzlSuggestionEntry *)widget;
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  g_assert (DZL_IS_SUGGESTION_ENTRY (self));
+  g_assert (event != NULL);
+
+  if (priv->popover)
+    _dzl_suggestion_popover_set_focused (priv->popover, TRUE);
+
+  return GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->focus_in_event (widget, event);
+}
+
+static gboolean
 dzl_suggestion_entry_focus_out_event (GtkWidget     *widget,
                                       GdkEventFocus *event)
 {
   DzlSuggestionEntry *self = (DzlSuggestionEntry *)widget;
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
   g_assert (event != NULL);
+
+  if (priv->popover)
+    _dzl_suggestion_popover_set_focused (priv->popover, FALSE);
 
   g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
 
@@ -479,6 +499,7 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
   object_class->set_property = dzl_suggestion_entry_set_property;
 
   widget_class->destroy = dzl_suggestion_entry_destroy;
+  widget_class->focus_in_event = dzl_suggestion_entry_focus_in_event;
   widget_class->focus_out_event = dzl_suggestion_entry_focus_out_event;
   widget_class->hierarchy_changed = dzl_suggestion_entry_hierarchy_changed;
   widget_class->key_press_event = dzl_suggestion_entry_key_press_event;
