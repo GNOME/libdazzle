@@ -755,7 +755,8 @@ dzl_suggestion_entry_set_model (DzlSuggestionEntry *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_MODEL]);
       dzl_suggestion_entry_update_attrs (self);
 
-      g_signal_emit (self, signals [SHOW_SUGGESTIONS], 0);
+      if (gtk_widget_has_focus (GTK_WIDGET (self)))
+        g_signal_emit (self, signals [SHOW_SUGGESTIONS], 0);
     }
 
   DZL_EXIT;
