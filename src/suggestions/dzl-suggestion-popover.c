@@ -815,7 +815,7 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
                                          G_CALLBACK (dzl_suggestion_popover_notify_child_revealed),
                                          self);
     }
-  else
+  else if (self->entry_focused)
     {
       dzl_suggestion_popover_popup (self);
       self->popup_requested = FALSE;
