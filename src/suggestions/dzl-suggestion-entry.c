@@ -197,10 +197,17 @@ dzl_suggestion_entry_key_press_event (GtkWidget   *widget,
 {
   DzlSuggestionEntry *self = (DzlSuggestionEntry *)widget;
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+  GdkDevice *device;
   gboolean ret;
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
   g_assert (priv->in_key_press >= 0);
+
+  if ((device = gdk_event_get_device ((GdkEvent *)key)) &&
+      gdk_device_get_source (device) == GDK_SOURCE_KEYBOARD)
+    device = gdk_device_get_associated_device (device);
+
+  _dzl_suggestion_popover_set_device (priv->popover, device);
 
   /*
    * If Tab was pressed, and there is uncommitted suggested text,

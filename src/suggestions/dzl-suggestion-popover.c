@@ -25,6 +25,8 @@
 #include "dzl-debug.h"
 
 #include "animation/dzl-animation.h"
+#include "shortcuts/dzl-shortcut-controller.h"
+#include "shortcuts/dzl-shortcut-private.h"
 #include "suggestions/dzl-suggestion.h"
 #include "suggestions/dzl-suggestion-entry.h"
 #include "suggestions/dzl-suggestion-popover.h"
@@ -55,6 +57,8 @@ struct _DzlSuggestionPopover
 
   GListModel         *model;
 
+  GdkDevice          *grab_device;
+
   GType               row_type;
 
   gulong              delete_event_handler;
@@ -70,6 +74,7 @@ struct _DzlSuggestionPopover
 
   guint               popup_requested : 1;
   guint               entry_focused : 1;
+  guint               has_grab : 1;
 };
 
 enum {
@@ -497,12 +502,102 @@ attach_cb (DzlListBox    *list_box,
                                      self->subtitle_ellipsize);
 }
 
+static gboolean
+dzl_suggestion_popover_key_press_event (GtkWidget   *widget,
+                                        GdkEventKey *event)
+{
+  DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
+
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+  g_assert (event != NULL);
+
+  if (self->relative_to != NULL)
+    {
+      DzlShortcutController *controller = dzl_shortcut_controller_try_find (self->relative_to);
+      g_autoptr(DzlShortcutChord) chord = NULL;
+
+      /* NOTE: This only allows for shortcuts on the target entry, not any
+       *       global shortcut. That is similar to how GtkEntryCompletion works
+       *       and ensures that we don't have state taken during global dispatch.
+       */
+
+      if (controller != NULL &&
+          (chord = dzl_shortcut_chord_new_from_event (event)))
+        {
+          DzlShortcutMatch match;
+
+          match = _dzl_shortcut_controller_handle (controller,
+                                                   event,
+                                                   chord,
+                                                   DZL_SHORTCUT_PHASE_DISPATCH,
+                                                   self->relative_to);
+
+          if (match == DZL_SHORTCUT_MATCH_EQUAL)
+            return TRUE;
+        }
+
+      return gtk_widget_event (self->relative_to, (GdkEvent *)event);
+    }
+
+  return GTK_WIDGET_CLASS (dzl_suggestion_popover_parent_class)->key_press_event (widget, event);
+}
+
+static gboolean
+dzl_suggestion_popover_key_release_event (GtkWidget   *widget,
+                                          GdkEventKey *event)
+{
+  DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
+
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+  g_assert (event != NULL);
+
+  if (self->relative_to != NULL)
+    return gtk_widget_event (self->relative_to, (GdkEvent *)event);
+
+  return GTK_WIDGET_CLASS (dzl_suggestion_popover_parent_class)->key_release_event (widget, event);
+}
+
+static gboolean
+dzl_suggestion_popover_grab_broken_event (GtkWidget          *widget,
+                                          GdkEventGrabBroken *event)
+{
+  DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
+
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+  g_assert (event != NULL);
+
+  dzl_suggestion_popover_popdown (self);
+
+  return GTK_WIDGET_CLASS (dzl_suggestion_popover_parent_class)->grab_broken_event (widget, event);
+}
+
+static gboolean
+dzl_suggestion_popover_button_release_event (GtkWidget      *widget,
+                                             GdkEventButton *event)
+{
+  DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
+  gboolean ret;
+
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+  g_assert (event != NULL);
+
+  ret = GTK_WIDGET_CLASS (dzl_suggestion_popover_parent_class)->button_release_event (widget, event);
+
+  dzl_suggestion_popover_popdown (self);
+
+  /* Force immediate hide */
+  gtk_widget_hide (GTK_WIDGET (self));
+
+  return ret;
+}
+
 static void
 dzl_suggestion_popover_destroy (GtkWidget *widget)
 {
   DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
 
   g_clear_handle_id (&self->queued_popdown, g_source_remove);
+  g_clear_object (&self->grab_device);
 
   dzl_suggestion_popover_set_transient_for (self, NULL);
 
@@ -603,6 +698,10 @@ dzl_suggestion_popover_class_init (DzlSuggestionPopoverClass *klass)
   widget_class->screen_changed = dzl_suggestion_popover_screen_changed;
   widget_class->realize = dzl_suggestion_popover_realize;
   widget_class->show = dzl_suggestion_popover_show;
+  widget_class->button_release_event = dzl_suggestion_popover_button_release_event;
+  widget_class->key_press_event = dzl_suggestion_popover_key_press_event;
+  widget_class->key_release_event = dzl_suggestion_popover_key_release_event;
+  widget_class->grab_broken_event = dzl_suggestion_popover_grab_broken_event;
 
   properties [PROP_MODEL] =
     g_param_spec_object ("model",
@@ -710,6 +809,7 @@ dzl_suggestion_popover_new (void)
 void
 dzl_suggestion_popover_popup (DzlSuggestionPopover *self)
 {
+  GdkScreen *screen = NULL;
   guint duration = 250;
   guint n_items;
 
@@ -720,6 +820,9 @@ dzl_suggestion_popover_popup (DzlSuggestionPopover *self)
       self->popup_requested = TRUE;
       return;
     }
+
+  if (gtk_widget_get_mapped (GTK_WIDGET (self)))
+    return;
 
   if (self->relative_to != NULL)
     {
@@ -733,6 +836,9 @@ dzl_suggestion_popover_popup (DzlSuggestionPopover *self)
       display = gtk_widget_get_display (GTK_WIDGET (self->relative_to));
       window = gtk_widget_get_window (GTK_WIDGET (self->relative_to));
       monitor = gdk_display_get_monitor_at_window (display, window);
+      screen = gtk_widget_get_screen (GTK_WIDGET (self->relative_to));
+
+      gtk_window_set_screen (GTK_WINDOW (self), screen);
 
       gtk_widget_get_preferred_height (GTK_WIDGET (self), &min_height, &nat_height);
       gtk_widget_get_allocation (GTK_WIDGET (self), &alloc);
@@ -740,7 +846,18 @@ dzl_suggestion_popover_popup (DzlSuggestionPopover *self)
       duration = dzl_animation_calculate_duration (monitor, alloc.height, nat_height);
     }
 
+  gtk_widget_grab_focus (GTK_WIDGET (self));
   gtk_widget_show (GTK_WIDGET (self));
+
+  if (!self->has_grab && self->grab_device != NULL)
+    {
+      self->has_grab = TRUE;
+      gtk_grab_add (GTK_WIDGET (self));
+      gdk_seat_grab (gdk_device_get_seat (self->grab_device),
+                     gtk_widget_get_window (GTK_WIDGET (self)),
+                     GDK_SEAT_CAPABILITY_POINTER | GDK_SEAT_CAPABILITY_TOUCH,
+                     TRUE, NULL, NULL, NULL, NULL);
+    }
 
   gtk_revealer_set_transition_duration (self->revealer, duration);
   gtk_revealer_set_reveal_child (self->revealer, TRUE);
@@ -759,7 +876,20 @@ dzl_suggestion_popover_popdown (DzlSuggestionPopover *self)
 
   self->popup_requested = FALSE;
 
-  if (!gtk_widget_get_realized (GTK_WIDGET (self)))
+  if (self->has_grab)
+    {
+      self->has_grab = FALSE;
+      gtk_grab_remove (GTK_WIDGET (self));
+
+      if (self->grab_device != NULL)
+        {
+          gdk_seat_ungrab (gdk_device_get_seat (self->grab_device));
+          g_clear_object (&self->grab_device);
+        }
+    }
+
+
+  if (!gtk_widget_get_mapped (GTK_WIDGET (self)))
     return;
 
   display = gtk_widget_get_display (GTK_WIDGET (self->relative_to));
@@ -823,12 +953,17 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
       DZL_EXIT;
     }
 
+  g_clear_handle_id (&self->queued_popdown, g_source_remove);
+
   if (self->popup_requested)
     {
       dzl_suggestion_popover_popup (self);
       self->popup_requested = FALSE;
       DZL_EXIT;
     }
+
+  if (gtk_widget_get_mapped (GTK_WIDGET (self)))
+    return;
 
   /*
    * If we are currently animating in the initial view of the popover,
@@ -853,6 +988,7 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
     {
       dzl_suggestion_popover_popup (self);
       self->popup_requested = FALSE;
+      DZL_EXIT;
     }
 
   DZL_EXIT;
@@ -1188,4 +1324,19 @@ _dzl_suggestion_popover_set_focused (DzlSuggestionPopover *self,
   self->entry_focused = !!entry_focused;
   if (!entry_focused)
     self->popup_requested = FALSE;
+}
+
+void
+_dzl_suggestion_popover_set_device (DzlSuggestionPopover *self,
+                                    GdkDevice            *device)
+{
+  g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
+  g_return_if_fail (!device || GDK_IS_DEVICE (device));
+
+  if (device != self->grab_device)
+    {
+      if (self->has_grab && self->grab_device != NULL)
+        gdk_seat_ungrab (gdk_device_get_seat (self->grab_device));
+      g_set_object (&self->grab_device, device);
+    }
 }
