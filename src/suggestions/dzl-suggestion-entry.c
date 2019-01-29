@@ -352,10 +352,11 @@ dzl_suggestion_entry_move_suggestion (DzlSuggestionEntry *self,
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (self));
 
+  if (priv->popover == NULL || !gtk_widget_get_mapped (GTK_WIDGET (priv->popover)))
+    return;
+
   priv->in_move_by++;
-
   dzl_suggestion_popover_move_by (priv->popover, amount);
-
   priv->in_move_by--;
 }
 
