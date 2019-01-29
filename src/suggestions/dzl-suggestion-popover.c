@@ -35,6 +35,8 @@
 #include "widgets/dzl-list-box.h"
 #include "widgets/dzl-list-box-private.h"
 
+#define DELAYED_POPDOWN_MSEC 100
+
 struct _DzlSuggestionPopover
 {
   GtkWindow           parent_instance;
@@ -60,6 +62,8 @@ struct _DzlSuggestionPopover
   gulong              size_allocate_handler;
   gulong              items_changed_handler;
   gulong              destroy_handler;
+
+  guint               queued_popdown;
 
   PangoEllipsizeMode  subtitle_ellipsize;
   PangoEllipsizeMode  title_ellipsize;
@@ -498,6 +502,8 @@ dzl_suggestion_popover_destroy (GtkWidget *widget)
 {
   DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
 
+  g_clear_handle_id (&self->queued_popdown, g_source_remove);
+
   dzl_suggestion_popover_set_transient_for (self, NULL);
 
   if (self->scroll_anim != NULL)
@@ -768,6 +774,30 @@ dzl_suggestion_popover_popdown (DzlSuggestionPopover *self)
   gtk_revealer_set_reveal_child (self->revealer, FALSE);
 }
 
+static gboolean
+dzl_suggestion_popover_do_queued_popdown (gpointer data)
+{
+  DzlSuggestionPopover *self = data;
+
+  self->queued_popdown = 0;
+
+  if (self->model != NULL && g_list_model_get_n_items (self->model) == 0)
+    dzl_suggestion_popover_popdown (self);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+dzl_suggestion_popover_queue_popdown (DzlSuggestionPopover *self)
+{
+  g_assert (DZL_IS_SUGGESTION_POPOVER (self));
+
+  g_clear_handle_id (&self->queued_popdown, g_source_remove);
+  self->queued_popdown = gdk_threads_add_timeout (DELAYED_POPDOWN_MSEC,
+                                                  dzl_suggestion_popover_do_queued_popdown,
+                                                  self);
+}
+
 static void
 dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
                                       guint                 position,
@@ -785,7 +815,11 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
 
   if (g_list_model_get_n_items (model) == 0)
     {
-      dzl_suggestion_popover_popdown (self);
+      /* do not immediately dismiss, because this might be an
+       * intermittant event only to be followed by an addition
+       * of new items to the GListModel.
+       */
+      dzl_suggestion_popover_queue_popdown (self);
       DZL_EXIT;
     }
 
