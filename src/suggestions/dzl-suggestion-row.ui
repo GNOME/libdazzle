@@ -4,7 +4,6 @@
     <child>
       <object class="GtkBox">
         <property name="orientation">horizontal</property>
-        <property name="spacing">12</property>
         <property name="visible">true</property>
         <child>
           <object class="GtkImage" id="image">
@@ -31,6 +30,7 @@
             <property name="label">—</property>
             <property name="visible">true</property>
             <style>
+              <class name="separator"/>
               <class name="dim-label"/>
             </style>
           </object>

@@ -33,11 +33,17 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row .title {
+  margin-left: 12px;
   color: @theme_fg_color;
 }
 
+dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row .separator {
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row > box {
-  margin: 4px 8px 4px 8px;
+  margin: 4px 8px;
 }
 
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row:last-child {
