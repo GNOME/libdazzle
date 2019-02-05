@@ -244,7 +244,7 @@ dzl_progress_menu_button_set_property (GObject      *object,
       break;
 
     case PROP_SHOW_THEATRIC:
-      dzl_progress_menu_button_set_show_theatric (self, g_value_get_double (value));
+      dzl_progress_menu_button_set_show_theatric (self, g_value_get_boolean (value));
       break;
 
     case PROP_THEATRIC_ICON_NAME:
