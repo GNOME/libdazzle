@@ -1015,3 +1015,24 @@ _dzl_suggestion_entry_reposition (DzlSuggestionEntry   *self,
   gtk_widget_set_size_request (GTK_WIDGET (popover), alloc.width, -1);
   gtk_window_move (GTK_WINDOW (popover), alloc.x, alloc.y);
 }
+
+/**
+ * dzl_suggestion_entry_get_popover:
+ * @self: a #DzlSuggestionEntry
+ *
+ * Gets the result display widget for the entry. This is currently
+ * always a #DzlSuggestionPopover.
+ *
+ * Returns: (transfer none): a #GtkWidget
+ *
+ * Since: 3.32
+ */
+GtkWidget *
+dzl_suggestion_entry_get_popover (DzlSuggestionEntry *self)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SUGGESTION_ENTRY (self), NULL);
+
+  return GTK_WIDGET (priv->popover);
+}

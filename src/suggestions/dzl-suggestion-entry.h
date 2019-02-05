@@ -94,6 +94,8 @@ void           dzl_suggestion_entry_set_activate_on_single_click (DzlSuggestionE
                                                                   gboolean                   activate_on_single_click);
 DZL_AVAILABLE_IN_3_30
 void           dzl_suggestion_entry_hide_suggestions             (DzlSuggestionEntry        *self);
+DZL_AVAILABLE_IN_3_32
+GtkWidget     *dzl_suggestion_entry_get_popover                  (DzlSuggestionEntry        *self);
 
 DZL_AVAILABLE_IN_ALL
 void dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,
