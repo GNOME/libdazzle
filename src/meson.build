@@ -132,7 +132,7 @@ if get_option('with_introspection')
         install_dir_gir: girdir,
     install_dir_typelib: typelibdir,
         export_packages: libdazzle_package,
-             extra_args: [ '--c-include=dazzle.h', '--quiet' ],
+             extra_args: [ '--c-include=dazzle.h', '--quiet', '-DDAZZLE_COMPILATION', ],
   )
 
   if get_option('with_vapi')
