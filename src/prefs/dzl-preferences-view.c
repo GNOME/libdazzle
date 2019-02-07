@@ -48,6 +48,7 @@ typedef struct
   guint                  last_widget_id;
 
   guint                  use_sidebar : 1;
+  guint                  use_search_entry : 1;
 } DzlPreferencesViewPrivate;
 
 typedef struct
@@ -66,6 +67,7 @@ G_DEFINE_TYPE_WITH_CODE (DzlPreferencesView, dzl_preferences_view, GTK_TYPE_BIN,
 enum {
   PROP_0,
   PROP_USE_SIDEBAR,
+  PROP_USE_SEARCH_ENTRY,
   N_PROPS
 };
 
@@ -242,6 +244,10 @@ dzl_preferences_view_get_property (GObject    *object,
       g_value_set_boolean (value, dzl_preferences_view_get_use_sidebar (self));
       break;
 
+    case PROP_USE_SEARCH_ENTRY:
+      g_value_set_boolean (value, dzl_preferences_view_get_use_search_entry (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -259,6 +265,10 @@ dzl_preferences_view_set_property (GObject      *object,
     {
     case PROP_USE_SIDEBAR:
       dzl_preferences_view_set_use_sidebar (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_USE_SEARCH_ENTRY:
+      dzl_preferences_view_set_use_search_entry (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -290,6 +300,13 @@ dzl_preferences_view_class_init (DzlPreferencesViewClass *klass)
     g_param_spec_boolean ("use-sidebar",
                           "Use Sidebar",
                           "Use Sidebar",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_USE_SEARCH_ENTRY] =
+    g_param_spec_boolean ("use-search-entry",
+                          "Use SearchEntry",
+                          "Use SearchEntry in the sidebar",
                           FALSE,
                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
@@ -363,6 +380,7 @@ dzl_preferences_view_init (DzlPreferencesView *self)
   };
 
   priv->use_sidebar = TRUE;
+  priv->use_search_entry = TRUE;
 
   gtk_widget_init_template (GTK_WIDGET (self));
 
@@ -1129,5 +1147,36 @@ dzl_preferences_view_set_use_sidebar (DzlPreferencesView *self,
       gtk_widget_set_visible (GTK_WIDGET (priv->top_stack_switcher), !use_sidebar);
 
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_USE_SIDEBAR]);
+    }
+}
+
+gboolean
+dzl_preferences_view_get_use_search_entry (DzlPreferencesView *self)
+{
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_PREFERENCES_VIEW (self), FALSE);
+
+  return priv->use_search_entry;
+}
+
+void
+dzl_preferences_view_set_use_search_entry (DzlPreferencesView *self,
+                                           gboolean            use_search_entry)
+{
+  DzlPreferencesViewPrivate *priv = dzl_preferences_view_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_PREFERENCES_VIEW (self));
+
+  if (!dzl_preferences_view_get_use_sidebar (self))
+    return;
+
+  if (priv->use_search_entry != use_search_entry)
+    {
+      priv->use_search_entry = use_search_entry;
+
+      gtk_widget_set_visible (GTK_WIDGET (priv->search_entry), use_search_entry);
+
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_USE_SEARCH_ENTRY]);
     }
 }

@@ -41,14 +41,19 @@ struct _DzlPreferencesViewClass
 };
 
 DZL_AVAILABLE_IN_3_28
-GtkWidget *dzl_preferences_view_new             (void);
+GtkWidget *dzl_preferences_view_new                  (void);
 DZL_AVAILABLE_IN_ALL
-void       dzl_preferences_view_reapply_filter  (DzlPreferencesView *self);
+void       dzl_preferences_view_reapply_filter       (DzlPreferencesView *self);
 DZL_AVAILABLE_IN_3_30
-gboolean   dzl_preferences_view_get_use_sidebar (DzlPreferencesView *self);
+gboolean   dzl_preferences_view_get_use_sidebar      (DzlPreferencesView *self);
 DZL_AVAILABLE_IN_3_30
-void       dzl_preferences_view_set_use_sidebar (DzlPreferencesView *self,
-                                                 gboolean            use_sidebar);
+void       dzl_preferences_view_set_use_sidebar      (DzlPreferencesView *self,
+                                                      gboolean            use_sidebar);
+DZL_AVAILABLE_IN_3_30
+gboolean   dzl_preferences_view_get_use_search_entry (DzlPreferencesView *self);
+DZL_AVAILABLE_IN_3_30
+void       dzl_preferences_view_set_use_search_entry (DzlPreferencesView *self,
+                                                      gboolean            use_search_entry);
 
 G_END_DECLS
 
