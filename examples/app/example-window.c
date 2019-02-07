@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include <glib/gi18n.h>
 
 #include "example-window.h"
@@ -171,7 +169,7 @@ example_window_init (ExampleWindow *self)
                     G_CALLBACK (on_page_changed),
                     self);
 
-  dzl_shortcut_manager_add_shortcut_entries (NULL, shortcuts, G_N_ELEMENTS (shortcuts), GETTEXT_PACKAGE);
+  dzl_shortcut_manager_add_shortcut_entries (NULL, shortcuts, G_N_ELEMENTS (shortcuts), NULL);
 
   controller = dzl_shortcut_controller_find (GTK_WIDGET (self));
 

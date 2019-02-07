@@ -33,7 +33,6 @@ config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('lo
 add_project_arguments([
   '-DHAVE_CONFIG_H',
   '-DDAZZLE_COMPILATION',
-  '-I' + meson.build_root(),
 ], language: 'c')
 
 root_inc = include_directories('.')
