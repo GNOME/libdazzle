@@ -86,7 +86,7 @@ dzl_shortcut_chord_compare (const DzlShortcutChord *a,
 }
 
 static gboolean
-dzl_shortcut_chord_is_valid (DzlShortcutChord *self)
+dzl_shortcut_chord_is_valid (const DzlShortcutChord *self)
 {
   g_assert (IS_SHORTCUT_CHORD (self));
 
