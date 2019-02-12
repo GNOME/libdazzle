@@ -296,9 +296,8 @@ dzl_shortcut_chord_copy (const DzlShortcutChord *self)
 }
 
 guint
-dzl_shortcut_chord_hash (gconstpointer data)
+dzl_shortcut_chord_hash (const DzlShortcutChord *self)
 {
-  const DzlShortcutChord *self = data;
   guint hash = 0;
 
   g_assert (IS_SHORTCUT_CHORD (self));
@@ -315,16 +314,16 @@ dzl_shortcut_chord_hash (gconstpointer data)
 }
 
 gboolean
-dzl_shortcut_chord_equal (gconstpointer data1,
-                          gconstpointer data2)
+dzl_shortcut_chord_equal (const DzlShortcutChord *data1,
+                          const DzlShortcutChord *data2)
 {
   if (data1 == data2)
     return TRUE;
   else if (data1 == NULL || data2 == NULL)
     return FALSE;
 
-  return 0 == memcmp (((const DzlShortcutChord *)data1)->keys,
-                      ((const DzlShortcutChord *)data2)->keys,
+  return 0 == memcmp (data1->keys,
+                      data2->keys,
                       sizeof (DzlShortcutChord));
 }
 

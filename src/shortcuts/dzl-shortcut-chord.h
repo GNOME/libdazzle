@@ -69,10 +69,10 @@ DZL_AVAILABLE_IN_ALL
 DzlShortcutMatch        dzl_shortcut_chord_match               (const DzlShortcutChord       *self,
                                                                 const DzlShortcutChord       *other);
 DZL_AVAILABLE_IN_ALL
-guint                   dzl_shortcut_chord_hash                (gconstpointer                 data);
+guint                   dzl_shortcut_chord_hash                (const DzlShortcutChord       *self);
 DZL_AVAILABLE_IN_ALL
-gboolean                dzl_shortcut_chord_equal               (gconstpointer                 data1,
-                                                                gconstpointer                 data2);
+gboolean                dzl_shortcut_chord_equal               (const DzlShortcutChord       *data1,
+                                                                const DzlShortcutChord       *data2);
 DZL_AVAILABLE_IN_ALL
 DzlShortcutChord       *dzl_shortcut_chord_copy                (const DzlShortcutChord       *self);
 DZL_AVAILABLE_IN_ALL
