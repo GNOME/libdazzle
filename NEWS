@@ -1,4 +1,14 @@
 ===============
+Version 3.31.92
+===============
+
+Changes in this release:
+
+ • Cross-compilation fixes
+ • Subproject build fixes
+ • Allow disabling search entry in preferences
+
+===============
 Version 3.31.90
 ===============
 
