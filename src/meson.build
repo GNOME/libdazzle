@@ -100,7 +100,7 @@ endif
 libdazzle = shared_library(
   'dazzle-' + apiversion,
   libdazzle_sources,
-
+      darwin_versions: darwin_versions,
             soversion: 0,
                c_args: libdazzle_args + release_args,
          dependencies: libdazzle_deps,

@@ -1,7 +1,7 @@
 project('libdazzle', 'c',
           version: '3.32.0',
           license: 'GPLv3+',
-    meson_version: '>= 0.47.2',
+    meson_version: '>= 0.48.0',
   default_options: [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=gnu11' ],
 )
 
@@ -25,6 +25,8 @@ endif
 current = dazzle_version_minor * 100 + dazzle_version_micro - dazzle_interface_age
 revision = dazzle_interface_age
 libversion = '@0@.@1@.@2@'.format(soversion, current, revision)
+
+darwin_versions = [current + 1, '@0@.@1@'.format(current + 1, revision)]
 
 config_h = configuration_data()
 config_h.set_quoted('GETTEXT_PACKAGE', 'libdazzle')
