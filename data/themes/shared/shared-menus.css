@@ -6,7 +6,7 @@ button.dzlmenubutton > box > image.arrow {
   margin-left: 3px;
 }
 popover.dzlmenubutton > box {
-  margin: 15px 15px 15px 12px;
+  margin: 8px;
 }
 dzlmenubuttonsection:first-child separator {
   background: none;
