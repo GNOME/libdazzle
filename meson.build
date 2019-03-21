@@ -137,8 +137,7 @@ test_link_args = [
 ]
 if not get_option('buildtype').startswith('debug')
   # TODO: Maybe reuse 'b_ndebug' option
-  add_global_arguments(['-DG_DISABLE_CAST_CHECKS'], language: 'c')
-  release_args += [ '-DG_DISABLE_ASSERT' ]
+  release_args += [ '-DG_DISABLE_ASSERT', '-DG_DISABLE_CAST_CHECKS' ]
   test_link_args += [
     '-Wl,-Bsymbolic',
     '-fno-plt',
