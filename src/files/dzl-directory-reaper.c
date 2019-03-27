@@ -254,6 +254,7 @@ remove_directory_with_children (DzlDirectoryReaper  *self,
       /* If the directory does not exist, nothing to do */
       if (g_error_matches (enum_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
         return TRUE;
+      g_propagate_error (error, g_steal_pointer (&enum_error));
       return FALSE;
     }
 
