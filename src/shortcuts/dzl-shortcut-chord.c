@@ -91,7 +91,7 @@ dzl_shortcut_chord_is_valid (const DzlShortcutChord *self)
   g_assert (IS_SHORTCUT_CHORD (self));
 
   /* Ensure we got a valid first key at least */
-  if (self->keys[0].keyval == 0)
+  if (self->keys[0].keyval == 0 && self->keys[0].modifier == 0)
     return FALSE;
 
   return TRUE;
@@ -103,10 +103,6 @@ dzl_shortcut_chord_new_from_event (const GdkEventKey *key)
   DzlShortcutChord *self;
 
   g_return_val_if_fail (key != NULL, NULL);
-
-  /* Ignore modifier keypresses */
-  if (key->is_modifier)
-    return NULL;
 
   self = g_slice_new0 (DzlShortcutChord);
   self->magic = CHORD_MAGIC;
@@ -168,6 +164,10 @@ dzl_shortcut_chord_append_event (DzlShortcutChord  *self,
 
   for (i = 0; i < G_N_ELEMENTS (self->keys); i++)
     {
+      /* We might have just a state (control, etc), and we want
+       * to consume that if we've gotten another key here. So we
+       * only check against key.keyval.
+       */
       if (self->keys[i].keyval == 0)
         {
           self->keys[i].keyval = gdk_keyval_to_lower (key->keyval);
