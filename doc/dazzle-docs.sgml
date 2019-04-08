@@ -18,10 +18,6 @@
 	common libraries that help you write cleaner and safer code.
       </para>
       <para>
-        The latest version of this API reference is also available
-        <ulink role="online-location" url="https://developer.gnome.org/libdazzle/">online</ulink>.
-      </para>
-      <para>
         If you find any issues in this API reference, please report it
         using <ulink type="http" url="&package_bugreport;">the online
         bug reporting tool</ulink> at bugzilla.gnome.org.
