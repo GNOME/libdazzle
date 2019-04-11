@@ -1,4 +1,15 @@
 ==============
+Version 3.32.1
+==============
+
+Changes in this release:
+
+ • Fix subproject builds
+ • Fix macOS symbol versioning
+ • Fix missing error propagation for reaper task
+ • Fix adwaita menu padding
+
+==============
 Version 3.32.0
 ==============
 
