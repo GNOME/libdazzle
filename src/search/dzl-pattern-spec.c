@@ -36,7 +36,7 @@ G_DEFINE_BOXED_TYPE (DzlPatternSpec, dzl_pattern_spec, dzl_pattern_spec_ref, dzl
  * @short_description: Simple glob-like searching
  *
  * This works similar to #GPatternSpec except the query syntax is different.
- * It tries to mtach word boundaries, but with matching partial words up
+ * It tries to match word boundaries, but with matching partial words up
  * to those boundaries. For example, "gtk widg" would match "gtk_widget_show".
  * Word boundaries include '_' and ' '. If any character is uppercase, then
  * case sensitivity is used.
