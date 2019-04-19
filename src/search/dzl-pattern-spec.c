@@ -127,7 +127,7 @@ dzl_pattern_spec_free (DzlPatternSpec *self)
 static inline gboolean
 is_word_break (gunichar ch)
 {
-  return (ch == ' ' || ch == '_' || ch == '-');
+  return (ch == ' ' || ch == '_' || ch == '-' || ch == '.');
 }
 
 static const gchar *
