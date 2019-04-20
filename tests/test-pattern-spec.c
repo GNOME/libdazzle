@@ -33,6 +33,8 @@ test_basic (void)
     { "dzlpattern", "DzlPatternSpec_autoptr", TRUE },
     { "dzlpattern", "dzl_pattern_spec", FALSE },
     { "dzl pattern", "dzl_pattern_spec", TRUE },
+    { "org", "org.freedesktop.DBus", TRUE },
+    { "org Db", "org.freedesktop.DBus", TRUE },
   };
 
   for (guint i = 0; i < G_N_ELEMENTS (tests); i++)
