@@ -100,7 +100,7 @@ button_clicked_cb (DzlSuggestionButton *self,
   g_assert (DZL_IS_SUGGESTION_BUTTON (self));
   g_assert (GTK_IS_BUTTON (button));
 
-  gtk_entry_set_width_chars (GTK_ENTRY (priv->entry), 5);
+  gtk_entry_set_width_chars (GTK_ENTRY (priv->entry), 1);
   gtk_entry_set_max_width_chars (GTK_ENTRY (priv->entry), 26);
 
   gtk_stack_set_visible_child (GTK_STACK (self), GTK_WIDGET (priv->entry));
