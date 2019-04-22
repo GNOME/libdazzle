@@ -39,7 +39,11 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (DzlSuggestionButton, dzl_suggestion_button, GTK_TYPE_STACK)
+static void buildable_iface_init (GtkBuildableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (DzlSuggestionButton, dzl_suggestion_button, GTK_TYPE_STACK,
+                         G_ADD_PRIVATE (DzlSuggestionButton)
+                         G_IMPLEMENT_INTERFACE (GTK_TYPE_BUILDABLE, buildable_iface_init))
 
 static GParamSpec *properties [N_PROPS];
 
@@ -296,4 +300,28 @@ dzl_suggestion_button_get_button (DzlSuggestionButton *self)
   g_return_val_if_fail (DZL_IS_SUGGESTION_BUTTON (self), NULL);
 
   return priv->button;
+}
+
+static GObject *
+get_internal_child (GtkBuildable *buildable,
+                    GtkBuilder   *builder,
+                    const gchar  *childname)
+{
+  DzlSuggestionButton *self = (DzlSuggestionButton *)buildable;
+  DzlSuggestionButtonPrivate *priv = dzl_suggestion_button_get_instance_private (self);
+
+  g_assert (DZL_IS_SUGGESTION_BUTTON (self));
+
+  if (g_strcmp0 (childname, "entry") == 0)
+    return G_OBJECT (priv->entry);
+  else if (g_strcmp0 (childname, "button") == 0)
+    return G_OBJECT (priv->button);
+  else
+    return NULL;
+}
+
+static void
+buildable_iface_init (GtkBuildableIface *iface)
+{
+  iface->get_internal_child = get_internal_child;
 }
