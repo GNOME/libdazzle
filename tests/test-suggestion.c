@@ -35,6 +35,7 @@ typedef struct
 
 static DzlFuzzyMutableIndex *search_index;
 static gulong notify_suggestion_handler;
+static gulong button_handler;
 static const DemoData demo_data[] = {
   { "web-browser-symbolic", "https://twitter.com", "Twitter", "twitter.com" },
   { "web-browser-symbolic", "https://facebook.com", "Facebook", "facebook.com" },
@@ -218,8 +219,10 @@ search_changed (DzlSuggestionEntry *entry,
   GString *str = g_string_new (NULL);
   AddSearchResults *res = NULL;
   const gchar *text;
+  gulong *handler = user_data;
 
   g_assert (DZL_IS_SUGGESTION_ENTRY (entry));
+  g_assert (handler);
 
   text = dzl_suggestion_entry_get_typed_text (entry);
 
@@ -242,9 +245,9 @@ search_changed (DzlSuggestionEntry *entry,
           /* Update the model, but ignore selection events while
            * that happens so that we don't update the entry box.
            */
-          g_signal_handler_block (entry, notify_suggestion_handler);
+          g_signal_handler_block (entry, *handler);
           dzl_suggestion_entry_set_model (entry, model);
-          g_signal_handler_unblock (entry, notify_suggestion_handler);
+          g_signal_handler_unblock (entry, *handler);
 
           old_model = G_LIST_MODEL (model);
         }
@@ -275,9 +278,9 @@ suggestion_activated (DzlSuggestionEntry *entry,
 
   g_print ("Activated selection: %s\n", uri);
 
-  g_signal_handlers_block_by_func (entry, G_CALLBACK (search_changed), NULL);
+  g_signal_handlers_block_by_func (entry, G_CALLBACK (search_changed), user_data);
   gtk_entry_set_text (GTK_ENTRY (entry), uri);
-  g_signal_handlers_unblock_by_func (entry, G_CALLBACK (search_changed), NULL);
+  g_signal_handlers_unblock_by_func (entry, G_CALLBACK (search_changed), user_data);
 
   g_signal_stop_emission_by_name (entry, "suggestion-activated");
 
@@ -293,10 +296,10 @@ suggestion_selected (DzlSuggestionEntry *entry,
 
   g_print ("Selected suggestion: %s\n", uri);
 
-  g_signal_handlers_block_by_func (entry, G_CALLBACK (search_changed), NULL);
+  g_signal_handlers_block_by_func (entry, G_CALLBACK (search_changed), user_data);
   gtk_entry_set_text (GTK_ENTRY (entry), uri);
   gtk_editable_set_position (GTK_EDITABLE (entry), -1);
-  g_signal_handlers_unblock_by_func (entry, G_CALLBACK (search_changed), NULL);
+  g_signal_handlers_unblock_by_func (entry, G_CALLBACK (search_changed), user_data);
 }
 
 static void
@@ -390,16 +393,16 @@ main (gint   argc,
     g_signal_connect (entry,
                       "notify::suggestion",
                       G_CALLBACK (notify_suggestion_cb),
-                      NULL);
+                      &notify_suggestion_handler);
 #if 0
   dzl_suggestion_entry_set_position_func (DZL_SUGGESTION_ENTRY (entry),
                                           dzl_suggestion_entry_window_position_func,
                                           NULL, NULL);
 #endif
   gtk_box_set_center_widget (GTK_BOX (box), entry);
-  g_signal_connect (entry, "changed", G_CALLBACK (search_changed), NULL);
-  g_signal_connect (entry, "suggestion-activated", G_CALLBACK (suggestion_activated), NULL);
-  g_signal_connect (entry, "suggestion-selected", G_CALLBACK (suggestion_selected), NULL);
+  g_signal_connect (entry, "changed", G_CALLBACK (search_changed), &notify_suggestion_handler);
+  g_signal_connect (entry, "suggestion-activated", G_CALLBACK (suggestion_activated), &notify_suggestion_handler);
+  g_signal_connect (entry, "suggestion-selected", G_CALLBACK (suggestion_selected), &notify_suggestion_handler);
 
   button = g_object_new (GTK_TYPE_BUTTON,
                          "halign", GTK_ALIGN_START,
@@ -417,6 +420,16 @@ main (gint   argc,
 
   g_signal_connect (window, "delete-event", gtk_main_quit, NULL);
   g_signal_connect (window, "key-press-event", G_CALLBACK (key_press), entry);
+
+  button = dzl_suggestion_button_new ();
+  entry = GTK_WIDGET (dzl_suggestion_button_get_entry (DZL_SUGGESTION_BUTTON (button)));
+  button_handler = g_signal_connect (entry, "changed", G_CALLBACK (search_changed), &button_handler);
+  g_signal_connect (entry, "suggestion-activated", G_CALLBACK (suggestion_activated), &button_handler);
+  g_signal_connect (entry, "suggestion-selected", G_CALLBACK (suggestion_selected), &button_handler);
+  g_signal_connect (entry, "notify::suggestion", G_CALLBACK (notify_suggestion_cb), &button_handler);
+  gtk_container_add (GTK_CONTAINER (header), button);
+  gtk_widget_show (button);
+
   gtk_window_present (GTK_WINDOW (window));
 
   gtk_main ();
