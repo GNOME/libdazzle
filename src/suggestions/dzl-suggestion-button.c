@@ -30,6 +30,7 @@ typedef struct
 {
   DzlSuggestionEntry *entry;
   GtkButton          *button;
+  gint                max_width_chars;
 } DzlSuggestionButtonPrivate;
 
 enum {
@@ -72,8 +73,8 @@ entry_focus_in_event_cb (DzlSuggestionButton *self,
   g_assert (DZL_IS_SUGGESTION_BUTTON (self));
   g_assert (DZL_IS_SUGGESTION_ENTRY (entry));
 
-  gtk_entry_set_width_chars (GTK_ENTRY (priv->entry), 5);
-  gtk_entry_set_max_width_chars (GTK_ENTRY (priv->entry), 26);
+  gtk_entry_set_width_chars (GTK_ENTRY (priv->entry), 1);
+  gtk_entry_set_max_width_chars (GTK_ENTRY (priv->entry), priv->max_width_chars ?: 20);
 
   return GDK_EVENT_PROPAGATE;
 }
@@ -99,11 +100,17 @@ static void
 dzl_suggestion_button_begin (DzlSuggestionButton *self)
 {
   DzlSuggestionButtonPrivate *priv = dzl_suggestion_button_get_instance_private (self);
+  gint max_width_chars;
 
   g_assert (DZL_IS_SUGGESTION_BUTTON (self));
 
+  max_width_chars = gtk_entry_get_max_width_chars (GTK_ENTRY (priv->entry));
+
+  if (max_width_chars)
+    priv->max_width_chars = max_width_chars;
+
   gtk_entry_set_width_chars (GTK_ENTRY (priv->entry), 1);
-  gtk_entry_set_max_width_chars (GTK_ENTRY (priv->entry), 26);
+  gtk_entry_set_max_width_chars (GTK_ENTRY (priv->entry), priv->max_width_chars ?: 20);
   gtk_stack_set_visible_child (GTK_STACK (self), GTK_WIDGET (priv->entry));
   gtk_widget_grab_focus (GTK_WIDGET (priv->entry));
 }
