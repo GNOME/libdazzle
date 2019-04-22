@@ -29,6 +29,7 @@
 #include "suggestions/dzl-suggestion-entry-buffer.h"
 #include "suggestions/dzl-suggestion-popover.h"
 #include "suggestions/dzl-suggestion-private.h"
+#include "util/dzl-gtk.h"
 #include "util/dzl-util-private.h"
 
 typedef struct
@@ -59,6 +60,7 @@ enum {
 };
 
 enum {
+  ACTION,
   ACTIVATE_SUGGESTION,
   HIDE_SUGGESTIONS,
   MOVE_SUGGESTION,
@@ -562,6 +564,18 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  signals [ACTION] =
+    g_signal_new_class_handler ("action",
+                                G_TYPE_FROM_CLASS (klass),
+                                G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
+                                G_CALLBACK (dzl_gtk_widget_action_with_string),
+                                NULL, NULL, NULL,
+                                G_TYPE_NONE,
+                                3,
+                                G_TYPE_STRING,
+                                G_TYPE_STRING,
+                                G_TYPE_STRING);
 
   signals [HIDE_SUGGESTIONS] =
     g_signal_new ("hide-suggestions",
