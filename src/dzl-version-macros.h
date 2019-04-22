@@ -44,6 +44,7 @@
 #define DZL_VERSION_3_28 (G_ENCODE_VERSION (3, 28))
 #define DZL_VERSION_3_30 (G_ENCODE_VERSION (3, 30))
 #define DZL_VERSION_3_32 (G_ENCODE_VERSION (3, 32))
+#define DZL_VERSION_3_34 (G_ENCODE_VERSION (3, 34))
 
 #if (DZL_MINOR_VERSION == 99)
 # define DZL_VERSION_CUR_STABLE (G_ENCODE_VERSION (DZL_MAJOR_VERSION + 1, 0))
@@ -156,6 +157,20 @@
 # define DZL_AVAILABLE_IN_3_32                 DZL_UNAVAILABLE(3, 32)
 #else
 # define DZL_AVAILABLE_IN_3_32                 _DZL_EXTERN
+#endif
+
+#if DZL_VERSION_MIN_REQUIRED >= DZL_VERSION_3_34
+# define DZL_DEPRECATED_IN_3_34                DZL_DEPRECATED
+# define DZL_DEPRECATED_IN_3_34_FOR(f)         DZL_DEPRECATED_FOR(f)
+#else
+# define DZL_DEPRECATED_IN_3_34                _DZL_EXTERN
+# define DZL_DEPRECATED_IN_3_34_FOR(f)         _DZL_EXTERN
+#endif
+
+#if DZL_VERSION_MAX_ALLOWED < DZL_VERSION_3_34
+# define DZL_AVAILABLE_IN_3_34                 DZL_UNAVAILABLE(3, 34)
+#else
+# define DZL_AVAILABLE_IN_3_34                 _DZL_EXTERN
 #endif
 
 #endif /* DZL_VERSION_MACROS_H */
