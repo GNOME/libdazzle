@@ -1,4 +1,5 @@
 suggestions_headers = [
+  'dzl-suggestion-button.h',
   'dzl-suggestion-entry-buffer.h',
   'dzl-suggestion-entry.h',
   'dzl-suggestion-popover.h',
@@ -7,6 +8,7 @@ suggestions_headers = [
 ]
 
 suggestions_sources = [
+  'dzl-suggestion-button.c',
   'dzl-suggestion-entry-buffer.c',
   'dzl-suggestion-entry.c',
   'dzl-suggestion-popover.c',

@@ -54,3 +54,11 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row > box > image:first-child {
   min-width: 16px;
 }
+
+/* DzlSuggestionButton */
+button.suggestionbutton entry.suggestion image.left {
+  margin-left: 1px;
+}
+button.suggestionbutton entry.suggestion image.right {
+  margin-right: 1px;
+}

@@ -118,6 +118,7 @@ G_BEGIN_DECLS
 #include "shortcuts/dzl-shortcuts-window.h"
 #include "statemachine/dzl-state-machine-buildable.h"
 #include "statemachine/dzl-state-machine.h"
+#include "suggestions/dzl-suggestion-button.h"
 #include "suggestions/dzl-suggestion-entry-buffer.h"
 #include "suggestions/dzl-suggestion-entry.h"
 #include "suggestions/dzl-suggestion-popover.h"
