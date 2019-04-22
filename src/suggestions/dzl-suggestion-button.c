@@ -92,19 +92,26 @@ entry_focus_out_event_cb (DzlSuggestionButton *self,
 }
 
 static void
-button_clicked_cb (DzlSuggestionButton *self,
-                   GtkButton           *button)
+dzl_suggestion_button_begin (DzlSuggestionButton *self)
 {
   DzlSuggestionButtonPrivate *priv = dzl_suggestion_button_get_instance_private (self);
 
   g_assert (DZL_IS_SUGGESTION_BUTTON (self));
-  g_assert (GTK_IS_BUTTON (button));
 
   gtk_entry_set_width_chars (GTK_ENTRY (priv->entry), 1);
   gtk_entry_set_max_width_chars (GTK_ENTRY (priv->entry), 26);
-
   gtk_stack_set_visible_child (GTK_STACK (self), GTK_WIDGET (priv->entry));
   gtk_widget_grab_focus (GTK_WIDGET (priv->entry));
+}
+
+static void
+button_clicked_cb (DzlSuggestionButton *self,
+                   GtkButton           *button)
+{
+  g_assert (DZL_IS_SUGGESTION_BUTTON (self));
+  g_assert (GTK_IS_BUTTON (button));
+
+  dzl_suggestion_button_begin (self);
 }
 
 static void
@@ -136,11 +143,10 @@ static void
 dzl_suggestion_button_grab_focus (GtkWidget *widget)
 {
   DzlSuggestionButton *self = (DzlSuggestionButton *)widget;
-  DzlSuggestionButtonPrivate *priv = dzl_suggestion_button_get_instance_private (self);
 
   g_assert (DZL_IS_SUGGESTION_BUTTON (self));
 
-  gtk_widget_grab_focus (GTK_WIDGET (priv->entry));
+  dzl_suggestion_button_begin (self);
 }
 
 static void
