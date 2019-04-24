@@ -59,23 +59,23 @@ struct _DzlApplicationClass
 };
 
 DZL_AVAILABLE_IN_3_34
-DzlApplication     *dzl_application_new                  (const gchar *application_id,
-                                                          GApplicationFlags flags);
+DzlApplication     *dzl_application_new                  (const gchar       *application_id,
+                                                          GApplicationFlags  flags);
 DZL_AVAILABLE_IN_ALL
-DzlMenuManager     *dzl_application_get_menu_manager     (DzlApplication *self);
+DzlMenuManager     *dzl_application_get_menu_manager     (DzlApplication    *self);
 DZL_AVAILABLE_IN_ALL
-DzlShortcutManager *dzl_application_get_shortcut_manager (DzlApplication *self);
+DzlShortcutManager *dzl_application_get_shortcut_manager (DzlApplication    *self);
 DZL_AVAILABLE_IN_ALL
-DzlThemeManager    *dzl_application_get_theme_manager    (DzlApplication *self);
+DzlThemeManager    *dzl_application_get_theme_manager    (DzlApplication    *self);
 DZL_AVAILABLE_IN_ALL
-GMenu              *dzl_application_get_menu_by_id       (DzlApplication *self,
-                                                          const gchar    *menu_id);
+GMenu              *dzl_application_get_menu_by_id       (DzlApplication    *self,
+                                                          const gchar       *menu_id);
 DZL_AVAILABLE_IN_ALL
-void                dzl_application_add_resources        (DzlApplication *self,
-                                                          const gchar    *resource_path);
+void                dzl_application_add_resources        (DzlApplication    *self,
+                                                          const gchar       *resource_path);
 DZL_AVAILABLE_IN_ALL
-void                dzl_application_remove_resources     (DzlApplication *self,
-                                                          const gchar    *resource_path);
+void                dzl_application_remove_resources     (DzlApplication    *self,
+                                                          const gchar       *resource_path);
 
 G_END_DECLS
 
