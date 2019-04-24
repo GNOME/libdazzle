@@ -30,12 +30,18 @@ G_BEGIN_DECLS
 DZL_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (DzlBoldingLabel, dzl_bolding_label, DZL, BOLDING_LABEL, GtkLabel)
 
+DZL_AVAILABLE_IN_3_34
+DzlBoldingLabel *dzl_bolding_label_new               (const gchar     *str,
+                                                      gboolean         bold);
+DZL_AVAILABLE_IN_3_34
+DzlBoldingLabel *dzl_bolding_label_new_with_mnemonic (const gchar     *str,
+                                                      gboolean         bold);
 DZL_AVAILABLE_IN_ALL
-void dzl_bolding_label_set_weight (DzlBoldingLabel *self,
-                                   PangoWeight      weight);
+void             dzl_bolding_label_set_weight        (DzlBoldingLabel *self,
+                                                      PangoWeight      weight);
 DZL_AVAILABLE_IN_ALL
-void dzl_bolding_label_set_bold   (DzlBoldingLabel *self,
-                                   gboolean         bold);
+void             dzl_bolding_label_set_bold          (DzlBoldingLabel *self,
+                                                      gboolean         bold);
 
 G_END_DECLS
 

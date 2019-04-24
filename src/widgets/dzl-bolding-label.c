@@ -53,6 +53,38 @@ enum {
 
 static GParamSpec *properties [N_PROPS];
 
+DzlBoldingLabel *
+dzl_bolding_label_new (const gchar *str,
+                       gboolean     bold)
+{
+  DzlBoldingLabel *label;
+
+  label = g_object_new (DZL_TYPE_BOLDING_LABEL,
+                        "bold", bold,
+                        NULL);
+
+  if (str && *str)
+    gtk_label_set_text (GTK_LABEL (label), str);
+
+  return label;
+}
+
+DzlBoldingLabel *
+dzl_bolding_label_new_with_mnemonic (const gchar *str,
+                                     gboolean     bold)
+{
+  DzlBoldingLabel *label;
+
+  label = g_object_new (DZL_TYPE_BOLDING_LABEL,
+                        "bold", bold,
+                        NULL);
+
+  if (str && *str)
+    gtk_label_set_text_with_mnemonic (GTK_LABEL (label), str);
+
+  return label;
+}
+
 static void
 dzl_bolding_label_get_preferred_width (GtkWidget *widget,
                                        gint      *min_width,
