@@ -58,6 +58,9 @@ struct _DzlApplicationClass
   gpointer _reserved8;
 };
 
+DZL_AVAILABLE_IN_3_34
+DzlApplication     *dzl_application_new                  (const gchar *application_id,
+                                                          GApplicationFlags flags);
 DZL_AVAILABLE_IN_ALL
 DzlMenuManager     *dzl_application_get_menu_manager     (DzlApplication *self);
 DZL_AVAILABLE_IN_ALL
