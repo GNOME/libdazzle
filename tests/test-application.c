@@ -25,9 +25,7 @@ test_app_basic (void)
   g_autoptr(DzlApplication) app = NULL;
   int ret;
 
-  app = g_object_new (DZL_TYPE_APPLICATION,
-                      "application-id", "org.gnome.FooTest",
-                      NULL);
+  app = dzl_application_new ("org.gnome.FooTest", G_APPLICATION_FLAGS_NONE);
   g_signal_connect (app, "activate", G_CALLBACK (on_activate), NULL);
   ret = g_application_run (G_APPLICATION (app), g_argc, g_argv);
   g_assert_cmpint (ret, ==, EXIT_SUCCESS);

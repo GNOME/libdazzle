@@ -89,6 +89,18 @@ static GParamSpec *properties [N_PROPS];
 
 G_DEFINE_TYPE_WITH_PRIVATE (DzlApplication, dzl_application, GTK_TYPE_APPLICATION)
 
+DzlApplication *
+dzl_application_new (const gchar *application_id,
+                     GApplicationFlags flags)
+{
+  g_return_val_if_fail (application_id == NULL || g_application_id_is_valid (application_id), NULL);
+
+  return g_object_new (DZL_TYPE_APPLICATION,
+                       "application-id", application_id,
+                       "flags", flags,
+                       NULL);
+}
+
 static void
 dzl_application_real_add_resources (DzlApplication *self,
                                     const gchar    *resource_path)
