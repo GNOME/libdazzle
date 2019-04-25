@@ -156,7 +156,7 @@ dzl_suggestion_row_get_property (GObject    *object,
     case PROP_ORIENTATION:
       g_value_set_enum (value, priv->orientation);
       break;
- 
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -178,11 +178,13 @@ dzl_suggestion_row_set_property (GObject      *object,
       break;
 
     case PROP_ORIENTATION:
-      priv->orientation = g_value_get_enum (value);
-      if (priv->orientation == GTK_ORIENTATION_VERTICAL)
-        gtk_widget_set_visible (GTK_WIDGET (priv->separator), FALSE);
-
-      gtk_orientable_set_orientation (GTK_ORIENTABLE (priv->box), priv->orientation);
+      if (priv->orientation != g_value_get_enum (value))
+        {
+          priv->orientation = g_value_get_enum (value);
+          gtk_widget_set_visible (GTK_WIDGET (priv->separator),
+                                  priv->orientation != GTK_ORIENTATION_VERTICAL);
+          gtk_orientable_set_orientation (GTK_ORIENTABLE (priv->box), priv->orientation);
+        }
       break;
 
     default:
@@ -214,7 +216,7 @@ dzl_suggestion_row_class_init (DzlSuggestionRowClass *klass)
                        GTK_TYPE_ORIENTATION,
                        GTK_ORIENTATION_VERTICAL,
                        (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
- 
+
    g_object_class_install_properties (object_class, N_PROPS, properties);
 
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/dazzle/ui/dzl-suggestion-row.ui");
