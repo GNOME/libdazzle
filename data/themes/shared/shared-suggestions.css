@@ -37,6 +37,10 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
   color: @theme_fg_color;
 }
 
+dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row box.vertical .subtitle {
+  margin-left: 12px;
+}
+
 dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row .separator {
   margin-left: 12px;
   margin-right: 12px;

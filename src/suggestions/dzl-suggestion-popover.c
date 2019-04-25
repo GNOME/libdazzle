@@ -75,6 +75,7 @@ struct _DzlSuggestionPopover
   guint               popup_requested : 1;
   guint               entry_focused : 1;
   guint               has_grab : 1;
+  guint               compact : 1;
 };
 
 enum {
@@ -500,6 +501,7 @@ attach_cb (DzlListBox    *list_box,
   _dzl_suggestion_row_set_ellipsize (DZL_SUGGESTION_ROW (row),
                                      self->title_ellipsize,
                                      self->subtitle_ellipsize);
+  gtk_orientable_set_orientation (GTK_ORIENTABLE (row), self->compact ? GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL);
 }
 
 static gboolean
@@ -1339,4 +1341,11 @@ _dzl_suggestion_popover_set_device (DzlSuggestionPopover *self,
         gdk_seat_ungrab (gdk_device_get_seat (self->grab_device));
       g_set_object (&self->grab_device, device);
     }
+}
+
+void
+dzl_suggestion_popover_set_compact (DzlSuggestionPopover *self,
+                                    gboolean              compact)
+{
+  self->compact = compact;
 }
