@@ -478,7 +478,7 @@ dzl_shortcut_tooltip_set_widget (DzlShortcutTooltip *self,
  *
  * Returns: (nullable): an override accel, or %NULL
  *
- * Since: 3.320
+ * Since: 3.32
  */
 const gchar *
 dzl_shortcut_tooltip_get_accel (DzlShortcutTooltip *self)
