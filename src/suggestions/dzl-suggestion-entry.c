@@ -45,6 +45,7 @@ typedef struct
   GDestroyNotify             func_data_destroy;
 
   guint                      activate_on_single_click : 1;
+  guint                      compact : 1;
 
   gint                       in_key_press;
   gint                       in_move_by;
@@ -53,6 +54,7 @@ typedef struct
 enum {
   PROP_0,
   PROP_ACTIVATE_ON_SINGLE_CLICK,
+  PROP_COMPACT,
   PROP_MODEL,
   PROP_TYPED_TEXT,
   PROP_SUGGESTION,
@@ -453,6 +455,10 @@ dzl_suggestion_entry_get_property (GObject    *object,
       g_value_set_boolean (value, dzl_suggestion_entry_get_activate_on_single_click (self));
       break;
 
+    case PROP_COMPACT:
+      g_value_set_boolean (value, dzl_suggestion_entry_get_compact (self));
+      break;
+
     case PROP_MODEL:
       g_value_set_object (value, dzl_suggestion_entry_get_model (self));
       break;
@@ -482,6 +488,10 @@ dzl_suggestion_entry_set_property (GObject      *object,
     {
     case PROP_ACTIVATE_ON_SINGLE_CLICK:
       dzl_suggestion_entry_set_activate_on_single_click (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_COMPACT:
+      dzl_suggestion_entry_set_compact (self, g_value_get_boolean (value));
       break;
 
     case PROP_MODEL:
@@ -534,6 +544,22 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
                           "If entries should be activated upon a single click",
                           FALSE,
                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  /**
+   * DzlSuggestionEntry:compact:
+   *
+   * The "compact" property denotes if an alternate style should be used to
+   * reduce the width of the rows. This may be ideal in size contrained
+   * situations with portrait display.
+   *
+   * Since: 3.34
+   */
+  properties [PROP_COMPACT] =
+    g_param_spec_boolean ("compact",
+                          "Compact",
+                          "If compact mode should be used",
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_MODEL] =
     g_param_spec_object ("model",
@@ -1051,11 +1077,49 @@ dzl_suggestion_entry_get_popover (DzlSuggestionEntry *self)
   return GTK_WIDGET (priv->popover);
 }
 
+/**
+ * dzl_suggestion_entry_set_compact:
+ * @self: a #DzlSuggestionEntry
+ * @compact: if compact mode should be used
+ *
+ * Sets the #DzlSuggestionEntry:compact property.
+ *
+ * Since: 3.34
+ */
 void
 dzl_suggestion_entry_set_compact (DzlSuggestionEntry *self,
                                   gboolean            compact)
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
 
+  g_return_if_fail (DZL_IS_SUGGESTION_ENTRY (self));
+
+  compact = !!compact;
+
+  if (priv->compact != compact)
+    {
+      priv->compact = compact;
       _dzl_suggestion_popover_set_compact (priv->popover, compact);
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_COMPACT]);
+    }
+}
+
+/**
+ * dzl_suggestion_entry_get_compact:
+ * @self: a #DzlSuggestionEntry
+ *
+ * Gets the #DzlSuggestionEntry:compact property.
+ *
+ * Returns: %TRUE if compact-mode is in use.
+ *
+ * Since: 3.34
+ */
+gboolean
+dzl_suggestion_entry_get_compact (DzlSuggestionEntry *self)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SUGGESTION_ENTRY (self), FALSE);
+
+  return priv->compact;
 }

@@ -96,6 +96,11 @@ DZL_AVAILABLE_IN_3_30
 void           dzl_suggestion_entry_hide_suggestions             (DzlSuggestionEntry        *self);
 DZL_AVAILABLE_IN_3_32
 GtkWidget     *dzl_suggestion_entry_get_popover                  (DzlSuggestionEntry        *self);
+DZL_AVAILABLE_IN_3_34
+gboolean       dzl_suggestion_entry_get_compact                  (DzlSuggestionEntry        *self);
+DZL_AVAILABLE_IN_3_34
+void           dzl_suggestion_entry_set_compact                  (DzlSuggestionEntry        *self,
+                                                                  gboolean                   compact);
 
 DZL_AVAILABLE_IN_ALL
 void dzl_suggestion_entry_default_position_func (DzlSuggestionEntry *self,
@@ -107,10 +112,6 @@ void dzl_suggestion_entry_window_position_func  (DzlSuggestionEntry *self,
                                                  GdkRectangle       *area,
                                                  gboolean           *is_absolute,
                                                  gpointer            user_data);
-
-DZL_AVAILABLE_IN_3_34
-void dzl_suggestion_entry_set_compact           (DzlSuggestionEntry *self,
-                                                 gboolean            compact);
 
 G_END_DECLS
 
