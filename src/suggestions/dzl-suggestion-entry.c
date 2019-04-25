@@ -1057,5 +1057,5 @@ dzl_suggestion_entry_set_compact (DzlSuggestionEntry *self,
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
 
-  dzl_suggestion_popover_set_compact (priv->popover, compact);
+      _dzl_suggestion_popover_set_compact (priv->popover, compact);
 }

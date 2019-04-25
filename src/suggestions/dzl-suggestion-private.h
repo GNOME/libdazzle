@@ -26,6 +26,8 @@
 
 void _dzl_suggestion_entry_reposition       (DzlSuggestionEntry   *entry,
                                              DzlSuggestionPopover *popover);
+void _dzl_suggestion_popover_set_compact    (DzlSuggestionPopover *self,
+                                             gboolean              compact);
 void _dzl_suggestion_popover_set_device     (DzlSuggestionPopover *self,
                                              GdkDevice            *device);
 void _dzl_suggestion_popover_set_focused    (DzlSuggestionPopover *self,

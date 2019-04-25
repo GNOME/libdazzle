@@ -1344,7 +1344,7 @@ _dzl_suggestion_popover_set_device (DzlSuggestionPopover *self,
 }
 
 void
-dzl_suggestion_popover_set_compact (DzlSuggestionPopover *self,
+_dzl_suggestion_popover_set_compact (DzlSuggestionPopover *self,
                                     gboolean              compact)
 {
   self->compact = compact;
