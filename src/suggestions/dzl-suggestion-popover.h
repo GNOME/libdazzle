@@ -58,6 +58,9 @@ void           dzl_suggestion_popover_set_selected      (DzlSuggestionPopover *s
 DZL_AVAILABLE_IN_ALL
 void           dzl_suggestion_popover_activate_selected (DzlSuggestionPopover *self);
 
+void           dzl_suggestion_popover_set_compact       (DzlSuggestionPopover *self,
+                                                         gboolean              compact);
+
 G_END_DECLS
 
 #endif /* DZL_SUGGESTION_POPOVER_H */

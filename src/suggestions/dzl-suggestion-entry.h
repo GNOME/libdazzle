@@ -108,6 +108,10 @@ void dzl_suggestion_entry_window_position_func  (DzlSuggestionEntry *self,
                                                  gboolean           *is_absolute,
                                                  gpointer            user_data);
 
+DZL_AVAILABLE_IN_3_34
+void dzl_suggestion_entry_set_compact           (DzlSuggestionEntry *self,
+                                                 gboolean            compact);
+
 G_END_DECLS
 
 #endif /* DZL_SUGGESTION_ENTRY_H */

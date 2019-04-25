@@ -1050,3 +1050,12 @@ dzl_suggestion_entry_get_popover (DzlSuggestionEntry *self)
 
   return GTK_WIDGET (priv->popover);
 }
+
+void
+dzl_suggestion_entry_set_compact (DzlSuggestionEntry *self,
+                                  gboolean            compact)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  dzl_suggestion_popover_set_compact (priv->popover, compact);
+}
