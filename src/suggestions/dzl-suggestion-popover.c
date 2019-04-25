@@ -1343,9 +1343,35 @@ _dzl_suggestion_popover_set_device (DzlSuggestionPopover *self,
     }
 }
 
+static void
+make_rows_vertical (GtkWidget *row,
+                    gpointer   user_data)
+{
+  gtk_orientable_set_orientation (GTK_ORIENTABLE (row), GTK_ORIENTATION_VERTICAL);
+}
+
+static void
+make_rows_horizontal (GtkWidget *row,
+                      gpointer   user_data)
+{
+  gtk_orientable_set_orientation (GTK_ORIENTABLE (row), GTK_ORIENTATION_HORIZONTAL);
+}
+
 void
 _dzl_suggestion_popover_set_compact (DzlSuggestionPopover *self,
-                                    gboolean              compact)
+                                     gboolean              compact)
 {
-  self->compact = compact;
+  g_return_if_fail (DZL_IS_SUGGESTION_POPOVER (self));
+
+  compact = !!compact;
+
+  if (compact != self->compact)
+    {
+      self->compact = compact;
+
+      if (compact)
+        gtk_container_foreach (GTK_CONTAINER (self->list_box), make_rows_vertical, NULL);
+      else
+        gtk_container_foreach (GTK_CONTAINER (self->list_box), make_rows_horizontal, NULL);
+    }
 }
