@@ -363,7 +363,6 @@ dzl_tab_strip_child_icon_name_changed (DzlTabStrip *self,
                                        GParamSpec  *pspec,
                                        GtkWidget   *child)
 {
-  gchar *icon_name = NULL;
   GtkWidget *parent;
   DzlTab *tab;
 
@@ -379,13 +378,22 @@ dzl_tab_strip_child_icon_name_changed (DzlTabStrip *self,
 
   g_assert (GTK_IS_STACK (parent));
 
-  gtk_container_child_get (GTK_CONTAINER (parent), child,
-                           "icon-name", &icon_name,
-                           NULL);
+  if (DZL_IS_DOCK_ITEM (child))
+    {
+      g_autoptr(GIcon) gicon = NULL;
 
-  dzl_tab_set_icon_name (tab, icon_name);
+      gicon = dzl_dock_item_ref_gicon (DZL_DOCK_ITEM (child));
+      dzl_tab_set_gicon (tab, gicon);
+    }
+  else
+    {
+      g_autofree gchar *icon_name = NULL;
 
-  g_free (icon_name);
+      gtk_container_child_get (GTK_CONTAINER (parent), child,
+                               "icon-name", &icon_name,
+                               NULL);
+      dzl_tab_set_icon_name (tab, icon_name);
+    }
 }
 
 static void
@@ -423,6 +431,20 @@ dzl_tab_strip_tab_clicked (DzlTabStrip *self,
       if (dzl_tab_get_active (tab))
         gtk_widget_grab_focus (widget);
     }
+}
+
+static void
+dzl_tab_strip_gicon_changed (DzlDockItem *item,
+                             GParamSpec  *pspec,
+                             DzlTab      *tab)
+{
+  g_autoptr(GIcon) icon = NULL;
+
+  g_assert (DZL_IS_DOCK_ITEM (item));
+  g_assert (DZL_IS_TAB (tab));
+
+  if ((icon = dzl_dock_item_ref_gicon (item)))
+    dzl_tab_set_gicon (tab, icon);
 }
 
 static void
@@ -477,6 +499,13 @@ dzl_tab_strip_stack_add (DzlTabStrip *self,
                            self,
                            G_CONNECT_SWAPPED);
 
+  if (DZL_IS_DOCK_ITEM (widget))
+    g_signal_connect_object (widget,
+                             "notify::gicon",
+                             G_CALLBACK (dzl_tab_strip_gicon_changed),
+                             tab,
+                             0);
+
   gtk_container_add_with_properties (GTK_CONTAINER (self), GTK_WIDGET (tab),
                                      "pack-type", GTK_PACK_START,
                                      "expand", TRUE,
@@ -489,7 +518,10 @@ dzl_tab_strip_stack_add (DzlTabStrip *self,
     g_object_bind_property (widget, "can-close", tab, "can-close", 0);
 
   dzl_tab_strip_child_title_changed (self, NULL, widget);
-  dzl_tab_strip_child_icon_name_changed (self, NULL, widget);
+  if (DZL_IS_DOCK_ITEM (widget))
+    dzl_tab_strip_gicon_changed (DZL_DOCK_ITEM (widget), NULL, tab);
+  else
+    dzl_tab_strip_child_icon_name_changed (self, NULL, widget);
   dzl_tab_strip_stack_notify_visible_child (self, NULL, stack);
 }
 

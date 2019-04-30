@@ -30,6 +30,9 @@
 
 G_BEGIN_DECLS
 
+DZL_AVAILABLE_IN_3_34
+void             dzl_tab_set_gicon      (DzlTab          *self,
+                                         GIcon           *gicon);
 DZL_AVAILABLE_IN_ALL
 const gchar     *dzl_tab_get_icon_name  (DzlTab          *self);
 DZL_AVAILABLE_IN_ALL

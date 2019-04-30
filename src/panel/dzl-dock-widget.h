@@ -51,6 +51,9 @@ void       dzl_dock_widget_set_title     (DzlDockWidget *self,
 DZL_AVAILABLE_IN_ALL
 void       dzl_dock_widget_set_icon_name (DzlDockWidget *self,
                                           const gchar   *icon_name);
+DZL_AVAILABLE_IN_3_34
+void       dzl_dock_widget_set_gicon     (DzlDockWidget *self,
+                                          GIcon         *gicon);
 
 G_END_DECLS
 

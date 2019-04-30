@@ -709,3 +709,30 @@ dzl_dock_item_emit_presented (DzlDockItem *self)
 
   g_signal_emit (self, signals [PRESENTED], 0);
 }
+
+/**
+ * dzl_dock_item_ref_gicon:
+ * @self: a #DzlDockItem
+ *
+ * Gets a #GIcon for the dock item, if any has been set.
+ *
+ * If an icon-name has been set, a new #GIcon for that icon-name
+ * may be returned.
+ *
+ * Returns: (transfer full) (nullable): a #GIcon or %NULL
+ *
+ * Since: 3.34
+ */
+GIcon *
+dzl_dock_item_ref_gicon (DzlDockItem *self)
+{
+  g_autofree gchar *icon_name = NULL;
+
+  if (DZL_DOCK_ITEM_GET_IFACE (self)->ref_gicon)
+    return DZL_DOCK_ITEM_GET_IFACE (self)->ref_gicon (self);
+
+  if ((icon_name = dzl_dock_item_get_icon_name (self)))
+    return g_themed_icon_new (icon_name);
+
+  return NULL;
+}

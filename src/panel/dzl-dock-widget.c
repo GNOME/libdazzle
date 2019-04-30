@@ -28,6 +28,7 @@ typedef struct
 {
   gchar *title;
   gchar *icon_name;
+  GIcon *gicon;
   guint can_close : 1;
 } DzlDockWidgetPrivate;
 
@@ -40,6 +41,7 @@ G_DEFINE_TYPE_EXTENDED (DzlDockWidget, dzl_dock_widget, DZL_TYPE_BIN, 0,
 enum {
   PROP_0,
   PROP_CAN_CLOSE,
+  PROP_GICON,
   PROP_ICON_NAME,
   PROP_MANAGER,
   PROP_TITLE,
@@ -140,6 +142,10 @@ dzl_dock_widget_get_property (GObject    *object,
       g_value_set_boolean (value, dzl_dock_widget_get_can_close (DZL_DOCK_ITEM (self)));
       break;
 
+    case PROP_GICON:
+      g_value_take_object (value, dzl_dock_item_ref_gicon (DZL_DOCK_ITEM (self)));
+      break;
+
     case PROP_ICON_NAME:
       g_value_take_string (value, dzl_dock_widget_item_get_icon_name (DZL_DOCK_ITEM (self)));
       break;
@@ -169,6 +175,10 @@ dzl_dock_widget_set_property (GObject      *object,
     {
     case PROP_CAN_CLOSE:
       dzl_dock_widget_set_can_close (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_GICON:
+      dzl_dock_widget_set_gicon (self, g_value_get_object (value));
       break;
 
     case PROP_ICON_NAME:
@@ -206,6 +216,13 @@ dzl_dock_widget_class_init (DzlDockWidgetClass *klass)
                           "If the dock widget can be closed by the user",
                           FALSE,
                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_GICON] =
+    g_param_spec_object ("gicon",
+                         "GIcon",
+                         "The GIcon to be displayed",
+                         G_TYPE_ICON,
+                         (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   properties [PROP_ICON_NAME] =
     g_param_spec_string ("icon-name",
@@ -274,8 +291,42 @@ dzl_dock_widget_set_icon_name (DzlDockWidget *self,
     {
       g_free (priv->icon_name);
       priv->icon_name = g_strdup (icon_name);
+      g_clear_object (&priv->gicon);
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ICON_NAME]);
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_GICON]);
     }
+}
+
+void
+dzl_dock_widget_set_gicon (DzlDockWidget *self,
+                           GIcon         *gicon)
+{
+  DzlDockWidgetPrivate *priv = dzl_dock_widget_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_DOCK_WIDGET (self));
+  g_return_if_fail (!gicon || G_IS_ICON (gicon));
+
+  if (g_set_object (&priv->gicon, gicon))
+    {
+      g_clear_pointer (&priv->icon_name, g_free);
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ICON_NAME]);
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_GICON]);
+    }
+}
+
+static GIcon *
+dzl_dock_widget_ref_gicon (DzlDockItem *item)
+{
+  DzlDockWidget *self = DZL_DOCK_WIDGET (item);
+  DzlDockWidgetPrivate *priv = dzl_dock_widget_get_instance_private (self);
+
+  if (priv->icon_name != NULL)
+    return g_themed_icon_new (priv->icon_name);
+
+  if (priv->gicon != NULL)
+    return g_object_ref (priv->gicon);
+
+  return NULL;
 }
 
 static void
@@ -284,4 +335,5 @@ dock_item_iface_init (DzlDockItemInterface *iface)
   iface->get_can_close = dzl_dock_widget_get_can_close;
   iface->get_title = dzl_dock_widget_item_get_title;
   iface->get_icon_name = dzl_dock_widget_item_get_icon_name;
+  iface->ref_gicon = dzl_dock_widget_ref_gicon;
 }

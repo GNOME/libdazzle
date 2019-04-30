@@ -914,6 +914,18 @@ dzl_tab_set_title (DzlTab      *self,
   gtk_label_set_label (priv->title, title);
 }
 
+void
+dzl_tab_set_gicon (DzlTab *self,
+                   GIcon  *gicon)
+{
+  DzlTabPrivate *priv = dzl_tab_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_TAB (self));
+  g_return_if_fail (!gicon || G_IS_ICON (gicon));
+
+  g_object_set (priv->image, "gicon", gicon, NULL);
+}
+
 const gchar *
 dzl_tab_get_icon_name (DzlTab *self)
 {

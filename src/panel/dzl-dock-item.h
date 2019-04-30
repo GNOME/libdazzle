@@ -58,6 +58,7 @@ struct _DzlDockItemInterface
   void            (*release)            (DzlDockItem     *self,
                                          DzlDockItem     *child);
   void            (*presented)          (DzlDockItem     *self);
+  GIcon          *(*ref_gicon)          (DzlDockItem     *self);
 };
 
 DZL_AVAILABLE_IN_ALL
@@ -105,6 +106,9 @@ void            dzl_dock_item_release           (DzlDockItem     *self,
                                                  DzlDockItem     *child);
 DZL_AVAILABLE_IN_3_30
 void            dzl_dock_item_emit_presented    (DzlDockItem     *self);
+DZL_AVAILABLE_IN_3_34
+GIcon          *dzl_dock_item_ref_gicon         (DzlDockItem     *self);
+G_GNUC_INTERNAL
 void            _dzl_dock_item_printf           (DzlDockItem     *self);
 
 G_END_DECLS
