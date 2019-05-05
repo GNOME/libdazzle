@@ -498,9 +498,6 @@ dzl_shortcut_theme_set_chord_for_action (DzlShortcutTheme       *self,
     dzl_shortcut_chord_table_add (priv->actions_table, chord,
                                   (gpointer)detailed_action_name);
 
-  if (phase == DZL_SHORTCUT_PHASE_DISPATCH)
-    phase = DZL_SHORTCUT_PHASE_BUBBLE | DZL_SHORTCUT_PHASE_GLOBAL;
-
   if (!g_hash_table_contains (priv->chains, detailed_action_name))
     {
       DzlShortcutClosureChain *chain;
@@ -589,9 +586,6 @@ dzl_shortcut_theme_set_chord_for_command (DzlShortcutTheme       *self,
 
   if (chord != NULL)
     dzl_shortcut_chord_table_add (priv->commands_table, chord, (gpointer)command);
-
-  if (phase == DZL_SHORTCUT_PHASE_DISPATCH)
-    phase = DZL_SHORTCUT_PHASE_BUBBLE | DZL_SHORTCUT_PHASE_GLOBAL;
 
   if (!g_hash_table_contains (priv->chains, command))
     {
