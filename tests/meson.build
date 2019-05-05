@@ -398,4 +398,11 @@ test_shortcut_tooltip = executable('test-shortcut-tooltip', 'test-shortcut-toolt
   dependencies: libdazzle_deps + [libdazzle_dep],
 )
 
+test_fuzzy_highlight = executable('test-fuzzy-highlight', 'test-fuzzy-highlight.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-fuzzy-highlight', test_fuzzy_highlight, env: test_env)
+
 endif

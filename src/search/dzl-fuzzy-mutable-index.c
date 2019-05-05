@@ -595,16 +595,21 @@ dzl_fuzzy_highlight (const gchar *str,
 
       if (str_ch == '&')
         {
-          if (0 == strncmp (str, "&amp;", 5))
+          const gchar *entity_end = strchr (str, ';');
+
+          if (entity_end != NULL)
             {
-              str += 4;
-              g_string_append (ret, "&amp;");
-              continue;
-            }
-          else if (0 == strncmp (str, "&apos;", 6))
-            {
-              str += 5;
-              g_string_append (ret, "&apos;");
+              gsize len = entity_end - str;
+
+              if (element_open)
+                {
+                  g_string_append (ret, end);
+                  element_open = FALSE;
+                }
+
+              g_string_append_len (ret, str, len + 1);
+              str += len;
+
               continue;
             }
         }
@@ -618,7 +623,12 @@ dzl_fuzzy_highlight (const gchar *str,
               element_open = TRUE;
             }
 
-          g_string_append_unichar (ret, str_ch);
+          if (str_ch == '<')
+            g_string_append (ret, "&lt;");
+          else if (str_ch == '>')
+            g_string_append (ret, "&gt;");
+          else
+            g_string_append_unichar (ret, str_ch);
 
           /* TODO: We could seek to the next char and append in a batch. */
           match = g_utf8_next_char (match);
@@ -631,7 +641,12 @@ dzl_fuzzy_highlight (const gchar *str,
               element_open = FALSE;
             }
 
-          g_string_append_unichar (ret, str_ch);
+          if (str_ch == '<')
+            g_string_append (ret, "&lt;");
+          else if (str_ch == '>')
+            g_string_append (ret, "&gt;");
+          else
+            g_string_append_unichar (ret, str_ch);
         }
     }
 
