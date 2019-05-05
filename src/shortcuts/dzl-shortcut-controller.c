@@ -857,6 +857,9 @@ dzl_shortcut_controller_do_global (DzlShortcutController  *self,
   g_assert ((phase & DZL_SHORTCUT_PHASE_GLOBAL) != 0);
   g_assert (GTK_IS_WIDGET (widget));
 
+  if (!priv->have_global)
+    return DZL_SHORTCUT_MATCH_NONE;
+
   manager = dzl_shortcut_controller_get_manager (self);
   g_assert (DZL_IS_SHORTCUT_CONTROLLER (self));
 
