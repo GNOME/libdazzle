@@ -651,7 +651,7 @@ dzl_tab_get_property (GObject    *object,
       break;
 
     case PROP_ACTION_TARGET:
-      g_value_set_boxed (value, priv->action_target_value);
+      g_value_set_variant (value, priv->action_target_value);
       break;
 
     case PROP_CAN_CLOSE:
