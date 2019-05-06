@@ -1,4 +1,14 @@
 ==============
+Version 3.32.2
+==============
+
+Changes in this release:
+
+ • Improved fuzzy highlighting pango markup when <> are discovered
+ • Fix improper GValue usage in DzlTab
+ • Documentation improvements
+
+==============
 Version 3.32.1
 ==============
 
