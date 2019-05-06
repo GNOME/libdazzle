@@ -34,6 +34,7 @@ G_DEFINE_INTERFACE (DzlDockItem, dzl_dock_item, GTK_TYPE_WIDGET)
 
 enum {
   MANAGER_SET,
+  NEEDS_ATTENTION,
   PRESENTED,
   N_SIGNALS
 };
@@ -165,6 +166,17 @@ dzl_dock_item_default_init (DzlDockItemInterface *iface)
   g_signal_set_va_marshaller (signals [MANAGER_SET],
                               G_TYPE_FROM_INTERFACE (iface),
                               g_cclosure_marshal_VOID__OBJECTv);
+
+  signals [NEEDS_ATTENTION] =
+    g_signal_new ("needs-attention",
+                  G_TYPE_FROM_INTERFACE (iface),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (DzlDockItemInterface, needs_attention),
+                  NULL, NULL, NULL,
+                  G_TYPE_NONE, 0);
+  g_signal_set_va_marshaller (signals [NEEDS_ATTENTION],
+                              G_TYPE_FROM_INTERFACE (iface),
+                              g_cclosure_marshal_VOID__VOIDv);
 
   signals [PRESENTED] =
     g_signal_new ("presented",
@@ -735,4 +747,20 @@ dzl_dock_item_ref_gicon (DzlDockItem *self)
     return g_themed_icon_new (icon_name);
 
   return NULL;
+}
+
+/**
+ * dzl_dock_item_needs_attention:
+ * @self: a #DzlDockItem
+ *
+ * Emits the "needs-attention" signal.
+ *
+ * Since: 3.34
+ */
+void
+dzl_dock_item_needs_attention (DzlDockItem *self)
+{
+  g_return_if_fail (DZL_IS_DOCK_ITEM (self));
+
+  g_signal_emit (self, signals [NEEDS_ATTENTION], 0);
 }

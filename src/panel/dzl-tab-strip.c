@@ -25,6 +25,7 @@
 #include "panel/dzl-dock-widget.h"
 #include "panel/dzl-tab.h"
 #include "panel/dzl-tab-strip.h"
+#include "util/dzl-gtk.h"
 #include "util/dzl-macros.h"
 
 typedef struct
@@ -448,14 +449,37 @@ dzl_tab_strip_gicon_changed (DzlDockItem *item,
 }
 
 static void
+dzl_tab_strip_child_needs_attention (DzlTab     *tab,
+                                     GParamSpec *pspec,
+                                     GtkWidget  *child)
+{
+  GtkWidget *parent;
+  gboolean needs_attention;
+
+  g_assert (DZL_IS_TAB (tab));
+  g_assert (GTK_IS_WIDGET (child));
+
+  parent = gtk_widget_get_parent (child);
+  gtk_container_child_get (GTK_CONTAINER (parent), child,
+                           "needs-attention", &needs_attention,
+                           NULL);
+
+  if (needs_attention)
+    dzl_gtk_widget_add_style_class (GTK_WIDGET (tab), "needs-attention");
+  else
+    dzl_gtk_widget_remove_style_class (GTK_WIDGET (tab), "needs-attention");
+}
+
+static void
 dzl_tab_strip_stack_add (DzlTabStrip *self,
                          GtkWidget   *widget,
                          GtkStack    *stack)
 {
   DzlTabStripPrivate *priv = dzl_tab_strip_get_instance_private (self);
   g_autoptr(GVariant) target = g_variant_ref_sink (g_variant_new_int32 (0));
-  DzlTab *tab;
+  gboolean needs_attention = FALSE;
   gboolean can_close = FALSE;
+  DzlTab *tab;
 
   g_assert (DZL_IS_TAB_STRIP (self));
   g_assert (GTK_IS_WIDGET (widget));
@@ -475,11 +499,24 @@ dzl_tab_strip_stack_add (DzlTabStrip *self,
 
   g_object_set_data (G_OBJECT (widget), "DZL_TAB", tab);
 
+  gtk_container_child_get (GTK_CONTAINER (stack), widget,
+                           "needs-attention", &needs_attention,
+                           NULL);
+
+  if (needs_attention)
+    dzl_gtk_widget_add_style_class (GTK_WIDGET (tab), "needs-attention");
+
   g_signal_connect_object (tab,
                            "clicked",
                            G_CALLBACK (dzl_tab_strip_tab_clicked),
                            self,
                            G_CONNECT_SWAPPED | G_CONNECT_AFTER);
+
+  g_signal_connect_object (widget,
+                           "child-notify::needs-attention",
+                           G_CALLBACK (dzl_tab_strip_child_needs_attention),
+                           tab,
+                           G_CONNECT_SWAPPED);
 
   g_signal_connect_object (widget,
                            "child-notify::position",

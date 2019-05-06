@@ -54,6 +54,21 @@ enum {
 static GParamSpec *properties [N_PROPS];
 
 static void
+dzl_dock_stack_item_needs_attention_cb (DzlDockStack *self,
+                                        DzlDockItem  *item)
+{
+  DzlDockStackPrivate *priv = dzl_dock_stack_get_instance_private (self);
+
+  g_assert (DZL_IS_DOCK_STACK (self));
+  g_assert (DZL_IS_DOCK_ITEM (item));
+
+  if (GTK_WIDGET (item) != gtk_stack_get_visible_child (priv->stack))
+    gtk_container_child_set (GTK_CONTAINER (priv->stack), GTK_WIDGET (item),
+                             "needs-attention", TRUE,
+                             NULL);
+}
+
+static void
 dzl_dock_stack_add (GtkContainer *container,
                     GtkWidget    *widget)
 {
@@ -68,6 +83,11 @@ dzl_dock_stack_add (GtkContainer *container,
     {
       title = dzl_dock_item_get_title (DZL_DOCK_ITEM (widget));
       icon_name = dzl_dock_item_get_icon_name (DZL_DOCK_ITEM (widget));
+      g_signal_connect_object (widget,
+                               "needs-attention",
+                               G_CALLBACK (dzl_dock_stack_item_needs_attention_cb),
+                               self,
+                               G_CONNECT_SWAPPED);
     }
 
   gtk_container_add_with_properties (GTK_CONTAINER (priv->stack), widget,
@@ -111,7 +131,12 @@ dzl_dock_stack_notify_visible_child_cb (DzlDockStack *self,
     return;
 
   if ((visible_child = gtk_stack_get_visible_child (stack)) && DZL_IS_DOCK_ITEM (visible_child))
-    dzl_dock_item_emit_presented (DZL_DOCK_ITEM (visible_child));
+    {
+      gtk_container_child_set (GTK_CONTAINER (stack), visible_child,
+                               "needs-attention", FALSE,
+                               NULL);
+      dzl_dock_item_emit_presented (DZL_DOCK_ITEM (visible_child));
+    }
 }
 
 static void
@@ -435,6 +460,10 @@ dzl_dock_stack_release (DzlDockItem *item,
 
   g_assert (DZL_IS_DOCK_STACK (self));
   g_assert (DZL_IS_DOCK_ITEM (child));
+
+  g_signal_handlers_disconnect_by_func (child,
+                                        G_CALLBACK (dzl_dock_stack_item_needs_attention_cb),
+                                        self);
 
   gtk_container_remove (GTK_CONTAINER (priv->stack), GTK_WIDGET (child));
 }
