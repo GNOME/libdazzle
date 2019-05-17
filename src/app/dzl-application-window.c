@@ -20,6 +20,12 @@
 
 #include "config.h"
 
+#include <gtk/gtk.h>
+
+#if !GTK_CHECK_VERSION(3, 24, 0)
+# include "backports/gtkeventcontrollermotion.c"
+#endif
+
 #include "app/dzl-application-window.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "util/dzl-gtk.h"
