@@ -598,7 +598,7 @@ dzl_suggestion_popover_destroy (GtkWidget *widget)
 {
   DzlSuggestionPopover *self = (DzlSuggestionPopover *)widget;
 
-  g_clear_handle_id (&self->queued_popdown, g_source_remove);
+  dzl_clear_source (&self->queued_popdown);
   g_clear_object (&self->grab_device);
 
   dzl_suggestion_popover_set_transient_for (self, NULL);
@@ -924,7 +924,7 @@ dzl_suggestion_popover_queue_popdown (DzlSuggestionPopover *self)
 {
   g_assert (DZL_IS_SUGGESTION_POPOVER (self));
 
-  g_clear_handle_id (&self->queued_popdown, g_source_remove);
+  dzl_clear_source (&self->queued_popdown);
   self->queued_popdown = gdk_threads_add_timeout (DELAYED_POPDOWN_MSEC,
                                                   dzl_suggestion_popover_do_queued_popdown,
                                                   self);
@@ -955,7 +955,7 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
       DZL_EXIT;
     }
 
-  g_clear_handle_id (&self->queued_popdown, g_source_remove);
+  dzl_clear_source (&self->queued_popdown);
 
   if (self->popup_requested)
     {

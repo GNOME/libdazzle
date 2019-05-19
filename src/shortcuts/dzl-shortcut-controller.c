@@ -259,7 +259,7 @@ dzl_shortcut_controller_widget_destroy (DzlShortcutController *self,
   g_assert (GTK_IS_WIDGET (widget));
 
   dzl_shortcut_controller_disconnect (self);
-  g_clear_weak_pointer (&priv->widget);
+  dzl_clear_weak_pointer (&priv->widget);
 
   if (priv->root != NULL)
     {
@@ -380,12 +380,12 @@ dzl_shortcut_controller_set_widget (DzlShortcutController *self,
       if (priv->widget != NULL)
         {
           dzl_shortcut_controller_disconnect (self);
-          g_clear_weak_pointer (&priv->widget);
+          dzl_clear_weak_pointer (&priv->widget);
         }
 
       if (widget != NULL && widget != priv->widget)
         {
-          g_set_weak_pointer (&priv->widget, widget);
+          dzl_set_weak_pointer (&priv->widget, widget);
           dzl_shortcut_controller_connect (self);
         }
 

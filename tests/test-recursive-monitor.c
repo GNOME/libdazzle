@@ -29,6 +29,25 @@ failed_timeout (gpointer state)
   return G_SOURCE_REMOVE;
 }
 
+G_GNUC_NULL_TERMINATED
+static GFile *
+file_new_build_filename (const gchar *first, ...)
+{
+  g_autoptr(GPtrArray) parts = g_ptr_array_new ();
+  g_autofree gchar *path = NULL;
+  va_list args;
+
+  va_start (args, first);
+  g_ptr_array_add (parts, (gchar *)first);
+  while ((first = va_arg (args, const gchar *)))
+    g_ptr_array_add (parts, (gchar *)first);
+  g_ptr_array_add (parts, NULL);
+
+  path = g_build_filenamev ((gchar **)(gpointer)parts->pdata);
+
+  return g_file_new_for_path (path);
+}
+
 static gboolean
 begin_test_basic (gpointer data)
 {
@@ -170,7 +189,7 @@ test_basic (void)
   /* Build our list of directories to create/test */
   for (guint i = 0; layer1[i]; i++)
     {
-      g_autoptr(GFile) file1 = g_file_new_build_filename ("recursive-dir", layer1[i], NULL);
+      g_autoptr(GFile) file1 = file_new_build_filename ("recursive-dir", layer1[i], NULL);
 
       g_queue_push_tail (&state.dirs, g_object_ref (file1));
 

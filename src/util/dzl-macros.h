@@ -39,8 +39,15 @@ G_BEGIN_DECLS
 #endif
 
 /* These were upstreamed into GLib, just use them */
-#define dzl_clear_weak_pointer(ptr) g_clear_weak_pointer(ptr)
-#define dzl_set_weak_pointer(ptr,obj) g_set_weak_pointer(ptr,obj)
+#if GLIB_CHECK_VERSION(2,56,0)
+# define dzl_clear_weak_pointer(ptr) g_clear_weak_pointer(ptr)
+# define dzl_set_weak_pointer(ptr,obj) g_set_weak_pointer(ptr,obj)
+#else
+# define dzl_clear_weak_pointer(ptr) \
+  (*(ptr) ? (g_object_remove_weak_pointer((GObject*)*(ptr), (gpointer*)ptr),*(ptr)=NULL,1) : 0)
+# define dzl_set_weak_pointer(ptr,obj) \
+  ((obj!=*(ptr))?(dzl_clear_weak_pointer(ptr),*(ptr)=obj,((obj)?g_object_add_weak_pointer((GObject*)obj,(gpointer*)ptr),NULL:NULL),1):0)
+#endif
 
 /* A more type-correct form of g_clear_pointer(), to help find bugs.
  * GLib ended up with a similar feature which we can rely on now.

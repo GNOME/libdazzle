@@ -23,11 +23,11 @@
 
 G_BEGIN_DECLS
 
-#if !GTK_CHECK_VERSION(3, 22, 15)
+#if !GTK_CHECK_VERSION(3, 22, 0)
 # error "libdazzle requires gtk+-3.0 >= 3.22.15"
 #endif
 
-#if !GLIB_CHECK_VERSION(2, 52, 0)
+#if !GLIB_CHECK_VERSION(2, 50, 0)
 # error "libdazzle requires glib-2.0 >= 2.52.0"
 #endif
 
