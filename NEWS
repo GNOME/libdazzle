@@ -1,4 +1,21 @@
 ==============
+Version 3.33.3
+==============
+
+Changes in this release:
+
+ • libdazzle provides a backported GtkEventControllerMotion when compiled
+   against GTK versions <= 3.22. This means that libdazzle now effectively
+   supports 3.22 in addition to 3.24
+ • libdazzle has been backported to support GLib 2.50 so that it can be used on
+   older platforms
+ • Various API additions to simply use from bindings
+ • A new compact mode for DzlSuggestionEntry
+ • Improvements to shortcut activation
+ • The fuzzy highlighter has been improved to work around some embedded markup
+ • Correctness fixes • The panel now has support for "needs-attention"
+
+==============
 Version 3.33.1
 ==============
 
