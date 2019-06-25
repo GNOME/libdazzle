@@ -11,12 +11,10 @@ test_env = [
 ]
 
 test_cflags = [
-  '-fPIE',
   '-DTEST_DATA_DIR="@0@/data"'.format(meson.current_source_dir()),
 ]
 
 test_link_args = [
-  '-fPIC',
 ]
 
 test_application = executable('test-application', 'test-application.c',
