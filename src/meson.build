@@ -21,7 +21,6 @@ dzl_version_h = configure_file(
           input: 'dzl-version.h.in',
          output: 'dzl-version.h',
     install_dir: libdazzle_header_dir,
-        install: true,
   configuration: version_data)
 
 debug_data = configuration_data()
