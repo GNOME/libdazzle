@@ -187,7 +187,7 @@ dzl_trie_node_new (DzlTrie     *trie,
  *
  * Returns: %TRUE if there are no free slots in @chunk.
  */
-G_INLINE_FUNC gboolean
+static inline gboolean
 dzl_trie_node_chunk_is_full (DzlTrieNodeChunk *chunk)
 {
    g_assert(chunk);
@@ -371,7 +371,7 @@ dzl_trie_find_or_create_node (DzlTrie     *trie,
  * Removes child at index @idx from the chunk. The last item in the
  * chain of chunks will be moved to the slot indicated by @idx.
  */
-G_INLINE_FUNC void
+static inline void
 dzl_trie_node_remove_fast (DzlTrieNode      *node,
                            DzlTrieNodeChunk *chunk,
                            guint             idx)
