@@ -426,17 +426,6 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
 
   old_prefixes = g_object_get_data (G_OBJECT (widget), mux_key);
 
-  if (old_prefixes != NULL)
-    {
-      for (guint i = 0; old_prefixes [i]; i++)
-        {
-          if (g_str_equal (old_prefixes [i], "win") || g_str_equal (old_prefixes [i], "app"))
-            continue;
-
-          gtk_widget_insert_action_group (widget, old_prefixes [i], NULL);
-        }
-    }
-
   /*
    * Now, if there is a from_widget to mux, get all of their action
    * groups and mux them across to our target widget.
@@ -461,6 +450,17 @@ dzl_gtk_widget_mux_action_groups (GtkWidget   *widget,
                 continue;
 
               gtk_widget_insert_action_group (widget, prefixes[i], group);
+            }
+        }
+
+      if (old_prefixes != NULL && prefixes != NULL)
+        {
+          for (guint i = 0; old_prefixes[i]; i++)
+            {
+              gboolean found = g_strv_contains ((const gchar * const *)prefixes, old_prefixes[i]);
+
+              if (!found)
+                gtk_widget_insert_action_group (widget, old_prefixes[i], NULL);
             }
         }
     }
