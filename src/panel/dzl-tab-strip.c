@@ -453,6 +453,7 @@ dzl_tab_strip_child_needs_attention (DzlTab     *tab,
                                      GParamSpec *pspec,
                                      GtkWidget  *child)
 {
+  GtkStyleContext *style_context;
   GtkWidget *parent;
   gboolean needs_attention;
 
@@ -464,10 +465,15 @@ dzl_tab_strip_child_needs_attention (DzlTab     *tab,
                            "needs-attention", &needs_attention,
                            NULL);
 
-  if (needs_attention)
-    dzl_gtk_widget_add_style_class (GTK_WIDGET (tab), "needs-attention");
-  else
-    dzl_gtk_widget_remove_style_class (GTK_WIDGET (tab), "needs-attention");
+  style_context = gtk_widget_get_style_context (GTK_WIDGET (tab));
+
+  if (needs_attention != gtk_style_context_has_class (style_context, "needs-attention"))
+    {
+      if (needs_attention)
+        gtk_style_context_add_class (style_context, "needs-attention");
+      else
+        gtk_style_context_remove_class (style_context, "needs-attention");
+    }
 }
 
 static void
