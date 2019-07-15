@@ -365,7 +365,7 @@ main (gint   argc,
   if (!dzl_fuzzy_index_builder_write (builder, outfile, G_PRIORITY_DEFAULT, NULL, &error))
     g_printerr ("%s\n", error->message);
 
-  g_print ("desktop.index.written\n");
+  g_print ("desktop.index written\n");
 
   fsck_index ();
   create_ui ();
