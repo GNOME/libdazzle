@@ -403,4 +403,11 @@ test_fuzzy_highlight = executable('test-fuzzy-highlight', 'test-fuzzy-highlight.
 )
 test('test-fuzzy-highlight', test_fuzzy_highlight, env: test_env)
 
+test_mutable_scoring = executable('test-mutable-scoring', 'test-mutable-scoring.c',
+        c_args: test_cflags,
+     link_args: test_link_args,
+  dependencies: libdazzle_deps + [libdazzle_dep],
+)
+test('test-mutable-scoring', test_mutable_scoring, env: test_env)
+
 endif
