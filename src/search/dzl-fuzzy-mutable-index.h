@@ -74,6 +74,8 @@ gchar                    *dzl_fuzzy_highlight                        (const gcha
                                                                       const gchar          *query,
                                                                       gboolean              case_sensitive);
 
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (DzlFuzzyMutableIndex, dzl_fuzzy_mutable_index_unref)
+
 G_END_DECLS
 
 #endif /* DZL_FUZZY_MUTABLE_INDEX_H */
