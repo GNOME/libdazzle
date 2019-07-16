@@ -332,23 +332,50 @@ dzl_fuzzy_mutable_index_unref (DzlFuzzyMutableIndex *fuzzy)
     }
 }
 
+static void
+rollback_state_to_pos (GArray *table,
+                       gint   *state,
+                       guint   id,
+                       guint   pos)
+{
+  g_assert (table != NULL);
+  g_assert (state != NULL);
+  g_assert (pos > 0);
+
+  while (*state > 0 && *state <= table->len)
+    {
+      DzlFuzzyMutableIndexItem *iter;
+
+      (*state)--;
+
+      iter = &g_array_index (table, DzlFuzzyMutableIndexItem, *state);
+
+      if (iter->id > id || (iter->id == id && *state >= pos))
+        continue;
+
+      break;
+    }
+}
+
 static gboolean
 dzl_fuzzy_mutable_index_do_match (DzlFuzzyMutableIndexLookup *lookup,
                                   DzlFuzzyMutableIndexItem   *item,
                                   guint                       table_index,
                                   gint                        score)
 {
-  DzlFuzzyMutableIndexItem *iter;
-  gpointer key;
+  gboolean ret = FALSE;
   GArray *table;
   gint *state;
-  gint iter_score;
 
   table = lookup->tables [table_index];
   state = &lookup->state [table_index];
 
   for (; state [0] < (gint)table->len; state [0]++)
     {
+      DzlFuzzyMutableIndexItem *iter;
+      gpointer key;
+      gint iter_score;
+
       iter = &g_array_index (table, DzlFuzzyMutableIndexItem, state[0]);
 
       if ((iter->id < item->id) || ((iter->id == item->id) && (iter->pos <= item->pos)))
@@ -356,12 +383,26 @@ dzl_fuzzy_mutable_index_do_match (DzlFuzzyMutableIndexLookup *lookup,
       else if (iter->id > item->id)
         break;
 
-      iter_score = score + (iter->pos - item->pos);
+      iter_score = score + (iter->pos - item->pos - 1);
 
       if ((table_index + 1) < lookup->n_tables)
         {
           if (dzl_fuzzy_mutable_index_do_match (lookup, iter, table_index + 1, iter_score))
-            return TRUE;
+            {
+              ret = TRUE;
+
+              /* We already found a match, but we could have a better match
+               * further in the word. We need to rollback all of our additional
+               * table state to the current position so that we can possibly
+               * advance again.
+               */
+              if ((state[0] + 1) < table->len &&
+                  g_array_index (table, DzlFuzzyMutableIndexItem, state[0] + 1).id == item->id)
+                {
+                  for (guint i = table_index + 1; i < lookup->n_tables; i++)
+                    rollback_state_to_pos (lookup->tables[i], &lookup->state[i], iter->id, iter->pos + 1);
+                }
+            }
           continue;
         }
 
@@ -371,10 +412,10 @@ dzl_fuzzy_mutable_index_do_match (DzlFuzzyMutableIndexLookup *lookup,
           (iter_score < GPOINTER_TO_INT (g_hash_table_lookup (lookup->matches, key))))
         g_hash_table_insert (lookup->matches, key, GINT_TO_POINTER (iter_score));
 
-      return TRUE;
+      ret = TRUE;
     }
 
-  return FALSE;
+  return ret;
 }
 
 static inline const gchar *
@@ -466,7 +507,19 @@ dzl_fuzzy_mutable_index_match (DzlFuzzyMutableIndex *fuzzy,
       for (i = 0; i < root->len; i++)
         {
           item = &g_array_index (root, DzlFuzzyMutableIndexItem, i);
-          dzl_fuzzy_mutable_index_do_match (&lookup, item, 1, MIN (16, item->pos * 4));
+
+          if (dzl_fuzzy_mutable_index_do_match (&lookup, item, 1, 0) &&
+              i + 1 < root->len &&
+              (item + 1)->id == item->id)
+            {
+              /* We found a match, but we might find another one with a higher
+               * score later on for the same item of the corpus.  We need to
+               * roll state back to the position we're starting at so that we
+               * can match all the same characters again.
+               */
+              for (guint j = 1; j < lookup.n_tables; j++)
+                rollback_state_to_pos (lookup.tables[j], &lookup.state[j], item->id, item->pos + 1);
+            }
         }
     }
   else
@@ -500,8 +553,16 @@ dzl_fuzzy_mutable_index_match (DzlFuzzyMutableIndex *fuzzy,
 
       match.id = GPOINTER_TO_INT (key);
       match.key = dzl_fuzzy_mutable_index_get_string (fuzzy, match.id);
-      match.score = 1.0 / (strlen (match.key) + GPOINTER_TO_INT (value));
       match.value = g_ptr_array_index (fuzzy->id_to_value, match.id);
+
+      /* If we got a perfect substring match, then this is 1.0, and avoid
+       * perturbing further or we risk non-contiguous (but shorter strings)
+       * matching at higher value.
+       */
+      if (value == NULL)
+        match.score = 1.0;
+      else
+        match.score = 1.0 / (strlen (match.key) + GPOINTER_TO_INT (value));
 
       g_array_append_val (matches, match);
     }
