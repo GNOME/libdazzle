@@ -527,7 +527,7 @@ dzl_shortcuts_shortcut_class_init (DzlShortcutsShortcutClass *klass)
    * Sequences of keys can be specified using a + or & between the keys.
    *
    * Examples:
-   * - A single shortcut: &lt;ctl&rt;&lt;alt&gt;delete
+   * - A single shortcut: &lt;ctl&gt;&lt;alt&gt;delete
    * - Two alternative shortcuts: &lt;shift&gt;a Home
    * - A range of shortcuts: &lt;alt&gt;1...&lt;alt&gt;9
    * - Several keys pressed together: Control_L&Control_R
