@@ -1,4 +1,12 @@
 ==============
+Version 3.32.3
+==============
+
+Changes in this release:
+
+ • Workaround changes in GTK action muxing
+
+==============
 Version 3.32.2
 ==============
 
