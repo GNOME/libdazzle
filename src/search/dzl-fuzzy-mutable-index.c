@@ -62,8 +62,8 @@ struct _DzlFuzzyMutableIndex
 #pragma pack(push, 1)
 typedef struct
 {
-  guint id;
-  guint pos : 16;
+  guint64 id : 32;
+  guint64 pos : 16;
 } DzlFuzzyMutableIndexItem;
 #pragma pack(pop)
 
