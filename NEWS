@@ -1,4 +1,15 @@
 ==============
+Version 3.33.4
+==============
+
+Changes in this release:
+
+ • Work around recent changes in GTK action muxing
+ • Autoptr additions
+ • Improve fuzzy text matches
+ • Various fixes for alternative compilers
+
+==============
 Version 3.33.3
 ==============
 
