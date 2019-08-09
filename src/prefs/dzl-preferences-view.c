@@ -454,6 +454,7 @@ dzl_preferences_view_add_page (DzlPreferences *preferences,
     return;
 
   page = g_object_new (DZL_TYPE_PREFERENCES_PAGE,
+                       "name", page_name,
                        "priority", priority,
                        "visible", TRUE,
                        NULL);
@@ -994,8 +995,12 @@ dzl_preferences_view_set_page (DzlPreferences *preferences,
 
   if (strchr (page_name, '.') != NULL)
     {
+      gtk_container_foreach (GTK_CONTAINER (priv->subpage_stack),
+                             (GtkCallback)gtk_widget_hide,
+                             NULL);
       dzl_preferences_page_set_map (DZL_PREFERENCES_PAGE (page), map);
       gtk_stack_set_visible_child (priv->subpage_stack, page);
+      gtk_widget_show (page);
       gtk_widget_show (GTK_WIDGET (priv->subpage_stack));
     }
   else
