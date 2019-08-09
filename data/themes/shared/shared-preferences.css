@@ -44,3 +44,8 @@ dzlpreferencesview dzlpreferencesgroup list entry {
 dzlpreferencesview stackswitcher {
   margin: 12px 12px 0px 12px;
 }
+
+/* Tweak preferences+shortcut label */
+row:selected preferencesbin label.keycap {
+  color: @theme_fg_color;
+}
