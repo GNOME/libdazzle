@@ -1248,3 +1248,40 @@ dzl_shortcut_controller_get_widget (DzlShortcutController *self)
 
   return priv->widget;
 }
+
+void
+dzl_shortcut_controller_remove_accel (DzlShortcutController *self,
+                                      const gchar           *accel,
+                                      DzlShortcutPhase       phase)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+  g_autoptr(DzlShortcutChord) chord = NULL;
+
+  g_return_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self));
+  g_return_if_fail (accel != NULL);
+
+  chord = dzl_shortcut_chord_new_from_string (accel);
+
+  if (chord != NULL)
+    {
+      DzlShortcutContext *context;
+      DzlShortcutManager *manager;
+      DzlShortcutTheme *theme;
+
+      /* Add the chord to our chord table for lookups */
+      if (priv->commands_table != NULL)
+        dzl_shortcut_chord_table_remove (priv->commands_table, chord);
+
+      /* Set the value in the theme so it can have overrides by users */
+      manager = dzl_shortcut_controller_get_manager (self);
+      theme = _dzl_shortcut_manager_get_internal_theme (manager);
+      dzl_shortcut_theme_set_chord_for_command (theme, NULL, chord, 0);
+
+      if (priv->widget != NULL)
+        {
+          context = _dzl_shortcut_theme_find_default_context_with_phase (theme, priv->widget, phase);
+          if (context && _dzl_shortcut_context_contains (context, chord))
+            dzl_shortcut_context_remove (context, accel);
+        }
+    }
+}

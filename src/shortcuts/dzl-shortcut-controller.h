@@ -60,6 +60,10 @@ gboolean                dzl_shortcut_controller_execute_command       (DzlShortc
                                                                        const gchar           *command);
 DZL_AVAILABLE_IN_ALL
 const DzlShortcutChord *dzl_shortcut_controller_get_current_chord     (DzlShortcutController *self);
+DZL_AVAILABLE_IN_3_34
+void                    dzl_shortcut_controller_remove_accel          (DzlShortcutController *self,
+                                                                       const gchar           *accel,
+                                                                       DzlShortcutPhase       phase);
 DZL_AVAILABLE_IN_ALL
 void                    dzl_shortcut_controller_add_command_action    (DzlShortcutController *self,
                                                                        const gchar           *command_id,
