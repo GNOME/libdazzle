@@ -389,6 +389,8 @@ dzl_shortcut_controller_set_widget (DzlShortcutController *self,
           dzl_shortcut_controller_connect (self);
         }
 
+      g_assert (widget == priv->widget);
+
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_WIDGET]);
     }
 }
@@ -654,6 +656,8 @@ dzl_shortcut_controller_find (GtkWidget *widget)
       g_object_unref (dzl_shortcut_controller_new (widget));
       controller = g_object_get_qdata (G_OBJECT (widget), controller_quark);
     }
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (controller), NULL);
 
   return controller;
 }
