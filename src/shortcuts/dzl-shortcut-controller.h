@@ -36,6 +36,8 @@ G_DECLARE_FINAL_TYPE (DzlShortcutController, dzl_shortcut_controller, DZL, SHORT
 
 DZL_AVAILABLE_IN_ALL
 DzlShortcutController  *dzl_shortcut_controller_new                   (GtkWidget             *widget);
+DZL_AVAILABLE_IN_3_34
+GtkWidget              *dzl_shortcut_controller_get_widget            (DzlShortcutController *self);
 DZL_AVAILABLE_IN_ALL
 DzlShortcutManager     *dzl_shortcut_controller_get_manager           (DzlShortcutController *self);
 DZL_AVAILABLE_IN_ALL

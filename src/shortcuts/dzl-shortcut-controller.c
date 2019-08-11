@@ -1231,3 +1231,21 @@ _dzl_shortcut_controller_clear (DzlShortcutController *self)
   g_clear_pointer (&priv->current_chord, dzl_shortcut_chord_free);
   g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_CURRENT_CHORD]);
 }
+
+/**
+ * dzl_shortcut_controller_get_widget:
+ * @self: a #DzlShortcutController
+ *
+ * Returns: (transfer none): the widget for the controller
+ *
+ * Since: 3.34
+ */
+GtkWidget *
+dzl_shortcut_controller_get_widget (DzlShortcutController *self)
+{
+  DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SHORTCUT_CONTROLLER (self), NULL);
+
+  return priv->widget;
+}
