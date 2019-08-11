@@ -438,12 +438,7 @@ dzl_shortcut_controller_finalize (GObject *object)
   DzlShortcutController *self = (DzlShortcutController *)object;
   DzlShortcutControllerPrivate *priv = dzl_shortcut_controller_get_instance_private (self);
 
-  if (priv->widget != NULL)
-    {
-      g_object_remove_weak_pointer (G_OBJECT (priv->widget), (gpointer *)&priv->widget);
-      priv->widget = NULL;
-    }
-
+  dzl_clear_weak_pointer (&priv->widget);
   g_clear_pointer (&priv->commands, g_hash_table_unref);
   g_clear_pointer (&priv->commands_table, dzl_shortcut_chord_table_free);
   g_clear_object (&priv->root);
