@@ -404,6 +404,11 @@ dzl_shortcut_theme_editor_init (DzlShortcutThemeEditor *self)
                            self,
                            G_CONNECT_SWAPPED);
 
+  g_signal_connect (priv->filter_entry,
+                    "stop-search",
+                    G_CALLBACK (gtk_entry_set_text),
+                    (gpointer) "");
+
   g_signal_connect_object (priv->tree_view,
                            "row-activated",
                            G_CALLBACK (dzl_shortcut_theme_editor_row_activated),
