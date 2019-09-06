@@ -347,6 +347,16 @@ dzl_preferences_view_search_entry_changed (DzlPreferencesView *self,
 }
 
 static void
+dzl_preferences_view_search_entry_stop_search (DzlPreferencesView *self,
+                                               GtkSearchEntry     *search_entry)
+{
+  g_assert (DZL_IS_PREFERENCES_VIEW (self));
+  g_assert (GTK_IS_SEARCH_ENTRY (search_entry));
+
+  gtk_entry_set_text (GTK_ENTRY(search_entry), "");
+}
+
+static void
 dzl_preferences_view_notify_subpage_stack_visible (DzlPreferencesView *self,
                                                    GParamSpec         *pspec,
                                                    GtkStack           *subpage_stack)
@@ -387,6 +397,12 @@ dzl_preferences_view_init (DzlPreferencesView *self)
   g_signal_connect_object (priv->search_entry,
                            "changed",
                            G_CALLBACK (dzl_preferences_view_search_entry_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (priv->search_entry,
+                           "stop-search",
+                           G_CALLBACK (dzl_preferences_view_search_entry_stop_search),
                            self,
                            G_CONNECT_SWAPPED);
 
