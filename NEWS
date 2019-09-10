@@ -1,3 +1,12 @@
+==============
+Version 3.34.0
+==============
+
+Changes in this release:
+
+ • Set NO_AT_BRIDGE=1 in automated tests
+ • Allow Escape to clear/reset GtkSearchEntry based widgets
+
 ===============
 Version 3.33.90
 ===============
