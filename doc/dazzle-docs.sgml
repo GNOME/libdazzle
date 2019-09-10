@@ -241,11 +241,6 @@
     <xi:include href="xml/dzl-cpu-model.xml"/>
   </part>
 
-  <part id="dazzle-counters">
-    <title>Performance Counters</title>
-    <xi:include href="xml/dzl-counter.xml"/>
-  </part>
-
   <part id="dazzle-widgets">
     <title>Additional Widgets</title>
     <xi:include href="xml/dzl-bin.xml"/>
