@@ -1060,6 +1060,8 @@ dzl_dock_bin_child_size_allocate (DzlDockBin      *self,
         gdk_window_move_resize (child->handle,
                                 handle_alloc.x, handle_alloc.y,
                                 handle_alloc.width, handle_alloc.height);
+      else if (child->handle)
+        gdk_window_hide (child->handle);
 
       gtk_widget_size_allocate (child->widget, &child_alloc);
     }
