@@ -37,6 +37,7 @@ typedef struct
   DzlSuggestionPopover      *popover;
   DzlSuggestionEntryBuffer  *buffer;
   GListModel                *model;
+  GtkGesture                *press_gesture;
 
   gulong                     changed_handler;
 
@@ -46,6 +47,7 @@ typedef struct
 
   guint                      activate_on_single_click : 1;
   guint                      compact : 1;
+  guint                      allow_touch_selection : 1;
 
   gint                       in_key_press;
   gint                       in_move_by;
@@ -173,6 +175,7 @@ dzl_suggestion_entry_focus_out_event (GtkWidget     *widget,
     _dzl_suggestion_popover_set_focused (priv->popover, FALSE);
 
   g_signal_emit (self, signals [HIDE_SUGGESTIONS], 0);
+  priv->allow_touch_selection = TRUE;
 
   return GTK_WIDGET_CLASS (dzl_suggestion_entry_parent_class)->focus_out_event (widget, event);
 }
@@ -435,6 +438,7 @@ dzl_suggestion_entry_destroy (GtkWidget *widget)
     gtk_widget_destroy (GTK_WIDGET (priv->popover));
 
   g_clear_object (&priv->model);
+  g_clear_object (&priv->press_gesture);
 
   g_assert (priv->popover == NULL);
 
@@ -689,6 +693,48 @@ dzl_suggestion_entry_class_init (DzlSuggestionEntryClass *klass)
 }
 
 static void
+dzl_suggestion_entry_set_selection_bounds (GtkEditable *editable,
+                                           gint         start_pos,
+                                           gint         end_pos)
+{
+  DzlSuggestionEntry *self = (DzlSuggestionEntry *)editable;
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  g_assert (DZL_IS_SUGGESTION_ENTRY (self));
+
+  g_signal_handler_block (self, priv->changed_handler);
+
+  if (end_pos < 0)
+    end_pos = gtk_entry_buffer_get_length (GTK_ENTRY_BUFFER (priv->buffer));
+
+  if (end_pos > (gint)dzl_suggestion_entry_buffer_get_typed_length (priv->buffer))
+    dzl_suggestion_entry_buffer_commit (priv->buffer);
+
+  editable_parent_iface->set_selection_bounds (editable, start_pos, end_pos);
+
+  g_signal_handler_unblock (self, priv->changed_handler);
+}
+
+static void
+dzl_suggestion_entry_gesture_released (DzlSuggestionEntry   *self,
+                                       gint                  n_press,
+                                       gdouble               x,
+                                       gdouble               y,
+                                       GtkGestureMultiPress *gesture)
+{
+  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
+
+  g_assert (GTK_IS_GESTURE_MULTI_PRESS (gesture));
+  g_assert (DZL_IS_SUGGESTION_ENTRY (self));
+
+  if (n_press == 1 && priv->allow_touch_selection)
+    {
+      priv->allow_touch_selection = FALSE;
+      dzl_suggestion_entry_set_selection_bounds (GTK_EDITABLE (self), 0, -1);
+    }
+}
+
+static void
 dzl_suggestion_entry_init (DzlSuggestionEntry *self)
 {
   DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
@@ -727,6 +773,14 @@ dzl_suggestion_entry_init (DzlSuggestionEntry *self)
                                "suggestion");
 
   priv->buffer = dzl_suggestion_entry_buffer_new ();
+
+  priv->press_gesture = gtk_gesture_multi_press_new (GTK_WIDGET (self));
+  gtk_gesture_single_set_touch_only (GTK_GESTURE_SINGLE (priv->press_gesture), TRUE);
+  g_signal_connect_object (priv->press_gesture,
+                           "released",
+                           G_CALLBACK (dzl_suggestion_entry_gesture_released),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 GtkWidget *
@@ -753,29 +807,6 @@ static void
 buildable_iface_init (GtkBuildableIface *iface)
 {
   iface->get_internal_child = dzl_suggestion_entry_get_internal_child;
-}
-
-static void
-dzl_suggestion_entry_set_selection_bounds (GtkEditable *editable,
-                                           gint         start_pos,
-                                           gint         end_pos)
-{
-  DzlSuggestionEntry *self = (DzlSuggestionEntry *)editable;
-  DzlSuggestionEntryPrivate *priv = dzl_suggestion_entry_get_instance_private (self);
-
-  g_assert (DZL_IS_SUGGESTION_ENTRY (self));
-
-  g_signal_handler_block (self, priv->changed_handler);
-
-  if (end_pos < 0)
-    end_pos = gtk_entry_buffer_get_length (GTK_ENTRY_BUFFER (priv->buffer));
-
-  if (end_pos > (gint)dzl_suggestion_entry_buffer_get_typed_length (priv->buffer))
-    dzl_suggestion_entry_buffer_commit (priv->buffer);
-
-  editable_parent_iface->set_selection_bounds (editable, start_pos, end_pos);
-
-  g_signal_handler_unblock (self, priv->changed_handler);
 }
 
 static void
