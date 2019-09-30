@@ -339,9 +339,11 @@ main (gint   argc,
   GtkWidget *window;
   GtkWidget *header;
   GtkWidget *entry;
+  GtkWidget *main_entry;
   GtkWidget *box;
   GtkWidget *button;
   GtkWidget *scroller;
+  GtkWidget *switch_;
 
   gtk_init (&argc, &argv);
 
@@ -389,6 +391,7 @@ main (gint   argc,
                         "visible", TRUE,
                         "width-chars", 30,
                         NULL);
+  main_entry = entry;
   notify_suggestion_handler =
     g_signal_connect (entry,
                       "notify::suggestion",
@@ -429,6 +432,24 @@ main (gint   argc,
   g_signal_connect (entry, "notify::suggestion", G_CALLBACK (notify_suggestion_cb), &button_handler);
   gtk_container_add (GTK_CONTAINER (header), button);
   gtk_widget_show (button);
+
+  box = g_object_new (GTK_TYPE_BOX,
+                      "orientation", GTK_ORIENTATION_HORIZONTAL,
+                      "visible", TRUE,
+                      "spacing", 6,
+                      NULL);
+  gtk_container_add (GTK_CONTAINER (header), box);
+  switch_ = g_object_new (GTK_TYPE_SWITCH,
+                          "visible", TRUE,
+                          NULL);
+  g_object_bind_property (G_OBJECT (switch_), "active", main_entry, "compact",
+                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+  gtk_container_add (GTK_CONTAINER (box),
+                     g_object_new (GTK_TYPE_LABEL,
+                                   "label", "Compact Mode:",
+                                   "visible", TRUE,
+                                   NULL));
+  gtk_container_add (GTK_CONTAINER (box), switch_);
 
   gtk_window_present (GTK_WINDOW (window));
 
