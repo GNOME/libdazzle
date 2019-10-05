@@ -1,4 +1,12 @@
 ==============
+Version 3.34.1
+==============
+
+Changes in this release:
+
+ • panel: hide handles when animations are disabled
+
+==============
 Version 3.34.0
 ==============
 
