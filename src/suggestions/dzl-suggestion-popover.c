@@ -821,7 +821,8 @@ dzl_suggestion_popover_popup (DzlSuggestionPopover *self)
       return;
     }
 
-  if (gtk_widget_get_mapped (GTK_WIDGET (self)))
+  if (gtk_widget_get_mapped (GTK_WIDGET (self)) &&
+      gtk_revealer_get_reveal_child (self->revealer))
     return;
 
   if (self->relative_to != NULL)
@@ -962,8 +963,10 @@ dzl_suggestion_popover_items_changed (DzlSuggestionPopover *self,
       DZL_EXIT;
     }
 
-  if (gtk_widget_get_mapped (GTK_WIDGET (self)))
-    return;
+  if (gtk_widget_get_mapped (GTK_WIDGET (self)) &&
+      gtk_revealer_get_child_revealed (self->revealer) &&
+      gtk_revealer_get_reveal_child (self->revealer))
+    DZL_EXIT;
 
   /*
    * If we are currently animating in the initial view of the popover,
