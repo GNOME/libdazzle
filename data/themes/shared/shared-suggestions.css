@@ -37,7 +37,7 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
   color: @theme_fg_color;
 }
 
-dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row box.vertical .subtitle {
+dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row.vertical .subtitle {
   margin-left: 12px;
 }
 
@@ -46,7 +46,7 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
   margin-right: 12px;
 }
 
-dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row > box {
+dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row > grid {
   margin: 4px 8px;
 }
 
@@ -55,7 +55,7 @@ dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > li
   margin-bottom: 3px;
 }
 
-dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row > box > image:first-child {
+dzlsuggestionpopover > revealer > box > elastic > scrolledwindow > viewport > list > row > grid > image:first-child {
   min-width: 16px;
 }
 
