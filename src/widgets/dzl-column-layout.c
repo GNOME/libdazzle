@@ -18,6 +18,8 @@
 
 #include "config.h"
 
+#include <math.h>
+
 #define G_LOG_DOMAIN "dzl-column-layout"
 
 #include "util/dzl-macros.h"
@@ -120,9 +122,22 @@ dzl_column_layout_layout (DzlColumnLayout *self,
     }
 
   if (total_height <= height)
-    n_columns = 1;
+    {
+      n_columns = 1;
+    }
   else
-    n_columns = MAX (1, (width - (border_width * 2)) / (priv->column_width + priv->column_spacing));
+    {
+      int estimated_cols;
+      int leftover;
+
+      estimated_cols = round(width / priv->column_width);
+      leftover = (width % priv->column_width) - (border_width * 2) - (priv->column_spacing * (estimated_cols - 1));
+
+      if (leftover >= 0)
+        n_columns = estimated_cols;
+      else
+        n_columns = MAX(1, (estimated_cols - 1));
+    }
 
   if (priv->max_columns > 0)
     n_columns = MIN (n_columns, (gint)priv->max_columns);
