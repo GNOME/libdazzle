@@ -35,7 +35,7 @@ typedef struct
   GtkLabel      *title;
   GtkLabel      *separator;
   GtkLabel      *subtitle;
-  GtkLabel      *box;
+  GtkGrid       *grid;
 } DzlSuggestionRowPrivate;
 
 enum {
@@ -93,6 +93,46 @@ on_notify_icon_cb (DzlSuggestionRow *self,
 }
 
 static void
+dzl_suggestion_set_orientation (DzlSuggestionRowPrivate *priv)
+{
+  const gchar *subtitle;
+
+  subtitle = dzl_suggestion_get_subtitle (priv->suggestion);
+
+  gtk_widget_set_visible (GTK_WIDGET (priv->separator),
+                          priv->orientation != GTK_ORIENTATION_VERTICAL);
+
+  g_object_ref (priv->image);
+  g_object_ref (priv->title);
+  g_object_ref (priv->subtitle);
+
+  gtk_container_remove (GTK_CONTAINER (priv->grid), GTK_WIDGET (priv->image));
+  gtk_container_remove (GTK_CONTAINER (priv->grid), GTK_WIDGET (priv->title));
+  gtk_container_remove (GTK_CONTAINER (priv->grid), GTK_WIDGET (priv->subtitle));
+
+  if (priv->orientation == GTK_ORIENTATION_VERTICAL)
+    {
+      gtk_grid_attach (priv->grid, GTK_WIDGET (priv->image), 0, 0, 1, 1);
+      gtk_grid_attach (priv->grid, GTK_WIDGET (priv->title), 1, 0, 1, 1);
+      gtk_grid_attach (priv->grid, GTK_WIDGET (priv->subtitle), 1, 1, 1, 1);
+
+      gtk_widget_set_visible (GTK_WIDGET (priv->separator), FALSE);
+    }
+  else
+    {
+      gtk_grid_attach (priv->grid, GTK_WIDGET (priv->image), 0, 0, 1, 2);
+      gtk_grid_attach (priv->grid, GTK_WIDGET (priv->title), 1, 0, 1, 1);
+      gtk_grid_attach (priv->grid, GTK_WIDGET (priv->subtitle), 3, 0, 1, 1);
+
+      gtk_widget_set_visible (GTK_WIDGET (priv->separator), !!subtitle);
+    }
+
+  g_object_unref (priv->subtitle);
+  g_object_unref (priv->title);
+  g_object_unref (priv->image);
+}
+
+static void
 dzl_suggestion_row_connect (DzlSuggestionRow *self)
 {
   DzlSuggestionRowPrivate *priv = dzl_suggestion_row_get_instance_private (self);
@@ -115,12 +155,7 @@ dzl_suggestion_row_connect (DzlSuggestionRow *self)
   subtitle = dzl_suggestion_get_subtitle (priv->suggestion);
   gtk_label_set_label (priv->subtitle, subtitle);
 
-  if (priv->orientation == GTK_ORIENTATION_VERTICAL)
-    gtk_widget_set_visible (GTK_WIDGET (priv->separator), FALSE);
-  else
-    gtk_widget_set_visible (GTK_WIDGET (priv->separator), !!subtitle);
-
-  gtk_orientable_set_orientation (GTK_ORIENTABLE (priv->box), priv->orientation);
+  dzl_suggestion_set_orientation (priv);
 }
 
 static void
@@ -181,9 +216,7 @@ dzl_suggestion_row_set_property (GObject      *object,
       if (priv->orientation != g_value_get_enum (value))
         {
           priv->orientation = g_value_get_enum (value);
-          gtk_widget_set_visible (GTK_WIDGET (priv->separator),
-                                  priv->orientation != GTK_ORIENTATION_VERTICAL);
-          gtk_orientable_set_orientation (GTK_ORIENTABLE (priv->box), priv->orientation);
+          dzl_suggestion_set_orientation (priv);
         }
       break;
 
@@ -224,7 +257,7 @@ dzl_suggestion_row_class_init (DzlSuggestionRowClass *klass)
   gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, title);
   gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, subtitle);
   gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, separator);
-  gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, box);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, grid);
 }
 
 static void
