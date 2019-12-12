@@ -1,4 +1,16 @@
 ==============
+Version 3.35.2
+==============
+
+Changes in this release:
+
+ • Touch support for DzlSuggestionEntry
+ • Column sizing improvements to DzlColumnLayout
+ • Documentation improvements
+ • Improved support for disabled animations
+ • Improvments to when and how suggestion popups are displayed
+
+==============
 Version 3.34.0
 ==============
 
