@@ -42,9 +42,9 @@ struct _DzlSuggestionClass
   GIcon           *(*get_icon)           (DzlSuggestion *self);
   cairo_surface_t *(*get_icon_surface)   (DzlSuggestion *self,
                                           GtkWidget     *widget);
-
-  gpointer _reserved3;
-  gpointer _reserved4;
+  GIcon           *(*get_secondary_icon) (DzlSuggestion *self);
+  cairo_surface_t *(*get_secondary_icon_surface)   (DzlSuggestion *self,
+                                                    GtkWidget     *widget);
 };
 
 DZL_AVAILABLE_IN_ALL
@@ -80,6 +80,17 @@ GIcon           *dzl_suggestion_get_icon           (DzlSuggestion *self);
 DZL_AVAILABLE_IN_3_30
 cairo_surface_t *dzl_suggestion_get_icon_surface   (DzlSuggestion *self,
                                                     GtkWidget     *widget);
+DZL_AVAILABLE_IN_3_36
+const gchar     *dzl_suggestion_get_secondary_icon_name (DzlSuggestion *self);
+DZL_AVAILABLE_IN_3_36
+void             dzl_suggestion_set_secondary_icon_name (DzlSuggestion *self,
+                                                         const gchar   *icon_name);
+
+DZL_AVAILABLE_IN_3_36
+GIcon           *dzl_suggestion_get_secondary_icon (DzlSuggestion *self);
+DZL_AVAILABLE_IN_3_36
+cairo_surface_t *dzl_suggestion_get_secondary_icon_surface (DzlSuggestion *self,
+                                                            GtkWidget     *widget);
 
 G_END_DECLS
 

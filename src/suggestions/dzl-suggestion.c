@@ -31,14 +31,18 @@ typedef struct
 
   /* interned string */
   const gchar *icon_name;
+  const gchar *secondary_icon_name;
 
   GIcon *icon;
+  GIcon *secondary_icon;
 } DzlSuggestionPrivate;
 
 enum {
   PROP_0,
   PROP_ICON_NAME,
   PROP_ICON,
+  PROP_SECONDARY_ICON_NAME,
+  PROP_SECONDARY_ICON,
   PROP_ID,
   PROP_SUBTITLE,
   PROP_TITLE,
@@ -65,6 +69,19 @@ dzl_suggestion_real_get_icon (DzlSuggestion *self)
 
   if (priv->icon_name != NULL)
     return g_icon_new_for_string (priv->icon_name, NULL);
+
+  return NULL;
+}
+
+static GIcon *
+dzl_suggestion_real_get_secondary_icon (DzlSuggestion *self)
+{
+  DzlSuggestionPrivate *priv = dzl_suggestion_get_instance_private (self);
+
+  g_assert (DZL_IS_SUGGESTION (self));
+
+  if (priv->secondary_icon_name != NULL)
+    return g_icon_new_for_string (priv->secondary_icon_name, NULL);
 
   return NULL;
 }
@@ -106,6 +123,14 @@ dzl_suggestion_get_property (GObject    *object,
       g_value_take_object (value, dzl_suggestion_get_icon (self));
       break;
 
+    case PROP_SECONDARY_ICON_NAME:
+      g_value_set_static_string (value, dzl_suggestion_get_secondary_icon_name (self));
+      break;
+
+    case PROP_SECONDARY_ICON:
+      g_value_take_object (value, dzl_suggestion_get_secondary_icon (self));
+      break;
+
     case PROP_TITLE:
       g_value_set_string (value, dzl_suggestion_get_title (self));
       break;
@@ -131,6 +156,10 @@ dzl_suggestion_set_property (GObject      *object,
     {
     case PROP_ICON_NAME:
       dzl_suggestion_set_icon_name (self, g_value_get_string (value));
+      break;
+
+    case PROP_SECONDARY_ICON_NAME:
+      dzl_suggestion_set_secondary_icon_name (self, g_value_get_string (value));
       break;
 
     case PROP_ID:
@@ -160,6 +189,7 @@ dzl_suggestion_class_init (DzlSuggestionClass *klass)
   object_class->set_property = dzl_suggestion_set_property;
 
   klass->get_icon = dzl_suggestion_real_get_icon;
+  klass->get_secondary_icon = dzl_suggestion_real_get_secondary_icon;
 
   properties [PROP_ID] =
     g_param_spec_string ("id",
@@ -179,6 +209,20 @@ dzl_suggestion_class_init (DzlSuggestionClass *klass)
     g_param_spec_string ("icon-name",
                          "Icon Name",
                          "The name of the icon to display",
+                         NULL,
+                         (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_SECONDARY_ICON] =
+    g_param_spec_object ("secondary-icon",
+                         "Secondary Icon",
+                         "The secondary GIcon for the suggestion on the right",
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_SECONDARY_ICON_NAME] =
+    g_param_spec_string ("secondary-icon-name",
+                         "Secondary Icon Name",
+                         "The name of the secondary icon to display",
                          NULL,
                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
@@ -241,6 +285,16 @@ dzl_suggestion_get_icon_name (DzlSuggestion *self)
 }
 
 const gchar *
+dzl_suggestion_get_secondary_icon_name (DzlSuggestion *self)
+{
+  DzlSuggestionPrivate *priv = dzl_suggestion_get_instance_private (self);
+
+  g_return_val_if_fail (DZL_IS_SUGGESTION (self), NULL);
+
+  return priv->secondary_icon_name;
+}
+
+const gchar *
 dzl_suggestion_get_title (DzlSuggestion *self)
 {
   DzlSuggestionPrivate *priv = dzl_suggestion_get_instance_private (self);
@@ -274,6 +328,23 @@ dzl_suggestion_set_icon_name (DzlSuggestion *self,
     {
       priv->icon_name = icon_name;
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ICON_NAME]);
+    }
+}
+
+void
+dzl_suggestion_set_secondary_icon_name (DzlSuggestion *self,
+                                        const gchar   *icon_name)
+{
+  DzlSuggestionPrivate *priv = dzl_suggestion_get_instance_private (self);
+
+  g_return_if_fail (DZL_IS_SUGGESTION (self));
+
+  icon_name = g_intern_string (icon_name);
+
+  if (priv->secondary_icon_name != icon_name)
+    {
+      priv->secondary_icon_name = icon_name;
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_SECONDARY_ICON_NAME]);
     }
 }
 
@@ -428,6 +499,52 @@ dzl_suggestion_get_icon_surface (DzlSuggestion *self,
 
   if (DZL_SUGGESTION_GET_CLASS (self)->get_icon_surface)
     return DZL_SUGGESTION_GET_CLASS (self)->get_icon_surface (self, widget);
+
+  return NULL;
+}
+
+/**
+ * dzl_suggestion_get_secondary_icon:
+ * @self: a #DzlSuggestion
+ *
+ * Gets the secondary icon for the suggestion, if any.
+ *
+ * Returns: (transfer full) (nullable): a #GIcon or %NULL
+ *
+ * Since: 3.36
+ */
+GIcon *
+dzl_suggestion_get_secondary_icon (DzlSuggestion *self)
+{
+  g_return_val_if_fail (DZL_IS_SUGGESTION (self), NULL);
+
+  return DZL_SUGGESTION_GET_CLASS (self)->get_secondary_icon (self);
+}
+
+/**
+ * dzl_suggestion_get_secondary_icon_surface:
+ * @self: a #DzlSuggestion
+ * @widget: a widget that may contain the surface
+ *
+ * This function allows subclasses to dynamicly generate content for the
+ * suggestion such as may be required when integrating with favicons or
+ * similar.
+ *
+ * @widget is provided so that the implementation may determine scale or
+ * any other style-specific settings from the style context.
+ *
+ * Returns: (transfer full) (nullable): a #cairo_surface_t or %NULL
+ *
+ * Since: 3.36
+ */
+cairo_surface_t *
+dzl_suggestion_get_secondary_icon_surface (DzlSuggestion *self,
+                                           GtkWidget     *widget)
+{
+  g_return_val_if_fail (DZL_IS_SUGGESTION (self), NULL);
+
+  if (DZL_SUGGESTION_GET_CLASS (self)->get_secondary_icon_surface)
+    return DZL_SUGGESTION_GET_CLASS (self)->get_secondary_icon_surface (self, widget);
 
   return NULL;
 }

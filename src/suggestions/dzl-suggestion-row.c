@@ -30,8 +30,10 @@ typedef struct
   GtkOrientation orientation;
 
   gulong         notify_icon_handler;
+  gulong         notify_secondary_icon_handler;
 
   GtkImage      *image;
+  GtkImage      *secondary_image;
   GtkLabel      *title;
   GtkLabel      *separator;
   GtkLabel      *subtitle;
@@ -63,8 +65,10 @@ dzl_suggestion_row_disconnect (DzlSuggestionRow *self)
     return;
 
   dzl_clear_signal_handler (priv->suggestion, &priv->notify_icon_handler);
+  dzl_clear_signal_handler (priv->suggestion, &priv->notify_secondary_icon_handler);
 
   g_object_set (priv->image, "icon-name", NULL, NULL);
+  g_object_set (priv->secondary_image, "icon-name", NULL, NULL);
   gtk_label_set_label (priv->title, NULL);
   gtk_label_set_label (priv->subtitle, NULL);
 }
@@ -89,6 +93,29 @@ on_notify_icon_cb (DzlSuggestionRow *self,
     {
       g_autoptr(GIcon) icon = dzl_suggestion_get_icon (suggestion);
       gtk_image_set_from_gicon (priv->image, icon, GTK_ICON_SIZE_MENU);
+    }
+}
+
+static void
+on_notify_secondary_icon_cb (DzlSuggestionRow *self,
+                             GParamSpec       *pspec,
+                             DzlSuggestion    *suggestion)
+{
+  DzlSuggestionRowPrivate *priv = dzl_suggestion_row_get_instance_private (self);
+  cairo_surface_t *surface;
+
+  g_assert (DZL_IS_SUGGESTION_ROW (self));
+  g_assert (DZL_IS_SUGGESTION (suggestion));
+
+  if ((surface = dzl_suggestion_get_secondary_icon_surface (suggestion, GTK_WIDGET (priv->secondary_image))))
+    {
+      gtk_image_set_from_surface (priv->secondary_image, surface);
+      cairo_surface_destroy (surface);
+    }
+  else
+    {
+      g_autoptr(GIcon) icon = dzl_suggestion_get_secondary_icon (suggestion);
+      gtk_image_set_from_gicon (priv->secondary_image, icon, GTK_ICON_SIZE_MENU);
     }
 }
 
@@ -148,7 +175,15 @@ dzl_suggestion_row_connect (DzlSuggestionRow *self)
                              self,
                              G_CONNECT_SWAPPED);
 
+  priv->notify_secondary_icon_handler =
+    g_signal_connect_object (priv->suggestion,
+                             "notify::secondary-icon",
+                             G_CALLBACK (on_notify_secondary_icon_cb),
+                             self,
+                             G_CONNECT_SWAPPED);
+
   on_notify_icon_cb (self, NULL, priv->suggestion);
+  on_notify_secondary_icon_cb (self, NULL, priv->suggestion);
 
   gtk_label_set_label (priv->title, dzl_suggestion_get_title (priv->suggestion));
 
@@ -254,6 +289,7 @@ dzl_suggestion_row_class_init (DzlSuggestionRowClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/dazzle/ui/dzl-suggestion-row.ui");
   gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, image);
+  gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, secondary_image);
   gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, title);
   gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, subtitle);
   gtk_widget_class_bind_template_child_private (widget_class, DzlSuggestionRow, separator);
