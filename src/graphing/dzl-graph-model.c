@@ -577,7 +577,7 @@ dzl_graph_view_model_class_init (DzlGraphModelClass *klass)
     g_param_spec_double ("value-max",
                          "Value Max",
                          "Value Max",
-                         -G_MINDOUBLE, G_MAXDOUBLE,
+                         -G_MAXDOUBLE, G_MAXDOUBLE,
                          100.0,
                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
@@ -585,7 +585,7 @@ dzl_graph_view_model_class_init (DzlGraphModelClass *klass)
     g_param_spec_double ("value-min",
                          "Value Min",
                          "Value Min",
-                         -G_MINDOUBLE, G_MAXDOUBLE,
+                         -G_MAXDOUBLE, G_MAXDOUBLE,
                          100.0,
                          (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
