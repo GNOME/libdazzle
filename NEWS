@@ -1,4 +1,13 @@
 ==============
+Version 3.35.3
+==============
+
+Changes in this release:
+
+ • Support for secondary icons in suggestion rows
+ • Graph model property range fixes
+
+==============
 Version 3.35.2
 ==============
 
