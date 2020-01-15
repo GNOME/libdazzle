@@ -57,6 +57,7 @@ enum {
 
 enum {
   CHANGED,
+  VALUE_CHANGED,
   LAST_SIGNAL
 };
 
@@ -471,6 +472,8 @@ dzl_graph_view_model_iter_set_value (DzlGraphModelIter *iter,
   g_assert (col != NULL);
 
   _dzl_graph_view_column_set_value (col, impl->index, value);
+
+  g_signal_emit (impl->table, signals [VALUE_CHANGED], 0);
 }
 
 static void
@@ -598,7 +601,20 @@ dzl_graph_view_model_class_init (DzlGraphModelClass *klass)
                                      NULL, NULL, NULL,
                                      G_TYPE_NONE,
                                      0);
+
+  signals [VALUE_CHANGED] = g_signal_new ("value-changed",
+                                           G_TYPE_FROM_CLASS (klass),
+                                           G_SIGNAL_RUN_LAST,
+                                           0,
+                                           NULL, NULL, NULL,
+                                           G_TYPE_NONE,
+                                           0);
+
   g_signal_set_va_marshaller (signals [CHANGED],
+                              G_TYPE_FROM_CLASS (klass),
+                              g_cclosure_marshal_VOID__VOIDv);
+
+  g_signal_set_va_marshaller (signals [VALUE_CHANGED],
                               G_TYPE_FROM_CLASS (klass),
                               g_cclosure_marshal_VOID__VOIDv);
 }
