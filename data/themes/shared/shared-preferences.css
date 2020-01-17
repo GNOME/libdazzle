@@ -1,13 +1,13 @@
 entry.preferences-search {
   border: none;
-  border-right: 1px solid alpha(@borders, 0.55);
-  border-bottom: 1px solid alpha(@borders, 0.55);
+  border-right: 1px solid @borders;
+  border-bottom: 1px solid @borders;
   border-radius: 0;
 }
 
 dzlpreferencesview stacksidebar list {
   background-color: @content_view_bg;
-  border-right: 1px solid alpha(@borders, 0.55);
+  border-right: 1px solid @borders;
 }
 
 dzlpreferencesview stacksidebar list separator {
