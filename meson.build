@@ -28,8 +28,10 @@ libversion = '@0@.@1@.@2@'.format(soversion, current, revision)
 
 darwin_versions = [current + 1, '@0@.@1@'.format(current + 1, revision)]
 
+package_string = 'libdazzle-@0@'.format(apiversion)
+
 config_h = configuration_data()
-config_h.set_quoted('GETTEXT_PACKAGE', 'libdazzle')
+config_h.set_quoted('GETTEXT_PACKAGE', package_string)
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('localedir')))
 
 add_project_arguments([
@@ -169,11 +171,13 @@ configure_file(
   configuration: config_h,
 )
 
+i18n = import('i18n')
 gnome = import('gnome')
 
 subdir('src')
 subdir('tools')
 subdir('tests')
+subdir('po')
 subdir('examples/app')
 
 if get_option('enable_gtk_doc')
