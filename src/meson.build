@@ -80,6 +80,7 @@ libdazzle_sources = [
   libdazzle_public_sources,
   libdazzle_private_sources,
   libdazzle_resources,
+  'dzl-init.c',
 ]
 
 libdazzle_deps = [
