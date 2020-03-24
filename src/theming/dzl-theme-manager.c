@@ -131,9 +131,15 @@ dzl_theme_manager_add_resources (DzlThemeManager *self,
     {
       provider = dzl_css_provider_new (css_dir);
       g_hash_table_insert (self->providers_by_path, g_strdup (resource_path), g_object_ref (provider));
+
+      /* Use APPLICATION+1 to place ourselves higher than libraries that
+       * incorrectly use APPLICATION as their priority. This allows the
+       * application (whose themes we'll be loading) to have higher
+       * priorities than libraries like VTE.
+       */
       gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
                                                  GTK_STYLE_PROVIDER (provider),
-                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION+1);
     }
 
   /*
