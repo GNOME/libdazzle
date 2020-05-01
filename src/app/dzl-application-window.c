@@ -26,6 +26,8 @@
 # include "backports/gtkeventcontrollermotion.c"
 #endif
 
+#include "dzl-enums.h"
+
 #include "app/dzl-application-window.h"
 #include "shortcuts/dzl-shortcut-manager.h"
 #include "util/dzl-gtk.h"
@@ -59,8 +61,12 @@ typedef struct
   GtkEventController *motion_controller;
   gulong              motion_controller_handler;
 
+  DzlTitlebarAnimation  last_titlebar_animation;
+
   guint        fullscreen_source;
   guint        fullscreen_reveal_source;
+  guint        titlebar_hiding;
+
   guint        fullscreen : 1;
   guint        in_key_press : 1;
 } DzlApplicationWindowPrivate;
@@ -68,6 +74,7 @@ typedef struct
 enum {
   PROP_0,
   PROP_FULLSCREEN,
+  PROP_TITLEBAR_ANIMATION,
   N_PROPS
 };
 
@@ -80,6 +87,37 @@ G_DEFINE_TYPE_WITH_CODE (DzlApplicationWindow, dzl_application_window, GTK_TYPE_
 static GParamSpec *properties [N_PROPS];
 static GtkBuildableIface *parent_buildable;
 
+static void
+update_titlebar_animation_property (DzlApplicationWindow *self)
+{
+  DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
+  DzlTitlebarAnimation current;
+
+  g_assert (DZL_IS_APPLICATION_WINDOW (self));
+
+  current = dzl_application_window_get_titlebar_animation (self);
+
+  if (current != priv->last_titlebar_animation)
+    {
+      priv->last_titlebar_animation = current;
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_TITLEBAR_ANIMATION]);
+    }
+}
+
+static gboolean
+dzl_application_window_titlebar_hidden_cb (gpointer data)
+{
+  DzlApplicationWindow *self = data;
+  DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
+
+  g_assert (DZL_IS_APPLICATION_WINDOW (self));
+
+  priv->titlebar_hiding--;
+  update_titlebar_animation_property (self);
+
+  return G_SOURCE_REMOVE;
+}
+
 static gboolean
 dzl_application_window_dismissal (DzlApplicationWindow *self)
 {
@@ -87,10 +125,20 @@ dzl_application_window_dismissal (DzlApplicationWindow *self)
 
   g_assert (DZL_IS_APPLICATION_WINDOW (self));
 
-  priv->fullscreen_reveal_source = 0;
-
   if (dzl_application_window_get_fullscreen (self))
-    gtk_revealer_set_reveal_child (priv->titlebar_revealer, FALSE);
+    {
+      priv->titlebar_hiding++;
+      gtk_revealer_set_reveal_child (priv->titlebar_revealer, FALSE);
+      g_timeout_add_full (G_PRIORITY_DEFAULT,
+                          gtk_revealer_get_transition_duration (priv->titlebar_revealer),
+                          dzl_application_window_titlebar_hidden_cb,
+                          g_object_ref (self),
+                          g_object_unref);
+    }
+
+  update_titlebar_animation_property (self);
+
+  priv->fullscreen_reveal_source = 0;
 
   return G_SOURCE_REMOVE;
 }
@@ -222,6 +270,8 @@ dzl_application_window_complete_fullscreen (DzlApplicationWindow *self)
     }
 
   g_object_unref (titlebar);
+
+  update_titlebar_animation_property (self);
 
   return G_SOURCE_REMOVE;
 }
@@ -371,6 +421,17 @@ dzl_application_window_window_state_event (GtkWidget           *widget,
 }
 
 static void
+dzl_application_window_revealer_notify_child_state (DzlApplicationWindow *self,
+                                                    GParamSpec           *pspec,
+                                                    GtkRevealer          *revealer)
+{
+  g_assert (DZL_IS_APPLICATION_WINDOW (self));
+  g_assert (GTK_IS_REVEALER (revealer));
+
+  update_titlebar_animation_property (self);
+}
+
+static void
 dzl_application_window_destroy (GtkWidget *widget)
 {
   DzlApplicationWindow *self = (DzlApplicationWindow *)widget;
@@ -402,6 +463,10 @@ dzl_application_window_get_property (GObject    *object,
     {
     case PROP_FULLSCREEN:
       g_value_set_boolean (value, dzl_application_window_get_fullscreen (self));
+      break;
+
+    case PROP_TITLEBAR_ANIMATION:
+      g_value_set_enum (value, dzl_application_window_get_titlebar_animation (self));
       break;
 
     default:
@@ -467,6 +532,14 @@ dzl_application_window_class_init (DzlApplicationWindowClass *klass)
                           FALSE,
                           (G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  properties [PROP_TITLEBAR_ANIMATION] =
+    g_param_spec_enum ("titlebar-animation",
+                       "Titlebar Animation",
+                       "The state of the titlebar animation",
+                       DZL_TYPE_TITLEBAR_ANIMATION,
+                       DZL_TITLEBAR_ANIMATION_SHOWN,
+                       (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -475,6 +548,8 @@ dzl_application_window_init (DzlApplicationWindow *self)
 {
   DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
   g_autoptr(GPropertyAction) fullscreen = NULL;
+
+  priv->last_titlebar_animation = DZL_TITLEBAR_ANIMATION_SHOWN;
 
   priv->titlebar_container = g_object_new (GTK_TYPE_STACK,
                                            "name", "titlebar_container",
@@ -513,6 +588,16 @@ dzl_application_window_init (DzlApplicationWindow *self)
                                           "reveal-child", TRUE,
                                           "visible", TRUE,
                                           NULL);
+  g_signal_connect_object (priv->titlebar_revealer,
+                           "notify::child-revealed",
+                           G_CALLBACK (dzl_application_window_revealer_notify_child_state),
+                           self,
+                           G_CONNECT_SWAPPED);
+  g_signal_connect_object (priv->titlebar_revealer,
+                           "notify::reveal-child",
+                           G_CALLBACK (dzl_application_window_revealer_notify_child_state),
+                           self,
+                           G_CONNECT_SWAPPED);
   g_signal_connect (priv->titlebar_revealer,
                     "destroy",
                     G_CALLBACK (gtk_widget_destroyed),
@@ -566,7 +651,10 @@ dzl_application_window_set_fullscreen (DzlApplicationWindow *self,
   fullscreen = !!fullscreen;
 
   if (fullscreen != dzl_application_window_get_fullscreen (self))
-    DZL_APPLICATION_WINDOW_GET_CLASS (self)->set_fullscreen (self, fullscreen);
+    {
+      DZL_APPLICATION_WINDOW_GET_CLASS (self)->set_fullscreen (self, fullscreen);
+      update_titlebar_animation_property (self);
+    }
 }
 
 static void
@@ -643,4 +731,42 @@ dzl_application_window_set_titlebar (DzlApplicationWindow *self,
 
   if (titlebar != NULL)
     gtk_container_add (GTK_CONTAINER (priv->titlebar_container), titlebar);
+}
+
+DzlTitlebarAnimation
+dzl_application_window_get_titlebar_animation (DzlApplicationWindow *self)
+{
+  DzlApplicationWindowPrivate *priv = dzl_application_window_get_instance_private (self);
+  GtkWidget *titlebar;
+
+  g_return_val_if_fail (DZL_IS_APPLICATION_WINDOW (self), 0);
+
+  titlebar = dzl_application_window_get_titlebar (self);
+  if (titlebar == NULL)
+    return DZL_TITLEBAR_ANIMATION_HIDDEN;
+
+  if (!dzl_application_window_get_fullscreen (self))
+    {
+      if (gtk_widget_get_visible (titlebar))
+        return DZL_TITLEBAR_ANIMATION_SHOWN;
+      else
+        return DZL_TITLEBAR_ANIMATION_HIDDEN;
+    }
+
+  /* If the source from queue_dismissal is 0, then we already
+   * fired and we are hiding the titlebar.
+   */
+  if (priv->titlebar_hiding)
+    return DZL_TITLEBAR_ANIMATION_HIDING;
+
+  /* Titlebar currently visible */
+  if (gtk_revealer_get_reveal_child (priv->titlebar_revealer) &&
+      gtk_revealer_get_child_revealed (priv->titlebar_revealer))
+    return DZL_TITLEBAR_ANIMATION_SHOWN;
+
+  /* Working towards becoming visible */
+  if (gtk_revealer_get_reveal_child (priv->titlebar_revealer))
+    return DZL_TITLEBAR_ANIMATION_SHOWING;
+
+  return DZL_TITLEBAR_ANIMATION_HIDDEN;
 }

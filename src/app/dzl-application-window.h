@@ -30,6 +30,14 @@ G_BEGIN_DECLS
 DZL_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (DzlApplicationWindow, dzl_application_window, DZL, APPLICATION_WINDOW, GtkApplicationWindow)
 
+typedef enum
+{
+  DZL_TITLEBAR_ANIMATION_HIDDEN  = 0,
+  DZL_TITLEBAR_ANIMATION_SHOWING = 1,
+  DZL_TITLEBAR_ANIMATION_SHOWN   = 2,
+  DZL_TITLEBAR_ANIMATION_HIDING  = 3,
+} DzlTitlebarAnimation;
+
 struct _DzlApplicationWindowClass
 {
   GtkApplicationWindowClass parent_class;
@@ -49,15 +57,17 @@ struct _DzlApplicationWindowClass
 };
 
 DZL_AVAILABLE_IN_ALL
-gboolean   dzl_application_window_get_fullscreen (DzlApplicationWindow *self);
+gboolean              dzl_application_window_get_fullscreen         (DzlApplicationWindow *self);
 DZL_AVAILABLE_IN_ALL
-void       dzl_application_window_set_fullscreen (DzlApplicationWindow *self,
-                                                  gboolean              fullscreen);
+void                  dzl_application_window_set_fullscreen         (DzlApplicationWindow *self,
+                                                                     gboolean              fullscreen);
 DZL_AVAILABLE_IN_ALL
-GtkWidget *dzl_application_window_get_titlebar   (DzlApplicationWindow *self);
+GtkWidget            *dzl_application_window_get_titlebar           (DzlApplicationWindow *self);
 DZL_AVAILABLE_IN_ALL
-void       dzl_application_window_set_titlebar   (DzlApplicationWindow *self,
-                                                  GtkWidget            *titlebar);
+void                  dzl_application_window_set_titlebar           (DzlApplicationWindow *self,
+                                                                     GtkWidget            *titlebar);
+DZL_AVAILABLE_IN_3_38
+DzlTitlebarAnimation  dzl_application_window_get_titlebar_animation (DzlApplicationWindow *self);
 
 G_END_DECLS
 

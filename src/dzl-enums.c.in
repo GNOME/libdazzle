@@ -4,6 +4,7 @@
 
 #include "dzl-enums.h"
 
+#include "app/dzl-application-window.h"
 #include "files/dzl-file-transfer.h"
 #include "tree/dzl-tree-types.h"
 

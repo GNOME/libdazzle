@@ -8,6 +8,10 @@ app_sources = [
   'dzl-application-window.c',
 ]
 
+dzl_enum_headers += files([
+  'dzl-application-window.h',
+])
+
 libdazzle_public_headers += files(app_headers)
 libdazzle_public_sources += files(app_sources)
 
