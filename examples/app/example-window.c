@@ -143,6 +143,23 @@ on_page_changed (GtkNotebook   *notebook,
 }
 
 static void
+on_titlebar_animation (ExampleWindow *self,
+                       GParamSpec    *pspec)
+{
+  g_autoptr(GEnumClass) enum_class = NULL;
+  DzlTitlebarAnimation mode;
+  GEnumValue *value;
+
+  g_assert (EXAMPLE_IS_WINDOW (self));
+
+  mode = dzl_application_window_get_titlebar_animation (DZL_APPLICATION_WINDOW (self));
+
+  enum_class = g_type_class_ref (DZL_TYPE_TITLEBAR_ANIMATION);
+  value = g_enum_get_value (enum_class, mode);
+  g_print ("Titlebar Animation: %s\n", value->value_nick);
+}
+
+static void
 example_window_class_init (ExampleWindowClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
@@ -163,6 +180,11 @@ example_window_init (ExampleWindow *self)
   g_autoptr(GPropertyAction) right = NULL;
 
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  g_signal_connect (self,
+                    "notify::titlebar-animation",
+                    G_CALLBACK (on_titlebar_animation),
+                    NULL);
 
   g_signal_connect (self->notebook,
                     "notify::page",
