@@ -87,7 +87,7 @@ dzl_int_pair_new (gint first, gint second)
   pair.second = second;
 
 #ifdef DZL_INT_PAIR_64
-  return pair.ptr;
+  return (DzlIntPair *)pair.ptr;
 #else
   return g_slice_copy (sizeof (DzlIntPair), &pair);
 #endif
@@ -110,7 +110,7 @@ dzl_uint_pair_new (guint first, guint second)
   pair.second = second;
 
 #ifdef DZL_INT_PAIR_64
-  return pair.ptr;
+  return (DzlUIntPair *)pair.ptr;
 #else
   return g_slice_copy (sizeof (DzlUIntPair), &pair);
 #endif

@@ -94,7 +94,7 @@ dzl_str_equal0 (gconstpointer str1,
 {
   /* We use gconstpointer so that we can allow
    * both signed and unsigned chars here (such as xmlChar). */
-  return g_strcmp0 (str1, str2) == 0;
+  return g_strcmp0 ((const gchar *)str1, (const gchar *)str2) == 0;
 }
 
 static inline void
