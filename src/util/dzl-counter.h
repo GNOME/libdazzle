@@ -163,6 +163,9 @@ G_BEGIN_DECLS
 # define dzl_get_current_cpu() dzl_get_current_cpu_rdtscp()
 #elif defined(__linux__)
 # define dzl_get_current_cpu() dzl_get_current_cpu_call()
+#elif defined(__powerpc__) && !defined(__powerpc64__)
+# define dzl_get_current_cpu() 0
+# undef DZL_COUNTER_REQUIRES_ATOMIC
 #else
 # define dzl_get_current_cpu() 0
 # define DZL_COUNTER_REQUIRES_ATOMIC 1
