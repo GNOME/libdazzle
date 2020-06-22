@@ -53,9 +53,9 @@ G_DEFINE_BOXED_TYPE (DzlCounterArena, dzl_counter_arena, dzl_counter_arena_ref, 
   (((sizeof (CounterInfo) * COUNTERS_PER_GROUP) +         \
     (sizeof(DzlCounterValue) * (ncpu))) / DATA_CELL_SIZE)
 #ifdef DZL_COUNTER_REQUIRES_ATOMIC
-#define DZL_MEMORY_BARRIER __sync_synchronize()
+#define DZL_MEMORY_BARRIER G_STMT_START { __sync_synchronize(); } G_STMT_END
 #else
-#define DZL_MEMORY_BARRIER 0
+#define DZL_MEMORY_BARRIER G_STMT_START {} G_STMT_END
 #endif
 
 typedef struct
