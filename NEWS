@@ -1,4 +1,16 @@
 ==============
+Version 3.37.0
+==============
+
+Changes in this release:
+
+ • Fixes for powerpc32
+ • Tweaks for CSS priorities
+ • Add DzlApplicationWindow:titlebar-animation property
+ • Fix C++ compilation
+ • Make showing file browser asynchronous on Linux/BSD/etc
+
+==============
 Version 3.36.0
 ==============
 
