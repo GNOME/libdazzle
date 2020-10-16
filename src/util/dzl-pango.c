@@ -27,6 +27,7 @@
 #include "util/dzl-pango.h"
 
 #define FONT_FAMILY  "font-family"
+#define FONT_STYLE   "font-style"
 #define FONT_VARIANT "font-variant"
 #define FONT_STRETCH "font-stretch"
 #define FONT_WEIGHT  "font-weight"
@@ -73,6 +74,31 @@ dzl_pango_font_description_to_css (const PangoFontDescription *font_desc)
     }
 
   if ((mask & PANGO_FONT_MASK_STYLE) != 0)
+    {
+      PangoStyle style;
+
+      style = pango_font_description_get_style (font_desc);
+
+      switch (style)
+        {
+        case PANGO_STYLE_NORMAL:
+          ADD_KEYVAL (FONT_STYLE, "normal");
+          break;
+
+        case PANGO_STYLE_OBLIQUE:
+          ADD_KEYVAL (FONT_STYLE, "oblique");
+          break;
+
+        case PANGO_STYLE_ITALIC:
+          ADD_KEYVAL (FONT_STYLE, "italic");
+          break;
+
+        default:
+          break;
+        }
+    }
+
+  if ((mask & PANGO_FONT_MASK_VARIANT) != 0)
     {
       PangoVariant variant;
 
