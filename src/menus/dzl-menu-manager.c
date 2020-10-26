@@ -235,7 +235,7 @@ dzl_menu_manager_resolve_constraints (GMenu *menu)
     {
       g_autofree gchar *i_after = NULL;
 
-      g_menu_model_get_item_attribute (model, i, "after", "s", &i_after);
+      g_menu_model_get_item_attribute (model, i, DZL_MENU_ATTRIBUTE_AFTER, "s", &i_after);
       if (i_after == NULL)
         continue;
 
@@ -275,7 +275,7 @@ dzl_menu_manager_resolve_constraints (GMenu *menu)
     {
       g_autofree gchar *i_before = NULL;
 
-      g_menu_model_get_item_attribute (model, i, "before", "s", &i_before);
+      g_menu_model_get_item_attribute (model, i, DZL_MENU_ATTRIBUTE_BEFORE, "s", &i_before);
       if (i_before == NULL)
         continue;
 
