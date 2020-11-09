@@ -174,7 +174,11 @@ resolve_file (GFile *file)
     return g_object_ref (file);
 
   orig_path = g_file_get_path (file);
+#ifdef G_OS_UNIX
   real_path = realpath (orig_path, NULL);
+#else
+  real_path = _fullpath (orig_path, NULL, _MAX_PATH);
+#endif
 
   /* unlikely, but PATH_MAX exceeded */
   if (real_path == NULL)

@@ -71,16 +71,17 @@ G_DEFINE_BOXED_TYPE (DzlTrie, dzl_trie, dzl_trie_ref, dzl_trie_unref)
  * @children: The children #DzlTrieNodeChunk or %NULL. If the chunk is
  *   inline the DzlTrieNode, then there will be fewer items.
  */
-DZL_ALIGNED_BEGIN(1)
+#pragma pack(push, 1)
 struct _DzlTrieNodeChunk
 {
    DzlTrieNodeChunk *next;
-   gboolean          is_inline : 1;
-   guint             flags : 7;
-   guint             count : 8;
+   guint16           is_inline : 1;
+   guint16           flags : 7;
+   guint16           count : 8;
    guint8            keys[6];
    DzlTrieNode      *children[0];
-} DZL_ALIGNED_END(1);
+};
+#pragma pack(pop)
 
 /**
  * DzlTrieNode:
@@ -90,13 +91,14 @@ struct _DzlTrieNodeChunk
  * @chunk: The first chunk in the chain. Inline chunks have fewer children
  *    elements than extra allocated chunks so that they are cache aligned.
  */
-DZL_ALIGNED_BEGIN(1)
+#pragma pack(push, 1)
 struct _DzlTrieNode
 {
    DzlTrieNode      *parent;
    gpointer          value;
    DzlTrieNodeChunk  chunk;
-} DZL_ALIGNED_END(1);
+};
+#pragma pack(pop)
 
 /**
  * DzlTrie:

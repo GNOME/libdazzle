@@ -75,6 +75,7 @@ test_reaper_basic (void)
       g_assert_cmpint (r, ==, TRUE);
     }
 
+#ifdef G_OS_UNIX
   /* Add a symlink to ../ so that we keep ourselves honest ;) */
   {
     g_autofree gchar *cwd = g_get_current_dir ();
@@ -95,6 +96,7 @@ test_reaper_basic (void)
   g_assert_cmpint (0, ==, symlink ("../../../out-of-tree", "reaper/a/b/d"));
   g_assert_true (g_file_test ("reaper/a/b/d", G_FILE_TEST_IS_SYMLINK));
   g_assert_true (g_file_test ("reaper/a/b/d", G_FILE_TEST_EXISTS));
+#endif
 
   dzl_directory_reaper_add_directory (reaper, file, 0);
 
