@@ -1,3 +1,8 @@
 # List of source files to skip.
 # Please keep this file sorted alphabetically.
 examples/app/example-window.c
+examples/app/example-window.ui
+examples/app/gtk/menus.ui
+tests/data/menus/joined1.ui
+tests/data/menus/joined2.ui
+tests/data/menus/menus.ui
