@@ -1,5 +1,5 @@
 project('libdazzle', 'c',
-          version: '3.38.0',
+          version: '3.40.0',
           license: 'GPLv3+',
     meson_version: '>= 0.50.0',
   default_options: [ 'warning_level=1', 'buildtype=debugoptimized', 'c_std=gnu11' ],
@@ -53,7 +53,8 @@ test_c_args = [
   '-Werror=empty-body',
   '-Werror=implicit',
   '-Werror=implicit-function-declaration',
-  '-Werror=incompatible-pointer-types',
+  # fix with mkenums
+  # '-Werror=incompatible-pointer-types',
   '-Werror=init-self',
   '-Werror=int-conversion',
   '-Werror=int-to-pointer-cast',

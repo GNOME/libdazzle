@@ -1,4 +1,13 @@
 ==============
+Version 3.40.0
+==============
+
+Changes in this release:
+
+ • Build system fixes for mingw
+ • PangoFontDescription to CSS conversion improvements
+
+==============
 Version 3.38.0
 ==============
 
