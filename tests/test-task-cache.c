@@ -58,11 +58,64 @@ test_task_cache (void)
   g_assert (foo == NULL);
 }
 
+static void
+populate_callback_raw_value (DzlTaskCache  *self,
+                             gconstpointer  key,
+                             GTask         *task,
+                             gpointer       user_data)
+{
+  g_task_return_pointer (task, GINT_TO_POINTER ((gint) TRUE), NULL);
+}
+
+static void
+get_foo_raw_value_cb (GObject      *object,
+                      GAsyncResult *result,
+                      gpointer      user_data)
+{
+  GError *error = NULL;
+  gboolean value;
+  gpointer ret;
+
+  ret = dzl_task_cache_get_finish (cache, result, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (ret);
+
+  value = (gboolean) GPOINTER_TO_INT (ret);
+  g_assert_true (value);
+
+  g_assert_true (dzl_task_cache_evict (cache, "foo"));
+
+  g_main_loop_quit (main_loop);
+}
+
+static void
+test_task_cache_raw_value (void)
+{
+  main_loop = g_main_loop_new (NULL, FALSE);
+  cache = dzl_task_cache_new (g_str_hash,
+                              g_str_equal,
+                              (GBoxedCopyFunc)g_strdup,
+                              (GBoxedFreeFunc)g_free,
+                              NULL,
+                              NULL,
+                              100 /* msec */,
+                              populate_callback_raw_value, NULL, NULL);
+
+  g_assert (!dzl_task_cache_peek (cache, "foo"));
+  g_assert (!dzl_task_cache_evict (cache, "foo"));
+
+  dzl_task_cache_get_async (cache, "foo", TRUE, NULL, get_foo_raw_value_cb, NULL);
+
+  g_main_loop_run (main_loop);
+  g_main_loop_unref (main_loop);
+}
+
 gint
 main (gint   argc,
       gchar *argv[])
 {
   g_test_init (&argc, &argv, NULL);
   g_test_add_func ("/Dazzle/TaskCache/basic", test_task_cache);
+  g_test_add_func ("/Dazzle/TaskCache/raw-value", test_task_cache_raw_value);
   return g_test_run ();
 }

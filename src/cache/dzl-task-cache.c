@@ -718,8 +718,6 @@ dzl_task_cache_constructed (GObject *object)
 
   if ((self->key_equal_func == NULL) ||
       (self->key_hash_func == NULL) ||
-      (self->value_copy_func == NULL) ||
-      (self->value_destroy_func == NULL) ||
       (self->populate_callback == NULL))
     {
       g_error ("DzlTaskCache was configured improperly.");
@@ -731,6 +729,12 @@ dzl_task_cache_constructed (GObject *object)
 
   if (self->key_destroy_func == NULL)
     self->key_destroy_func = dzl_task_cache_dummy_destroy_func;
+
+  if (self->value_copy_func == NULL)
+    self->value_copy_func = dzl_task_cache_dummy_copy_func;
+
+  if (self->value_destroy_func == NULL)
+    self->value_destroy_func = dzl_task_cache_dummy_destroy_func;
 
   /*
    * This is where the cached result objects live.
