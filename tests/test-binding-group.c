@@ -245,8 +245,8 @@ celsius_to_fahrenheit (GBinding     *binding,
 {
   gdouble celsius, fahrenheit;
 
-  g_assert (G_VALUE_HOLDS (from_value, G_TYPE_DOUBLE));
-  g_assert (G_VALUE_HOLDS (to_value, G_TYPE_DOUBLE));
+  g_assert_true (G_VALUE_HOLDS (from_value, G_TYPE_DOUBLE));
+  g_assert_true (G_VALUE_HOLDS (to_value, G_TYPE_DOUBLE));
 
   celsius = g_value_get_double (from_value);
   fahrenheit = (9 * celsius / 5) + 32.0;
@@ -267,8 +267,8 @@ fahrenheit_to_celsius (GBinding     *binding,
 {
   gdouble celsius, fahrenheit;
 
-  g_assert (G_VALUE_HOLDS (from_value, G_TYPE_DOUBLE));
-  g_assert (G_VALUE_HOLDS (to_value, G_TYPE_DOUBLE));
+  g_assert_true (G_VALUE_HOLDS (from_value, G_TYPE_DOUBLE));
+  g_assert_true (G_VALUE_HOLDS (to_value, G_TYPE_DOUBLE));
 
   fahrenheit = g_value_get_double (from_value);
   celsius = 5 * (fahrenheit - 32.0) / 9;
@@ -341,7 +341,7 @@ test_binding_group_default (void)
 
   g_assert_null (dzl_binding_group_get_source (group));
   dzl_binding_group_set_source (group, source);
-  g_assert (dzl_binding_group_get_source (group) == (GObject *)source);
+  g_assert_true (dzl_binding_group_get_source (group) == (GObject *)source);
 
   for (i = 0; i < 2; ++i)
     {
@@ -356,7 +356,7 @@ test_binding_group_default (void)
       dzl_binding_group_set_source (group, NULL);
       g_assert_null (dzl_binding_group_get_source (group));
       dzl_binding_group_set_source (group, source);
-      g_assert (dzl_binding_group_get_source (group) == (GObject *)source);
+      g_assert_true (dzl_binding_group_get_source (group) == (GObject *)source);
     }
 
   g_object_unref (group);
@@ -388,7 +388,7 @@ test_binding_group_bidirectional (void)
 
   g_assert_null (dzl_binding_group_get_source (group));
   dzl_binding_group_set_source (group, source);
-  g_assert (dzl_binding_group_get_source (group) == (GObject *)source);
+  g_assert_true (dzl_binding_group_get_source (group) == (GObject *)source);
 
   for (i = 0; i < 2; ++i)
     {
@@ -403,7 +403,7 @@ test_binding_group_bidirectional (void)
       dzl_binding_group_set_source (group, NULL);
       g_assert_null (dzl_binding_group_get_source (group));
       dzl_binding_group_set_source (group, source);
-      g_assert (dzl_binding_group_get_source (group) == (GObject *)source);
+      g_assert_true (dzl_binding_group_get_source (group) == (GObject *)source);
     }
 
   g_object_unref (group);
@@ -554,7 +554,7 @@ test_binding_group_weak_ref_source (void)
                           G_BINDING_BIDIRECTIONAL);
 
   g_object_add_weak_pointer (G_OBJECT (source), (gpointer)&source);
-  g_assert (dzl_binding_group_get_source (group) == (GObject *)source);
+  g_assert_true (dzl_binding_group_get_source (group) == (GObject *)source);
   g_object_unref (source);
   g_assert_null (source);
   g_assert_null (dzl_binding_group_get_source (group));
