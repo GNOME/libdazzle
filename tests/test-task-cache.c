@@ -25,10 +25,10 @@ get_foo_cb (GObject      *object,
 
   ret = dzl_task_cache_get_finish (cache, result, &error);
   g_assert_no_error (error);
-  g_assert (ret != NULL);
-  g_assert (ret == foo);
+  g_assert_nonnull (ret);
+  g_assert_true (ret == foo);
 
-  g_assert (dzl_task_cache_evict (cache, "foo"));
+  g_assert_true (dzl_task_cache_evict (cache, "foo"));
   g_object_unref (ret);
 
   g_main_loop_quit (main_loop);
@@ -47,15 +47,15 @@ test_task_cache (void)
                               100 /* msec */,
                               populate_callback, NULL, NULL);
 
-  g_assert (!dzl_task_cache_peek (cache, "foo"));
-  g_assert (!dzl_task_cache_evict (cache, "foo"));
+  g_assert_null (dzl_task_cache_peek (cache, "foo"));
+  g_assert_false (dzl_task_cache_evict (cache, "foo"));
 
   dzl_task_cache_get_async (cache, "foo", TRUE, NULL, get_foo_cb, NULL);
 
   g_main_loop_run (main_loop);
   g_main_loop_unref (main_loop);
 
-  g_assert (foo == NULL);
+  g_assert_null (foo);
 }
 
 static void
@@ -101,8 +101,8 @@ test_task_cache_raw_value (void)
                               100 /* msec */,
                               populate_callback_raw_value, NULL, NULL);
 
-  g_assert (!dzl_task_cache_peek (cache, "foo"));
-  g_assert (!dzl_task_cache_evict (cache, "foo"));
+  g_assert_null (dzl_task_cache_peek (cache, "foo"));
+  g_assert_false (dzl_task_cache_evict (cache, "foo"));
 
   dzl_task_cache_get_async (cache, "foo", TRUE, NULL, get_foo_raw_value_cb, NULL);
 
