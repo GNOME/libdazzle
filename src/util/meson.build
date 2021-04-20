@@ -36,6 +36,7 @@ util_sources = [
 ]
 
 # No counters if building on win32 for now.
+# When avaiable remove G_OS_WIN32 checks in src/dazzel.h.
 # They need explicit porting to that platform and should
 # probably just wrap the eventtrace API or something.
 if host_machine.system() != 'windows'

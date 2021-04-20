@@ -133,7 +133,9 @@ G_BEGIN_DECLS
 #include "tree/dzl-tree-types.h"
 #include "util/dzl-cairo.h"
 #include "util/dzl-cancellable.h"
-#include "util/dzl-counter.h"
+#ifndef G_OS_WIN32
+# include "util/dzl-counter.h"
+#endif
 #include "util/dzl-date-time.h"
 #include "util/dzl-dnd.h"
 #include "util/dzl-file-manager.h"
@@ -153,7 +155,9 @@ G_BEGIN_DECLS
 #include "widgets/dzl-box.h"
 #include "widgets/dzl-centering-bin.h"
 #include "widgets/dzl-column-layout.h"
-#include "widgets/dzl-counters-window.h"
+#ifndef G_OS_WIN32
+# include "widgets/dzl-counters-window.h"
+#endif
 #include "widgets/dzl-elastic-bin.h"
 #include "widgets/dzl-empty-state.h"
 #include "widgets/dzl-entry-box.h"
