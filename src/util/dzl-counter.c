@@ -418,7 +418,7 @@ _dzl_counter_arena_destroy (DzlCounterArena *arena)
   g_assert (arena != NULL);
 
   if (arena->data_is_mmapped)
-    munmap (arena->cells, arena->data_length);
+    munmap ((void *)arena->cells, arena->data_length);
   else
 #ifdef G_OS_WIN32
     /* Allocated with _aligned_malloc() */
