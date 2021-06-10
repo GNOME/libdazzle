@@ -97,6 +97,10 @@ if get_option('enable_rdtscp')
   libdazzle_args += '-DDZL_HAVE_RDTSCP'
 endif
 
+if host_machine.system() == 'darwin'
+  libdazzle_args += '-xobjective-c'
+endif
+
 libdazzle = shared_library(
   'dazzle-' + apiversion,
   libdazzle_sources,

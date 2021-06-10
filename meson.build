@@ -39,6 +39,12 @@ add_project_arguments([
   '-DDAZZLE_COMPILATION',
 ], language: 'c')
 
+if host_machine.system() == 'darwin'
+  add_project_arguments([
+    '-DPLATFORM_OSX',
+  ], language: 'c')
+endif
+
 root_inc = include_directories('.')
 src_inc = include_directories('src')
 
