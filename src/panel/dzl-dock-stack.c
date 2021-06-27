@@ -32,8 +32,8 @@ typedef struct
   GtkStack         *stack;
   DzlTabStrip      *tab_strip;
   GtkButton        *pinned_button;
-  GtkPositionType   edge : 2;
-  DzlTabStyle       style : 2;
+  GtkPositionType   edge;
+  DzlTabStyle       style;
 } DzlDockStackPrivate;
 
 static void dzl_dock_stack_init_dock_item_iface (DzlDockItemInterface *iface);
