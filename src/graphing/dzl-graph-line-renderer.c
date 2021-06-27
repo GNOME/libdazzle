@@ -19,6 +19,7 @@
 #include "config.h"
 
 #include <glib/gi18n.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "dzl-graph-line-renderer.h"

@@ -771,7 +771,7 @@ apply_style (GtkWidget *widget,
     dzl_tab_set_style (DZL_TAB (widget), style);
 }
 
-guint
+DzlTabStyle
 dzl_tab_strip_get_style (DzlTabStrip *self)
 {
   DzlTabStripPrivate *priv = dzl_tab_strip_get_instance_private (self);

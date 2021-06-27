@@ -18,6 +18,7 @@
 
 #include "config.h"
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #define G_LOG_DOMAIN "dzl-column-layout"
