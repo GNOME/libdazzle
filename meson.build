@@ -122,7 +122,7 @@ hidden_visibility_args = []
 if get_option('default_library') != 'static'
   if host_machine.system() == 'windows'
     config_h.set('DLL_EXPORT', true)
-    if cc.get_id() == 'msvc'
+    if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl'
       config_h.set('_DZL_EXTERN', '__declspec(dllexport) extern')
     elif cc.has_argument('-fvisibility=hidden')
       config_h.set('_DZL_EXTERN', '__attribute__((visibility("default"))) __declspec(dllexport) extern')
