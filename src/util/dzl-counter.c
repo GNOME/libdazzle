@@ -30,7 +30,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#ifndef G_OS_WIN32
 #include <unistd.h>
+#endif
 
 #ifdef G_OS_UNIX
 # include <sys/mman.h>
@@ -148,6 +150,7 @@ dzl_counter_reset (DzlCounter *counter)
   DZL_MEMORY_BARRIER;
 }
 
+#ifndef G_OS_WIN32
 static void
 _dzl_counter_arena_atexit (void)
 {
@@ -158,6 +161,7 @@ _dzl_counter_arena_atexit (void)
   g_snprintf (name, sizeof name, NAME_FORMAT, pid);
   shm_unlink (name);
 }
+#endif
 
 static void
 _dzl_counter_arena_init_local (DzlCounterArena *arena)

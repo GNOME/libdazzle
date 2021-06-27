@@ -21,7 +21,9 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <unistd.h>
+#ifdef __linux__
+# include <unistd.h>
+#endif
 #include <stdio.h>
 #if defined(__FreeBSD__)
 # include <errno.h>
