@@ -22,6 +22,7 @@
 
 #include <gdk/gdk.h>
 #include <glib/gstdio.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "util/dzl-pango.h"
