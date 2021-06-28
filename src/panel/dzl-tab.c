@@ -30,12 +30,6 @@ struct _DzlTab { GtkEventBox parent; };
 
 typedef struct
 {
-  /*
-   * The edge the tab is being displayed upon. We use this to rotate
-   * text or alter box orientation.
-   */
-  GtkPositionType edge : 2;
-
   /* Can we be closed by the user */
   guint can_close : 1;
 
@@ -51,8 +45,14 @@ typedef struct
   /* If we are currently activating */
   guint in_activate : 1;
 
+  /*
+   * The edge the tab is being displayed upon. We use this to rotate
+   * text or alter box orientation.
+   */
+  GtkPositionType edge;
+
   /* Our icon/text style */
-  DzlTabStyle style : 2;
+  DzlTabStyle style;
 
   /* The action name to change the current tab */
   gchar *action_name;

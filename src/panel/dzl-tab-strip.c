@@ -32,8 +32,8 @@ typedef struct
 {
   GAction         *action;
   GtkStack        *stack;
-  GtkPositionType  edge : 2;
-  DzlTabStyle      style : 2;
+  GtkPositionType  edge;
+  DzlTabStyle      style;
 } DzlTabStripPrivate;
 
 static void buildable_iface_init (GtkBuildableIface *iface);

@@ -27,7 +27,7 @@
 
 typedef struct
 {
-  GtkPositionType child_edge : 2;
+  GtkPositionType child_edge;
 } DzlDockPanedPrivate;
 
 G_DEFINE_TYPE_EXTENDED (DzlDockPaned, dzl_dock_paned, DZL_TYPE_MULTI_PANED, 0,
