@@ -1,0 +1,303 @@
+# Chinese (China) translation for libdazzle.
+# Copyright (C) 2021 libdazzle's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libdazzle package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libdazzle master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libdazzle/issues\n"
+"POT-Creation-Date: 2021-06-28 05:13+0000\n"
+"PO-Revision-Date: 2021-06-30 11:19-0400\n"
+"Last-Translator: Silence Zhou <silence_zhou@126.com>\n"
+"Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.0\n"
+
+#: src/animation/dzl-animation.c:752
+#, c-format
+msgid "Cannot locate property %s in class %s"
+msgstr "在类 %2$s 中无法定位属性 %1$s"
+
+#: src/animation/dzl-animation.c:1099 src/animation/dzl-animation.c:1105
+#, c-format
+msgid "Failed to find property %s in %s"
+msgstr "在 %2$s 中找不到属性 %1$s"
+
+#: src/animation/dzl-animation.c:1113
+#, c-format
+msgid "Failed to find property %s in %s or parent %s"
+msgstr "在类 %2$s 或父类 %3$s 中找不到属性 %1$s"
+
+#: src/animation/dzl-animation.c:1123
+#, c-format
+msgid "Failed to retrieve va_list value: %s"
+msgstr "va_list 值检索失败: %s"
+
+#: src/files/dzl-directory-model.c:377
+msgid "Directory"
+msgstr "目录"
+
+#: src/files/dzl-directory-model.c:378
+msgid "The directory to list files from."
+msgstr "要从中列出文件的目录。"
+
+#: src/prefs/dzl-preferences-font-button.ui:57
+msgid "_Select"
+msgstr "选择(_S)"
+
+#: src/prefs/dzl-preferences-view.ui:15
+msgid "Search Preferences"
+msgstr "搜索偏好"
+
+#: src/search/dzl-trie.c:782
+#, c-format
+msgid "Traversal order %u is not supported on DzlTrie."
+msgstr "DzlTrie 不支持遍历顺序 %u。"
+
+#: src/shortcuts/dzl-shortcut-accel-dialog.c:446
+#: src/widgets/dzl-file-chooser-entry.c:168
+msgid "Cancel"
+msgstr "取消"
+
+#: src/shortcuts/dzl-shortcut-accel-dialog.c:447
+msgid "Set"
+msgstr "设置"
+
+#. Translators: <b>%s</b> is used to show the provided text in bold
+#: src/shortcuts/dzl-shortcut-accel-dialog.c:504
+#, c-format
+msgid "Enter new shortcut to change <b>%s</b>."
+msgstr "输入新的快捷方式更改<b>%s</b>。"
+
+#: src/shortcuts/dzl-shortcut-accel-dialog.ui:43
+msgid "Press Escape to cancel or Backspace to disable."
+msgstr "按 Escape 取消，或按 Backspace 禁用。"
+
+#: src/shortcuts/dzl-shortcut-manager.c:219
+msgid "Default Shortcuts"
+msgstr "默认快捷键"
+
+#: src/shortcuts/dzl-shortcuts-group.c:304
+#: src/shortcuts/dzl-shortcuts-section.c:364
+msgid "Title"
+msgstr "标题"
+
+#: src/shortcuts/dzl-shortcuts-group.c:318
+msgid "View"
+msgstr "视图"
+
+#: src/shortcuts/dzl-shortcuts-group.c:331
+#: src/shortcuts/dzl-shortcuts-group.c:332
+msgid "Accelerator Size Group"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcuts-group.c:345
+#: src/shortcuts/dzl-shortcuts-group.c:346
+msgid "Title Size Group"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcuts-group.c:358
+msgid "Height"
+msgstr "高度"
+
+#: src/shortcuts/dzl-shortcuts-section.c:338
+#: src/shortcuts/dzl-shortcuts-window.c:784
+msgid "Section Name"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcuts-section.c:352
+#: src/shortcuts/dzl-shortcuts-window.c:799
+msgid "View Name"
+msgstr "视图名称"
+
+#: src/shortcuts/dzl-shortcuts-section.c:377
+msgid "Maximum Height"
+msgstr "最大高度"
+
+#: src/shortcuts/dzl-shortcuts-section.c:384
+msgid "change-current-page"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcuts-section.c:437
+msgid "_Show All"
+msgstr "显示全部(_S)"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:135
+msgid "Two finger pinch"
+msgstr "两个手指捏合"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:139
+msgid "Two finger stretch"
+msgstr "两个手指伸展"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:143
+msgid "Rotate clockwise"
+msgstr "顺时针旋转"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:147
+msgid "Rotate counterclockwise"
+msgstr "逆时针方向旋转"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:151
+msgid "Two finger swipe left"
+msgstr "两根手指向左滑动"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:155
+msgid "Two finger swipe right"
+msgstr "两根手指向右滑动"
+
+#. *
+#. * DzlShortcutsWindow::close:
+#. *
+#. * The ::close signal is a
+#. * [keybinding signal][GtkBindingSignal]
+#. * which gets emitted when the user uses a keybinding to close
+#. * the window.
+#. *
+#. * The default binding for this signal is the Escape key.
+#.
+#: src/shortcuts/dzl-shortcuts-window.c:815
+msgid "close"
+msgstr "关闭"
+
+#. *
+#. * DzlShortcutsWindow::search:
+#. *
+#. * The ::search signal is a
+#. * [keybinding signal][GtkBindingSignal]
+#. * which gets emitted when the user uses a keybinding to start a search.
+#. *
+#. * The default binding for this signal is Control-F.
+#.
+#: src/shortcuts/dzl-shortcuts-window.c:832
+msgid "search"
+msgstr "搜索"
+
+#: src/shortcuts/dzl-shortcuts-window.c:926
+msgid "Shortcuts"
+msgstr "快捷键"
+
+#: src/shortcuts/dzl-shortcuts-window.c:931
+msgid "Search Results"
+msgstr "搜索结果"
+
+#: src/shortcuts/dzl-shortcuts-window.c:985
+msgid "Search Shortcuts"
+msgstr "搜索快捷键"
+
+#: src/shortcuts/dzl-shortcuts-window.c:1050
+msgid "No Results Found"
+msgstr "未找到结果"
+
+#: src/shortcuts/dzl-shortcuts-window.c:1057
+msgid "Try a different search"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcut-theme-editor.c:200
+msgid "Set Shortcut"
+msgstr "设置快捷键"
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:16
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:26
+msgid "Filter Shortcuts"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:53
+msgid "Action"
+msgstr ""
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:66
+msgid "Shortcut"
+msgstr ""
+
+#: src/util/dzl-date-time.c:66
+msgid "Just now"
+msgstr ""
+
+#: src/util/dzl-date-time.c:68
+msgid "An hour ago"
+msgstr ""
+
+#: src/util/dzl-date-time.c:70
+msgid "Yesterday"
+msgstr ""
+
+#: src/util/dzl-date-time.c:76
+msgid "About a year ago"
+msgstr ""
+
+#: src/util/dzl-date-time.c:80
+#, c-format
+msgid "About %u year ago"
+msgid_plural "About %u years ago"
+msgstr[0] ""
+
+#: src/util/dzl-file-manager.c:89
+msgid "File path is NULL"
+msgstr ""
+
+#: src/util/dzl-file-manager.c:98 src/util/dzl-file-manager.c:109
+msgid "Error converting UTF-8 filename to wide char"
+msgstr ""
+
+#: src/util/dzl-file-manager.c:117
+msgid "ILCreateFromPath() failed"
+msgstr ""
+
+#: src/util/dzl-file-manager.c:154
+#, c-format
+msgid "Cannot convert “%s” into a valid NSURL."
+msgstr ""
+
+#: src/widgets/dzl-counters-window.ui:14
+msgid "Category"
+msgstr "分类"
+
+#: src/widgets/dzl-counters-window.ui:26
+msgid "Name"
+msgstr "名称"
+
+#: src/widgets/dzl-counters-window.ui:38
+msgid "Value"
+msgstr "值"
+
+#: src/widgets/dzl-counters-window.ui:49
+msgid "Description"
+msgstr "描述"
+
+#: src/widgets/dzl-file-chooser-entry.c:105
+#: src/widgets/dzl-file-chooser-entry.c:169
+msgid "Open"
+msgstr "打开"
+
+#: src/widgets/dzl-file-chooser-entry.c:109
+msgid "Select"
+msgstr ""
+
+#: src/widgets/dzl-file-chooser-entry.c:113
+msgid "Create"
+msgstr ""
+
+#: src/widgets/dzl-file-chooser-entry.c:117
+msgid "Save"
+msgstr "保存"
+
+#: src/widgets/dzl-file-chooser-entry.c:473
+msgid "Browse…"
+msgstr "浏览…"
+
+#: src/widgets/dzl-search-bar.c:380
+msgid "Search"
+msgstr "搜索"
+
+#: src/widgets/dzl-stack-list.c:417 src/widgets/dzl-stack-list.c:418
+msgid "Model"
+msgstr ""
