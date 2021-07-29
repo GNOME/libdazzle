@@ -254,7 +254,6 @@ static void
 dzl_dock_widget_init (DzlDockWidget *self)
 {
   gtk_widget_set_has_window (GTK_WIDGET (self), FALSE);
-  gtk_widget_set_can_focus (GTK_WIDGET (self), TRUE);
 }
 
 GtkWidget *
