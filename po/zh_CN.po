@@ -1,15 +1,15 @@
 # Chinese (China) translation for libdazzle.
 # Copyright (C) 2021 libdazzle's COPYRIGHT HOLDER
 # This file is distributed under the same license as the libdazzle package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Silence Zhou <silence_zhou@126.com>, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: libdazzle master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libdazzle/issues\n"
-"POT-Creation-Date: 2021-06-28 05:13+0000\n"
-"PO-Revision-Date: 2021-06-30 11:19-0400\n"
-"Last-Translator: Silence Zhou <silence_zhou@126.com>\n"
+"POT-Creation-Date: 2021-06-30 15:20+0000\n"
+"PO-Revision-Date: 2021-08-28 17:12-0400\n"
+"Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
 "Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -196,7 +196,7 @@ msgstr "未找到结果"
 
 #: src/shortcuts/dzl-shortcuts-window.c:1057
 msgid "Try a different search"
-msgstr ""
+msgstr "尝试不同的搜索"
 
 #: src/shortcuts/dzl-shortcut-theme-editor.c:200
 msgid "Set Shortcut"
@@ -204,58 +204,58 @@ msgstr "设置快捷键"
 
 #: src/shortcuts/dzl-shortcut-theme-editor.ui:16
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "快捷键"
 
 #: src/shortcuts/dzl-shortcut-theme-editor.ui:26
 msgid "Filter Shortcuts"
-msgstr ""
+msgstr "过滤快捷键"
 
 #: src/shortcuts/dzl-shortcut-theme-editor.ui:53
 msgid "Action"
-msgstr ""
+msgstr "动作"
 
 #: src/shortcuts/dzl-shortcut-theme-editor.ui:66
 msgid "Shortcut"
-msgstr ""
+msgstr "快捷键"
 
 #: src/util/dzl-date-time.c:66
 msgid "Just now"
-msgstr ""
+msgstr "当前"
 
 #: src/util/dzl-date-time.c:68
 msgid "An hour ago"
-msgstr ""
+msgstr "一小时前"
 
 #: src/util/dzl-date-time.c:70
 msgid "Yesterday"
-msgstr ""
+msgstr "昨天"
 
 #: src/util/dzl-date-time.c:76
 msgid "About a year ago"
-msgstr ""
+msgstr "大约一年前"
 
 #: src/util/dzl-date-time.c:80
 #, c-format
 msgid "About %u year ago"
 msgid_plural "About %u years ago"
-msgstr[0] ""
+msgstr[0] "大约 %u 年前"
 
 #: src/util/dzl-file-manager.c:89
 msgid "File path is NULL"
-msgstr ""
+msgstr "文件路径为 NULL"
 
 #: src/util/dzl-file-manager.c:98 src/util/dzl-file-manager.c:109
 msgid "Error converting UTF-8 filename to wide char"
-msgstr ""
+msgstr "将 UTF-8 文件名转换为宽字符时出错"
 
 #: src/util/dzl-file-manager.c:117
 msgid "ILCreateFromPath() failed"
-msgstr ""
+msgstr "ILCreateFromPath() 失败"
 
 #: src/util/dzl-file-manager.c:154
 #, c-format
 msgid "Cannot convert “%s” into a valid NSURL."
-msgstr ""
+msgstr "无法将 “%s” 转换为有效的NSURL。"
 
 #: src/widgets/dzl-counters-window.ui:14
 msgid "Category"
@@ -280,11 +280,11 @@ msgstr "打开"
 
 #: src/widgets/dzl-file-chooser-entry.c:109
 msgid "Select"
-msgstr ""
+msgstr "选择"
 
 #: src/widgets/dzl-file-chooser-entry.c:113
 msgid "Create"
-msgstr ""
+msgstr "创建"
 
 #: src/widgets/dzl-file-chooser-entry.c:117
 msgid "Save"
@@ -300,4 +300,4 @@ msgstr "搜索"
 
 #: src/widgets/dzl-stack-list.c:417 src/widgets/dzl-stack-list.c:418
 msgid "Model"
-msgstr ""
+msgstr "模式"
