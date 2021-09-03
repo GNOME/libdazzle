@@ -1,4 +1,16 @@
 ==============
+Version 3.42.0
+==============
+
+Changes in this release:
+
+ • Build system fixes for macOS
+ • Win32 fixes
+ • Panel fixes
+ • Allow DzlTaskCache to use NULL copy/free funcs
+ • Additional translations
+
+==============
 Version 3.40.0
 ==============
 
