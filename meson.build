@@ -142,6 +142,9 @@ test_link_args = [
   '-Wl,-z,relro',
   '-Wl,-z,now',
 ]
+if get_option('buildtype') != 'plain'
+  test_link_args += '-fstack-protector-strong'
+endif
 if not get_option('buildtype').startswith('debug')
   # TODO: Maybe reuse 'b_ndebug' option
   release_args += [ '-DG_DISABLE_ASSERT', '-DG_DISABLE_CAST_CHECKS' ]
