@@ -29,7 +29,6 @@ struct _DzlCssProvider
 {
   GtkCssProvider  parent_instance;
   gchar          *base_path;
-  guint           queued_update;
 };
 
 G_DEFINE_TYPE (DzlCssProvider, dzl_css_provider, GTK_TYPE_CSS_PROVIDER)
@@ -151,31 +150,6 @@ dzl_css_provider_update (DzlCssProvider *self)
   load_resource (self, resource_path);
 }
 
-static gboolean
-dzl_css_provider_do_update (gpointer user_data)
-{
-  DzlCssProvider *self = user_data;
-
-  g_assert (DZL_IS_CSS_PROVIDER (self));
-
-  self->queued_update = 0;
-  dzl_css_provider_update (self);
-
-  return G_SOURCE_REMOVE;
-}
-
-static void
-dzl_css_provider_queue_update (DzlCssProvider *self)
-{
-  g_assert (DZL_IS_CSS_PROVIDER (self));
-
-  if (self->queued_update == 0)
-    self->queued_update = g_idle_add_full (G_PRIORITY_LOW,
-                                           dzl_css_provider_do_update,
-                                           g_object_ref (self),
-                                           g_object_unref);
-}
-
 static void
 dzl_css_provider__settings_notify_gtk_theme_name (DzlCssProvider *self,
                                                  GParamSpec    *pspec,
@@ -183,7 +157,7 @@ dzl_css_provider__settings_notify_gtk_theme_name (DzlCssProvider *self,
 {
   g_assert (DZL_IS_CSS_PROVIDER (self));
 
-  dzl_css_provider_queue_update (self);
+  dzl_css_provider_update (self);
 }
 
 static void
@@ -193,7 +167,7 @@ dzl_css_provider__settings_notify_gtk_application_prefer_dark_theme (DzlCssProvi
 {
   g_assert (DZL_IS_CSS_PROVIDER (self));
 
-  dzl_css_provider_queue_update (self);
+  dzl_css_provider_update (self);
 }
 
 static void
@@ -254,7 +228,6 @@ dzl_css_provider_finalize (GObject *object)
   DzlCssProvider *self = (DzlCssProvider *)object;
 
   g_clear_pointer (&self->base_path, g_free);
-  dzl_clear_source (&self->queued_update);
 
   G_OBJECT_CLASS (dzl_css_provider_parent_class)->finalize (object);
 }
