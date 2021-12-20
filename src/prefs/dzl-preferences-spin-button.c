@@ -395,7 +395,7 @@ dzl_preferences_spin_button_init (DzlPreferencesSpinButton *self)
                 "upper", 0.0,
                 "step-increment", 1.0,
                 "page-increment", 10.0,
-                "page-size", 10.0,
+                "page-size", 0.0,
                 NULL);
 
   g_signal_connect_object (self->spin_button,
