@@ -36,10 +36,10 @@ typedef struct
 
 typedef struct
 {
-  DzlTaskCache *self;
-  GCancellable *cancellable;
-  gpointer      key;
-  gulong        cancelled_id;
+  GCancellable   *cancellable;
+  gpointer        key;
+  GBoxedFreeFunc  key_destroy_func;
+  gulong          cancelled_id;
 } CancelledData;
 
 typedef struct
@@ -228,13 +228,11 @@ cancelled_data_free (gpointer data)
 {
   CancelledData *cancelled = data;
 
-  g_clear_pointer (&cancelled->key, cancelled->self->key_destroy_func);
+  g_clear_pointer (&cancelled->key, cancelled->key_destroy_func);
 
   g_cancellable_disconnect (cancelled->cancellable, cancelled->cancelled_id);
   cancelled->cancelled_id = 0;
   g_clear_object (&cancelled->cancellable);
-
-  cancelled->self = NULL;
 
   g_slice_free (CancelledData, cancelled);
 }
@@ -248,9 +246,9 @@ cancelled_data_new (DzlTaskCache  *self,
   CancelledData *ret;
 
   ret = g_slice_new0 (CancelledData);
-  ret->self = self;
   ret->cancellable = (cancellable != NULL) ? g_object_ref (cancellable) : NULL;
   ret->key = self->key_copy_func ((gpointer)key);
+  ret->key_destroy_func = self->key_destroy_func;
   ret->cancelled_id = cancelled_id;
 
   return ret;
@@ -454,7 +452,6 @@ dzl_task_cache_cancel_in_idle (gpointer user_data)
   g_assert (DZL_IS_TASK_CACHE (self));
   g_assert (G_IS_CANCELLABLE (cancellable));
   g_assert (data != NULL);
-  g_assert (data->self == self);
   g_assert (data->cancellable == cancellable);
 
   if ((queued = g_hash_table_lookup (self->queued, data->key)))
@@ -512,7 +509,6 @@ dzl_task_cache_cancelled_cb (GCancellable *cancellable,
 
   g_assert (DZL_IS_TASK_CACHE (self));
   g_assert (data != NULL);
-  g_assert (data->self == self);
   g_assert (data->cancellable == cancellable);
 
   source = g_idle_source_new ();
