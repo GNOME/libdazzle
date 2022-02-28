@@ -1,17 +1,17 @@
 # Dazzle
 
 The libdazzle library is a companion library to GObject and Gtk+.
-It provides various features that we wish were in the underlying library but cannot for various reasons.
-In most cases, they are wildly out of scope for those libraries.
-In other cases, our design isn't quite generic enough to work for everyone.
 
-While we don't want to blind our users, we do think of dazzle as something you haven't seen before.
-As we improve our implementations in libdazzle, we do think that bits of libdazzle can be migrated into upstream projects.
+** This project is basically end-of-life **
 
-Currently, the primary consumer of libdazzle is the Builder IDE.
-Most of this code was extracted from Builder so that it could be used by others.
+It was never really meant to be used outside of Builder and Sysprof projects as it was a convenient spot to share code.
 
-The libdazzle project is heavily opinionated, and tends to gravitate towards design that matches the GNOME 3 human interface guidelines.
+Ideally, GTK 4 has what you need.
+
+If you find yourself using things like search, action helpers, etc you should just copy that code into your project.
+If you need paneling, https://gitlab.gnome.org/chergert/libpanel has some of that, albeit has not made an official release.
+If you need shortcuts, GTK 4 has better solutions built in.
+If you need suggestion/searching, you can just us popovers in GTK 4.
 
 ## Language Support
 
