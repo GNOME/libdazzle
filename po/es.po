@@ -1,0 +1,305 @@
+# Spanish translation for libdazzle.
+# Copyright (C) 2022 libdazzle's COPYRIGHT HOLDER
+# This file is distributed under the same license as the libdazzle package.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2022.
+# Daniel Mustieles García <daniel.mustieles@gmail.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: libdazzle master\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/libdazzle/issues\n"
+"POT-Creation-Date: 2022-02-28 22:06+0000\n"
+"PO-Revision-Date: 2022-03-03 12:18+0100\n"
+"Last-Translator: Daniel Mustieles García <daniel.mustieles@gmail.com>\n"
+"Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Generator: Gtranslator 41.0\n"
+
+#: src/animation/dzl-animation.c:752
+#, c-format
+msgid "Cannot locate property %s in class %s"
+msgstr "No se pudo encontrar la propiedad %s en la clase %s."
+
+#: src/animation/dzl-animation.c:1099 src/animation/dzl-animation.c:1105
+#, c-format
+msgid "Failed to find property %s in %s"
+msgstr "Falló al buscar la propiedad %s en %s"
+
+#: src/animation/dzl-animation.c:1113
+#, c-format
+msgid "Failed to find property %s in %s or parent %s"
+msgstr "Falló al buscar la propiedad %s en %s o el padre %s"
+
+#: src/animation/dzl-animation.c:1123
+#, c-format
+msgid "Failed to retrieve va_list value: %s"
+msgstr "Falló al recuperar el valor va_list: %s"
+
+#: src/files/dzl-directory-model.c:377
+msgid "Directory"
+msgstr "Carpeta"
+
+#: src/files/dzl-directory-model.c:378
+msgid "The directory to list files from."
+msgstr "La carpeta de la que listar los archivos."
+
+#: src/prefs/dzl-preferences-font-button.ui:57
+msgid "_Select"
+msgstr "_Seleccionar"
+
+#: src/prefs/dzl-preferences-view.ui:15
+msgid "Search Preferences"
+msgstr "Preferencias de búsqueda"
+
+#: src/search/dzl-trie.c:782
+#, c-format
+msgid "Traversal order %u is not supported on DzlTrie."
+msgstr "El orden transversal %u no está soportado en DzlTrie."
+
+#: src/shortcuts/dzl-shortcut-accel-dialog.c:446
+#: src/widgets/dzl-file-chooser-entry.c:168
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/shortcuts/dzl-shortcut-accel-dialog.c:447
+msgid "Set"
+msgstr "Establecer"
+
+#. Translators: <b>%s</b> is used to show the provided text in bold
+#: src/shortcuts/dzl-shortcut-accel-dialog.c:504
+#, c-format
+msgid "Enter new shortcut to change <b>%s</b>."
+msgstr "Introduzca un atajo nuevo para cambiar <b>%s</b>."
+
+#: src/shortcuts/dzl-shortcut-accel-dialog.ui:43
+msgid "Press Escape to cancel or Backspace to disable."
+msgstr "Pulse Esc para cancelar o Retroceso para desactivar."
+
+#: src/shortcuts/dzl-shortcut-manager.c:219
+msgid "Default Shortcuts"
+msgstr "Atajos predeterminados"
+
+#: src/shortcuts/dzl-shortcuts-group.c:304
+#: src/shortcuts/dzl-shortcuts-section.c:364
+msgid "Title"
+msgstr "Título"
+
+#: src/shortcuts/dzl-shortcuts-group.c:318
+msgid "View"
+msgstr "Vista"
+
+#: src/shortcuts/dzl-shortcuts-group.c:331
+#: src/shortcuts/dzl-shortcuts-group.c:332
+msgid "Accelerator Size Group"
+msgstr "Grupo de tamaño del acelerador"
+
+#: src/shortcuts/dzl-shortcuts-group.c:345
+#: src/shortcuts/dzl-shortcuts-group.c:346
+msgid "Title Size Group"
+msgstr "Grupo de tamaño del título"
+
+#: src/shortcuts/dzl-shortcuts-group.c:358
+msgid "Height"
+msgstr "Altura"
+
+#: src/shortcuts/dzl-shortcuts-section.c:338
+#: src/shortcuts/dzl-shortcuts-window.c:784
+msgid "Section Name"
+msgstr "Nombre de la sección"
+
+#: src/shortcuts/dzl-shortcuts-section.c:352
+#: src/shortcuts/dzl-shortcuts-window.c:799
+msgid "View Name"
+msgstr "Nombre de la vista"
+
+#: src/shortcuts/dzl-shortcuts-section.c:377
+msgid "Maximum Height"
+msgstr "Altura máxima"
+
+#: src/shortcuts/dzl-shortcuts-section.c:384
+msgid "change-current-page"
+msgstr "cambiar-pagina-actual"
+
+#: src/shortcuts/dzl-shortcuts-section.c:437
+msgid "_Show All"
+msgstr "_Mostrar todo"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:135
+msgid "Two finger pinch"
+msgstr "Pellizcar con dos dedos"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:139
+msgid "Two finger stretch"
+msgstr "Estirar con dos dedos"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:143
+msgid "Rotate clockwise"
+msgstr "Rotar en sentido horario"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:147
+msgid "Rotate counterclockwise"
+msgstr "Rotar en sentido antihorario"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:151
+msgid "Two finger swipe left"
+msgstr "Deslizar a la izquierda con dos dedos"
+
+#: src/shortcuts/dzl-shortcuts-shortcut.c:155
+msgid "Two finger swipe right"
+msgstr "Deslizar a la derecha con dos dedos"
+
+#. *
+#. * DzlShortcutsWindow::close:
+#. *
+#. * The ::close signal is a
+#. * [keybinding signal][GtkBindingSignal]
+#. * which gets emitted when the user uses a keybinding to close
+#. * the window.
+#. *
+#. * The default binding for this signal is the Escape key.
+#.
+#: src/shortcuts/dzl-shortcuts-window.c:815
+msgid "close"
+msgstr "cerrar"
+
+#. *
+#. * DzlShortcutsWindow::search:
+#. *
+#. * The ::search signal is a
+#. * [keybinding signal][GtkBindingSignal]
+#. * which gets emitted when the user uses a keybinding to start a search.
+#. *
+#. * The default binding for this signal is Control-F.
+#.
+#: src/shortcuts/dzl-shortcuts-window.c:832
+msgid "search"
+msgstr "buscar"
+
+#: src/shortcuts/dzl-shortcuts-window.c:926
+msgid "Shortcuts"
+msgstr "Atajos"
+
+#: src/shortcuts/dzl-shortcuts-window.c:931
+msgid "Search Results"
+msgstr "Resultados de búsqueda"
+
+#: src/shortcuts/dzl-shortcuts-window.c:985
+msgid "Search Shortcuts"
+msgstr "Atajos de búsqueda"
+
+#: src/shortcuts/dzl-shortcuts-window.c:1050
+msgid "No Results Found"
+msgstr "No se encontraron resultados"
+
+#: src/shortcuts/dzl-shortcuts-window.c:1057
+msgid "Try a different search"
+msgstr "Pruebe a hacer una búsqueda diferente"
+
+#: src/shortcuts/dzl-shortcut-theme-editor.c:200
+msgid "Set Shortcut"
+msgstr "Establecer atajo"
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:16
+msgid "Keyboard Shortcuts"
+msgstr "Atajos del teclado"
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:26
+msgid "Filter Shortcuts"
+msgstr "Atajos de filtrado"
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:53
+msgid "Action"
+msgstr "Acción"
+
+#: src/shortcuts/dzl-shortcut-theme-editor.ui:66
+msgid "Shortcut"
+msgstr "Atajo"
+
+#: src/util/dzl-date-time.c:66
+msgid "Just now"
+msgstr "Ahora mismo"
+
+#: src/util/dzl-date-time.c:68
+msgid "An hour ago"
+msgstr "Hace una hora"
+
+#: src/util/dzl-date-time.c:70
+msgid "Yesterday"
+msgstr "Ayer"
+
+#: src/util/dzl-date-time.c:76
+msgid "About a year ago"
+msgstr "Hace un año"
+
+#: src/util/dzl-date-time.c:80
+#, c-format
+msgid "About %u year ago"
+msgid_plural "About %u years ago"
+msgstr[0] "Hace %u año"
+msgstr[1] "Hace %u años"
+
+#: src/util/dzl-file-manager.c:89
+msgid "File path is NULL"
+msgstr "La ruta es NULL"
+
+#: src/util/dzl-file-manager.c:98 src/util/dzl-file-manager.c:109
+msgid "Error converting UTF-8 filename to wide char"
+msgstr "Error al convertir el nombre de archivo UTF-8 a caracteres anchos"
+
+#: src/util/dzl-file-manager.c:117
+msgid "ILCreateFromPath() failed"
+msgstr "ILCreateFromPath() falló"
+
+#: src/util/dzl-file-manager.c:154
+#, c-format
+msgid "Cannot convert “%s” into a valid NSURL."
+msgstr "No se puede convertir «%s» en un NSURL válido."
+
+#: src/widgets/dzl-counters-window.ui:14
+msgid "Category"
+msgstr "Categoría"
+
+#: src/widgets/dzl-counters-window.ui:26
+msgid "Name"
+msgstr "Nombre"
+
+#: src/widgets/dzl-counters-window.ui:38
+msgid "Value"
+msgstr "Valor"
+
+#: src/widgets/dzl-counters-window.ui:49
+msgid "Description"
+msgstr "Descripción"
+
+#: src/widgets/dzl-file-chooser-entry.c:105
+#: src/widgets/dzl-file-chooser-entry.c:169
+msgid "Open"
+msgstr "Abrir"
+
+#: src/widgets/dzl-file-chooser-entry.c:109
+msgid "Select"
+msgstr "Seleccionar"
+
+#: src/widgets/dzl-file-chooser-entry.c:113
+msgid "Create"
+msgstr "Crear"
+
+#: src/widgets/dzl-file-chooser-entry.c:117
+msgid "Save"
+msgstr "Guardar"
+
+#: src/widgets/dzl-file-chooser-entry.c:473
+msgid "Browse…"
+msgstr "Examinar…"
+
+#: src/widgets/dzl-search-bar.c:380
+msgid "Search"
+msgstr "Buscar"
+
+#: src/widgets/dzl-stack-list.c:417 src/widgets/dzl-stack-list.c:418
+msgid "Model"
+msgstr "Modelo"
