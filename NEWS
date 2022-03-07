@@ -1,3 +1,23 @@
+===============
+Version 3.43.90
+===============
+
+This is a RC release for GNOME 42.
+
+ • Apply CSS changes immediately
+ • Build fixes for stack protector
+ • Improvements to DzlTaskCache
+ • GCC fixes for macOS
+ • Fix page-size for spinbutton adjustments
+
+Note that libdazzle is not expected to survive into GTK 4. Applications
+using features from libdazzle should either look to the replacements that
+can be found as part of GTK 4 itself or libadwaita.
+
+For those using the more esoteric features of libdazzle like fuzzy search,
+tries, and file system abstractions, you should copy those into your project
+instead.
+
 ==============
 Version 3.42.0
 ==============
