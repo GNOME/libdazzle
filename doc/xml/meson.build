@@ -1,6 +1,6 @@
 ent_conf = configuration_data()
 ent_conf.set('PACKAGE', 'Dazzle')
-ent_conf.set('PACKAGE_BUGREPORT', 'https://bugzilla.gnome.org/enter_bug.cgi?product=gnome-builder')
+ent_conf.set('PACKAGE_BUGREPORT', 'https://gitlab.gnome.org/GNOME/libdazzle/-/issues/')
 ent_conf.set('PACKAGE_NAME', 'Dazzle')
 ent_conf.set('PACKAGE_STRING', 'libdazzle')
 ent_conf.set('PACKAGE_TARNAME', 'libdazzle-' + meson.project_version())
