@@ -44,10 +44,10 @@ static const DemoData demo_data[] = {
   { "web-browser-symbolic", "https://news.ycombinator.com", "Hacker News", "news.ycombinator.com" },
   { "web-browser-symbolic", "https://reddit.com/r/gnome", "GNOME Desktop Environment", "reddit.com/r/gnome" },
   { "web-browser-symbolic", "https://reddit.com/r/linux", "Linux, GNU/Linux, free software", "reddit.com/r/linux" },
-  { "web-browser-symbolic", "https://wiki.gnome.org", "GNOME Wiki", "wiki.gnome.org" },
+  { "web-browser-symbolic", "https://handbook.gnome.org", "GNOME Handbook", "handbook.gnome.org" },
   { "web-browser-symbolic", "https://gnome.org", "GNOME", "gnome.org" },
   { "web-browser-symbolic", "https://planet.gnome.org", "Planet GNOME", "planet.gnome.org" },
-  { "web-browser-symbolic", "https://wiki.gnome.org/Apps/Builder", "GNOME Builder", "wiki.gnome.org/Apps/Builder" },
+  { "web-browser-symbolic", "https://apps.gnome.org/Builder/", "GNOME Builder", "apps.gnome.org/Builder/" },
 };
 
 static void

@@ -44,7 +44,7 @@ about_activate (GSimpleAction *action,
   dialog = g_object_new (GTK_TYPE_ABOUT_DIALOG,
                          "copyright", "Copyright 2017 Christian Hergert",
                          "logo-icon-name", "org.gnome.clocks",
-                         "website", "https://wiki.gnome.org/Apps/Builder",
+                         "website", "https://apps.gnome.org/Builder/",
                          "version", DZL_VERSION_S,
                          NULL);
 
