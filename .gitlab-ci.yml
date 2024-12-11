@@ -1,7 +1,7 @@
 include:
   - component: gitlab.gnome.org/alatiera/citemplates/build-meta@alatiera/bst-build
     inputs:
-      element: "core-deps/libdazzle.bst"
+      element: "sdk/libdazzle.bst"
   - component: gitlab.gnome.org/GNOME/citemplates/release-service@master
     # core module build is the current bst template
     inputs:
